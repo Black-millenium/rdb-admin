@@ -23,12 +23,10 @@
 package workbench.gui.macros;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum DragType
-{
-	reorderItems,
-	moveItems,
-	none
+public enum DragType {
+  reorderItems,
+  moveItems,
+  none
 }

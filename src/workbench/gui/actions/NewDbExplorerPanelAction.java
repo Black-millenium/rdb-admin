@@ -22,35 +22,30 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-
 import workbench.gui.MainWindow;
 
+import java.awt.event.ActionEvent;
+
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class NewDbExplorerPanelAction
-	extends WbAction
-{
-	private MainWindow mainWin;
+    extends WbAction {
+  private MainWindow mainWin;
 
-	public NewDbExplorerPanelAction(MainWindow aWindow)
-	{
-		this(aWindow, "MnuTxtNewExplorerPanel");
-		setEnabled(false);
-	}
-	
-	public NewDbExplorerPanelAction(MainWindow aWindow, String key)
-	{
-		super();
-		mainWin = aWindow;
-		this.initMenuDefinition(key);
-	}
+  public NewDbExplorerPanelAction(MainWindow aWindow) {
+    this(aWindow, "MnuTxtNewExplorerPanel");
+    setEnabled(false);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		mainWin.newDbExplorerPanel(true);
-	}
+  public NewDbExplorerPanelAction(MainWindow aWindow, String key) {
+    super();
+    mainWin = aWindow;
+    this.initMenuDefinition(key);
+  }
+
+  @Override
+  public void executeAction(ActionEvent e) {
+    mainWin.newDbExplorerPanel(true);
+  }
 }

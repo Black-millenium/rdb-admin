@@ -22,66 +22,59 @@
  */
 package workbench.db.importer.modifier;
 
+import workbench.db.ColumnIdentifier;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import workbench.db.ColumnIdentifier;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class RegexModifier
-	implements ImportValueModifier
-{
-	public Map<ColumnIdentifier, RegexDef> limits = new HashMap<ColumnIdentifier, RegexDef>();
+    implements ImportValueModifier {
+  public Map<ColumnIdentifier, RegexDef> limits = new HashMap<ColumnIdentifier, RegexDef>();
 
-	@Override
-	public int getSize()
-	{
-		return limits.size();
-	}
+  @Override
+  public int getSize() {
+    return limits.size();
+  }
 
-	/**
-	 * Define regex replacement for a column.
-	 * An existing mapping for that column will be overwritten.
-	 *
-	 * @param col the column for which to apply the substring
-	 * @param regex the regular expression to search for
-	 * @param replacement the replacement for the regex
-	 */
-	public void addDefinition(ColumnIdentifier col, String regex, String replacement)
-		throws PatternSyntaxException
-	{
-		RegexDef def = new RegexDef(regex, replacement);
-		this.limits.put(col.createCopy(), def);
-	}
+  /**
+   * Define regex replacement for a column.
+   * An existing mapping for that column will be overwritten.
+   *
+   * @param col         the column for which to apply the substring
+   * @param regex       the regular expression to search for
+   * @param replacement the replacement for the regex
+   */
+  public void addDefinition(ColumnIdentifier col, String regex, String replacement)
+      throws PatternSyntaxException {
+    RegexDef def = new RegexDef(regex, replacement);
+    this.limits.put(col.createCopy(), def);
+  }
 
-	@Override
-	public String modifyValue(ColumnIdentifier col, String value)
-	{
-		if (value == null) return null;
-		RegexDef def = this.limits.get(col);
-		if (def != null)
-		{
-			Matcher m = def.regex.matcher(value);
-			return m.replaceAll(def.replacement);
-		}
-		return value;
-	}
+  @Override
+  public String modifyValue(ColumnIdentifier col, String value) {
+    if (value == null) return null;
+    RegexDef def = this.limits.get(col);
+    if (def != null) {
+      Matcher m = def.regex.matcher(value);
+      return m.replaceAll(def.replacement);
+    }
+    return value;
+  }
 
-	private static class RegexDef
-	{
-		Pattern regex;
-		String replacement;
+  private static class RegexDef {
+    Pattern regex;
+    String replacement;
 
-		public RegexDef(String exp, String repl)
-			throws PatternSyntaxException
-		{
-			regex = Pattern.compile(exp);
-			replacement = repl;
-		}
-	}
+    public RegexDef(String exp, String repl)
+        throws PatternSyntaxException {
+      regex = Pattern.compile(exp);
+      replacement = repl;
+    }
+  }
 }

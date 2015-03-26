@@ -25,11 +25,9 @@ package workbench.interfaces;
 import java.util.EventListener;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public interface TextSelectionListener
-	extends EventListener
-{
-	void selectionChanged(int newStart, int newEnd);
+    extends EventListener {
+  void selectionChanged(int newStart, int newEnd);
 }

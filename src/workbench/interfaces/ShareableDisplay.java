@@ -22,15 +22,14 @@
  */
 package workbench.interfaces;
 
-import javax.swing.JTable;
+import javax.swing.*;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public interface ShareableDisplay
-	extends Reloadable
-{
-	void addTableListDisplayClient(JTable aClient);
-	void removeTableListDisplayClient(JTable aClient);
+    extends Reloadable {
+  void addTableListDisplayClient(JTable aClient);
+
+  void removeTableListDisplayClient(JTable aClient);
 }

@@ -22,11 +22,17 @@
  */
 package workbench.gui.sql;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Toolkit;
+import workbench.console.DataStorePrinter;
+import workbench.gui.components.WbButton;
+import workbench.resource.IconMgr;
+import workbench.resource.ResourceMgr;
+import workbench.storage.DataStore;
+import workbench.storage.RowData;
+import workbench.util.StringUtil;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -36,39 +42,18 @@ import java.awt.event.AdjustmentListener;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
-
-import workbench.console.DataStorePrinter;
-import workbench.resource.IconMgr;
-import workbench.resource.ResourceMgr;
-
-import workbench.gui.components.WbButton;
-
-import workbench.storage.DataStore;
-import workbench.storage.RowData;
-
-import workbench.util.StringUtil;
-
 /**
- *
  * @author Thomas Kellerer
  */
 public class FormNavigation
-	extends JPanel
-	implements ActionListener, AdjustmentListener
-{
-	private RecordFormPanel display;
-	private JTextField currentRow = new JTextField(4);
-	private JScrollBar scrollBar;
-	private JButton copyButton;
+    extends JPanel
+    implements ActionListener, AdjustmentListener {
+  private RecordFormPanel display;
+  private JTextField currentRow = new JTextField(4);
+  private JScrollBar scrollBar;
+  private JButton copyButton;
 
-  public FormNavigation(RecordFormPanel panel)
-  {
+  public FormNavigation(RecordFormPanel panel) {
     super(new BorderLayout());
     this.display = panel;
     int size = IconMgr.getInstance().getSizeForLabel();
@@ -107,22 +92,15 @@ public class FormNavigation
   }
 
   @Override
-  public void actionPerformed(ActionEvent e)
-  {
-    if (e.getSource() == this)
-    {
+  public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == this) {
       int newRow = StringUtil.getIntValue(currentRow.getText(), -1);
-      if (newRow > 0 && newRow <= display.getRowCount())
-      {
-        if (changeRow(newRow - 1))
-        {
-          try
-          {
+      if (newRow > 0 && newRow <= display.getRowCount()) {
+        if (changeRow(newRow - 1)) {
+          try {
             scrollBar.setValueIsAdjusting(true);
             scrollBar.setValue(display.getCurrentRow());
-          }
-          finally
-          {
+          } finally {
             scrollBar.setValueIsAdjusting(false);
           }
         }
@@ -130,14 +108,12 @@ public class FormNavigation
       updateStatus();
     }
 
-    if (e.getSource() == copyButton)
-    {
+    if (e.getSource() == copyButton) {
       copyToClipboard();
     }
   }
 
-  private void copyToClipboard()
-  {
+  private void copyToClipboard() {
     DataStore ds = display.getDataStore();
     DataStorePrinter printer = new DataStorePrinter(ds);
     StringWriter writer = new StringWriter();
@@ -150,43 +126,33 @@ public class FormNavigation
     clp.setContents(sel, sel);
   }
 
-	private boolean changeRow(int newRow)
-	{
-		if (display.validateInput())
-		{
-			display.showRecord(newRow);
-			return true;
-		}
-		return false;
-	}
+  private boolean changeRow(int newRow) {
+    if (display.validateInput()) {
+      display.showRecord(newRow);
+      return true;
+    }
+    return false;
+  }
 
-	private void updateStatus()
-	{
-		currentRow.setText(Integer.toString(display.getCurrentRow() + 1));
-	}
+  private void updateStatus() {
+    currentRow.setText(Integer.toString(display.getCurrentRow() + 1));
+  }
 
-	@Override
-	public void adjustmentValueChanged(AdjustmentEvent e)
-	{
-		int newRow = e.getValue();
-		int current = display.getCurrentRow();
-		if (changeRow(newRow))
-		{
-			updateStatus();
-		}
-		else
-		{
-			try
-			{
-				scrollBar.setValueIsAdjusting(true);
-				scrollBar.setValue(current);
-			}
-			finally
-			{
-				scrollBar.setValueIsAdjusting(false);
-			}
-		}
-	}
+  @Override
+  public void adjustmentValueChanged(AdjustmentEvent e) {
+    int newRow = e.getValue();
+    int current = display.getCurrentRow();
+    if (changeRow(newRow)) {
+      updateStatus();
+    } else {
+      try {
+        scrollBar.setValueIsAdjusting(true);
+        scrollBar.setValue(current);
+      } finally {
+        scrollBar.setValueIsAdjusting(false);
+      }
+    }
+  }
 
 
 }

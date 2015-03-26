@@ -20,42 +20,35 @@
 
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import workbench.resource.ResourceMgr;
-
 import workbench.gui.menu.RecentFileManager;
-
+import workbench.resource.ResourceMgr;
 import workbench.sql.macros.MacroFileSelector;
 import workbench.sql.macros.MacroManager;
-
 import workbench.util.WbFile;
 
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class LoadMacrosAction
-	extends WbAction
-{
-	private final int macroClientId;
+    extends WbAction {
+  private final int macroClientId;
 
-	public LoadMacrosAction(int clientId)
-	{
-		super();
-		this.macroClientId = clientId;
-		this.initMenuDefinition("MnuTxtLoadMacros");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_MACRO);
-		this.setIcon(null);
-	}
+  public LoadMacrosAction(int clientId) {
+    super();
+    this.macroClientId = clientId;
+    this.initMenuDefinition("MnuTxtLoadMacros");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_MACRO);
+    this.setIcon(null);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		MacroFileSelector selector = new MacroFileSelector();
-		WbFile f = selector.selectStorageForLoad(macroClientId);
-		if (f == null) return;
-		RecentFileManager.getInstance().macrosLoaded(f);
-		MacroManager.getInstance().loadMacros(macroClientId, f);
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    MacroFileSelector selector = new MacroFileSelector();
+    WbFile f = selector.selectStorageForLoad(macroClientId);
+    if (f == null) return;
+    RecentFileManager.getInstance().macrosLoaded(f);
+    MacroManager.getInstance().loadMacros(macroClientId, f);
+  }
 }

@@ -25,17 +25,16 @@ package workbench.interfaces;
 /**
  * @author Thomas Kellerer
  */
-public interface ResultReceiver
-{
-	public static enum ShowType
-	{
-		showNone,
-		appendText,
-		replaceText,
-		logText;
-	}
-	
-	void showResult(String sql, String comment, ShowType how);
-	String getTitle();
-	
+public interface ResultReceiver {
+  void showResult(String sql, String comment, ShowType how);
+
+  String getTitle();
+
+  public static enum ShowType {
+    showNone,
+    appendText,
+    replaceText,
+    logText;
+  }
+
 }

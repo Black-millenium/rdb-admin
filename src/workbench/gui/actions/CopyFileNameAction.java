@@ -22,62 +22,51 @@
  */
 package workbench.gui.actions;
 
-import java.io.File;
-
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.ActionEvent;
-
 import workbench.interfaces.TextFileContainer;
 import workbench.util.WbFile;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.io.File;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class CopyFileNameAction
-	extends WbAction
-{
-	private TextFileContainer editor;
-	private boolean copyPathName;
+    extends WbAction {
+  private TextFileContainer editor;
+  private boolean copyPathName;
 
-	public CopyFileNameAction(TextFileContainer textContainer, boolean copyFullPath)
-	{
-		this.editor = textContainer;
-		copyPathName = copyFullPath;
-		if (copyPathName)
-		{
-			this.initMenuDefinition("MnuTxtCpyFilePath");
-		}
-		else
-		{
-			this.initMenuDefinition("MnuTxtCpyFileName");
-		}
-		this.setEnabled(this.editor.getCurrentFile() != null);
-	}
+  public CopyFileNameAction(TextFileContainer textContainer, boolean copyFullPath) {
+    this.editor = textContainer;
+    copyPathName = copyFullPath;
+    if (copyPathName) {
+      this.initMenuDefinition("MnuTxtCpyFilePath");
+    } else {
+      this.initMenuDefinition("MnuTxtCpyFileName");
+    }
+    this.setEnabled(this.editor.getCurrentFile() != null);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		if (editor == null) return;
+  @Override
+  public void executeAction(ActionEvent e) {
+    if (editor == null) return;
 
-		File file = editor.getCurrentFile();
-		if (file == null) return;
+    File file = editor.getCurrentFile();
+    if (file == null) return;
 
-		WbFile wfile = new WbFile(file);
+    WbFile wfile = new WbFile(file);
 
-		String toCopy = null;
-		if (copyPathName)
-		{
-			toCopy = wfile.getFullPath();
-		}
-		else
-		{
-			toCopy = wfile.getName();
-		}
-		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-		clipboard.setContents(new StringSelection(toCopy),null);
-	}
+    String toCopy = null;
+    if (copyPathName) {
+      toCopy = wfile.getFullPath();
+    } else {
+      toCopy = wfile.getName();
+    }
+    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+    clipboard.setContents(new StringSelection(toCopy), null);
+  }
 
 }

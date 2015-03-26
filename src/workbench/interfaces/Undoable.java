@@ -23,11 +23,10 @@
 package workbench.interfaces;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface Undoable
-{
-	void undo();
-	void redo();
+public interface Undoable {
+  void undo();
+
+  void redo();
 }

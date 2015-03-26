@@ -27,21 +27,16 @@ import workbench.db.mssql.SqlServerUtil;
 import workbench.db.oracle.OracleFKHandler;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class FKHandlerFactory
-{
-	public static FKHandler createInstance(WbConnection conn)
-	{
-		if (conn.getMetadata().isOracle() && conn.getDbSettings().fixFKRetrieval())
-		{
-			return new OracleFKHandler(conn);
-		}
-		if (conn.getMetadata().isSqlServer() && SqlServerUtil.isSqlServer2005(conn))
-		{
-			return new SqlServerFKHandler(conn);
-		}
-		return new DefaultFKHandler(conn);
-	}
+public class FKHandlerFactory {
+  public static FKHandler createInstance(WbConnection conn) {
+    if (conn.getMetadata().isOracle() && conn.getDbSettings().fixFKRetrieval()) {
+      return new OracleFKHandler(conn);
+    }
+    if (conn.getMetadata().isSqlServer() && SqlServerUtil.isSqlServer2005(conn)) {
+      return new SqlServerFKHandler(conn);
+    }
+    return new DefaultFKHandler(conn);
+  }
 }

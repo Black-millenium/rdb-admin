@@ -23,23 +23,25 @@ import workbench.sql.DelimiterDefinition;
 import workbench.sql.lexer.SQLToken;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface DelimiterTester
-{
-	void setAlternateDelimiter(DelimiterDefinition delimiter);
-	void setDelimiter(DelimiterDefinition delimiter);
+public interface DelimiterTester {
+  void setAlternateDelimiter(DelimiterDefinition delimiter);
 
-	void currentToken(SQLToken token, boolean isStartOfStatement);
+  void setDelimiter(DelimiterDefinition delimiter);
 
-	DelimiterDefinition getCurrentDelimiter();
+  void currentToken(SQLToken token, boolean isStartOfStatement);
 
-	void statementFinished();
+  DelimiterDefinition getCurrentDelimiter();
 
-	boolean supportsMixedDelimiters();
-	boolean supportsSingleLineStatements();
-	boolean isSingleLineStatement(SQLToken token, boolean isStartOfLine);
-	void lineEnd();
+  void statementFinished();
+
+  boolean supportsMixedDelimiters();
+
+  boolean supportsSingleLineStatements();
+
+  boolean isSingleLineStatement(SQLToken token, boolean isStartOfLine);
+
+  void lineEnd();
 
 }

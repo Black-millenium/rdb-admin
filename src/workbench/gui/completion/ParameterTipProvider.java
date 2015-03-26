@@ -23,10 +23,8 @@
 package workbench.gui.completion;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ParameterTipProvider
-{
-	String getCurrentTooltip();
+public interface ParameterTipProvider {
+  String getCurrentTooltip();
 }

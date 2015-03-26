@@ -22,60 +22,53 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.util.List;
-
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
 import workbench.db.DbObject;
 import workbench.db.ObjectScripter;
-
 import workbench.gui.WbSwingUtilities;
 import workbench.gui.dbobjects.DbObjectList;
 import workbench.gui.dbobjects.ObjectScripterUI;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.event.ActionEvent;
+import java.util.List;
 
 /**
  * @author Thomas Kellerer
  */
 public class ScriptDbObjectAction
-	extends WbAction
-	implements ListSelectionListener
-{
-	private DbObjectList source;
-	private ListSelectionModel selection;
+    extends WbAction
+    implements ListSelectionListener {
+  private DbObjectList source;
+  private ListSelectionModel selection;
 
-	public ScriptDbObjectAction(DbObjectList client, ListSelectionModel list)
-	{
-		super();
-		this.initMenuDefinition("MnuTxtCreateScript");
-		this.source = client;
-		this.selection = list;
-		setEnabled(false);
-		setIcon("script");
-		list.addListSelectionListener(this);
-	}
+  public ScriptDbObjectAction(DbObjectList client, ListSelectionModel list) {
+    super();
+    this.initMenuDefinition("MnuTxtCreateScript");
+    this.source = client;
+    this.selection = list;
+    setEnabled(false);
+    setIcon("script");
+    list.addListSelectionListener(this);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		if (!WbSwingUtilities.isConnectionIdle(source.getComponent(), source.getConnection())) return;
+  @Override
+  public void executeAction(ActionEvent e) {
+    if (!WbSwingUtilities.isConnectionIdle(source.getComponent(), source.getConnection())) return;
 
-		List<? extends DbObject> objects = source.getSelectedObjects();
-		if (objects == null || objects.isEmpty()) return;
+    List<? extends DbObject> objects = source.getSelectedObjects();
+    if (objects == null || objects.isEmpty()) return;
 
-		ObjectScripter s = new ObjectScripter(objects, source.getConnection());
-		ObjectScripterUI scripterUI = new ObjectScripterUI(s);
-		scripterUI.setDbConnection(source.getConnection());
-		scripterUI.show(SwingUtilities.getWindowAncestor(source.getComponent()));
-	}
+    ObjectScripter s = new ObjectScripter(objects, source.getConnection());
+    ObjectScripterUI scripterUI = new ObjectScripterUI(s);
+    scripterUI.setDbConnection(source.getConnection());
+    scripterUI.show(SwingUtilities.getWindowAncestor(source.getComponent()));
+  }
 
-	@Override
-	public void valueChanged(ListSelectionEvent e)
-	{
-		setEnabled(this.selection.getMinSelectionIndex() >= 0);
-	}
+  @Override
+  public void valueChanged(ListSelectionEvent e) {
+    setEnabled(this.selection.getMinSelectionIndex() >= 0);
+  }
 
 }

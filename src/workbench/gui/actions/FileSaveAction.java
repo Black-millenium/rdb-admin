@@ -22,35 +22,32 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
 import workbench.gui.sql.EditorPanel;
-
 import workbench.resource.PlatformShortcuts;
 import workbench.resource.ResourceMgr;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
  * Save the current file in the SQL Editor.
- *	@author  Thomas Kellerer
+ *
+ * @author Thomas Kellerer
  */
-public class FileSaveAction extends WbAction
-{
-	private EditorPanel client;
+public class FileSaveAction extends WbAction {
+  private EditorPanel client;
 
-	public FileSaveAction(EditorPanel aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtFileSave", KeyStroke.getKeyStroke(KeyEvent.VK_S, PlatformShortcuts.getDefaultModifier()));
-		this.setMenuItemName(ResourceMgr.MNU_TXT_FILE);
-		this.setEnabled(this.client.hasFileLoaded());
-	}
+  public FileSaveAction(EditorPanel aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtFileSave", KeyStroke.getKeyStroke(KeyEvent.VK_S, PlatformShortcuts.getDefaultModifier()));
+    this.setMenuItemName(ResourceMgr.MNU_TXT_FILE);
+    this.setEnabled(this.client.hasFileLoaded());
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.saveCurrentFile();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.saveCurrentFile();
+  }
 }

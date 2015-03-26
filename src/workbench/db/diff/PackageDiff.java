@@ -24,72 +24,59 @@ package workbench.db.diff;
 
 import workbench.db.report.ReportPackage;
 import workbench.db.report.TagWriter;
-
 import workbench.util.StringUtil;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class PackageDiff
-{
-	public static final String TAG_CREATE_PKG = "create-package";
-	public static final String TAG_UPDATE_PKG = "update-package";
+public class PackageDiff {
+  public static final String TAG_CREATE_PKG = "create-package";
+  public static final String TAG_UPDATE_PKG = "update-package";
+  private final TagWriter writer = new TagWriter();
+  private ReportPackage referencePckg;
+  private ReportPackage targetPckg;
+  private StringBuilder indent = StringUtil.emptyBuilder();
 
-	private ReportPackage referencePckg;
-	private ReportPackage targetPckg;
+  public PackageDiff(ReportPackage reference, ReportPackage target) {
+    this.referencePckg = reference;
+    this.targetPckg = target;
+  }
 
-	private final TagWriter writer = new TagWriter();
-	private StringBuilder indent = StringUtil.emptyBuilder();
+  public StringBuilder getMigrateTargetXml() {
+    StringBuilder result = new StringBuilder(500);
 
-	public PackageDiff(ReportPackage reference, ReportPackage target)
-	{
-		this.referencePckg = reference;
-		this.targetPckg = target;
-	}
+    boolean isDifferent = true;
+    String tagToUse = TAG_CREATE_PKG;
 
-	public StringBuilder getMigrateTargetXml()
-	{
-		StringBuilder result = new StringBuilder(500);
+    CharSequence refSource = referencePckg.getSource();
+    CharSequence targetSource = targetPckg == null ? null : targetPckg.getSource();
 
-		boolean isDifferent = true;
-		String tagToUse = TAG_CREATE_PKG;
+    if (targetSource != null) {
+      isDifferent = !refSource.toString().trim().equals(targetSource.toString().trim());
+      tagToUse = TAG_UPDATE_PKG;
+    }
 
-		CharSequence refSource = referencePckg.getSource();
-		CharSequence targetSource = targetPckg == null ? null : targetPckg.getSource();
+    StringBuilder myIndent = new StringBuilder(indent);
+    myIndent.append("  ");
+    if (isDifferent) {
+      writer.appendOpenTag(result, this.indent, tagToUse);
+      result.append('\n');
+      referencePckg.setIndent(myIndent);
+      result.append(referencePckg.getXml(true));
+      writer.appendCloseTag(result, this.indent, tagToUse);
+    }
+    return result;
+  }
 
-		if (targetSource != null)
-		{
-			isDifferent = !refSource.toString().trim().equals(targetSource.toString().trim());
-			tagToUse = TAG_UPDATE_PKG;
-		}
-
-		StringBuilder myIndent = new StringBuilder(indent);
-		myIndent.append("  ");
-		if (isDifferent)
-		{
-			writer.appendOpenTag(result, this.indent, tagToUse);
-			result.append('\n');
-			referencePckg.setIndent(myIndent);
-			result.append(referencePckg.getXml(true));
-			writer.appendCloseTag(result, this.indent, tagToUse);
-		}
-		return result;
-	}
-
-	/**
-	 *	Set an indent for generating the XML
-	 */
-	public void setIndent(StringBuilder ind)
-	{
-		if (ind == null)
-		{
-			this.indent = StringUtil.emptyBuilder();
-		}
-		else
-		{
-			this.indent = ind;
-		}
-	}
+  /**
+   * Set an indent for generating the XML
+   */
+  public void setIndent(StringBuilder ind) {
+    if (ind == null) {
+      this.indent = StringUtil.emptyBuilder();
+    } else {
+      this.indent = ind;
+    }
+  }
 
 }

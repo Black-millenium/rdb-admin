@@ -23,10 +23,8 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface Validator
-{
-	boolean isValid(String name);
+public interface Validator {
+  boolean isValid(String name);
 }

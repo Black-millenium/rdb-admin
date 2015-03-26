@@ -23,12 +23,12 @@
 package workbench.interfaces;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface FileActions
-{
-	void saveItem() throws Exception;
-	void deleteItem() throws Exception;
-	void newItem(boolean copyCurrent) throws Exception;
+public interface FileActions {
+  void saveItem() throws Exception;
+
+  void deleteItem() throws Exception;
+
+  void newItem(boolean copyCurrent) throws Exception;
 }

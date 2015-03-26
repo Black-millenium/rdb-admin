@@ -22,19 +22,20 @@
  */
 package workbench.interfaces;
 
-import java.sql.SQLException;
-
 import workbench.sql.StatementRunnerResult;
 
+import java.sql.SQLException;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ResultSetConsumer
-{
-	void consumeResult(StatementRunnerResult toConsume);
-	void cancel()
-		throws SQLException;
-	void done();
-	boolean ignoreMaxRows();
+public interface ResultSetConsumer {
+  void consumeResult(StatementRunnerResult toConsume);
+
+  void cancel()
+      throws SQLException;
+
+  void done();
+
+  boolean ignoreMaxRows();
 }

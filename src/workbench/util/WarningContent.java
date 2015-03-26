@@ -23,18 +23,15 @@
 package workbench.util;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class WarningContent
-{
-	public final CharSequence allWarnings;
-	public final boolean isRealWarning;
+public class WarningContent {
+  public final CharSequence allWarnings;
+  public final boolean isRealWarning;
 
-	public WarningContent(CharSequence warnings, boolean isRealWarning)
-	{
-		this.allWarnings = warnings;
-		this.isRealWarning = isRealWarning;
-	}
+  public WarningContent(CharSequence warnings, boolean isRealWarning) {
+    this.allWarnings = warnings;
+    this.isRealWarning = isRealWarning;
+  }
 
 }

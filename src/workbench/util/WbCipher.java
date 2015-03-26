@@ -23,10 +23,10 @@
 package workbench.util;
 
 /**
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface WbCipher
-{
-	String decryptString(String aValue);
-	String encryptString(String aValue);
+public interface WbCipher {
+  String decryptString(String aValue);
+
+  String encryptString(String aValue);
 }

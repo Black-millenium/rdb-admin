@@ -19,136 +19,111 @@
  */
 package workbench.gui.components;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Window;
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.renderer.ColorUtils;
+import workbench.resource.ResourceMgr;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.border.EmptyBorder;
-
-import workbench.resource.ResourceMgr;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.renderer.ColorUtils;
-
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class FoldingPanel
-	extends JPanel
-	implements MouseListener
-{
-	private final JPanel content;
-	private ToggleIndicator toggle;
-	private boolean showing;
-	private String tooltipFolded;
-	private String tooltipExpanded;
+    extends JPanel
+    implements MouseListener {
+  private final JPanel content;
+  private ToggleIndicator toggle;
+  private boolean showing;
+  private String tooltipFolded;
+  private String tooltipExpanded;
 
-	public FoldingPanel(JPanel content)
-	{
-		super(new BorderLayout(0, 2));
-		this.content = content;
+  public FoldingPanel(JPanel content) {
+    super(new BorderLayout(0, 2));
+    this.content = content;
 
-		toggle = new ToggleIndicator();
-		Color bg = toggle.getBackground().darker();
-		bg = ColorUtils.blend(toggle.getBackground(), bg, 150);
-		toggle.setBackground(bg);
+    toggle = new ToggleIndicator();
+    Color bg = toggle.getBackground().darker();
+    bg = ColorUtils.blend(toggle.getBackground(), bg, 150);
+    toggle.setBackground(bg);
 
-		toggle.setBorder(new EmptyBorder(0,2,0,2));
-		Cursor cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
-		this.toggle.setCursor(cursor);
+    toggle.setBorder(new EmptyBorder(0, 2, 0, 2));
+    Cursor cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+    this.toggle.setCursor(cursor);
 
-		this.toggle.addMouseListener(this);
+    this.toggle.addMouseListener(this);
 
-		this.tooltipExpanded = ResourceMgr.getString("TxtExtOptHide");
-		this.tooltipFolded = ResourceMgr.getString("TxtExtOptShow");
-		this.toggle.setToolTipText(this.tooltipFolded);
+    this.tooltipExpanded = ResourceMgr.getString("TxtExtOptHide");
+    this.tooltipFolded = ResourceMgr.getString("TxtExtOptShow");
+    this.toggle.setToolTipText(this.tooltipFolded);
 
-		this.add(toggle, BorderLayout.PAGE_START);
-	}
+    this.add(toggle, BorderLayout.PAGE_START);
+  }
 
-	public void setTooltips(String collapsed, String expanded)
-	{
-		tooltipFolded = collapsed;
-		tooltipExpanded = expanded;
-	}
+  public void setTooltips(String collapsed, String expanded) {
+    tooltipFolded = collapsed;
+    tooltipExpanded = expanded;
+  }
 
-	public void showContent()
-	{
-		this.add(content, BorderLayout.CENTER);
-		showing = true;
-		toggle.setDirectionUp();
-		toggle.setToolTipText(tooltipExpanded);
-		updateDisplay(content.getPreferredSize().height);
-	}
+  public void showContent() {
+    this.add(content, BorderLayout.CENTER);
+    showing = true;
+    toggle.setDirectionUp();
+    toggle.setToolTipText(tooltipExpanded);
+    updateDisplay(content.getPreferredSize().height);
+  }
 
-	public void hideContent()
-	{
-		this.remove(content);
-		showing = false;
-		toggle.setDirectionDown();
-		toggle.setToolTipText(tooltipFolded);
-		updateDisplay(-1 * content.getPreferredSize().height);
-	}
+  public void hideContent() {
+    this.remove(content);
+    showing = false;
+    toggle.setDirectionDown();
+    toggle.setToolTipText(tooltipFolded);
+    updateDisplay(-1 * content.getPreferredSize().height);
+  }
 
-	private void updateDisplay(final int delta)
-	{
-		this.invalidate();
-		WbSwingUtilities.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				Window w = SwingUtilities.getWindowAncestor(FoldingPanel.this);
-				if (w != null)
-				{
-					w.validate();
-					Dimension d = w.getSize();
-					d.height += delta;
-					w.setSize(d);
-				}
-			}
-		});
-	}
+  private void updateDisplay(final int delta) {
+    this.invalidate();
+    WbSwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        Window w = SwingUtilities.getWindowAncestor(FoldingPanel.this);
+        if (w != null) {
+          w.validate();
+          Dimension d = w.getSize();
+          d.height += delta;
+          w.setSize(d);
+        }
+      }
+    });
+  }
 
-	@Override
-	public void mouseClicked(MouseEvent e)
-	{
-		if (showing)
-		{
-			hideContent();
-		}
-		else
-		{
-			showContent();
-		}
-	}
+  @Override
+  public void mouseClicked(MouseEvent e) {
+    if (showing) {
+      hideContent();
+    } else {
+      showContent();
+    }
+  }
 
-	@Override
-	public void mousePressed(MouseEvent e)
-	{
-	}
+  @Override
+  public void mousePressed(MouseEvent e) {
+  }
 
-	@Override
-	public void mouseReleased(MouseEvent e)
-	{
-	}
+  @Override
+  public void mouseReleased(MouseEvent e) {
+  }
 
-	@Override
-	public void mouseEntered(MouseEvent e)
-	{
-	}
+  @Override
+  public void mouseEntered(MouseEvent e) {
+  }
 
-	@Override
-	public void mouseExited(MouseEvent e)
-	{
-	}
+  @Override
+  public void mouseExited(MouseEvent e) {
+  }
 
 }

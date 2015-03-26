@@ -23,68 +23,56 @@
 package workbench.gui.renderer;
 
 
-
-import javax.swing.JLabel;
 import workbench.util.NumberStringCache;
 import workbench.util.SqlUtil;
+
+import javax.swing.*;
 
 /**
  * Displays the integer values from java.sql.Types as readable names.
  *
- * @see workbench.util.SqlUtil#getTypeName(int)
- *
  * @author Thomas Kellerer
+ * @see workbench.util.SqlUtil#getTypeName(int)
  */
 public class SqlTypeRenderer
-	extends ToolTipRenderer
-{
-	private boolean showNumericValue;
+    extends ToolTipRenderer {
+  private boolean showNumericValue;
 
-	public SqlTypeRenderer()
-	{
-		this(false);
-	}
+  public SqlTypeRenderer() {
+    this(false);
+  }
 
-	public SqlTypeRenderer(boolean showValue)
-	{
-		super();
-		this.setHorizontalAlignment(JLabel.LEFT);
-		showNumericValue = showValue;
-	}
+  public SqlTypeRenderer(boolean showValue) {
+    super();
+    this.setHorizontalAlignment(JLabel.LEFT);
+    showNumericValue = showValue;
+  }
 
-	@Override
-	public void prepareDisplay(Object value)
-	{
-		if (value != null)
-		{
-			int type = -1;
-			try
-			{
-				type = ((Integer)value).intValue();
-				displayValue = SqlUtil.getTypeName(type);
-				StringBuilder tip = new StringBuilder(displayValue.length() + 8);
-				tip.append(displayValue);
-				tip.append(" (");
-				tip.append(NumberStringCache.getNumberString(type));
-				tip.append(')');
-				String toolTip = tip.toString();
-				setTooltip(toolTip);
-				if (showNumericValue)
-				{
-					displayValue = toolTip;
-				}
-			}
-			catch (Exception e)
-			{
-				displayValue = value.toString();
-				setTooltip(displayValue);
-			}
-		}
-		else
-		{
-			displayValue = "";
-			setTooltip(null);
-		}
-	}
+  @Override
+  public void prepareDisplay(Object value) {
+    if (value != null) {
+      int type = -1;
+      try {
+        type = ((Integer) value).intValue();
+        displayValue = SqlUtil.getTypeName(type);
+        StringBuilder tip = new StringBuilder(displayValue.length() + 8);
+        tip.append(displayValue);
+        tip.append(" (");
+        tip.append(NumberStringCache.getNumberString(type));
+        tip.append(')');
+        String toolTip = tip.toString();
+        setTooltip(toolTip);
+        if (showNumericValue) {
+          displayValue = toolTip;
+        }
+      } catch (Exception e) {
+        displayValue = value.toString();
+        setTooltip(displayValue);
+      }
+    } else {
+      displayValue = "";
+      setTooltip(null);
+    }
+  }
 
 }

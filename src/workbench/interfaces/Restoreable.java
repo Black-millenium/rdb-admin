@@ -23,11 +23,10 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface Restoreable
-{
-	void restoreSettings();
-	void saveSettings();
+public interface Restoreable {
+  void restoreSettings();
+
+  void saveSettings();
 }

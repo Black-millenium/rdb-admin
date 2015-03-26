@@ -20,7 +20,10 @@
 
 package workbench.gui;
 
-import java.awt.Component;
+import workbench.gui.sql.SqlPanel;
+import workbench.log.LogMgr;
+
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -31,100 +34,75 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import workbench.log.LogMgr;
-
-import workbench.gui.sql.SqlPanel;
-
 
 /**
- *
  * @author Thomas Kellerer
  */
 class DropHandler
-	implements DropTargetListener
-{
-	private final MainWindow client;
-	private final DropTarget target;
+    implements DropTargetListener {
+  private final MainWindow client;
+  private final DropTarget target;
 
-	DropHandler(MainWindow client, Component dropTarget)
-	{
-		this.client = client;
-		target = new DropTarget(dropTarget, DnDConstants.ACTION_COPY, this);
-	}
+  DropHandler(MainWindow client, Component dropTarget) {
+    this.client = client;
+    target = new DropTarget(dropTarget, DnDConstants.ACTION_COPY, this);
+  }
 
-	public void dispose()
-	{
-		if (target != null)
-		{
-			target.removeDropTargetListener(this);
-		}
-	}
+  public void dispose() {
+    if (target != null) {
+      target.removeDropTargetListener(this);
+    }
+  }
 
-	@Override
-	public void dragEnter(java.awt.dnd.DropTargetDragEvent dropTargetDragEvent)
-	{
-		dropTargetDragEvent.acceptDrag(DnDConstants.ACTION_COPY);
-	}
+  @Override
+  public void dragEnter(java.awt.dnd.DropTargetDragEvent dropTargetDragEvent) {
+    dropTargetDragEvent.acceptDrag(DnDConstants.ACTION_COPY);
+  }
 
-	@Override
-	public void dragExit(java.awt.dnd.DropTargetEvent dropTargetEvent)
-	{
-	}
+  @Override
+  public void dragExit(java.awt.dnd.DropTargetEvent dropTargetEvent) {
+  }
 
-	@Override
-	public void dragOver(java.awt.dnd.DropTargetDragEvent dropTargetDragEvent)
-	{
-	}
+  @Override
+  public void dragOver(java.awt.dnd.DropTargetDragEvent dropTargetDragEvent) {
+  }
 
-	@Override
-	public void drop(java.awt.dnd.DropTargetDropEvent dropTargetDropEvent)
-	{
-		try
-		{
-			Transferable tr = dropTargetDropEvent.getTransferable();
-			if (tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
-			{
-				dropTargetDropEvent.acceptDrop(DnDConstants.ACTION_COPY);
-				List fileList = (List)tr.getTransferData(DataFlavor.javaFileListFlavor);
-				if (fileList != null)
-				{
-					openFiles(fileList);
-				}
-			}
-			else
-			{
-				dropTargetDropEvent.rejectDrop();
-			}
-		}
-		catch (IOException | UnsupportedFlavorException io)
-		{
-			LogMgr.logError("MainWindow.drop()", "Error processing drop event", io);
-			dropTargetDropEvent.rejectDrop();
-		}
-	}
+  @Override
+  public void drop(java.awt.dnd.DropTargetDropEvent dropTargetDropEvent) {
+    try {
+      Transferable tr = dropTargetDropEvent.getTransferable();
+      if (tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+        dropTargetDropEvent.acceptDrop(DnDConstants.ACTION_COPY);
+        List fileList = (List) tr.getTransferData(DataFlavor.javaFileListFlavor);
+        if (fileList != null) {
+          openFiles(fileList);
+        }
+      } else {
+        dropTargetDropEvent.rejectDrop();
+      }
+    } catch (IOException | UnsupportedFlavorException io) {
+      LogMgr.logError("MainWindow.drop()", "Error processing drop event", io);
+      dropTargetDropEvent.rejectDrop();
+    }
+  }
 
-	@Override
-	public void dropActionChanged(java.awt.dnd.DropTargetDragEvent dropTargetDragEvent)
-	{
-	}
+  @Override
+  public void dropActionChanged(java.awt.dnd.DropTargetDragEvent dropTargetDragEvent) {
+  }
 
-	private void openFiles(final List fileList)
-	{
-		WbSwingUtilities.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				int count = fileList.size();
-				for (int i=0; i < count; i++)
-				{
-					File file = (File)fileList.get(i);
-					boolean doSelect = (i == count - 1);
-					SqlPanel newTab = (SqlPanel)client.addTab(doSelect, doSelect, true, true);
-					newTab.readFile(file.getAbsolutePath(), null);
-				}
-			}
-		});
-	}
+  private void openFiles(final List fileList) {
+    WbSwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        int count = fileList.size();
+        for (int i = 0; i < count; i++) {
+          File file = (File) fileList.get(i);
+          boolean doSelect = (i == count - 1);
+          SqlPanel newTab = (SqlPanel) client.addTab(doSelect, doSelect, true, true);
+          newTab.readFile(file.getAbsolutePath(), null);
+        }
+      }
+    });
+  }
 
 }

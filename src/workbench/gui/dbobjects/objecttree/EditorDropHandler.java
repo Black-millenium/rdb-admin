@@ -23,24 +23,19 @@ import workbench.db.ColumnIdentifier;
 import workbench.db.ConnectionMgr;
 import workbench.db.DbObject;
 import workbench.db.WbConnection;
-
 import workbench.gui.sql.EditorPanel;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class EditorDropHandler
-{
+public class EditorDropHandler {
   private EditorPanel editor;
 
-  public EditorDropHandler(EditorPanel editor)
-  {
+  public EditorDropHandler(EditorPanel editor) {
     this.editor = editor;
   }
 
-  public void handleDrop(ObjectTreeTransferable selection)
-  {
+  public void handleDrop(ObjectTreeTransferable selection) {
     if (selection == null) return;
     ObjectTreeNode[] nodes = selection.getSelectedNodes();
     if (nodes == null || nodes.length == 0) return;
@@ -49,8 +44,7 @@ public class EditorDropHandler
     WbConnection conn = ConnectionMgr.getInstance().findConnection(id);
     StringBuilder text = new StringBuilder(nodes.length * 20);
     boolean first = true;
-    for (ObjectTreeNode node : nodes)
-    {
+    for (ObjectTreeNode node : nodes) {
       if (first) first = false;
       else text.append(", ");
       text.append(getDisplayString(conn, node));
@@ -58,14 +52,11 @@ public class EditorDropHandler
     editor.setSelectedText(text.toString());
   }
 
-  private String getDisplayString(WbConnection conn, ObjectTreeNode node)
-  {
+  private String getDisplayString(WbConnection conn, ObjectTreeNode node) {
     if (node == null) return "";
     DbObject dbo = node.getDbObject();
-    if (dbo == null)
-    {
-      if (TreeLoader.TYPE_COLUMN_LIST.equals(node.getType()))
-      {
+    if (dbo == null) {
+      if (TreeLoader.TYPE_COLUMN_LIST.equals(node.getType())) {
         return getColumnList(node);
       }
       return node.getName();
@@ -73,19 +64,15 @@ public class EditorDropHandler
     return dbo.getObjectExpression(conn);
   }
 
-  private String getColumnList(ObjectTreeNode columns)
-  {
+  private String getColumnList(ObjectTreeNode columns) {
     int count = columns.getChildCount();
     StringBuilder result = new StringBuilder(count * 10);
     int colCount = 0;
-    for (int i=0; i < count; i++)
-    {
-      ObjectTreeNode col = (ObjectTreeNode)columns.getChildAt(i);
-      if (col != null && col.getDbObject() != null)
-      {
+    for (int i = 0; i < count; i++) {
+      ObjectTreeNode col = (ObjectTreeNode) columns.getChildAt(i);
+      if (col != null && col.getDbObject() != null) {
         DbObject dbo = col.getDbObject();
-        if (dbo instanceof ColumnIdentifier)
-        {
+        if (dbo instanceof ColumnIdentifier) {
           if (colCount > 0) result.append(", ");
           result.append(dbo.getObjectName());
           colCount++;

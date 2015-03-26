@@ -27,19 +27,16 @@ import workbench.resource.ResourceMgr;
 /**
  * @author Thomas Kellerer
  */
-public class LowMemoryException 
-	extends java.lang.RuntimeException
-{
+public class LowMemoryException
+    extends java.lang.RuntimeException {
 
-	public LowMemoryException()
-	{
-		super();
-	}
+  public LowMemoryException() {
+    super();
+  }
 
-	@Override
-	public String getMessage()
-	{
-		return ResourceMgr.getString("MsgLowMemoryError");
-	}
+  @Override
+  public String getMessage() {
+    return ResourceMgr.getString("MsgLowMemoryError");
+  }
 
 }

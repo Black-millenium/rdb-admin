@@ -20,29 +20,24 @@
 
 package workbench.console;
 
-import java.util.List;
-
+import jline.FileNameCompletor;
 import workbench.sql.wbcommands.console.WbRun;
 
-import jline.FileNameCompletor;
+import java.util.List;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class WbFilenameCompletor
-	extends FileNameCompletor
-{
+    extends FileNameCompletor {
 
-	@Override
-	public int complete(String buf, int cursor, List candidates)
-	{
-		int chars = WbRun.VERB.length();
-		if (buf.trim().toLowerCase().startsWith(WbRun.VERB.toLowerCase()))
-		{
-			return super.complete(buf.substring(chars), cursor - chars, candidates);
-		}
-		return -1;
-	}
+  @Override
+  public int complete(String buf, int cursor, List candidates) {
+    int chars = WbRun.VERB.length();
+    if (buf.trim().toLowerCase().startsWith(WbRun.VERB.toLowerCase())) {
+      return super.complete(buf.substring(chars), cursor - chars, candidates);
+    }
+    return -1;
+  }
 
 }

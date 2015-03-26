@@ -22,38 +22,33 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.sql.macros.MacroFileSelector;
 import workbench.sql.macros.MacroManager;
-
 import workbench.util.WbFile;
 
+import java.awt.event.ActionEvent;
+
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class LoadMacroFileAction extends WbAction
-{
-	private WbFile macroFile;
-	private final int macroClientId;
+public class LoadMacroFileAction extends WbAction {
+  private final int macroClientId;
+  private WbFile macroFile;
 
-	public LoadMacroFileAction(int clientId, WbFile file)
-	{
-		super();
-		macroFile = file;
-		macroClientId = clientId;
-		this.setMenuText(macroFile.getFileName());
-		this.setTooltip(macroFile.getFullPath());
-		this.setIcon(null);
-	}
+  public LoadMacroFileAction(int clientId, WbFile file) {
+    super();
+    macroFile = file;
+    macroClientId = clientId;
+    this.setMenuText(macroFile.getFileName());
+    this.setTooltip(macroFile.getFullPath());
+    this.setIcon(null);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		MacroFileSelector selector = new MacroFileSelector();
-		if (selector.canLoadMacros(macroClientId))
-		{
-			MacroManager.getInstance().loadMacros(macroClientId, macroFile);
-		}
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    MacroFileSelector selector = new MacroFileSelector();
+    if (selector.canLoadMacros(macroClientId)) {
+      MacroManager.getInstance().loadMacros(macroClientId, macroFile);
+    }
+  }
 }

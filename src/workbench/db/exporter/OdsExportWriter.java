@@ -25,34 +25,29 @@ package workbench.db.exporter;
 /**
  * An export writer to create an OpenDocument spreadsheet format.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  * @see OdsRowDataConverter
  */
 public class OdsExportWriter
-	extends ExportWriter
-{
-	public OdsExportWriter(DataExporter exp)
-	{
-		super(exp);
-	}
+    extends ExportWriter {
+  public OdsExportWriter(DataExporter exp) {
+    super(exp);
+  }
 
-	@Override
-	public void configureConverter()
-	{
-		super.configureConverter();
-		converter.setNullString(exporter.getNullString());
-	}
+  @Override
+  public void configureConverter() {
+    super.configureConverter();
+    converter.setNullString(exporter.getNullString());
+  }
 
-	@Override
-	public RowDataConverter createConverter()
-	{
-		return new OdsRowDataConverter();
-	}
+  @Override
+  public RowDataConverter createConverter() {
+    return new OdsRowDataConverter();
+  }
 
-	@Override
-	public boolean managesOutput()
-	{
-		return true;
-	}
+  @Override
+  public boolean managesOutput() {
+    return true;
+  }
 
 }

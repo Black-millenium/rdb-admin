@@ -22,63 +22,50 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.List;
-
-import javax.swing.KeyStroke;
-
+import workbench.gui.MainWindow;
 import workbench.interfaces.ToolWindow;
 import workbench.resource.DbExplorerSettings;
 import workbench.resource.PlatformShortcuts;
 
-import workbench.gui.MainWindow;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.util.List;
 
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class ShowDbExplorerAction
-	extends WbAction
-{
-	private MainWindow mainWin;
-	public ShowDbExplorerAction(MainWindow aWindow)
-	{
-		super();
-		mainWin = aWindow;
-		this.initMenuDefinition("MnuTxtShowDbExplorer",KeyStroke.getKeyStroke(KeyEvent.VK_D, PlatformShortcuts.getDefaultModifier()));
-		this.setIcon("database");
-		setEnabled(false);
-	}
+    extends WbAction {
+  private MainWindow mainWin;
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		boolean useTab = DbExplorerSettings.getShowDbExplorerInMainWindow();
-		if (useTab)
-		{
-			int index = mainWin.findFirstExplorerTab();
-			if (index > -1)
-			{
-				mainWin.selectTab(index);
-			}
-			else
-			{
-				mainWin.newDbExplorerPanel(true);
-			}
-		}
-		else
-		{
-			List<ToolWindow> windows = mainWin.getExplorerWindows();
-			if (windows.size() > 0)
-			{
-				ToolWindow w = windows.get(0);
-				w.activate();
-			}
-			else
-			{
-				mainWin.newDbExplorerWindow();
-			}
-		}
-	}
+  public ShowDbExplorerAction(MainWindow aWindow) {
+    super();
+    mainWin = aWindow;
+    this.initMenuDefinition("MnuTxtShowDbExplorer", KeyStroke.getKeyStroke(KeyEvent.VK_D, PlatformShortcuts.getDefaultModifier()));
+    this.setIcon("database");
+    setEnabled(false);
+  }
+
+  @Override
+  public void executeAction(ActionEvent e) {
+    boolean useTab = DbExplorerSettings.getShowDbExplorerInMainWindow();
+    if (useTab) {
+      int index = mainWin.findFirstExplorerTab();
+      if (index > -1) {
+        mainWin.selectTab(index);
+      } else {
+        mainWin.newDbExplorerPanel(true);
+      }
+    } else {
+      List<ToolWindow> windows = mainWin.getExplorerWindows();
+      if (windows.size() > 0) {
+        ToolWindow w = windows.get(0);
+        w.activate();
+      } else {
+        mainWin.newDbExplorerWindow();
+      }
+    }
+  }
 
 }

@@ -23,11 +23,10 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface EncodingSelector
-{
-	void setEncoding(String enc);
-	String getEncoding();
+public interface EncodingSelector {
+  String getEncoding();
+
+  void setEncoding(String enc);
 }

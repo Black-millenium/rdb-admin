@@ -22,87 +22,68 @@
  */
 package workbench.sql.commands;
 
-import java.sql.SQLException;
-
 import workbench.log.LogMgr;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
+
+import java.sql.SQLException;
 
 /**
  * Handles COMMIT and ROLLBACK
  *
  * @author Thomas Kellerer
  */
-public class SingleVerbCommand extends SqlCommand
-{
-	public static final String COMMIT_VERB = "COMMIT";
-	public static final String ROLLBACK_VERB = "ROLLBACK";
+public class SingleVerbCommand extends SqlCommand {
+  public static final String COMMIT_VERB = "COMMIT";
+  public static final String ROLLBACK_VERB = "ROLLBACK";
+  private String verb;
 
-	public static SqlCommand getCommit()
-	{
-		return new SingleVerbCommand(COMMIT_VERB);
-	}
+  private SingleVerbCommand(String sqlVerb) {
+    super();
+    this.verb = sqlVerb;
+    this.isUpdatingCommand = COMMIT_VERB.equalsIgnoreCase(this.verb);
+  }
 
-	public static SqlCommand getRollback()
-	{
-		return new SingleVerbCommand(ROLLBACK_VERB);
-	}
+  public static SqlCommand getCommit() {
+    return new SingleVerbCommand(COMMIT_VERB);
+  }
 
-	private String verb;
+  public static SqlCommand getRollback() {
+    return new SingleVerbCommand(ROLLBACK_VERB);
+  }
 
-	private SingleVerbCommand(String sqlVerb)
-	{
-		super();
-		this.verb = sqlVerb;
-		this.isUpdatingCommand = COMMIT_VERB.equalsIgnoreCase(this.verb);
-	}
+  @Override
+  public StatementRunnerResult execute(String aSql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult(aSql);
+    try {
+      if (currentConnection.useJdbcCommit()) {
+        if (COMMIT_VERB.equals(this.verb)) {
+          currentConnection.getSqlConnection().commit();
+        } else if (ROLLBACK_VERB.equals(this.verb)) {
+          currentConnection.getSqlConnection().rollback();
+        }
+      } else {
+        this.currentStatement = currentConnection.createStatement();
+        this.currentStatement.execute(verb);
+      }
 
-	@Override
-	public StatementRunnerResult execute(String aSql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult(aSql);
-		try
-		{
-			if (currentConnection.useJdbcCommit())
-			{
-				if (COMMIT_VERB.equals(this.verb))
-				{
-					currentConnection.getSqlConnection().commit();
-				}
-				else if (ROLLBACK_VERB.equals(this.verb))
-				{
-					currentConnection.getSqlConnection().rollback();
-				}
-			}
-			else
-			{
-				this.currentStatement = currentConnection.createStatement();
-				this.currentStatement.execute(verb);
-			}
+      appendSuccessMessage(result);
+      result.setSuccess();
+      processMoreResults(aSql, result, false);
+    } catch (Exception e) {
+      addErrorInfo(result, aSql, e);
+      LogMgr.logUserSqlError("SingleVerbCommand.execute()", aSql, e);
+    } finally {
+      done();
+    }
 
-			appendSuccessMessage(result);
-			result.setSuccess();
-			processMoreResults(aSql, result, false);
-		}
-		catch (Exception e)
-		{
-			addErrorInfo(result, aSql, e);
-			LogMgr.logUserSqlError("SingleVerbCommand.execute()", aSql, e);
-		}
-		finally
-		{
-			done();
-		}
+    return result;
+  }
 
-		return result;
-	}
-
-	@Override
-	public String getVerb()
-	{
-		return verb;
-	}
+  @Override
+  public String getVerb() {
+    return verb;
+  }
 
 }

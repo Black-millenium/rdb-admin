@@ -22,43 +22,37 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
 import workbench.interfaces.ClipboardSupport;
 import workbench.resource.PlatformShortcuts;
 import workbench.resource.ResourceMgr;
-
 import workbench.util.MacOSHelper;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
- *	Action to copy the contents of an entry field into the clipboard
+ * Action to copy the contents of an entry field into the clipboard
  *
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class CopyAction
-	extends WbAction
-{
-	private ClipboardSupport client;
+    extends WbAction {
+  private ClipboardSupport client;
 
-	public CopyAction(ClipboardSupport aClient)
-	{
-		super();
-		this.client = aClient;
-		initMenuDefinition("MnuTxtCopy", PlatformShortcuts.getDefaultCopyShortcut());
-		if (!MacOSHelper.isMacOS())
-		{
-			setAlternateAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, KeyEvent.CTRL_MASK));
-		}
-		this.setIcon("copy");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-	}
+  public CopyAction(ClipboardSupport aClient) {
+    super();
+    this.client = aClient;
+    initMenuDefinition("MnuTxtCopy", PlatformShortcuts.getDefaultCopyShortcut());
+    if (!MacOSHelper.isMacOS()) {
+      setAlternateAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, KeyEvent.CTRL_MASK));
+    }
+    this.setIcon("copy");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.copy();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.copy();
+  }
 }

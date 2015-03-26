@@ -22,59 +22,51 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
+import workbench.gui.components.WbTable;
+import workbench.resource.ResourceMgr;
 
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-
-import workbench.resource.ResourceMgr;
-
-import workbench.gui.components.WbTable;
+import java.awt.event.ActionEvent;
 
 /**
- *	Reset the filter defined on a WbTable
- *	@author  Thomas Kellerer
+ * Reset the filter defined on a WbTable
+ *
+ * @author Thomas Kellerer
  */
 public class ResetFilterAction
-	extends WbAction
-	implements TableModelListener
-{
-	private WbTable client;
+    extends WbAction
+    implements TableModelListener {
+  private WbTable client;
 
-	public ResetFilterAction(WbTable aClient)
-	{
-		super();
-		this.initMenuDefinition("MnuTxtResetFilter");
-		this.setClient(aClient);
-		this.setIcon("resetfilter");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
-		this.setCreateToolbarSeparator(false);
-		this.setEnabled(false);
-	}
+  public ResetFilterAction(WbTable aClient) {
+    super();
+    this.initMenuDefinition("MnuTxtResetFilter");
+    this.setClient(aClient);
+    this.setIcon("resetfilter");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
+    this.setCreateToolbarSeparator(false);
+    this.setEnabled(false);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.resetFilter();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.resetFilter();
+  }
 
-	@Override
-	public void tableChanged(TableModelEvent tableModelEvent)
-	{
-		this.setEnabled(this.client.isFiltered());
-	}
+  @Override
+  public void tableChanged(TableModelEvent tableModelEvent) {
+    this.setEnabled(this.client.isFiltered());
+  }
 
-	public void setClient(WbTable c)
-	{
-		if (this.client != null)
-		{
-			this.client.removeTableModelListener(this);
-		}
-		this.client = c;
-		if (this.client != null)
-		{
-			this.client.addTableModelListener(this);
-		}
-	}
+  public void setClient(WbTable c) {
+    if (this.client != null) {
+      this.client.removeTableModelListener(this);
+    }
+    this.client = c;
+    if (this.client != null) {
+      this.client.addTableModelListener(this);
+    }
+  }
 
 }

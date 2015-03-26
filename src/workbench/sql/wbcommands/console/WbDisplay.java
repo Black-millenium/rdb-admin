@@ -22,88 +22,74 @@
  */
 package workbench.sql.wbcommands.console;
 
-import java.sql.SQLException;
-
 import workbench.RunMode;
 import workbench.console.ConsoleSettings;
 import workbench.console.RowDisplay;
 import workbench.resource.ResourceMgr;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
-
 import workbench.util.StringUtil;
+
+import java.sql.SQLException;
 
 /**
  * A SQL command to control the output format in console mode.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class WbDisplay
-	extends SqlCommand
-{
-	public static final String VERB = "WbDisplay";
+    extends SqlCommand {
+  public static final String VERB = "WbDisplay";
 
-	@Override
-	public StatementRunnerResult execute(String aSql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
-		String param = getCommandLine(aSql);
+  @Override
+  public StatementRunnerResult execute(String aSql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult();
+    String param = getCommandLine(aSql);
 
-		if ("tab".equalsIgnoreCase(param) || "row".equalsIgnoreCase(param))
-		{
-			result.setSuccess();
-			ConsoleSettings.getInstance().setRowDisplay(RowDisplay.SingleLine);
-			result.addMessageByKey("MsgDispChangeRow");
-		}
-		else if ("record".equalsIgnoreCase(param) || "form".equalsIgnoreCase(param) || "single".equalsIgnoreCase(param))
-		{
-			ConsoleSettings.getInstance().setRowDisplay(RowDisplay.Form);
-			result.addMessageByKey("MsgDispChangeForm");
-		}
-		else
-		{
-			RowDisplay current = ConsoleSettings.getInstance().getRowDisplay();
-			String currentDisp = "tab";
+    if ("tab".equalsIgnoreCase(param) || "row".equalsIgnoreCase(param)) {
+      result.setSuccess();
+      ConsoleSettings.getInstance().setRowDisplay(RowDisplay.SingleLine);
+      result.addMessageByKey("MsgDispChangeRow");
+    } else if ("record".equalsIgnoreCase(param) || "form".equalsIgnoreCase(param) || "single".equalsIgnoreCase(param)) {
+      ConsoleSettings.getInstance().setRowDisplay(RowDisplay.Form);
+      result.addMessageByKey("MsgDispChangeForm");
+    } else {
+      RowDisplay current = ConsoleSettings.getInstance().getRowDisplay();
+      String currentDisp = "tab";
 
-			if (current == RowDisplay.Form)
-			{
-				currentDisp = "record";
-			}
+      if (current == RowDisplay.Form) {
+        currentDisp = "record";
+      }
 
-			if (StringUtil.isBlank(param)) result.setSuccess();
-			else result.setFailure();
+      if (StringUtil.isBlank(param)) result.setSuccess();
+      else result.setFailure();
 
-			String msg = ResourceMgr.getFormattedString("ErrDispWrongArgument", currentDisp);
-			result.addMessage(msg);
-		}
+      String msg = ResourceMgr.getFormattedString("ErrDispWrongArgument", currentDisp);
+      result.addMessage(msg);
+    }
 
-		return result;
-	}
+    return result;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	public boolean isModeSupported(RunMode mode)
-	{
-		return mode != RunMode.GUI;
-	}
+  @Override
+  public boolean isModeSupported(RunMode mode) {
+    return mode != RunMode.GUI;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 
 }

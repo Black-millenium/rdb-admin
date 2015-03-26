@@ -6,23 +6,24 @@
  */
 package jline;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.List;
 
 /**
- *  <p>
- *  A {@link CompletionHandler} that deals with multiple distinct completions
- *  by cycling through each one every time tab is pressed. This
- *  mimics the behavior of the
- *  <a href="http://packages.qa.debian.org/e/editline.html">editline</a>
- *  library.
- *  </p>
- *  <p><strong>This class is currently a stub; it does nothing</strong></p>
- *  @author  <a href="mailto:mwp1@cornell.edu">Marc Prud'hommeaux</a>
+ * <p>
+ * A {@link CompletionHandler} that deals with multiple distinct completions
+ * by cycling through each one every time tab is pressed. This
+ * mimics the behavior of the
+ * <a href="http://packages.qa.debian.org/e/editline.html">editline</a>
+ * library.
+ * </p>
+ * <p><strong>This class is currently a stub; it does nothing</strong></p>
+ *
+ * @author <a href="mailto:mwp1@cornell.edu">Marc Prud'hommeaux</a>
  */
 public class CandidateCycleCompletionHandler implements CompletionHandler {
-    public boolean complete(final ConsoleReader reader, final List candidates,
-                            final int position) throws IOException {
-        throw new IllegalStateException("CandidateCycleCompletionHandler unimplemented");
-    }
+  public boolean complete(final ConsoleReader reader, final List candidates,
+                          final int position) throws IOException {
+    throw new IllegalStateException("CandidateCycleCompletionHandler unimplemented");
+  }
 }

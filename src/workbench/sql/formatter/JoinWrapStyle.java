@@ -25,26 +25,22 @@ package workbench.sql.formatter;
 import workbench.resource.ResourceMgr;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum JoinWrapStyle
-{
-	none("TxtJoinWrapNone"),
-	always("TxtJoinWrapAlways"),
-	onlyMultiple("TxtJoinWrapMult");
-	
-	private String label;
+public enum JoinWrapStyle {
+  none("TxtJoinWrapNone"),
+  always("TxtJoinWrapAlways"),
+  onlyMultiple("TxtJoinWrapMult");
 
-	private JoinWrapStyle(String resourceKey)
-	{
-		this.label = ResourceMgr.getString(resourceKey);
-	}
+  private String label;
 
-	@Override
-	public String toString()
-	{
-		return label;
-	}
+  private JoinWrapStyle(String resourceKey) {
+    this.label = ResourceMgr.getString(resourceKey);
+  }
+
+  @Override
+  public String toString() {
+    return label;
+  }
 
 }

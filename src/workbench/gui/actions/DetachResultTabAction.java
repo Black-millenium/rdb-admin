@@ -22,62 +22,54 @@
  */
 package workbench.gui.actions;
 
-import java.awt.EventQueue;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-
-import javax.swing.SwingUtilities;
-
 import workbench.gui.sql.DetachedResultWindow;
 import workbench.gui.sql.DwPanel;
 import workbench.gui.sql.SqlPanel;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+
 /**
  * An action to detach the the currently selected result tab of a SqlPanel and open it in a separate window
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class DetachResultTabAction
-	extends WbAction
-{
-	private SqlPanel panel;
+    extends WbAction {
+  private SqlPanel panel;
 
-	public DetachResultTabAction(SqlPanel sqlPanel)
-	{
-		super();
-		panel = sqlPanel;
-		this.initMenuDefinition("MnuTxtDetachResult");
-		this.setIcon(null);
-		this.setEnabled(panel.getCurrentResult() != null);
-	}
+  public DetachResultTabAction(SqlPanel sqlPanel) {
+    super();
+    panel = sqlPanel;
+    this.initMenuDefinition("MnuTxtDetachResult");
+    this.setIcon(null);
+    this.setEnabled(panel.getCurrentResult() != null);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		final DwPanel result = panel.getCurrentResult();
-		if (result == null) return;
+  @Override
+  public void executeAction(ActionEvent e) {
+    final DwPanel result = panel.getCurrentResult();
+    if (result == null) return;
 
-		if (result.getTable() == null) return;
-		if (result.getDataStore() == null) return;
+    if (result.getTable() == null) return;
+    if (result.getDataStore() == null) return;
 
     final int timer = panel.getRefreshMgr().getRefreshPeriod(result);
-		panel.removeCurrentResult();
-		final Window parent = SwingUtilities.getWindowAncestor(panel);
+    panel.removeCurrentResult();
+    final Window parent = SwingUtilities.getWindowAncestor(panel);
 
-		EventQueue.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				DetachedResultWindow window = new DetachedResultWindow(result, parent, panel);
-        if (timer > 0)
-        {
+    EventQueue.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        DetachedResultWindow window = new DetachedResultWindow(result, parent, panel);
+        if (timer > 0) {
           window.refreshAutomatically(timer);
         }
-				window.showWindow();
-			}
-		});
+        window.showWindow();
+      }
+    });
 
-	}
+  }
 
 }

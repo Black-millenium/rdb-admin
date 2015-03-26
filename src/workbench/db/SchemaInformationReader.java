@@ -23,14 +23,16 @@
 package workbench.db;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface SchemaInformationReader
-{
-	String getCurrentSchema();
-	String getCachedSchema();
-	void dispose();
-	void clearCache();
-	boolean isSupported();
+public interface SchemaInformationReader {
+  String getCurrentSchema();
+
+  String getCachedSchema();
+
+  void dispose();
+
+  void clearCache();
+
+  boolean isSupported();
 }

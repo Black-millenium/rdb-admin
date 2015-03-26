@@ -22,41 +22,36 @@
  */
 package workbench.gui.actions;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * Action to toggle the detection of prepared statements during SQL execution
  *
+ * @author Thomas Kellerer
  * @see workbench.resource.Settings#setCheckPreparedStatements(boolean)
- *
- * @author  Thomas Kellerer
  */
 public class ConsolidateLogAction
-	extends CheckBoxAction
-	implements PropertyChangeListener
-{
-	public ConsolidateLogAction()
-	{
-		super("LblConsolidateLog", Settings.PROPERTY_CONSOLIDATE_LOG_MESSAGES);
-		this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
-		Settings.getInstance().addPropertyChangeListener(this, Settings.PROPERTY_CONSOLIDATE_LOG_MESSAGES);
-	}
+    extends CheckBoxAction
+    implements PropertyChangeListener {
+  public ConsolidateLogAction() {
+    super("LblConsolidateLog", Settings.PROPERTY_CONSOLIDATE_LOG_MESSAGES);
+    this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
+    Settings.getInstance().addPropertyChangeListener(this, Settings.PROPERTY_CONSOLIDATE_LOG_MESSAGES);
+  }
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt)
-	{
-		setSwitchedOn(Settings.getInstance().getConsolidateLogMsg());
-	}
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+    setSwitchedOn(Settings.getInstance().getConsolidateLogMsg());
+  }
 
-	@Override
-	public void dispose()
-	{
-		super.dispose();
-		Settings.getInstance().removePropertyChangeListener(this);
-	}
+  @Override
+  public void dispose() {
+    super.dispose();
+    Settings.getInstance().removePropertyChangeListener(this);
+  }
 
 }

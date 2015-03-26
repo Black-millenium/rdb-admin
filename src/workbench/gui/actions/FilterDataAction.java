@@ -22,60 +22,52 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
+import workbench.gui.components.WbTable;
+import workbench.gui.filter.DefineFilterExpressionPanel;
+import workbench.resource.ResourceMgr;
 
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-
-import workbench.resource.ResourceMgr;
-
-import workbench.gui.components.WbTable;
-import workbench.gui.filter.DefineFilterExpressionPanel;
+import java.awt.event.ActionEvent;
 
 /**
- *	Filter data from a WbTable
- *	@author  Thomas Kellerer
+ * Filter data from a WbTable
+ *
+ * @author Thomas Kellerer
  */
 public class FilterDataAction
-		extends WbAction
-		implements TableModelListener
-{
-	private WbTable client;
+    extends WbAction
+    implements TableModelListener {
+  private WbTable client;
 
-	public FilterDataAction(WbTable aClient)
-	{
-		super();
-		this.setClient(aClient);
-		this.initMenuDefinition("MnuTxtFilter");
-		this.setIcon("filter");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
-		this.setCreateToolbarSeparator(false);
-		this.setEnabled(false);
-	}
+  public FilterDataAction(WbTable aClient) {
+    super();
+    this.setClient(aClient);
+    this.initMenuDefinition("MnuTxtFilter");
+    this.setIcon("filter");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
+    this.setCreateToolbarSeparator(false);
+    this.setEnabled(false);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		DefineFilterExpressionPanel.showDialog(this.client);
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    DefineFilterExpressionPanel.showDialog(this.client);
+  }
 
-	@Override
-	public void tableChanged(TableModelEvent tableModelEvent)
-	{
-		this.setEnabled(this.client.getLastFilter() != null || this.client.getRowCount() > 0);
-	}
+  @Override
+  public void tableChanged(TableModelEvent tableModelEvent) {
+    this.setEnabled(this.client.getLastFilter() != null || this.client.getRowCount() > 0);
+  }
 
-	public final void setClient(WbTable c)
-	{
-		if (this.client != null)
-		{
-			this.client.removeTableModelListener(this);
-		}
-		this.client = c;
-		if (this.client != null)
-		{
-			this.client.addTableModelListener(this);
-		}
-	}
+  public final void setClient(WbTable c) {
+    if (this.client != null) {
+      this.client.removeTableModelListener(this);
+    }
+    this.client = c;
+    if (this.client != null) {
+      this.client.addTableModelListener(this);
+    }
+  }
 
 }

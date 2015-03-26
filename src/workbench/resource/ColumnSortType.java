@@ -25,24 +25,21 @@ package workbench.resource;
 /**
  * An Enum to indicate the setting how a pasted column list should be sorted
  *
- * @see workbench.gui.completion.CompletionPopup
- *
  * @author Thomas Kellerer
+ * @see workbench.gui.completion.CompletionPopup
  */
-public enum ColumnSortType
-{
-	name("LblSortPastColName"),
-	position("LblSortPastColPos");
+public enum ColumnSortType {
+  name("LblSortPastColName"),
+  position("LblSortPastColPos");
 
-	private String label;
-	private ColumnSortType(String key)
-	{
-		this.label = ResourceMgr.getString(key);
-	}
+  private String label;
 
-	@Override
-	public String toString()
-	{
-		return label;
-	}
+  private ColumnSortType(String key) {
+    this.label = ResourceMgr.getString(key);
+  }
+
+  @Override
+  public String toString() {
+    return label;
+  }
 }

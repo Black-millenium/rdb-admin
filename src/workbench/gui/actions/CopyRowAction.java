@@ -22,39 +22,36 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.interfaces.DbData;
 import workbench.resource.ResourceMgr;
 
+import java.awt.event.ActionEvent;
+
 /**
  * Action to create a copy of the currently selected row in a table.
+ *
+ * @author Thomas Kellerer
  * @see workbench.interfaces.DbData
- * @author  Thomas Kellerer
  */
-public class CopyRowAction extends WbAction
-{
-	private DbData client;
+public class CopyRowAction extends WbAction {
+  private DbData client;
 
-	public CopyRowAction(DbData aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtCopyRow");
-		this.setIcon("copy_row");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
-		this.setEnabled(false);
-	}
+  public CopyRowAction(DbData aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtCopyRow");
+    this.setIcon("copy_row");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
+    this.setEnabled(false);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.duplicateRow();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.duplicateRow();
+  }
 
-	public void setClient(DbData db)
-	{
-		this.client = db;
-	}
+  public void setClient(DbData db) {
+    this.client = db;
+  }
 
 }

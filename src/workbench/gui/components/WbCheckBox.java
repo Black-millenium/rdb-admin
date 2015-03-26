@@ -22,41 +22,34 @@
  */
 package workbench.gui.components;
 
-import javax.swing.JCheckBox;
+import javax.swing.*;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class WbCheckBox
-	extends JCheckBox
-{
+    extends JCheckBox {
 
-	public WbCheckBox()
-	{
-		super();
-	}
+  public WbCheckBox() {
+    super();
+  }
 
-	public WbCheckBox(String text)
-	{
-		super(text);
-	}
+  public WbCheckBox(String text) {
+    super(text);
+  }
 
-	@Override
-	public void setText(String newText)
-	{
-		int pos = newText.indexOf('&');
-		if (pos > -1)
-		{
-			char mnemonic = newText.charAt(pos + 1);
-			newText = newText.substring(0, pos) + newText.substring(pos + 1);
-			this.setMnemonic((int)mnemonic);
-		}
-		super.setText(newText);
-		if (pos > -1 )
-		{
-			this.setDisplayedMnemonicIndex(pos);
-		}
-	}
+  @Override
+  public void setText(String newText) {
+    int pos = newText.indexOf('&');
+    if (pos > -1) {
+      char mnemonic = newText.charAt(pos + 1);
+      newText = newText.substring(0, pos) + newText.substring(pos + 1);
+      this.setMnemonic((int) mnemonic);
+    }
+    super.setText(newText);
+    if (pos > -1) {
+      this.setDisplayedMnemonicIndex(pos);
+    }
+  }
 
 }

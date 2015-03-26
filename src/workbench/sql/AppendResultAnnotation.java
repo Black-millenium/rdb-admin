@@ -26,13 +26,11 @@ package workbench.sql;
  * @author Thomas Kellerer
  */
 public class AppendResultAnnotation
-	extends WbAnnotation
-{
-	public static final String ANNOTATION = "WbAppendResult";
+    extends WbAnnotation {
+  public static final String ANNOTATION = "WbAppendResult";
 
-	public AppendResultAnnotation()
-	{
-		super(ANNOTATION);
-	}
+  public AppendResultAnnotation() {
+    super(ANNOTATION);
+  }
 
 }

@@ -22,44 +22,37 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.text.JTextComponent;
 import workbench.gui.renderer.WrapEnabledEditor;
 
+import javax.swing.text.JTextComponent;
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class MultilineWrapAction
-	extends CheckBoxAction
-{
-	private WrapEnabledEditor client;
+    extends CheckBoxAction {
+  private WrapEnabledEditor client;
 
-	public MultilineWrapAction(WrapEnabledEditor wrappable, JTextComponent editor, String property)
-	{
-		super("LblWordWrap", property);
-		client = wrappable;
-		if (editor != null)
-		{
-			addToInputMap(editor);
-		}
-	}
+  public MultilineWrapAction(WrapEnabledEditor wrappable, JTextComponent editor, String property) {
+    super("LblWordWrap", property);
+    client = wrappable;
+    if (editor != null) {
+      addToInputMap(editor);
+    }
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		super.executeAction(e);
-		if (client != null)
-		{
-			client.setWordwrap(this.isSwitchedOn());
-		}
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    super.executeAction(e);
+    if (client != null) {
+      client.setWordwrap(this.isSwitchedOn());
+    }
+  }
 
-	@Override
-	public boolean allowDuplicate()
-	{
-		return true;
-	}
+  @Override
+  public boolean allowDuplicate() {
+    return true;
+  }
 
 }

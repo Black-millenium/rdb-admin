@@ -22,74 +22,58 @@
  */
 package workbench.gui.dialogs;
 
+import workbench.util.QuoteEscapeType;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JCheckBox;
-
-import workbench.util.QuoteEscapeType;
-
 /**
- *
  * @author Thomas Kellerer
  */
 public class QuoteSettingVerifier
-	implements ActionListener
-{
-	private QuoteEscapeSelector escapeBox;
-	private JCheckBox quoteAlwaysBox;
+    implements ActionListener {
+  private QuoteEscapeSelector escapeBox;
+  private JCheckBox quoteAlwaysBox;
 
-	public QuoteSettingVerifier(QuoteEscapeSelector escape, JCheckBox quoteAlways)
-	{
-		escapeBox = escape;
-		escapeBox.addActionListener(this);
-		quoteAlwaysBox = quoteAlways;
-		quoteAlwaysBox.addActionListener(this);
-	}
+  public QuoteSettingVerifier(QuoteEscapeSelector escape, JCheckBox quoteAlways) {
+    escapeBox = escape;
+    escapeBox.addActionListener(this);
+    quoteAlwaysBox = quoteAlways;
+    quoteAlwaysBox.addActionListener(this);
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		if (e.getSource() == quoteAlwaysBox)
-		{
-			checkQuote();
-		}
-		else
-		{
-			checkEscape();
-		}
-	}
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == quoteAlwaysBox) {
+      checkQuote();
+    } else {
+      checkEscape();
+    }
+  }
 
-	/**
-	 * Verify the status after the quoteAlways dropdown has been changed.
-	 *
-	 */
-	private void checkQuote()
-	{
-		QuoteEscapeType escape = escapeBox.getEscapeType();
-		boolean always = quoteAlwaysBox.isSelected();
+  /**
+   * Verify the status after the quoteAlways dropdown has been changed.
+   */
+  private void checkQuote() {
+    QuoteEscapeType escape = escapeBox.getEscapeType();
+    boolean always = quoteAlwaysBox.isSelected();
 
-		if (always && escape == QuoteEscapeType.duplicate)
-		{
-			escapeBox.setEscapeType(QuoteEscapeType.escape);
-		}
-	}
+    if (always && escape == QuoteEscapeType.duplicate) {
+      escapeBox.setEscapeType(QuoteEscapeType.escape);
+    }
+  }
 
-	/**
-	 * Verify the status after the escapeType dropdown has been changed.
-	 *
-	 */
-	private void checkEscape()
-	{
-		QuoteEscapeType escape = escapeBox.getEscapeType();
-		if (escape == QuoteEscapeType.duplicate)
-		{
-			quoteAlwaysBox.setEnabled(false);
-			quoteAlwaysBox.setSelected(false);
-		}
-		else
-		{
-			quoteAlwaysBox.setEnabled(true);
-		}
-	}
+  /**
+   * Verify the status after the escapeType dropdown has been changed.
+   */
+  private void checkEscape() {
+    QuoteEscapeType escape = escapeBox.getEscapeType();
+    if (escape == QuoteEscapeType.duplicate) {
+      quoteAlwaysBox.setEnabled(false);
+      quoteAlwaysBox.setSelected(false);
+    } else {
+      quoteAlwaysBox.setEnabled(true);
+    }
+  }
 }

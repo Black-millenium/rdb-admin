@@ -25,16 +25,13 @@ package workbench.db.importer;
 import org.xml.sax.SAXException;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class ParsingEndedException
-	extends SAXException
-{
-	
-	public ParsingEndedException()
-	{
-		super("Parsing ended");
-	}
-	
+    extends SAXException {
+
+  public ParsingEndedException() {
+    super("Parsing ended");
+  }
+
 }

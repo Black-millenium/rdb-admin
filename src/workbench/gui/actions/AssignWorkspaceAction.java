@@ -22,37 +22,34 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.gui.MainWindow;
 import workbench.resource.ResourceMgr;
 
+import java.awt.event.ActionEvent;
+
 /**
  * Action to assign the currently loaded workspace to the current connection profile
+ *
+ * @author Thomas Kellerer
  * @see workbench.gui.MainWindow#assignWorkspace()
  * @see workbench.db.ConnectionProfile
  * @see workbench.util.WbWorkspace
- * 
- * @author  Thomas Kellerer
  */
-public class AssignWorkspaceAction 
-	extends WbAction
-{
-	private MainWindow client;
+public class AssignWorkspaceAction
+    extends WbAction {
+  private MainWindow client;
 
-	public AssignWorkspaceAction(MainWindow aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtAssignWorkspace", null);
-		this.setMenuItemName(ResourceMgr.MNU_TXT_WORKSPACE);
-		this.setIcon(null);
-	}
+  public AssignWorkspaceAction(MainWindow aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtAssignWorkspace", null);
+    this.setMenuItemName(ResourceMgr.MNU_TXT_WORKSPACE);
+    this.setIcon(null);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.assignWorkspace();
-	}
-	
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.assignWorkspace();
+  }
+
 }

@@ -22,28 +22,25 @@
  */
 package workbench.gui.editor.actions;
 
-import java.awt.event.ActionEvent;
 import workbench.gui.editor.InputHandler;
 import workbench.gui.editor.JEditTextArea;
 import workbench.resource.PlatformShortcuts;
 
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class DocumentEnd
-	extends EditorAction
-{
-	public DocumentEnd()
-	{
-		super("TxtEdDocEnd", PlatformShortcuts.getDefaultEndOfDoc(false));
-	}
+    extends EditorAction {
+  public DocumentEnd() {
+    super("TxtEdDocEnd", PlatformShortcuts.getDefaultEndOfDoc(false));
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt)
-	{
-		JEditTextArea textArea = InputHandler.getTextArea(evt);
-		textArea.selectNone();
-		textArea.setCaretPosition(textArea.getDocumentLength());
-	}
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    JEditTextArea textArea = InputHandler.getTextArea(evt);
+    textArea.selectNone();
+    textArea.setCaretPosition(textArea.getDocumentLength());
+  }
 }

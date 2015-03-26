@@ -28,20 +28,19 @@ import java.io.OutputStream;
 import java.io.Writer;
 
 /**
- * 
  * @author Thomas Kellerer
  */
-public interface OutputFactory
-{
-	OutputStream createOutputStream(File output) 
-		throws IOException;
-	
-	Writer createWriter(File output, String encoding) 
-		throws IOException;
-	
-	Writer createWriter(String filename, String encoding) 
-		throws IOException;
-	
-	void done() throws IOException;
-	boolean isArchive();
+public interface OutputFactory {
+  OutputStream createOutputStream(File output)
+      throws IOException;
+
+  Writer createWriter(File output, String encoding)
+      throws IOException;
+
+  Writer createWriter(String filename, String encoding)
+      throws IOException;
+
+  void done() throws IOException;
+
+  boolean isArchive();
 }

@@ -24,31 +24,25 @@ package workbench.db.diff;
 
 import workbench.db.report.ReportProcedure;
 import workbench.db.report.TagWriter;
-
 import workbench.util.StringUtil;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class ProcDiff
-{
+public class ProcDiff {
   public static final String TAG_CREATE_PROC = "create-proc";
   public static final String TAG_UPDATE_PROC = "update-proc";
-
+  private final TagWriter writer = new TagWriter();
   private ReportProcedure reference;
   private ReportProcedure target;
-  private final TagWriter writer = new TagWriter();
   private StringBuilder indent = StringUtil.emptyBuilder();
 
-  public ProcDiff(ReportProcedure ref, ReportProcedure tar)
-  {
+  public ProcDiff(ReportProcedure ref, ReportProcedure tar) {
     reference = ref;
     target = tar;
   }
 
-  public StringBuilder getMigrateTargetXml()
-  {
+  public StringBuilder getMigrateTargetXml() {
     StringBuilder result = new StringBuilder(500);
 
     boolean isDifferent = true;
@@ -57,14 +51,12 @@ public class ProcDiff
     CharSequence refSource = reference.getSource();
     CharSequence targetSource = target.getSource();
 
-    if (targetSource != null)
-    {
+    if (targetSource != null) {
       isDifferent = !refSource.toString().trim().equals(targetSource.toString().trim());
       tagToUse = TAG_UPDATE_PROC;
     }
 
-    if (isDifferent)
-    {
+    if (isDifferent) {
       StringBuilder myIndent = new StringBuilder(indent);
       myIndent.append("  ");
       writer.appendOpenTag(result, this.indent, tagToUse);
@@ -74,21 +66,17 @@ public class ProcDiff
       result.append(reference.getXml());
       writer.appendCloseTag(result, this.indent, tagToUse);
     }
-    
+
     return result;
   }
 
-	/**
-	 *	Set an indent for generating the XML
-	 */
-  public void setIndent(StringBuilder ind)
-  {
-    if (ind == null)
-    {
+  /**
+   * Set an indent for generating the XML
+   */
+  public void setIndent(StringBuilder ind) {
+    if (ind == null) {
       this.indent = StringUtil.emptyBuilder();
-    }
-    else
-    {
+    } else {
       this.indent = ind;
     }
   }

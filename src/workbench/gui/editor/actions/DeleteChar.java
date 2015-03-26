@@ -22,62 +22,48 @@
  */
 package workbench.gui.editor.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import javax.swing.text.BadLocationException;
 import workbench.gui.editor.InputHandler;
 import workbench.gui.editor.JEditTextArea;
 
+import javax.swing.text.BadLocationException;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class DeleteChar
-	extends EditorAction
-{
-	public DeleteChar()
-	{
-		super("TxtEdDelChar", KeyEvent.VK_DELETE, 0);
-	}
+    extends EditorAction {
+  public DeleteChar() {
+    super("TxtEdDelChar", KeyEvent.VK_DELETE, 0);
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt)
-	{
-		JEditTextArea textArea = InputHandler.getTextArea(evt);
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    JEditTextArea textArea = InputHandler.getTextArea(evt);
 
-		if (!textArea.isEditable())
-		{
-			textArea.getToolkit().beep();
-			return;
-		}
+    if (!textArea.isEditable()) {
+      textArea.getToolkit().beep();
+      return;
+    }
 
-		if (textArea.getSelectionStart() != textArea.getSelectionEnd())
-		{
-			if (textArea.isEmptyRectangleSelection())
-			{
-				textArea.doRectangleDeleteChar();
-			}
-			else
-			{
-				textArea.setSelectedText("");
-			}
-		}
-		else
-		{
-			int caret = textArea.getCaretPosition();
-			if (caret == textArea.getDocumentLength())
-			{
-				textArea.getToolkit().beep();
-				return;
-			}
-			try
-			{
-				textArea.getDocument().remove(caret, 1);
-			}
-			catch (BadLocationException bl)
-			{
-				bl.printStackTrace();
-			}
-		}
-	}
+    if (textArea.getSelectionStart() != textArea.getSelectionEnd()) {
+      if (textArea.isEmptyRectangleSelection()) {
+        textArea.doRectangleDeleteChar();
+      } else {
+        textArea.setSelectedText("");
+      }
+    } else {
+      int caret = textArea.getCaretPosition();
+      if (caret == textArea.getDocumentLength()) {
+        textArea.getToolkit().beep();
+        return;
+      }
+      try {
+        textArea.getDocument().remove(caret, 1);
+      } catch (BadLocationException bl) {
+        bl.printStackTrace();
+      }
+    }
+  }
 }

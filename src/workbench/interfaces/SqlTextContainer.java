@@ -23,11 +23,9 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public interface SqlTextContainer
-	extends TextContainer
-{
-	String getSelectedStatement();
+    extends TextContainer {
+  String getSelectedStatement();
 }

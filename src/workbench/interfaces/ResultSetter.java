@@ -26,11 +26,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ResultSetter
-{
-	Map<String, Object> getFKValues(List<String> columns);
-	void setResult(List<Map<String, Object>> values, Map<String, String> fkColumnsMap);
+public interface ResultSetter {
+  Map<String, Object> getFKValues(List<String> columns);
+
+  void setResult(List<Map<String, Object>> values, Map<String, String> fkColumnsMap);
 }

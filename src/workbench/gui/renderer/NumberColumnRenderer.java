@@ -22,72 +22,57 @@
  */
 package workbench.gui.renderer;
 
-import java.math.BigDecimal;
-
 import workbench.resource.GuiSettings;
-
 import workbench.util.WbNumberFormatter;
+
+import java.math.BigDecimal;
 
 /**
  * Display numeric values according to the global formatting settings.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class NumberColumnRenderer
-	extends ToolTipRenderer
-{
-	private WbNumberFormatter formatter;
+    extends ToolTipRenderer {
+  private WbNumberFormatter formatter;
 
-	public NumberColumnRenderer()
-	{
-		super();
-		formatter = new WbNumberFormatter(4, '.');
-		this.setHorizontalAlignment(GuiSettings.getNumberDataAlignment());
-	}
+  public NumberColumnRenderer() {
+    super();
+    formatter = new WbNumberFormatter(4, '.');
+    this.setHorizontalAlignment(GuiSettings.getNumberDataAlignment());
+  }
 
-	public NumberColumnRenderer(int maxDigits, char sep)
-	{
-		this(maxDigits, sep, false);
-	}
-	
-	public NumberColumnRenderer(int maxDigits, char sep, boolean fixedDigits)
-	{
-		super();
-		formatter = new WbNumberFormatter(maxDigits, sep, fixedDigits);
-		this.setHorizontalAlignment(GuiSettings.getNumberDataAlignment());
-	}
+  public NumberColumnRenderer(int maxDigits, char sep) {
+    this(maxDigits, sep, false);
+  }
 
-	@Override
-	public void prepareDisplay(Object aValue)
-	{
-		try
-		{
-			Number n = (Number) aValue;
+  public NumberColumnRenderer(int maxDigits, char sep, boolean fixedDigits) {
+    super();
+    formatter = new WbNumberFormatter(maxDigits, sep, fixedDigits);
+    this.setHorizontalAlignment(GuiSettings.getNumberDataAlignment());
+  }
 
-			displayValue = formatter.format(n);
+  @Override
+  public void prepareDisplay(Object aValue) {
+    try {
+      Number n = (Number) aValue;
 
-			if (showTooltip)
-			{
-				// Tooltip should be unformatted to show the "real" value
-				if (n instanceof BigDecimal)
-				{
-					tooltip = ((BigDecimal)n).toPlainString();
-				}
-				else
-				{
-					tooltip = n.toString();
-				}
-			}
-			else
-			{
-				tooltip = null;
-			}
-		}
-		catch (Throwable th)
-		{
-			displayValue = aValue.toString();
-			tooltip = null;
-		}
-	}
+      displayValue = formatter.format(n);
+
+      if (showTooltip) {
+        // Tooltip should be unformatted to show the "real" value
+        if (n instanceof BigDecimal) {
+          tooltip = ((BigDecimal) n).toPlainString();
+        } else {
+          tooltip = n.toString();
+        }
+      } else {
+        tooltip = null;
+      }
+    } catch (Throwable th) {
+      displayValue = aValue.toString();
+      tooltip = null;
+    }
+  }
 
 }

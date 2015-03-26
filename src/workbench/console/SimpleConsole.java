@@ -28,91 +28,73 @@ import java.util.Scanner;
 
 /**
  * A simple WbConsoleReader using a Scanner
- *
+ * <p/>
  * This is a fallback if neither JLine nor the new Java 6 Console is available
  *
  * @author Thomas Kellerer
  */
 public class SimpleConsole
-	implements WbConsole
-{
-	private static Scanner inputScanner;
+    implements WbConsole {
+  private static Scanner inputScanner;
 
-	public SimpleConsole()
-	{
-		inputScanner = new Scanner(System.in);
-	}
+  public SimpleConsole() {
+    inputScanner = new Scanner(System.in);
+  }
 
 
   @Override
-  public void clearScreen()
-  {
+  public void clearScreen() {
   }
 
   @Override
-  public char readCharacter()
-  {
-    try
-    {
+  public char readCharacter() {
+    try {
       int value = System.in.read();
-      return (char)value;
+      return (char) value;
+    } catch (IOException ex) {
     }
-    catch (IOException ex)
-    {
-    }
-    return (char)0;
+    return (char) 0;
   }
 
   @Override
-  public void reset()
-  {
-    try
-    {
+  public void reset() {
+    try {
       System.in.reset();
-    }
-    catch (IOException ex)
-    {
+    } catch (IOException ex) {
     }
   }
 
-	@Override
-	public String readPassword(String prompt)
-	{
-		return readLine(prompt);
-	}
+  @Override
+  public String readPassword(String prompt) {
+    return readLine(prompt);
+  }
 
-	@Override
-	public String readLine(String prompt)
-	{
-		System.out.print(prompt);
-		return inputScanner.nextLine();
-	}
+  @Override
+  public String readLine(String prompt) {
+    System.out.print(prompt);
+    return inputScanner.nextLine();
+  }
 
-	@Override
-	public void shutdown()
-	{
-	}
+  @Override
+  public void shutdown() {
+  }
 
-	@Override
-	public int getColumns()
-	{
-		return -1;
-	}
+  @Override
+  public int getColumns() {
+    return -1;
+  }
 
-	@Override
-	public String readLineWithoutHistory(String prompt)
-	{
-		return readLine(prompt);
-	}
+  @Override
+  public String readLineWithoutHistory(String prompt) {
+    return readLine(prompt);
+  }
 
-	@Override
-	public void clearHistory()
-	{
-	}
+  @Override
+  public void clearHistory() {
+  }
 
-	@Override
-	public void addToHistory(List<String> lines)
-	{
-	}
+  @Override
+  public void addToHistory(List<String> lines) {
+  }
 
 }

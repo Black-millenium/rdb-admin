@@ -6,15 +6,15 @@
  */
 package jline;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.List;
 
 /**
- *  Handler for dealing with candidates for tab-completion.
+ * Handler for dealing with candidates for tab-completion.
  *
- *  @author  <a href="mailto:mwp1@cornell.edu">Marc Prud'hommeaux</a>
+ * @author <a href="mailto:mwp1@cornell.edu">Marc Prud'hommeaux</a>
  */
 public interface CompletionHandler {
-    boolean complete(ConsoleReader reader, List candidates, int position)
-              throws IOException;
+  boolean complete(ConsoleReader reader, List candidates, int position)
+      throws IOException;
 }

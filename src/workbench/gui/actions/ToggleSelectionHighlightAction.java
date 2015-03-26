@@ -22,55 +22,49 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import workbench.gui.sql.EditorPanel;
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
 
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 /**
  * Action to toggle the detection of prepared statements during SQL execution
  *
+ * @author Thomas Kellerer
  * @see workbench.resource.Settings#setCheckPreparedStatements(boolean)
- *
- * @author  Thomas Kellerer
  */
 public class ToggleSelectionHighlightAction
-	extends CheckBoxAction
-	implements PropertyChangeListener
-{
-	private final EditorPanel editor;
-	public ToggleSelectionHighlightAction(EditorPanel panel)
-	{
-		super("MnuTxtHiliteSel");
-		this.editor = panel;
-		this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-		Settings.getInstance().addPropertyChangeListener(this, Settings.PROPERTY_EDITOR_OCCURANCE_HIGHLIGHT);
-	}
+    extends CheckBoxAction
+    implements PropertyChangeListener {
+  private final EditorPanel editor;
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		super.executeAction(e);
-		editor.setHighlightSelection(this.isSwitchedOn());
-	}
+  public ToggleSelectionHighlightAction(EditorPanel panel) {
+    super("MnuTxtHiliteSel");
+    this.editor = panel;
+    this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+    Settings.getInstance().addPropertyChangeListener(this, Settings.PROPERTY_EDITOR_OCCURANCE_HIGHLIGHT);
+  }
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt)
-	{
-		if (editor.isGlobalSelectionHighlight())
-		{
-			setSwitchedOn(Settings.getInstance().getHighlightCurrentSelection());
-		}
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    super.executeAction(e);
+    editor.setHighlightSelection(this.isSwitchedOn());
+  }
 
-	@Override
-	public void dispose()
-	{
-		super.dispose();
-		Settings.getInstance().removePropertyChangeListener(this);
-	}
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+    if (editor.isGlobalSelectionHighlight()) {
+      setSwitchedOn(Settings.getInstance().getHighlightCurrentSelection());
+    }
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
+    Settings.getInstance().removePropertyChangeListener(this);
+  }
 
 }

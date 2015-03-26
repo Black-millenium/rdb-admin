@@ -25,15 +25,12 @@ package workbench.gui.editor.actions;
 import java.awt.event.KeyEvent;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class SelectNextLine
-	extends NextLine
-{
-	public SelectNextLine()
-	{
-		super("TxtEdNxtLineSel", KeyEvent.VK_DOWN, KeyEvent.SHIFT_MASK);
-		select = true;
-	}
+    extends NextLine {
+  public SelectNextLine() {
+    super("TxtEdNxtLineSel", KeyEvent.VK_DOWN, KeyEvent.SHIFT_MASK);
+    select = true;
+  }
 }

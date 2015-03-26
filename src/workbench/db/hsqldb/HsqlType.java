@@ -22,44 +22,37 @@
  */
 package workbench.db.hsqldb;
 
-import java.util.Collections;
-import java.util.List;
-
 import workbench.db.BaseObjectType;
 import workbench.db.ColumnIdentifier;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class HsqlType
-	extends BaseObjectType
-{
-	private String dataType;
+    extends BaseObjectType {
+  private String dataType;
 
-	public HsqlType(String schema, String typeName)
-	{
-		super(schema, typeName);
-	}
+  public HsqlType(String schema, String typeName) {
+    super(schema, typeName);
+  }
 
-	public void setDataTypeName(String typeName)
-	{
-		dataType = typeName;
-	}
+  public String getDataTypeName() {
+    return dataType;
+  }
 
-	public String getDataTypeName()
-	{
-		return dataType;
-	}
+  public void setDataTypeName(String typeName) {
+    dataType = typeName;
+  }
 
-	@Override
-	public List<ColumnIdentifier> getAttributes()
-	{
-		return Collections.emptyList();
-	}
+  @Override
+  public List<ColumnIdentifier> getAttributes() {
+    return Collections.emptyList();
+  }
 
-	@Override
-	public void setAttributes(List<ColumnIdentifier> attr)
-	{
-	}
+  @Override
+  public void setAttributes(List<ColumnIdentifier> attr) {
+  }
 }

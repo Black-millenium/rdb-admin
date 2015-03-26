@@ -22,12 +22,10 @@
  */
 package workbench.gui.editor;
 
+import workbench.gui.WbSwingUtilities;
 import workbench.interfaces.SqlTextContainer;
 import workbench.log.LogMgr;
 import workbench.resource.Settings;
-
-import workbench.gui.WbSwingUtilities;
-
 import workbench.sql.DelimiterDefinition;
 import workbench.sql.formatter.SqlFormatter;
 import workbench.sql.lexer.SQLLexer;
@@ -35,132 +33,107 @@ import workbench.sql.lexer.SQLLexerFactory;
 import workbench.sql.lexer.SQLToken;
 import workbench.sql.parser.ParserType;
 import workbench.sql.parser.ScriptParser;
-
 import workbench.util.StringUtil;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class TextFormatter
-{
+public class TextFormatter {
 
-	private String dbId;
+  private String dbId;
 
-	public TextFormatter(String id)
-	{
-		this.dbId = id;
-	}
+  public TextFormatter(String id) {
+    this.dbId = id;
+  }
 
-	private boolean isEmpty(String sql)
-	{
-		SQLLexer lexer = SQLLexerFactory.createLexerForDbId(dbId, sql);
-		SQLToken token = lexer.getNextToken(false, false);
-		return token == null;
-	}
+  private boolean isEmpty(String sql) {
+    SQLLexer lexer = SQLLexerFactory.createLexerForDbId(dbId, sql);
+    SQLToken token = lexer.getNextToken(false, false);
+    return token == null;
+  }
 
-	public void formatSql(final SqlTextContainer editor, DelimiterDefinition alternateDelimiter)
-	{
-		String sql = editor.getSelectedStatement();
-		ScriptParser parser = new ScriptParser(ParserType.getTypeFromDBID(dbId));
-		parser.setAlternateDelimiter(alternateDelimiter);
-		parser.setReturnStartingWhitespace(true);
-		parser.setScript(sql);
+  public void formatSql(final SqlTextContainer editor, DelimiterDefinition alternateDelimiter) {
+    String sql = editor.getSelectedStatement();
+    ScriptParser parser = new ScriptParser(ParserType.getTypeFromDBID(dbId));
+    parser.setAlternateDelimiter(alternateDelimiter);
+    parser.setReturnStartingWhitespace(true);
+    parser.setScript(sql);
 
-		boolean isSelected = editor.isTextSelected();
+    boolean isSelected = editor.isTextSelected();
 
-		int count = parser.getSize();
-		if (count < 1) return;
+    int count = parser.getSize();
+    if (count < 1) return;
 
-		StringBuilder newSql = new StringBuilder(sql.length() + 100);
-		boolean needDelimiter = false;
-		boolean addNewLine = false;
-		for (int i=0; i < count; i++)
-		{
-			String command = parser.getCommand(i);
+    StringBuilder newSql = new StringBuilder(sql.length() + 100);
+    boolean needDelimiter = false;
+    boolean addNewLine = false;
+    for (int i = 0; i < count; i++) {
+      String command = parser.getCommand(i);
 
-			DelimiterDefinition delimiter = parser.getDelimiterUsed(i);
-			if (delimiter == null)
-			{
-				delimiter = parser.getDelimiter();
-			}
+      DelimiterDefinition delimiter = parser.getDelimiterUsed(i);
+      if (delimiter == null) {
+        delimiter = parser.getDelimiter();
+      }
 
-			// no need to format "empty" strings
-			if (StringUtil.isBlank(command))
-			{
-				newSql.append(command);
-				continue;
-			}
+      // no need to format "empty" strings
+      if (StringUtil.isBlank(command)) {
+        newSql.append(command);
+        continue;
+      }
 
-			boolean isEmpty = isEmpty(command);
+      boolean isEmpty = isEmpty(command);
 
-			needDelimiter = (count > 1) || (isSelected && delimiter.terminatesScript(sql, false));
+      needDelimiter = (count > 1) || (isSelected && delimiter.terminatesScript(sql, false));
 
-			addNewLine = (i < count);
+      addNewLine = (i < count);
 
-			SqlFormatter f = new SqlFormatter(command, Settings.getInstance().getFormatterMaxSubselectLength(), dbId);
+      SqlFormatter f = new SqlFormatter(command, Settings.getInstance().getFormatterMaxSubselectLength(), dbId);
 
-			try
-			{
-				String formattedSql = f.getFormattedSql();
-				newSql.append(formattedSql.trim());
-				if (needDelimiter && !isEmpty)
-				{
-					if (delimiter.isSingleLine())
-					{
-						newSql.append('\n');
-					}
-					newSql.append(delimiter.getDelimiter());
-				}
-				newSql.append('\n');
+      try {
+        String formattedSql = f.getFormattedSql();
+        newSql.append(formattedSql.trim());
+        if (needDelimiter && !isEmpty) {
+          if (delimiter.isSingleLine()) {
+            newSql.append('\n');
+          }
+          newSql.append(delimiter.getDelimiter());
+        }
+        newSql.append('\n');
 
-				// add a blank line between the statements, but not for the last one
-				if (addNewLine)
-				{
-					newSql.append('\n');
-				}
-			}
-			catch (Exception e)
-			{
-				LogMgr.logError("EditorPanel.reformatSql()", "Error when formatting SQL", e);
-			}
-		}
+        // add a blank line between the statements, but not for the last one
+        if (addNewLine) {
+          newSql.append('\n');
+        }
+      } catch (Exception e) {
+        LogMgr.logError("EditorPanel.reformatSql()", "Error when formatting SQL", e);
+      }
+    }
 
-		if (newSql.length() == 0) return;
+    if (newSql.length() == 0) return;
 
-		final String text = newSql.toString();
+    final String text = newSql.toString();
 
-		WbSwingUtilities.invoke(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				if (editor.isTextSelected())
-				{
-					boolean editable = editor.isEditable();
-					try
-					{
-						if (!editable)
-						{
-							// the editor will refuse to execute setSelectedText() if it's not editable
-							editor.setEditable(true);
-						}
-						editor.setSelectedText(text);
-					}
-					finally
-					{
-						if (!editable)
-						{
-							editor.setEditable(false);
-						}
-					}
-				}
-				else
-				{
-					// setText() is always allowed, even if the editor is not editable
-					editor.setText(text);
-				}
-			}
-		});
-	}
+    WbSwingUtilities.invoke(new Runnable() {
+      @Override
+      public void run() {
+        if (editor.isTextSelected()) {
+          boolean editable = editor.isEditable();
+          try {
+            if (!editable) {
+              // the editor will refuse to execute setSelectedText() if it's not editable
+              editor.setEditable(true);
+            }
+            editor.setSelectedText(text);
+          } finally {
+            if (!editable) {
+              editor.setEditable(false);
+            }
+          }
+        } else {
+          // setText() is always allowed, even if the editor is not editable
+          editor.setText(text);
+        }
+      }
+    });
+  }
 }

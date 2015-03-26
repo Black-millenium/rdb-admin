@@ -25,22 +25,20 @@ package workbench.sql;
  *
  * @author Thomas Kellerer
  */
-public enum ErrorReportLevel
-{
-	/**
-	 * Log only the error, not the statement.
-	 */
-	none,
+public enum ErrorReportLevel {
+  /**
+   * Log only the error, not the statement.
+   */
+  none,
 
-	/**
-	 * Log the statement text up to a defined limit.
-	 * (Truncates the statement)
-	 *
-	 */
-	limited,
+  /**
+   * Log the statement text up to a defined limit.
+   * (Truncates the statement)
+   */
+  limited,
 
-	/**
-	 * Logs the full statement that was executed.
-	 */
-	full;
+  /**
+   * Logs the full statement that was executed.
+   */
+  full;
 }

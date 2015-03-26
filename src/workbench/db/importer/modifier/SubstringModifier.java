@@ -22,57 +22,51 @@
  */
 package workbench.db.importer.modifier;
 
-import java.util.HashMap;
-import java.util.Map;
 import workbench.db.ColumnIdentifier;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class SubstringModifier
-	implements ImportValueModifier
-{
-	private Map<ColumnIdentifier, ColumnValueSubstring> limits =  new HashMap<ColumnIdentifier, ColumnValueSubstring>();
+    implements ImportValueModifier {
+  private Map<ColumnIdentifier, ColumnValueSubstring> limits = new HashMap<ColumnIdentifier, ColumnValueSubstring>();
 
-	@Override
-	public int getSize()
-	{
-		return limits.size();
-	}
+  @Override
+  public int getSize() {
+    return limits.size();
+  }
 
-	/**
-	 * Define substring limits for a column.
-	 * An existing mapping for that column will be overwritten.
-	 *
-	 * @param col the column for which to apply the substring
-	 * @param start the start of the substring
-	 * @param end the end of the substring
-	 */
-	public void addDefinition(ColumnIdentifier col, int start, int end)
-	{
-		ColumnValueSubstring s = new ColumnValueSubstring(start, end);
-		this.limits.put(col.createCopy(), s);
-	}
+  /**
+   * Define substring limits for a column.
+   * An existing mapping for that column will be overwritten.
+   *
+   * @param col   the column for which to apply the substring
+   * @param start the start of the substring
+   * @param end   the end of the substring
+   */
+  public void addDefinition(ColumnIdentifier col, int start, int end) {
+    ColumnValueSubstring s = new ColumnValueSubstring(start, end);
+    this.limits.put(col.createCopy(), s);
+  }
 
-	@Override
-	public String modifyValue(ColumnIdentifier col, String value)
-	{
-		ColumnValueSubstring s = this.limits.get(col);
-		if (s != null)
-		{
-			return s.getSubstring(value);
-		}
-		return value;
-	}
+  @Override
+  public String modifyValue(ColumnIdentifier col, String value) {
+    ColumnValueSubstring s = this.limits.get(col);
+    if (s != null) {
+      return s.getSubstring(value);
+    }
+    return value;
+  }
 
-	/**
-	 * For testing purposes to allow access to the actual "modifier"
-	 */
-	public ColumnValueSubstring getSubstring(ColumnIdentifier col)
-	{
-		return this.limits.get(col);
-	}
+  /**
+   * For testing purposes to allow access to the actual "modifier"
+   */
+  public ColumnValueSubstring getSubstring(ColumnIdentifier col) {
+    return this.limits.get(col);
+  }
 
 }
 

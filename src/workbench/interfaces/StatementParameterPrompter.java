@@ -24,13 +24,12 @@ package workbench.interfaces;
 
 import workbench.sql.preparedstatement.StatementParameters;
 
-public interface StatementParameterPrompter
-{
-	/**
-	 * Prompt the user for values of the named parameters.
-	 *
-	 * @param parms the parameters identified by the caller
-	 * @param showNames true if then parameter names should be displayed to the user
-	 */
-	boolean showParameterDialog(final StatementParameters parms, final boolean showNames);
+public interface StatementParameterPrompter {
+  /**
+   * Prompt the user for values of the named parameters.
+   *
+   * @param parms     the parameters identified by the caller
+   * @param showNames true if then parameter names should be displayed to the user
+   */
+  boolean showParameterDialog(final StatementParameters parms, final boolean showNames);
 }

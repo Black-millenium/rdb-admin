@@ -22,41 +22,36 @@
  */
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-
 import workbench.resource.ResourceMgr;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
 
+import java.sql.SQLException;
+
 /**
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class WbEndBatch
-	extends SqlCommand
-{
-	public static final String VERB = "WbEndBatch";
+    extends SqlCommand {
+  public static final String VERB = "WbEndBatch";
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String aSql)
-		throws SQLException, Exception
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
-		result.setSuccess();
-		result.addMessage(ResourceMgr.getString("MsgJdbcBatchProcessingEnded"));
-		return result;
-	}
+  @Override
+  public StatementRunnerResult execute(String aSql)
+      throws SQLException, Exception {
+    StatementRunnerResult result = new StatementRunnerResult();
+    result.setSuccess();
+    result.addMessage(ResourceMgr.getString("MsgJdbcBatchProcessingEnded"));
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 
 }

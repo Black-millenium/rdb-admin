@@ -23,16 +23,15 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public interface BatchCommitter
-	extends Committer
-{
-	void setUseBatch(boolean useBatch);
+    extends Committer {
+  void setUseBatch(boolean useBatch);
 
-	void setBatchSize(int size);
-	int getBatchSize();
+  int getBatchSize();
 
-	void setCommitBatch(boolean commitBatch);
+  void setBatchSize(int size);
+
+  void setCommitBatch(boolean commitBatch);
 }

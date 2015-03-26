@@ -22,34 +22,31 @@
  */
 package workbench.gui.actions;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import workbench.resource.GuiSettings;
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 /**
- *	Toggle highlighting of the the error line (or statement).
+ * Toggle highlighting of the the error line (or statement).
  *
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class HighlightErrorLineAction
-	extends CheckBoxAction
-	implements PropertyChangeListener
-{
+    extends CheckBoxAction
+    implements PropertyChangeListener {
 
-	public HighlightErrorLineAction()
-	{
-		super("LblHiliteErr", GuiSettings.PROPERTY_HILITE_ERROR_LINE);
-		this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
-		Settings.getInstance().addPropertyChangeListener(this, GuiSettings.PROPERTY_HILITE_ERROR_LINE);
-	}
+  public HighlightErrorLineAction() {
+    super("LblHiliteErr", GuiSettings.PROPERTY_HILITE_ERROR_LINE);
+    this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
+    Settings.getInstance().addPropertyChangeListener(this, GuiSettings.PROPERTY_HILITE_ERROR_LINE);
+  }
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt)
-	{
-		this.setSwitchedOn(Settings.getInstance().getBoolProperty(GuiSettings.PROPERTY_HILITE_ERROR_LINE, false));
-	}
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+    this.setSwitchedOn(Settings.getInstance().getBoolProperty(GuiSettings.PROPERTY_HILITE_ERROR_LINE, false));
+  }
 
 }

@@ -22,39 +22,35 @@
  */
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-
 import workbench.db.WbConnection;
-
-import workbench.storage.RowActionMonitor;
-
 import workbench.sql.StatementRunnerResult;
-
+import workbench.storage.RowActionMonitor;
 import workbench.util.ArgumentParser;
+
+import java.sql.SQLException;
 
 /**
  * An interface to define a single copy task.
  *
  * @author Thomas Kellerer
  */
-public interface CopyTask
-{
-	void setAdjustSequences(boolean flag);
+public interface CopyTask {
+  void setAdjustSequences(boolean flag);
 
-	void setTargetSchemaAndCatalog(String schema, String catalog);
+  void setTargetSchemaAndCatalog(String schema, String catalog);
 
-	boolean init(WbConnection source, WbConnection target, StatementRunnerResult result, ArgumentParser cmdLine, RowActionMonitor monitor)
-		throws SQLException;
+  boolean init(WbConnection source, WbConnection target, StatementRunnerResult result, ArgumentParser cmdLine, RowActionMonitor monitor)
+      throws SQLException;
 
 
-	long copyData()
-		throws SQLException, Exception;
+  long copyData()
+      throws SQLException, Exception;
 
-	boolean isSuccess();
+  boolean isSuccess();
 
-	boolean hasWarnings();
-	
-	CharSequence getMessages();
+  boolean hasWarnings();
 
-	void cancel();
+  CharSequence getMessages();
+
+  void cancel();
 }

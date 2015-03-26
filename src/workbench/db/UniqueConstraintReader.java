@@ -25,10 +25,8 @@ package workbench.db;
 import java.util.List;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface UniqueConstraintReader
-{
-	void processIndexList(List<IndexDefinition> indexList, WbConnection con);
+public interface UniqueConstraintReader {
+  void processIndexList(List<IndexDefinition> indexList, WbConnection con);
 }

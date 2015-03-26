@@ -22,37 +22,32 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.gui.MainWindow;
-
 import workbench.util.WbFile;
 
+import java.awt.event.ActionEvent;
+
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class LoadWorkspaceFileAction extends WbAction
-{
-	private MainWindow client;
-	private WbFile workspace;
+public class LoadWorkspaceFileAction extends WbAction {
+  private MainWindow client;
+  private WbFile workspace;
 
-	public LoadWorkspaceFileAction(MainWindow aClient, WbFile file)
-	{
-		super();
-		client = aClient;
-		workspace = file;
-		this.setMenuText(workspace.getFileName());
-		this.setTooltip(workspace.getFullPath());
-		this.setIcon(null);
-	}
+  public LoadWorkspaceFileAction(MainWindow aClient, WbFile file) {
+    super();
+    client = aClient;
+    workspace = file;
+    this.setMenuText(workspace.getFileName());
+    this.setTooltip(workspace.getFullPath());
+    this.setIcon(null);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		boolean canLoad = client.saveWorkspace(true);
-		if (canLoad)
-		{
-			this.client.loadWorkspace(workspace.getFullPath(), true);
-		}
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    boolean canLoad = client.saveWorkspace(true);
+    if (canLoad) {
+      this.client.loadWorkspace(workspace.getFullPath(), true);
+    }
+  }
 }

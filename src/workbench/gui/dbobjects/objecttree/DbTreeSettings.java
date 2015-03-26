@@ -22,60 +22,48 @@
  */
 package workbench.gui.dbobjects.objecttree;
 
-import java.util.List;
-
 import workbench.resource.Settings;
 
+import java.util.List;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public class DbTreeSettings
-{
+public class DbTreeSettings {
   public static final String SETTINGS_PREFIX = "workbench.gui.dbtree.";
 
 
-  public static boolean enableDbTree()
-  {
+  public static boolean enableDbTree() {
     return Settings.getInstance().getBoolProperty(SETTINGS_PREFIX + "enabled", false);
   }
 
-  public static List<String> getSelectedObjectTypes()
-  {
+  public static List<String> getSelectedObjectTypes() {
     return Settings.getInstance().getListProperty(SETTINGS_PREFIX + "selectedtypes", false);
   }
 
-  public static boolean showOnlyCurrentSchema(String dbId)
-  {
+  public static boolean showOnlyCurrentSchema(String dbId) {
     boolean defaultValue = Settings.getInstance().getBoolProperty(SETTINGS_PREFIX + "only.currentschema", false);
     return Settings.getInstance().getBoolProperty(SETTINGS_PREFIX + dbId + ".only.currentschema", defaultValue);
   }
 
-  public static TreePosition getDbTreePosition()
-  {
+  public static TreePosition getDbTreePosition() {
     String pos = Settings.getInstance().getProperty(SETTINGS_PREFIX + "position", TreePosition.left.name());
-    try
-    {
+    try {
       return TreePosition.valueOf(pos);
-    }
-    catch (Throwable th)
-    {
+    } catch (Throwable th) {
       return TreePosition.left;
     }
   }
 
-  public static void setDbTreePosition(TreePosition pos)
-  {
+  public static void setDbTreePosition(TreePosition pos) {
     Settings.getInstance().setProperty(SETTINGS_PREFIX + "position", pos.name());
   }
 
-  public static void setDividerLocation(int location)
-  {
+  public static void setDividerLocation(int location) {
     Settings.getInstance().setProperty(SETTINGS_PREFIX + "divider", location);
   }
 
-  public static int getDividerLocation(int defaultLocation)
-  {
+  public static int getDividerLocation(int defaultLocation) {
     return Settings.getInstance().getIntProperty(SETTINGS_PREFIX + "divider", defaultLocation);
   }
 

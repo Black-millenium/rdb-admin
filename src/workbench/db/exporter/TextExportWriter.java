@@ -31,67 +31,54 @@ import workbench.storage.PostgresBlobFormatter;
 /**
  * An ExportWriter to generate flat files.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class TextExportWriter
-	extends ExportWriter
-{
-	public TextExportWriter(DataExporter exp)
-	{
-		super(exp);
-	}
+    extends ExportWriter {
+  public TextExportWriter(DataExporter exp) {
+    super(exp);
+  }
 
-	@Override
-	public RowDataConverter createConverter()
-	{
-		return new TextRowDataConverter();
-	}
+  @Override
+  public RowDataConverter createConverter() {
+    return new TextRowDataConverter();
+  }
 
-	@Override
-	public void configureConverter()
-	{
-		super.configureConverter();
-		TextRowDataConverter conv = (TextRowDataConverter)this.converter;
-		conv.setDelimiter(exporter.getTextDelimiter());
-		conv.setQuoteCharacter(exporter.getTextQuoteChar());
-		conv.setQuoteAlways(exporter.getQuoteAlways());
-		conv.setEscapeRange(exporter.getEscapeRange());
-		conv.setNullString(exporter.getNullString());
-		conv.setLineEnding(exporter.getLineEnding());
-		conv.setWriteClobToFile(exporter.getWriteClobAsFile());
-		conv.setQuoteEscaping(exporter.getQuoteEscaping());
-		conv.setRowIndexColName(exporter.getRowIndexColumnName());
-		conv.setEscapeType(exporter.getEscapeType());
-		BlobMode mode = exporter.getBlobMode();
-		if (mode == BlobMode.AnsiLiteral)
-		{
-			conv.setBlobFormatter(BlobFormatterFactory.createAnsiFormatter());
-			conv.setWriteBlobToFile(false);
-		}
-		else if (mode == BlobMode.Base64)
-		{
-			conv.setBlobFormatter(BlobFormatterFactory.createInstance(BlobLiteralType.base64));
-			conv.setWriteBlobToFile(false);
-		}
-		else if (mode == BlobMode.DbmsLiteral)
-		{
-			DbMetadata meta = null;
-			WbConnection con = exporter.getConnection();
-			if (con != null) meta = con.getMetadata();
-			conv.setBlobFormatter(BlobFormatterFactory.createInstance(meta));
-			conv.setWriteBlobToFile(false);
-		}
-		else if (mode == BlobMode.pgHex || mode == BlobMode.pgEscape)
-		{
-			PostgresBlobFormatter formatter = new PostgresBlobFormatter(mode);
-			conv.setBlobFormatter(formatter);
-			conv.setWriteBlobToFile(false);
-		}
-		else if (mode == BlobMode.SaveToFile)
-		{
-			conv.setBlobFormatter(null);
-			conv.setWriteBlobToFile(true);
-		}
-	}
+  @Override
+  public void configureConverter() {
+    super.configureConverter();
+    TextRowDataConverter conv = (TextRowDataConverter) this.converter;
+    conv.setDelimiter(exporter.getTextDelimiter());
+    conv.setQuoteCharacter(exporter.getTextQuoteChar());
+    conv.setQuoteAlways(exporter.getQuoteAlways());
+    conv.setEscapeRange(exporter.getEscapeRange());
+    conv.setNullString(exporter.getNullString());
+    conv.setLineEnding(exporter.getLineEnding());
+    conv.setWriteClobToFile(exporter.getWriteClobAsFile());
+    conv.setQuoteEscaping(exporter.getQuoteEscaping());
+    conv.setRowIndexColName(exporter.getRowIndexColumnName());
+    conv.setEscapeType(exporter.getEscapeType());
+    BlobMode mode = exporter.getBlobMode();
+    if (mode == BlobMode.AnsiLiteral) {
+      conv.setBlobFormatter(BlobFormatterFactory.createAnsiFormatter());
+      conv.setWriteBlobToFile(false);
+    } else if (mode == BlobMode.Base64) {
+      conv.setBlobFormatter(BlobFormatterFactory.createInstance(BlobLiteralType.base64));
+      conv.setWriteBlobToFile(false);
+    } else if (mode == BlobMode.DbmsLiteral) {
+      DbMetadata meta = null;
+      WbConnection con = exporter.getConnection();
+      if (con != null) meta = con.getMetadata();
+      conv.setBlobFormatter(BlobFormatterFactory.createInstance(meta));
+      conv.setWriteBlobToFile(false);
+    } else if (mode == BlobMode.pgHex || mode == BlobMode.pgEscape) {
+      PostgresBlobFormatter formatter = new PostgresBlobFormatter(mode);
+      conv.setBlobFormatter(formatter);
+      conv.setWriteBlobToFile(false);
+    } else if (mode == BlobMode.SaveToFile) {
+      conv.setBlobFormatter(null);
+      conv.setWriteBlobToFile(true);
+    }
+  }
 
 }

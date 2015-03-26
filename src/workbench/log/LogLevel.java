@@ -25,37 +25,33 @@ package workbench.log;
 import workbench.util.StringUtil;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum LogLevel
-{
-	error,
-	warning,
-	info,
-	debug,
-	trace;
+public enum LogLevel {
+  error,
+  warning,
+  info,
+  debug,
+  trace;
 
-	public static LogLevel getLevel(String type)
-	{
-		if (StringUtil.isBlank(type)) return error;
-		if (type.equalsIgnoreCase("warn")) return warning;
-		if (type.equalsIgnoreCase("warning")) return warning;
-		if (type.equalsIgnoreCase("error")) return error;
-		if (type.equalsIgnoreCase("info")) return info;
-		if (type.equalsIgnoreCase("debug")) return debug;
-		if (type.equalsIgnoreCase("trace")) return trace;
-		return error;
- 	}
+  public static LogLevel getLevel(String type) {
+    if (StringUtil.isBlank(type)) return error;
+    if (type.equalsIgnoreCase("warn")) return warning;
+    if (type.equalsIgnoreCase("warning")) return warning;
+    if (type.equalsIgnoreCase("error")) return error;
+    if (type.equalsIgnoreCase("info")) return info;
+    if (type.equalsIgnoreCase("debug")) return debug;
+    if (type.equalsIgnoreCase("trace")) return trace;
+    return error;
+  }
 
-	@Override
-	public String toString()
-	{
-		if (this == error) return "ERROR";
-		if (this == warning) return "WARN";
-		if (this == info) return "INFO";
-		if (this == debug) return "DEBUG";
-		if (this == trace) return "TRACE";
-		return super.toString();
-	}
+  @Override
+  public String toString() {
+    if (this == error) return "ERROR";
+    if (this == warning) return "WARN";
+    if (this == info) return "INFO";
+    if (this == debug) return "DEBUG";
+    if (this == trace) return "TRACE";
+    return super.toString();
+  }
 }

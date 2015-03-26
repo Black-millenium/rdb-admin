@@ -22,98 +22,74 @@
  */
 package workbench.gui.completion;
 
-import java.awt.Component;
-
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JList;
-
 import workbench.db.ColumnIdentifier;
 import workbench.db.DbObject;
-
 import workbench.util.SqlUtil;
 import workbench.util.StringUtil;
 
+import javax.swing.*;
+import java.awt.*;
+
 /**
  * A ListCellRenderer for the completion popup.
- *
+ * <p/>
  * If a ColumnIdentifier is displayed, and that is a PK column, the name will be displayed in bold face.
- *
+ * <p/>
  * For instances of DbObject, the object's comment (remark) is shown as a tooltip.
  *
  * @author Thomas Kellerer
  */
 public class CompletionListRenderer
-	extends DefaultListCellRenderer
-{
-	private boolean showNotNulls;
+    extends DefaultListCellRenderer {
+  private boolean showNotNulls;
 
-	public void setShowNotNulls(boolean flag)
-	{
-		this.showNotNulls = flag;
-	}
+  public void setShowNotNulls(boolean flag) {
+    this.showNotNulls = flag;
+  }
 
-	@Override
-	public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
-	{
-		Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-		if (value instanceof ColumnIdentifier)
-		{
-			ColumnIdentifier col = (ColumnIdentifier)value;
-			String colname = SqlUtil.removeObjectQuotes(col.getColumnName());
-			if (col.isPkColumn())
-			{
-				setText("<html><b>" + colname + "</b></html>");
-			}
-			else if (showNotNulls && !col.isNullable())
-			{
-				setText("<html><span style='color:red'>" + colname + "</span></html>");
-			}
-			else
-			{
-				setText(colname);
-			}
-		}
+  @Override
+  public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+    Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+    if (value instanceof ColumnIdentifier) {
+      ColumnIdentifier col = (ColumnIdentifier) value;
+      String colname = SqlUtil.removeObjectQuotes(col.getColumnName());
+      if (col.isPkColumn()) {
+        setText("<html><b>" + colname + "</b></html>");
+      } else if (showNotNulls && !col.isNullable()) {
+        setText("<html><span style='color:red'>" + colname + "</span></html>");
+      } else {
+        setText(colname);
+      }
+    }
 
-		if (value instanceof DbObject)
-		{
-			DbObject dbo = (DbObject)value;
-			String type = null;
+    if (value instanceof DbObject) {
+      DbObject dbo = (DbObject) value;
+      String type = null;
 
-			if (dbo instanceof ColumnIdentifier)
-			{
-				ColumnIdentifier col = ((ColumnIdentifier)dbo);
-				type = col.getDbmsType();
-				if (!col.isNullable())
-				{
-					type += " (NN)";
-				}
-			}
-			else
-			{
-				type = dbo.getObjectType();
-			}
-			String tooltip = null;
-			String comment = dbo.getComment();
+      if (dbo instanceof ColumnIdentifier) {
+        ColumnIdentifier col = ((ColumnIdentifier) dbo);
+        type = col.getDbmsType();
+        if (!col.isNullable()) {
+          type += " (NN)";
+        }
+      } else {
+        type = dbo.getObjectType();
+      }
+      String tooltip = null;
+      String comment = dbo.getComment();
 
-			if (StringUtil.isBlank(comment) && StringUtil.isNonBlank(type))
-			{
-				tooltip = "<html><tt>" + type + "</tt></html>";
-			}
-			else if (StringUtil.isNonBlank(type))
-			{
-				tooltip = "<html><tt>" + type + "</tt><br><i>" + comment + "</i></html>";
-			}
-			setToolTipText(tooltip);
-		}
-		else if (value instanceof TooltipElement)
-		{
-			setToolTipText(((TooltipElement)value).getTooltip());
-		}
-		else
-		{
-			setToolTipText(null);
-		}
-		return c;
-	}
+      if (StringUtil.isBlank(comment) && StringUtil.isNonBlank(type)) {
+        tooltip = "<html><tt>" + type + "</tt></html>";
+      } else if (StringUtil.isNonBlank(type)) {
+        tooltip = "<html><tt>" + type + "</tt><br><i>" + comment + "</i></html>";
+      }
+      setToolTipText(tooltip);
+    } else if (value instanceof TooltipElement) {
+      setToolTipText(((TooltipElement) value).getTooltip());
+    } else {
+      setToolTipText(null);
+    }
+    return c;
+  }
 
 }

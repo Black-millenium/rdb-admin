@@ -22,18 +22,16 @@
  */
 package workbench.sql;
 
+import workbench.interfaces.ResultLogger;
+import workbench.resource.ResourceMgr;
+import workbench.storage.DataStore;
+import workbench.util.DurationFormatter;
+import workbench.util.MessageBuffer;
+
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import workbench.interfaces.ResultLogger;
-import workbench.resource.ResourceMgr;
-
-import workbench.storage.DataStore;
-
-import workbench.util.DurationFormatter;
-import workbench.util.MessageBuffer;
 
 /**
  * Stores the result of a SQL execution.
@@ -41,331 +39,285 @@ import workbench.util.MessageBuffer;
  * If the SQL command produced a result this might be available as a DataStore or as a
  * ResultSet (depending on the command).
  * <br/>
- * @see workbench.sql.SqlCommand#execute(java.lang.String)
  *
  * @author Thomas Kellerer
+ * @see workbench.sql.SqlCommand#execute(java.lang.String)
  */
-public class StatementRunnerResult
-{
-	private List<ResultSet> results;
-	private long totalUpdateCount;
-	private long totalRowsProcessed;
-	private MessageBuffer messages;
-	private List<DataStore> datastores;
-	private String sourceCommand;
+public class StatementRunnerResult {
+  private static final DurationFormatter timingFormatter = new DurationFormatter();
+  private List<ResultSet> results;
+  private long totalUpdateCount;
+  private long totalRowsProcessed;
+  private MessageBuffer messages;
+  private List<DataStore> datastores;
+  private String sourceCommand;
+  private boolean success = true;
+  private boolean hasWarning;
+  private boolean wasCancelled;
+  private boolean stopScriptExecution;
+  private boolean showRowCount = true;
+  private boolean ignoreUpdateCount;
+  private long executionTime = -1;
+  private ErrorDescriptor errorDetails;
 
-	private boolean success = true;
-	private boolean hasWarning;
-	private boolean wasCancelled;
-	private boolean stopScriptExecution;
-	private boolean showRowCount = true;
-	private boolean ignoreUpdateCount;
+  public StatementRunnerResult() {
+    this.messages = new MessageBuffer();
+  }
 
-	private long executionTime = -1;
-	private static final DurationFormatter timingFormatter = new DurationFormatter();
-	private ErrorDescriptor errorDetails;
+  public StatementRunnerResult(String aCmd) {
+    this();
+    this.sourceCommand = aCmd;
+  }
 
-	public StatementRunnerResult()
-	{
-		this.messages = new MessageBuffer();
-	}
+  public void ignoreUpdateCounts(boolean flag) {
+    ignoreUpdateCount = flag;
+  }
 
-	public StatementRunnerResult(String aCmd)
-	{
-		this();
-		this.sourceCommand = aCmd;
-	}
+  public long getRowsProcessed() {
+    return this.totalRowsProcessed;
+  }
 
-	public void ignoreUpdateCounts(boolean flag)
-	{
-		ignoreUpdateCount = flag;
-	}
+  public void setRowsProcessed(long rows) {
+    this.totalRowsProcessed = rows;
+  }
 
-	public void setRowsProcessed(long rows)
-	{
-		this.totalRowsProcessed = rows;
-	}
+  public void addRowsProcessed(long rows) {
+    this.totalRowsProcessed += rows;
+  }
 
-	public long getRowsProcessed()
-	{
-		return this.totalRowsProcessed;
-	}
+  public boolean stopScript() {
+    return stopScriptExecution;
+  }
 
-	public void addRowsProcessed(long rows)
-	{
-		this.totalRowsProcessed += rows;
-	}
+  public void setStopScript(boolean flag) {
+    this.stopScriptExecution = flag;
+  }
 
-	public boolean stopScript()
-	{
-		return stopScriptExecution;
-	}
+  public boolean promptingWasCancelled() {
+    return wasCancelled;
+  }
 
-	public void setStopScript(boolean flag)
-	{
-		this.stopScriptExecution = flag;
-	}
+  public void setPromptingWasCancelled() {
+    this.wasCancelled = true;
+  }
 
-	public boolean promptingWasCancelled()
-	{
-		return wasCancelled;
-	}
+  /**
+   * Returns the duration of the statement.
+   */
+  public long getExecutionDuration() {
+    return this.executionTime;
+  }
 
-	public void setPromptingWasCancelled()
-	{
-		this.wasCancelled = true;
-	}
+  public void setExecutionDuration(long t) {
+    this.executionTime = t;
+  }
 
-	public void setExecutionDuration(long t)
-	{
-		this.executionTime = t;
-	}
+  public boolean getShowRowCount() {
+    return showRowCount;
+  }
 
-	/**
-	 * Returns the duration of the statement.
-	 */
-	public long getExecutionDuration()
-	{
-		return this.executionTime;
-	}
+  public void setShowRowCount(boolean flag) {
+    showRowCount = flag;
+  }
 
-	public void setShowRowCount(boolean flag)
-	{
-		showRowCount = flag;
-	}
+  public String getTimingMessage() {
+    if (executionTime == -1) return null;
+    StringBuilder msg = new StringBuilder(100);
+    msg.append(ResourceMgr.getString("MsgExecTime"));
+    msg.append(' ');
+    msg.append(timingFormatter.formatDuration(executionTime, (executionTime < DurationFormatter.ONE_MINUTE)));
+    return msg.toString();
+  }
 
-	public boolean getShowRowCount()
-	{
-		return showRowCount;
-	}
+  public void appendMessages(ResultLogger log) {
+    if (this.messages == null) return;
+    messages.appendTo(log);
+  }
 
-	public String getTimingMessage()
-	{
-		if (executionTime == -1) return null;
-		StringBuilder msg = new StringBuilder(100);
-		msg.append(ResourceMgr.getString("MsgExecTime"));
-		msg.append(' ');
-		msg.append(timingFormatter.formatDuration(executionTime, (executionTime < DurationFormatter.ONE_MINUTE)));
-		return msg.toString();
-	}
+  public void setSuccess() {
+    this.success = true;
+    this.errorDetails = null;
+  }
 
-	public void appendMessages(ResultLogger log)
-	{
-		if (this.messages == null) return;
-		messages.appendTo(log);
-	}
+  public void setFailure() {
+    setFailure(null);
+  }
 
-	public void setSuccess()
-	{
-		this.success = true;
-		this.errorDetails = null;
-	}
+  public void setFailure(ErrorDescriptor error) {
+    this.success = false;
+    this.errorDetails = error;
+  }
 
-	public void setFailure()
-	{
-		setFailure(null);
-	}
+  public void setWarning(boolean flag) {
+    this.hasWarning = flag;
+  }
 
-	public void setFailure(ErrorDescriptor error)
-	{
-		this.success = false;
-		this.errorDetails = error;
-	}
+  public boolean hasWarning() {
+    return this.hasWarning;
+  }
 
-	public void setWarning(boolean flag)
-	{
-		this.hasWarning = flag;
-	}
+  public ErrorDescriptor getErrorDescriptor() {
+    return errorDetails;
+  }
 
-	public boolean hasWarning()
-	{
-		return this.hasWarning;
-	}
+  public boolean isSuccess() {
+    return this.success;
+  }
 
-	public ErrorDescriptor getErrorDescriptor()
-	{
-		return errorDetails;
-	}
+  public String getSourceCommand() {
+    return this.sourceCommand;
+  }
 
-	public boolean isSuccess()
-	{
-		return this.success;
-	}
+  /**
+   * Define the SQL statement that generated this
+   * result. This is mainly used in the GUI to display
+   * a tooltip for the result-tab
+   *
+   * @param sql
+   */
+  public void setSourceCommand(String sql) {
+    sourceCommand = sql;
+  }
 
-	/**
-	 * Define the SQL statement that generated this
-	 * result. This is mainly used in the GUI to display
-	 * a tooltip for the result-tab
-	 *
-	 * @param sql
-	 */
-	public void setSourceCommand(String sql)
-	{
-		sourceCommand = sql;
-	}
+  public int addDataStore(DataStore ds) {
+    if (this.datastores == null) this.datastores = new ArrayList<>(5);
+    if (ds != null) {
+      ds.resetCancelStatus();
+      this.datastores.add(ds);
+    }
+    return this.datastores.size();
+  }
 
-	public String getSourceCommand()
-	{
-		return this.sourceCommand;
-	}
+  public int addResultSet(ResultSet rs) {
+    if (this.results == null) this.results = new LinkedList<>();
+    this.results.add(rs);
+    return this.results.size();
+  }
 
-	public int addDataStore(DataStore ds)
-	{
-		if (this.datastores == null) this.datastores = new ArrayList<>(5);
-		if (ds != null)
-		{
-			ds.resetCancelStatus();
-			this.datastores.add(ds);
-		}
-		return this.datastores.size();
-	}
+  public void addUpdateCountMsg(int count) {
+    if (ignoreUpdateCount) return;
+    this.totalUpdateCount += count;
+    addMessage(ResourceMgr.getFormattedString("MsgRowsAffected", count));
+  }
 
-	public int addResultSet(ResultSet rs)
-	{
-		if (this.results == null) this.results = new LinkedList<>();
-		this.results.add(rs);
-		return this.results.size();
-	}
+  public void addMessageByKey(String key) {
+    addMessage(ResourceMgr.getString(key));
+  }
 
-	public void addUpdateCountMsg(int count)
-	{
-		if (ignoreUpdateCount) return;
-		this.totalUpdateCount += count;
-		addMessage(ResourceMgr.getFormattedString("MsgRowsAffected", count));
-	}
+  public void addMessage(MessageBuffer buffer) {
+    if (buffer == null) return;
+    this.messages.append(buffer);
+  }
 
-	public void addMessageByKey(String key)
-	{
-		addMessage(ResourceMgr.getString(key));
-	}
-	public void addMessage(MessageBuffer buffer)
-	{
-		if (buffer == null) return;
-		this.messages.append(buffer);
-	}
+  public void addMessageNewLine() {
+    this.messages.appendNewLine();
+  }
 
-	public void addMessageNewLine()
-	{
-		this.messages.appendNewLine();
-	}
+  public void addMessage(CharSequence msgBuffer) {
+    if (msgBuffer == null) return;
+    if (messages.getLength() > 0) messages.appendNewLine();
+    messages.append(msgBuffer);
+  }
 
-	public void addMessage(CharSequence msgBuffer)
-	{
-		if (msgBuffer == null) return;
-		if (messages.getLength() > 0) messages.appendNewLine();
-		messages.append(msgBuffer);
-	}
+  public boolean hasData() {
+    return (this.hasResultSets() || this.hasDataStores());
+  }
 
-	public boolean hasData()
-	{
-		return (this.hasResultSets() || this.hasDataStores());
-	}
+  public boolean hasMessages() {
+    if (this.messages == null) return false;
+    return (messages.getLength() > 0);
+  }
 
-	public boolean hasMessages()
-	{
-		if (this.messages == null) return false;
-		return (messages.getLength() > 0);
-	}
+  public boolean hasResultSets() {
+    return (this.results != null && this.results.size() > 0);
+  }
 
-	public boolean hasResultSets()
-	{
-		return (this.results != null && this.results.size() > 0);
-	}
+  public boolean hasDataStores() {
+    return (this.datastores != null && this.datastores.size() > 0);
+  }
 
-	public boolean hasDataStores()
-	{
-		return (this.datastores != null && this.datastores.size() > 0);
-	}
+  public List<DataStore> getDataStores() {
+    return this.datastores;
+  }
 
-	public List<DataStore> getDataStores()
-	{
-		return this.datastores;
-	}
+  public List<ResultSet> getResultSets() {
+    return this.results;
+  }
 
-	public List<ResultSet> getResultSets()
-	{
-		return this.results;
-	}
+  /**
+   * Return the messages that have been collected for this result.
+   * This will clear the internal buffer used to store the messages.
+   *
+   * @see workbench.util.MessageBuffer#getBuffer()
+   */
+  public CharSequence getMessageBuffer() {
+    if (this.messages == null) return null;
+    return messages.getBuffer();
+  }
 
-	/**
-	 * Return the messages that have been collected for this result.
-	 * This will clear the internal buffer used to store the messages.
-	 *
-	 * @see workbench.util.MessageBuffer#getBuffer()
-	 */
-	public CharSequence getMessageBuffer()
-	{
-		if (this.messages == null) return null;
-		return messages.getBuffer();
-	}
+  public long getTotalUpdateCount() {
+    return totalUpdateCount;
+  }
 
-	public long getTotalUpdateCount()
-	{
-		return totalUpdateCount;
-	}
+  /**
+   * Clears stored ResultSets and DataStores. The content of
+   * the datastores will be removed!
+   *
+   * @see #clearResultSets()
+   */
+  public void clearResultData() {
+    if (this.datastores != null) {
+      //for (int i = 0; i < datastores.size(); i++)
+      for (DataStore ds : datastores) {
+        if (ds != null) ds.reset();
+      }
+      this.datastores.clear();
+    }
+    this.clearResultSets();
+  }
 
-	/**
-	 * Clears stored ResultSets and DataStores. The content of
-	 * the datastores will be removed!
-	 * @see #clearResultSets()
-	 */
-	public void clearResultData()
-	{
-		if (this.datastores != null)
-		{
-			//for (int i = 0; i < datastores.size(); i++)
-			for (DataStore ds : datastores)
-			{
-				if (ds != null) ds.reset();
-			}
-			this.datastores.clear();
-		}
-		this.clearResultSets();
-	}
+  /**
+   * Closes all "stored" ResultSets
+   */
+  public void clearResultSets() {
+    if (this.results != null) {
+      for (ResultSet rs : results) {
+        if (rs != null) {
+          try {
+            rs.clearWarnings();
+          } catch (Exception th) {
+          }
+          try {
+            rs.close();
+          } catch (Exception th) {
+          }
+        }
+      }
+      this.results.clear();
+    }
+  }
 
-	/**
-	 * Closes all "stored" ResultSets
-	 */
-	public void clearResultSets()
-	{
-		if (this.results != null)
-		{
-			for (ResultSet rs : results)
-			{
-				if (rs != null)
-				{
-					try { rs.clearWarnings(); } catch (Exception th) {}
-					try { rs.close(); } catch (Exception th) {}
-				}
-			}
-			this.results.clear();
-		}
-	}
+  public void clearMessageBuffer() {
+    this.messages.clear();
+  }
 
-	public void clearMessageBuffer()
-	{
-		this.messages.clear();
-	}
+  public void clear() {
+    // Do not call clearResultData() !!!
+    // otherwise the content of the retrieved DataStores will also
+    // be removed and as they are re-used by DwPanel or TableDataPanel
+    // they might still be in use.
 
-	public void clear()
-	{
-		// Do not call clearResultData() !!!
-		// otherwise the content of the retrieved DataStores will also
-		// be removed and as they are re-used by DwPanel or TableDataPanel
-		// they might still be in use.
-
-		// We only want to free the list itself.
-		if (this.datastores != null)
-		{
-			this.datastores.clear();
-		}
-		clearResultSets();
-		clearMessageBuffer();
-		this.totalUpdateCount = 0;
-		this.sourceCommand = null;
-		this.hasWarning = false;
-		this.executionTime = -1;
-		this.errorDetails = null;
-	}
+    // We only want to free the list itself.
+    if (this.datastores != null) {
+      this.datastores.clear();
+    }
+    clearResultSets();
+    clearMessageBuffer();
+    this.totalUpdateCount = 0;
+    this.sourceCommand = null;
+    this.hasWarning = false;
+    this.executionTime = -1;
+    this.errorDetails = null;
+  }
 
 }

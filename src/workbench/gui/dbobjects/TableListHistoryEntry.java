@@ -26,39 +26,32 @@ import workbench.db.TableIdentifier;
 import workbench.util.StringUtil;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class TableListHistoryEntry
-{
+public class TableListHistoryEntry {
 
-	private TableIdentifier selectedTable;
-	private String regexFilter;
-	private int selectedDetailTab;
+  private TableIdentifier selectedTable;
+  private String regexFilter;
+  private int selectedDetailTab;
 
-	public TableListHistoryEntry(TableIdentifier tbl, String filter, int selectedTab)
-	{
-		selectedTable = tbl;
-		if (StringUtil.isNonBlank(filter))
-		{
-			regexFilter = filter;
-		}
-		selectedDetailTab = selectedTab;
-	}
+  public TableListHistoryEntry(TableIdentifier tbl, String filter, int selectedTab) {
+    selectedTable = tbl;
+    if (StringUtil.isNonBlank(filter)) {
+      regexFilter = filter;
+    }
+    selectedDetailTab = selectedTab;
+  }
 
-	public String getRegexFilter()
-	{
-		return regexFilter;
-	}
+  public String getRegexFilter() {
+    return regexFilter;
+  }
 
-	public int getSelectedTab()
-	{
-		return selectedDetailTab;
-	}
+  public int getSelectedTab() {
+    return selectedDetailTab;
+  }
 
-	public TableIdentifier getSelectedTable()
-	{
-		return selectedTable;
-	}
+  public TableIdentifier getSelectedTable() {
+    return selectedTable;
+  }
 
 }

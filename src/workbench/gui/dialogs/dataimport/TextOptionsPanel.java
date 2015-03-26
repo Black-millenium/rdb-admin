@@ -22,196 +22,176 @@
  */
 package workbench.gui.dialogs.dataimport;
 
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-
-import javax.swing.JPanel;
-
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
 import workbench.db.importer.TextImportOptions;
-
 import workbench.gui.dialogs.QuoteEscapeSelector;
 import workbench.gui.dialogs.QuoteSettingVerifier;
-
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
 import workbench.util.QuoteEscapeType;
 import workbench.util.StringUtil;
 
+import javax.swing.*;
+import java.awt.*;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class TextOptionsPanel
-	extends JPanel
-	implements TextImportOptions
-{
+    extends JPanel
+    implements TextImportOptions {
 
-	public TextOptionsPanel()
-	{
-		super();
-		initComponents();
-		// The verifier will register itself with the two checkboxes
-		new QuoteSettingVerifier((QuoteEscapeSelector)escapeSelect, quoteAlways);
-		Font font = decimalCharTextField.getFont();
-		if (font != null)
-		{
-			FontMetrics fm = decimalCharTextField.getFontMetrics(font);
-			if (fm != null)
-			{
-				int width = fm.charWidth('M');
-				int height = fm.getHeight();
-				Dimension min = new Dimension(width * 3, height);
-				decimalCharTextField.setMinimumSize(min);
-				delimiter.setMinimumSize(min);
-				quoteChar.setMinimumSize(min);
-			}
-		}
-	}
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JLabel decimalCharLabel;
+  private javax.swing.JTextField decimalCharTextField;
+  private javax.swing.JCheckBox decode;
+  private javax.swing.JTextField delimiter;
+  private javax.swing.JLabel delimiterLabel;
+  private javax.swing.JComboBox escapeSelect;
+  private javax.swing.JCheckBox headerIncluded;
+  private javax.swing.JLabel jLabel1;
+  private javax.swing.JCheckBox quoteAlways;
+  private javax.swing.JTextField quoteChar;
+  private javax.swing.JLabel quoteCharLabel;
 
-	public void saveSettings()
-	{
-		saveSettings("text");
-	}
+  public TextOptionsPanel() {
+    super();
+    initComponents();
+    // The verifier will register itself with the two checkboxes
+    new QuoteSettingVerifier((QuoteEscapeSelector) escapeSelect, quoteAlways);
+    Font font = decimalCharTextField.getFont();
+    if (font != null) {
+      FontMetrics fm = decimalCharTextField.getFontMetrics(font);
+      if (fm != null) {
+        int width = fm.charWidth('M');
+        int height = fm.getHeight();
+        Dimension min = new Dimension(width * 3, height);
+        decimalCharTextField.setMinimumSize(min);
+        delimiter.setMinimumSize(min);
+        quoteChar.setMinimumSize(min);
+      }
+    }
+  }
 
-	public void saveSettings(String key)
-	{
-		Settings s = Settings.getInstance();
-		s.setProperty("workbench.import."  + key + ".containsheader", this.getContainsHeader());
-		s.setProperty("workbench.import." + key + ".decode", this.getDecode());
-		s.setDelimiter("workbench.import." + key + ".fielddelimiter", getTextDelimiter());
-		s.setProperty("workbench.import." + key + ".quotechar", this.getTextQuoteChar());
-		s.setProperty("workbench.import." + key + ".decimalchar", this.getDecimalChar());
-		s.setProperty("workbench.import." + key + ".quote.escape", getQuoteEscaping().toString());
-		s.setProperty("workbench.import." + key + ".quotealways", this.getQuoteAlways());
-	}
+  public void saveSettings() {
+    saveSettings("text");
+  }
 
-	public void restoreSettings()
-	{
-		restoreSettings("text");
-	}
+  public void saveSettings(String key) {
+    Settings s = Settings.getInstance();
+    s.setProperty("workbench.import." + key + ".containsheader", this.getContainsHeader());
+    s.setProperty("workbench.import." + key + ".decode", this.getDecode());
+    s.setDelimiter("workbench.import." + key + ".fielddelimiter", getTextDelimiter());
+    s.setProperty("workbench.import." + key + ".quotechar", this.getTextQuoteChar());
+    s.setProperty("workbench.import." + key + ".decimalchar", this.getDecimalChar());
+    s.setProperty("workbench.import." + key + ".quote.escape", getQuoteEscaping().toString());
+    s.setProperty("workbench.import." + key + ".quotealways", this.getQuoteAlways());
+  }
 
-	public void restoreSettings(String key)
-	{
-		Settings s = Settings.getInstance();
-		this.setContainsHeader(s.getBoolProperty("workbench.import." + key + ".containsheader", true));
-		this.setDecode(s.getBoolProperty("workbench.import." + key + ".decode", false));
-		this.setTextQuoteChar(s.getProperty("workbench.import." + key + ".quotechar", s.getQuoteChar()));
-		this.quoteAlways.setSelected(s.getBoolProperty("workbench.import." + key + ".quotealways", false));
-		this.setTextDelimiter(s.getDelimiter("workbench.import." + key + ".fielddelimiter", "\\t", true));
-		this.setDecimalChar(s.getProperty("workbench.import." + key + ".decimalchar", "."));
-		String quote = s.getProperty("workbench.import." + key + ".quote.escape", "none");
-		QuoteEscapeType escape = null;
-		try
-		{
-			escape = QuoteEscapeType.valueOf(quote);
-		}
-		catch (Exception e)
-		{
-			escape = QuoteEscapeType.none;
-		}
-		((QuoteEscapeSelector)escapeSelect).setEscapeType(escape);
-	}
+  public void restoreSettings() {
+    restoreSettings("text");
+  }
 
-	@Override
-	public boolean getQuoteAlways()
-	{
-		return this.quoteAlways.isSelected();
-	}
+  public void restoreSettings(String key) {
+    Settings s = Settings.getInstance();
+    this.setContainsHeader(s.getBoolProperty("workbench.import." + key + ".containsheader", true));
+    this.setDecode(s.getBoolProperty("workbench.import." + key + ".decode", false));
+    this.setTextQuoteChar(s.getProperty("workbench.import." + key + ".quotechar", s.getQuoteChar()));
+    this.quoteAlways.setSelected(s.getBoolProperty("workbench.import." + key + ".quotealways", false));
+    this.setTextDelimiter(s.getDelimiter("workbench.import." + key + ".fielddelimiter", "\\t", true));
+    this.setDecimalChar(s.getProperty("workbench.import." + key + ".decimalchar", "."));
+    String quote = s.getProperty("workbench.import." + key + ".quote.escape", "none");
+    QuoteEscapeType escape = null;
+    try {
+      escape = QuoteEscapeType.valueOf(quote);
+    } catch (Exception e) {
+      escape = QuoteEscapeType.none;
+    }
+    ((QuoteEscapeSelector) escapeSelect).setEscapeType(escape);
+  }
 
-	@Override
-	public QuoteEscapeType getQuoteEscaping()
-	{
-		return ((QuoteEscapeSelector)escapeSelect).getEscapeType();
-	}
+  @Override
+  public boolean getQuoteAlways() {
+    return this.quoteAlways.isSelected();
+  }
 
-	@Override
-	public boolean getDecode()
-	{
-		return this.decode.isSelected();
-	}
+  @Override
+  public QuoteEscapeType getQuoteEscaping() {
+    return ((QuoteEscapeSelector) escapeSelect).getEscapeType();
+  }
 
-	@Override
-	public void setDecode(boolean flag)
-	{
-		this.decode.setSelected(flag);
-	}
+  @Override
+  public boolean getDecode() {
+    return this.decode.isSelected();
+  }
 
-	@Override
-	public boolean getContainsHeader()
-	{
-		return this.headerIncluded.isSelected();
-	}
+  @Override
+  public void setDecode(boolean flag) {
+    this.decode.setSelected(flag);
+  }
 
-	@Override
-	public String getTextDelimiter()
-	{
-		return this.delimiter.getText();
-	}
+  @Override
+  public boolean getContainsHeader() {
+    return this.headerIncluded.isSelected();
+  }
 
-	@Override
-	public String getTextQuoteChar()
-	{
-		return this.quoteChar.getText();
-	}
+  @Override
+  public void setContainsHeader(boolean flag) {
+    this.headerIncluded.setSelected(flag);
+  }
 
-	public void disableHeaderSelection()
-	{
-		this.headerIncluded.setEnabled(false);
-	}
-	@Override
-	public void setContainsHeader(boolean flag)
-	{
-		this.headerIncluded.setSelected(flag);
-	}
+  @Override
+  public String getTextDelimiter() {
+    return this.delimiter.getText();
+  }
 
-	@Override
-	public void setTextDelimiter(String delim)
-	{
-		this.delimiter.setText(delim);
-	}
+  @Override
+  public void setTextDelimiter(String delim) {
+    this.delimiter.setText(delim);
+  }
 
-	@Override
-	public void setTextQuoteChar(String quote)
-	{
-		this.quoteChar.setText(quote);
-	}
+  @Override
+  public String getTextQuoteChar() {
+    return this.quoteChar.getText();
+  }
 
-	@Override
-	public String getDecimalChar()
-	{
-		String s = this.decimalCharTextField.getText();
-		if (StringUtil.isBlank(s)) return ".";
-		return s.trim();
-	}
+  @Override
+  public void setTextQuoteChar(String quote) {
+    this.quoteChar.setText(quote);
+  }
 
-	@Override
-	public void setDecimalChar(String s)
-	{
-		this.decimalCharTextField.setText(s);
-	}
+  public void disableHeaderSelection() {
+    this.headerIncluded.setEnabled(false);
+  }
 
-	@Override
-	public String getNullString()
-	{
-		return null;
-	}
+  @Override
+  public String getDecimalChar() {
+    String s = this.decimalCharTextField.getText();
+    if (StringUtil.isBlank(s)) return ".";
+    return s.trim();
+  }
 
-	@Override
-	public void setNullString(String nullString)
-	{
-	}
+  @Override
+  public void setDecimalChar(String s) {
+    this.decimalCharTextField.setText(s);
+  }
 
+  @Override
+  public String getNullString() {
+    return null;
+  }
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  @Override
+  public void setNullString(String nullString) {
+  }
+
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
 
     delimiterLabel = new javax.swing.JLabel();
@@ -332,20 +312,6 @@ public class TextOptionsPanel
     gridBagConstraints.insets = new java.awt.Insets(5, 4, 0, 4);
     add(escapeSelect, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
-
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JLabel decimalCharLabel;
-  private javax.swing.JTextField decimalCharTextField;
-  private javax.swing.JCheckBox decode;
-  private javax.swing.JTextField delimiter;
-  private javax.swing.JLabel delimiterLabel;
-  private javax.swing.JComboBox escapeSelect;
-  private javax.swing.JCheckBox headerIncluded;
-  private javax.swing.JLabel jLabel1;
-  private javax.swing.JCheckBox quoteAlways;
-  private javax.swing.JTextField quoteChar;
-  private javax.swing.JLabel quoteCharLabel;
   // End of variables declaration//GEN-END:variables
 
 }

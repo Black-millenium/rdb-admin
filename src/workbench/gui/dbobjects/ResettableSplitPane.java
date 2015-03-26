@@ -22,37 +22,33 @@
  */
 package workbench.gui.dbobjects;
 
-import java.util.HashSet;
-import java.util.Set;
 import workbench.gui.components.WbSplitPane;
 import workbench.interfaces.Resettable;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Thomas Kellerer
  */
 public class ResettableSplitPane
-	extends WbSplitPane
-	implements Resettable
-{
-	private Set<Resettable> clients = new HashSet<>();
-	
-	public ResettableSplitPane(int type)
-	{
-		super(type);
-	}
-	
-	public void addClient(Resettable r)
-	{
-		clients.add(r);
-	}
-	
-	public void reset()
-	{
-		for (Resettable r : clients)
-		{
-			r.reset();
-		}
-	}
-	
-	
+    extends WbSplitPane
+    implements Resettable {
+  private Set<Resettable> clients = new HashSet<>();
+
+  public ResettableSplitPane(int type) {
+    super(type);
+  }
+
+  public void addClient(Resettable r) {
+    clients.add(r);
+  }
+
+  public void reset() {
+    for (Resettable r : clients) {
+      r.reset();
+    }
+  }
+
+
 }

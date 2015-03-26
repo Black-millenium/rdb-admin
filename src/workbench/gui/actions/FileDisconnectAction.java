@@ -22,12 +22,11 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import workbench.resource.ResourceMgr;
-
 import workbench.gui.MainWindow;
 import workbench.gui.WbSwingUtilities;
+import workbench.resource.ResourceMgr;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Disconnect the current window.
@@ -35,33 +34,26 @@ import workbench.gui.WbSwingUtilities;
  * @author Thomas Kellerer
  */
 public class FileDisconnectAction
-	extends WbAction
-{
-	private MainWindow window;
+    extends WbAction {
+  private MainWindow window;
 
-	public FileDisconnectAction(MainWindow aWindow)
-	{
-		super();
-		this.window = aWindow;
-		this.initMenuDefinition("MnuTxtDisconnect");
-		setEnabled(false);
-	}
+  public FileDisconnectAction(MainWindow aWindow) {
+    super();
+    this.window = aWindow;
+    this.initMenuDefinition("MnuTxtDisconnect");
+    setEnabled(false);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		if (isCtrlPressed(e) && invokedByMouse(e))
-		{
-			boolean doIt = WbSwingUtilities.getYesNo(window, ResourceMgr.getString("MsgAbortWarning"));
+  @Override
+  public void executeAction(ActionEvent e) {
+    if (isCtrlPressed(e) && invokedByMouse(e)) {
+      boolean doIt = WbSwingUtilities.getYesNo(window, ResourceMgr.getString("MsgAbortWarning"));
 
-			if (doIt)
-			{
-				window.forceDisconnect();
-			}
-		}
-		else
-		{
-			window.disconnect(true, true, true);
-		}
-	}
+      if (doIt) {
+        window.forceDisconnect();
+      }
+    } else {
+      window.disconnect(true, true, true);
+    }
+  }
 }

@@ -22,43 +22,37 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
 import workbench.interfaces.ClipboardSupport;
 import workbench.resource.PlatformShortcuts;
 import workbench.resource.ResourceMgr;
-
 import workbench.util.MacOSHelper;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 
 /**
- *	Action to paste the contents of the clipboard into the entry field
+ * Action to paste the contents of the clipboard into the entry field
  *
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class PasteAction extends WbAction
-{
-	private ClipboardSupport client;
+public class PasteAction extends WbAction {
+  private ClipboardSupport client;
 
-	public PasteAction(ClipboardSupport aClient)
-	{
-		super();
-		this.client = aClient;
-		initMenuDefinition("MnuTxtPaste", PlatformShortcuts.getDefaultPasteShortcut());
-		if (!MacOSHelper.isMacOS())
-		{
-			setAlternateAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, KeyEvent.SHIFT_MASK));
-		}
-		this.setIcon("paste");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-	}
+  public PasteAction(ClipboardSupport aClient) {
+    super();
+    this.client = aClient;
+    initMenuDefinition("MnuTxtPaste", PlatformShortcuts.getDefaultPasteShortcut());
+    if (!MacOSHelper.isMacOS()) {
+      setAlternateAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, KeyEvent.SHIFT_MASK));
+    }
+    this.setIcon("paste");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.paste();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.paste();
+  }
 }

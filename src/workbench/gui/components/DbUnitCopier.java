@@ -22,30 +22,26 @@
  */
 package workbench.gui.components;
 
-import java.io.StringWriter;
-
 import org.dbunit.dataset.DefaultDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
-
 import workbench.storage.DataStore;
 
+import java.io.StringWriter;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public class DbUnitCopier
-{
-	public String createDBUnitXMLDataString(DataStore data)
-		throws Exception
-	{
-		if (data == null) return null;
-		if (data.getRowCount() <= 0) return null;
+public class DbUnitCopier {
+  public String createDBUnitXMLDataString(DataStore data)
+      throws Exception {
+    if (data == null) return null;
+    if (data.getRowCount() <= 0) return null;
 
-		IDataSet fullDataSet = new DefaultDataSet(new DBUnitTableAdapter(data));
-		StringWriter s = new StringWriter();
-		FlatXmlDataSet.write(fullDataSet, s);
-		return s.toString();
-	}
+    IDataSet fullDataSet = new DefaultDataSet(new DBUnitTableAdapter(data));
+    StringWriter s = new StringWriter();
+    FlatXmlDataSet.write(fullDataSet, s);
+    return s.toString();
+  }
 
 }

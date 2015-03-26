@@ -22,65 +22,55 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
 import workbench.gui.WbSwingUtilities;
 import workbench.gui.sql.AutomaticRefreshMgr;
 import workbench.gui.sql.DwPanel;
 import workbench.gui.sql.SqlPanel;
-
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
 import workbench.storage.DataStore;
 
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class AutomaticReloadAction
-	extends WbAction
-{
-	private SqlPanel client;
+    extends WbAction {
+  private SqlPanel client;
 
-	public AutomaticReloadAction(SqlPanel panel)
-	{
-		initMenuDefinition("MnuTxtReloadAutomatic");
-		setClient(panel);
-	}
+  public AutomaticReloadAction(SqlPanel panel) {
+    initMenuDefinition("MnuTxtReloadAutomatic");
+    setClient(panel);
+  }
 
-	public final void setClient(SqlPanel panel)
-	{
-		client = panel;
-		checkEnabled();
-	}
+  public final void setClient(SqlPanel panel) {
+    client = panel;
+    checkEnabled();
+  }
 
-	public void checkEnabled()
-	{
-		boolean canRefresh = false;
-    DwPanel dw =  client.getCurrentResult();
-    if (dw != null)
-    {
+  public void checkEnabled() {
+    boolean canRefresh = false;
+    DwPanel dw = client.getCurrentResult();
+    if (dw != null) {
       DataStore ds = dw.getDataStore();
       canRefresh = (ds != null ? ds.getOriginalConnection() != null : false);
     }
-		setEnabled(canRefresh);
-	}
+    setEnabled(canRefresh);
+  }
 
-	@Override
-	public void executeAction(ActionEvent evt)
-	{
-    DwPanel dw =  client.getCurrentResult();
+  @Override
+  public void executeAction(ActionEvent evt) {
+    DwPanel dw = client.getCurrentResult();
     String lastValue = Settings.getInstance().getProperty("workbench.gui.result.refresh.last_interval", null);
     String interval = WbSwingUtilities.getUserInput(client, ResourceMgr.getString("LblRefreshIntv"), lastValue);
     if (interval == null) return;
     Settings.getInstance().setProperty("workbench.gui.result.refresh.last_interval", interval);
     int milliSeconds = AutomaticRefreshMgr.parseInterval(interval);
-    if (dw != null)
-    {
+    if (dw != null) {
       client.getRefreshMgr().addRefresh(client, dw, milliSeconds);
       client.checkAutoRefreshIndicator(dw);
     }
-	}
+  }
 
 }

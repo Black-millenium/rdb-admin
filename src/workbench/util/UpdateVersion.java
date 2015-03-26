@@ -23,12 +23,10 @@
 package workbench.util;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum UpdateVersion
-{
-	devBuild,
-	stable,
-	none;
+public enum UpdateVersion {
+  devBuild,
+  stable,
+  none;
 }

@@ -22,64 +22,58 @@
  */
 package workbench.db.report;
 
-import java.util.Collection;
-import java.util.Collections;
-
 import workbench.db.TableGrant;
 import workbench.db.TableGrantReader;
 import workbench.db.TableIdentifier;
 import workbench.db.WbConnection;
 
+import java.util.Collection;
+import java.util.Collections;
+
 
 /**
  * Generate XML report information about table grants.
  *
- * @see workbench.db.TableGrantReader#getTableGrants(workbench.db.WbConnection, workbench.db.TableIdentifier)
  * @author Thomas Kellerer
+ * @see workbench.db.TableGrantReader#getTableGrants(workbench.db.WbConnection, workbench.db.TableIdentifier)
  */
-public class ReportTableGrants
-{
-	public static final String TAG_GRANT = "grant";
-	public static final String TAG_GRANT_GRANTEE = "grantee";
-	public static final String TAG_GRANT_PRIV = "privilege";
-	public static final String TAG_GRANT_GRANTABLE = "grantable";
-	private Collection<TableGrant> grants;
+public class ReportTableGrants {
+  public static final String TAG_GRANT = "grant";
+  public static final String TAG_GRANT_GRANTEE = "grantee";
+  public static final String TAG_GRANT_PRIV = "privilege";
+  public static final String TAG_GRANT_GRANTABLE = "grantable";
+  private Collection<TableGrant> grants;
 
-	public ReportTableGrants(WbConnection con, TableIdentifier tbl)
-	{
-		TableGrantReader reader = new TableGrantReader();
-		grants = reader.getTableGrants(con, tbl);
-	}
+  public ReportTableGrants(WbConnection con, TableIdentifier tbl) {
+    TableGrantReader reader = new TableGrantReader();
+    grants = reader.getTableGrants(con, tbl);
+  }
 
-	public ReportTableGrants(Collection<TableGrant> tableGrants)
-	{
-		this.grants = tableGrants;
-	}
+  public ReportTableGrants(Collection<TableGrant> tableGrants) {
+    this.grants = tableGrants;
+  }
 
-	public void appendXml(StringBuilder result, StringBuilder indent)
-	{
-		if (grants.isEmpty()) return;
+  public void appendXml(StringBuilder result, StringBuilder indent) {
+    if (grants.isEmpty()) return;
 
-		TagWriter tagWriter = new TagWriter();
+    TagWriter tagWriter = new TagWriter();
 
-		StringBuilder indent1 = new StringBuilder(indent);
-		indent1.append("  ");
+    StringBuilder indent1 = new StringBuilder(indent);
+    indent1.append("  ");
 
-		for (TableGrant grant : grants)
-		{
-			tagWriter.appendOpenTag(result, indent, TAG_GRANT);
-			result.append('\n');
-			tagWriter.appendTag(result, indent1, TAG_GRANT_PRIV, grant.getPrivilege());
-			tagWriter.appendTag(result, indent1, TAG_GRANT_GRANTEE, grant.getGrantee());
-			tagWriter.appendTag(result, indent1, TAG_GRANT_GRANTABLE, grant.isGrantable());
-			tagWriter.appendCloseTag(result, indent, TAG_GRANT);
-		}
-	}
+    for (TableGrant grant : grants) {
+      tagWriter.appendOpenTag(result, indent, TAG_GRANT);
+      result.append('\n');
+      tagWriter.appendTag(result, indent1, TAG_GRANT_PRIV, grant.getPrivilege());
+      tagWriter.appendTag(result, indent1, TAG_GRANT_GRANTEE, grant.getGrantee());
+      tagWriter.appendTag(result, indent1, TAG_GRANT_GRANTABLE, grant.isGrantable());
+      tagWriter.appendCloseTag(result, indent, TAG_GRANT);
+    }
+  }
 
-	public Collection<TableGrant> getGrants()
-	{
-		return Collections.unmodifiableCollection(grants);
-	}
+  public Collection<TableGrant> getGrants() {
+    return Collections.unmodifiableCollection(grants);
+  }
 
 }
 

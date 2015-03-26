@@ -22,39 +22,35 @@
  */
 package workbench.gui.actions;
 
+import workbench.gui.sql.SqlPanel;
+import workbench.resource.ResourceMgr;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.KeyStroke;
-
-import workbench.resource.ResourceMgr;
-
-import workbench.gui.sql.SqlPanel;
-
 /**
  * Run all statements in the current SQL Panel
+ *
+ * @author Thomas Kellerer
  * @see workbench.gui.sql.SqlPanel#runCurrentStatement()
- *	@author  Thomas Kellerer
  */
 public class ExecuteCurrentAction
-	extends WbAction
-{
-	private SqlPanel target;
+    extends WbAction {
+  private SqlPanel target;
 
-	public ExecuteCurrentAction(SqlPanel aPanel)
-	{
-		super();
-		this.target = aPanel;
-		this.initMenuDefinition("MnuTxtExecuteCurrent", KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK));
-		this.setIcon("execute_current");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
-	}
+  public ExecuteCurrentAction(SqlPanel aPanel) {
+    super();
+    this.target = aPanel;
+    this.initMenuDefinition("MnuTxtExecuteCurrent", KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK));
+    this.setIcon("execute_current");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.target.runCurrentStatement();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.target.runCurrentStatement();
+  }
 
 }

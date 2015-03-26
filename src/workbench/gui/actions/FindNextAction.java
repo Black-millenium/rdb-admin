@@ -22,36 +22,33 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
 import workbench.interfaces.Searchable;
 import workbench.resource.ResourceMgr;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 
 /**
- *	Find the next occurance of a search string.
- *	@author  Thomas Kellerer
+ * Find the next occurance of a search string.
+ *
+ * @author Thomas Kellerer
  */
 public class FindNextAction
-	extends WbAction
-{
-	private Searchable client;
+    extends WbAction {
+  private Searchable client;
 
-	public FindNextAction(Searchable aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtFindAgain", KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
-		this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-		this.setDescriptiveName(ResourceMgr.getString("TxtEdPrefix") + " " + getMenuLabel());
-	}
+  public FindNextAction(Searchable aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtFindAgain", KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
+    this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+    this.setDescriptiveName(ResourceMgr.getString("TxtEdPrefix") + " " + getMenuLabel());
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.findNext();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.findNext();
+  }
 }

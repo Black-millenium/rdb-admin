@@ -26,39 +26,30 @@ import workbench.log.LogMgr;
 import workbench.util.WbFile;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class XmlTableNameResolver
-	implements TablenameResolver
-{
-	private String encoding;
+    implements TablenameResolver {
+  private String encoding;
 
-	public XmlTableNameResolver(String enc)
-	{
-		this.encoding = enc;
-	}
+  public XmlTableNameResolver(String enc) {
+    this.encoding = enc;
+  }
 
-	@Override
-	public String getTableName(WbFile f)
-	{
-		String tablename = f.getFileName();
-		ImportFileHandler handler = new ImportFileHandler();
-		try
-		{
-			handler.setMainFile(f, this.encoding);
-			XmlTableDefinitionParser parser = new XmlTableDefinitionParser(handler);
-			tablename = parser.getTableName();
-		}
-		catch (Exception ex)
-		{
-			LogMgr.logError("XmlTableNameResolver.getTableName()", "Error retrieving table name", ex);
-		}
-		finally
-		{
-			handler.done();
-		}
-		return tablename;
-	}
+  @Override
+  public String getTableName(WbFile f) {
+    String tablename = f.getFileName();
+    ImportFileHandler handler = new ImportFileHandler();
+    try {
+      handler.setMainFile(f, this.encoding);
+      XmlTableDefinitionParser parser = new XmlTableDefinitionParser(handler);
+      tablename = parser.getTableName();
+    } catch (Exception ex) {
+      LogMgr.logError("XmlTableNameResolver.getTableName()", "Error retrieving table name", ex);
+    } finally {
+      handler.done();
+    }
+    return tablename;
+  }
 
 }

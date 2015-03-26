@@ -23,10 +23,8 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface Resettable
-{
-	void reset();
+public interface Resettable {
+  void reset();
 }

@@ -28,85 +28,68 @@ import workbench.resource.ResourceMgr;
  * @author Thomas Kellerer
  */
 public class ContainsComparator
-	implements ColumnComparator
-{
-	@Override
-	public String getValueExpression(Object value)
-	{
-		return (value == null ? "" : value.toString());
-	}
+    implements ColumnComparator {
+  @Override
+  public String getValueExpression(Object value) {
+    return (value == null ? "" : value.toString());
+  }
 
-	@Override
-	public String getDescription()
-	{
-		return ResourceMgr.getString("TxtOpContains");
-	}
+  @Override
+  public String getDescription() {
+    return ResourceMgr.getString("TxtOpContains");
+  }
 
-	@Override
-	public String getOperator()
-	{
-		return getDescription();
-	}
+  @Override
+  public String getOperator() {
+    return getDescription();
+  }
 
-	@Override
-	public boolean evaluate(Object reference, Object value, boolean ignoreCase)
-	{
-		if (reference == null && value == null) return true;
-		if (reference == null || value == null) return false;
-		try
-		{
-			String v = value.toString();
-			String ref = reference.toString();
-			if (ignoreCase)
-			{
-				return (v.toLowerCase().indexOf(ref.toLowerCase()) > -1);
-			}
-			else
-			{
-				return (v.indexOf(ref) > -1);
-			}
-		}
-		catch (Exception e)
-		{
-			return false;
-		}
-	}
+  @Override
+  public boolean evaluate(Object reference, Object value, boolean ignoreCase) {
+    if (reference == null && value == null) return true;
+    if (reference == null || value == null) return false;
+    try {
+      String v = value.toString();
+      String ref = reference.toString();
+      if (ignoreCase) {
+        return (v.toLowerCase().indexOf(ref.toLowerCase()) > -1);
+      } else {
+        return (v.indexOf(ref) > -1);
+      }
+    } catch (Exception e) {
+      return false;
+    }
+  }
 
-	@Override
-	public boolean supportsType(Class valueClass)
-	{
-		// as we are calling toString() in evaluate() we support all types
-		return true;
-	}
+  @Override
+  public boolean supportsType(Class valueClass) {
+    // as we are calling toString() in evaluate() we support all types
+    return true;
+  }
 
-	@Override
-	public boolean supportsIgnoreCase()
-	{
-		return true;
-	}
+  @Override
+  public boolean supportsIgnoreCase() {
+    return true;
+  }
 
-	@Override
-	public boolean needsValue()
-	{
-		return true;
-	}
+  @Override
+  public boolean needsValue() {
+    return true;
+  }
 
-	@Override
-	public boolean validateInput(Object value)
-	{
-		return true;
-	}
+  @Override
+  public boolean validateInput(Object value) {
+    return true;
+  }
 
-	@Override
-	public boolean comparesEquality()
-	{
-		return false;
-	}
+  @Override
+  public boolean comparesEquality() {
+    return false;
+  }
 
-	@Override
-	public boolean equals(Object other)
-	{
-		return (other.getClass().equals(this.getClass()));
-	}
+  @Override
+  public boolean equals(Object other) {
+    return (other.getClass().equals(this.getClass()));
+  }
 
 }

@@ -22,40 +22,33 @@
  */
 package workbench.gui.profiles;
 
-import java.awt.event.ActionEvent;
-
+import workbench.gui.actions.WbAction;
 import workbench.interfaces.GroupTree;
 import workbench.log.LogMgr;
 
-import workbench.gui.actions.WbAction;
+import java.awt.event.ActionEvent;
 
 /**
  * @author Thomas Kellerer
  */
 public class NewGroupAction
-	extends WbAction
-{
-	private GroupTree client;
+    extends WbAction {
+  private GroupTree client;
 
-	public NewGroupAction(GroupTree panel, String resourceKey)
-	{
-		super();
-		this.client = panel;
-		this.setIcon("folder_new");
-		this.initMenuDefinition(resourceKey);
-	}
+  public NewGroupAction(GroupTree panel, String resourceKey) {
+    super();
+    this.client = panel;
+    this.setIcon("folder_new");
+    this.initMenuDefinition(resourceKey);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		try
-		{
-			this.client.addGroup();
-		}
-		catch (Exception ex)
-		{
-			LogMgr.logError("NewListEntryAction.executeAction()", "Error copying profile", ex);
-		}
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    try {
+      this.client.addGroup();
+    } catch (Exception ex) {
+      LogMgr.logError("NewListEntryAction.executeAction()", "Error copying profile", ex);
+    }
+  }
 
 }

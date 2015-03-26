@@ -19,55 +19,45 @@
  */
 package workbench.gui.tools;
 
+import workbench.db.ColumnIdentifier;
 import workbench.resource.ResourceMgr;
 
-import workbench.db.ColumnIdentifier;
-
 /**
- *
  * @author Thomas Kellerer
  */
 
-class ColumnMapRow
-{
-	private ColumnIdentifier source;
-	private ColumnIdentifier target;
+class ColumnMapRow {
+  private ColumnIdentifier source;
+  private ColumnIdentifier target;
 
-	void setTarget(ColumnIdentifier id)
-	{
-		this.target = id;
-	}
+  ColumnIdentifier getSource() {
+    return this.source;
+  }
 
-	void setSource(ColumnIdentifier o)
-	{
-		this.source = o;
-	}
+  void setSource(ColumnIdentifier o) {
+    this.source = o;
+  }
 
-	ColumnIdentifier getSource()
-	{
-		return this.source;
-	}
+  ColumnIdentifier getTarget() {
+    return this.target;
+  }
 
-	ColumnIdentifier getTarget()
-	{
-		return this.target;
-	}
+  void setTarget(ColumnIdentifier id) {
+    this.target = id;
+  }
 
-	@Override
-	public String toString()
-	{
-		return "Mapping " + source + " -> " + target;
-	}
+  @Override
+  public String toString() {
+    return "Mapping " + source + " -> " + target;
+  }
 }
 
-class SkipColumnIndicator
-{
-	private final String display = ResourceMgr.getString("LblDPDoNotCopyColumns");
+class SkipColumnIndicator {
+  private final String display = ResourceMgr.getString("LblDPDoNotCopyColumns");
 
-	@Override
-	public String toString()
-	{
-		return display;
-	}
+  @Override
+  public String toString() {
+    return display;
+  }
 
 }

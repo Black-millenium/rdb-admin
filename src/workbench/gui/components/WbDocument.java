@@ -24,56 +24,47 @@ package workbench.gui.components;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.AbstractDocument.Content;
 import javax.swing.text.PlainDocument;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class WbDocument
-	extends PlainDocument
-	implements DocumentListener
-{
-	private boolean modified;
-	public WbDocument(Content c)
-	{
-		super(c);
-		addDocumentListener(this);
-	}
+    extends PlainDocument
+    implements DocumentListener {
+  private boolean modified;
 
-	public WbDocument()
-	{
-		super();
-		addDocumentListener(this);
-	}
+  public WbDocument(Content c) {
+    super(c);
+    addDocumentListener(this);
+  }
 
-	public void resetModified()
-	{
-		modified = false;
-	}
+  public WbDocument() {
+    super();
+    addDocumentListener(this);
+  }
 
-	public boolean isModified()
-	{
-		return modified;
-	}
+  public void resetModified() {
+    modified = false;
+  }
 
-	@Override
-	public void insertUpdate(DocumentEvent e)
-	{
-		modified = true;
-	}
+  public boolean isModified() {
+    return modified;
+  }
 
-	@Override
-	public void removeUpdate(DocumentEvent e)
-	{
-		modified = true;
-	}
+  @Override
+  public void insertUpdate(DocumentEvent e) {
+    modified = true;
+  }
 
-	@Override
-	public void changedUpdate(DocumentEvent e)
-	{
-		modified = true;
-	}
+  @Override
+  public void removeUpdate(DocumentEvent e) {
+    modified = true;
+  }
+
+  @Override
+  public void changedUpdate(DocumentEvent e) {
+    modified = true;
+  }
 
 }

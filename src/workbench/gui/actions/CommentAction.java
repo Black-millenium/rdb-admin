@@ -22,43 +22,38 @@
  */
 package workbench.gui.actions;
 
+import workbench.gui.editor.TextCommenter;
+import workbench.gui.sql.EditorPanel;
+import workbench.resource.PlatformShortcuts;
+import workbench.resource.ResourceMgr;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.KeyStroke;
-import workbench.gui.editor.TextCommenter;
-import workbench.gui.sql.EditorPanel;
-
-import workbench.resource.PlatformShortcuts;
-import workbench.resource.ResourceMgr;
-
 /**
  * Action to "comment" the currently selected text in the SQL editor.
- *
+ * <p/>
  * This is done by adding single line comments to each line.
  *
+ * @author Thomas Kellerer
  * @see workbench.gui.editor.TextCommenter#commentSelection()
- * 
- * @author  Thomas Kellerer
  */
 public class CommentAction
-	extends WbAction
-{
-	private EditorPanel client;
+    extends WbAction {
+  private EditorPanel client;
 
-	public CommentAction(EditorPanel aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtCommentSelection",KeyStroke.getKeyStroke(KeyEvent.VK_C, PlatformShortcuts.getDefaultModifier() + InputEvent.SHIFT_MASK));
-		this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-	}
+  public CommentAction(EditorPanel aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtCommentSelection", KeyStroke.getKeyStroke(KeyEvent.VK_C, PlatformShortcuts.getDefaultModifier() + InputEvent.SHIFT_MASK));
+    this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		TextCommenter commenter = new TextCommenter(client);
-		commenter.commentSelection();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    TextCommenter commenter = new TextCommenter(client);
+    commenter.commentSelection();
+  }
 }

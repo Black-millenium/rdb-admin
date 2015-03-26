@@ -23,7 +23,6 @@
 package workbench.storage;
 
 /**
- *
  * An interface for the RowData class to "convert" data that is read from the database
  * on the fly.
  * <br/>
@@ -37,9 +36,10 @@ package workbench.storage;
  * @author Thomas Kellerer
  * @see RowDataReader#setConverter(workbench.storage.DataConverter)
  */
-public interface DataConverter
-{
-	boolean convertsType(int jdbcType, String dbmsType);
-	Object convertValue(int jdbcType, String dbmsType, Object originalValue);
-	Class getConvertedClass(int jdbcType, String dbmsType);
+public interface DataConverter {
+  boolean convertsType(int jdbcType, String dbmsType);
+
+  Object convertValue(int jdbcType, String dbmsType, Object originalValue);
+
+  Class getConvertedClass(int jdbcType, String dbmsType);
 }

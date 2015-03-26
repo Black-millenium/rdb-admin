@@ -21,11 +21,10 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ToolWindowManager
-{
-	void registerToolWindow(ToolWindow window);
-	void unregisterToolWindow(ToolWindow toolWindow);
+public interface ToolWindowManager {
+  void registerToolWindow(ToolWindow window);
+
+  void unregisterToolWindow(ToolWindow toolWindow);
 }

@@ -22,34 +22,32 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
+import workbench.gui.sql.SqlHistory;
 import workbench.resource.PlatformShortcuts;
 import workbench.resource.ResourceMgr;
 
-import workbench.gui.sql.SqlHistory;
+import java.awt.event.ActionEvent;
 
 /**
- *	Display the next statement from the SQL History.
- *	@author  Thomas Kellerer
+ * Display the next statement from the SQL History.
+ *
+ * @author Thomas Kellerer
  */
-public class NextStatementAction extends WbAction
-{
-	private SqlHistory history;
-	public NextStatementAction(SqlHistory aHistory)
-	{
-		super();
-		this.history = aHistory;
-		this.initMenuDefinition("MnuTxtNextStatement", PlatformShortcuts.getDefaultNextStatement());
-		this.setIcon("Forward");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
-		this.setCreateMenuSeparator(false);
-		this.setCreateToolbarSeparator(false);
- 	}
+public class NextStatementAction extends WbAction {
+  private SqlHistory history;
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.history.showNextStatement();
-	}
+  public NextStatementAction(SqlHistory aHistory) {
+    super();
+    this.history = aHistory;
+    this.initMenuDefinition("MnuTxtNextStatement", PlatformShortcuts.getDefaultNextStatement());
+    this.setIcon("Forward");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
+    this.setCreateMenuSeparator(false);
+    this.setCreateToolbarSeparator(false);
+  }
+
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.history.showNextStatement();
+  }
 }

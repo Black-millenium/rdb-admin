@@ -19,62 +19,52 @@
  */
 package workbench.gui.sql;
 
+import workbench.gui.components.WbTable;
+import workbench.sql.VariablePool;
+import workbench.util.CollectionUtil;
+
+import javax.swing.table.TableCellEditor;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
-import javax.swing.table.TableCellEditor;
-
-import workbench.gui.components.WbTable;
-
-import workbench.sql.VariablePool;
-
-import workbench.util.CollectionUtil;
-
 
 /**
- *
  * @author Thomas Kellerer
  */
 public abstract class VariablesTable
-	extends WbTable
-{
-	private DropDownCellEditor dropDownEditor;
+    extends WbTable {
+  private DropDownCellEditor dropDownEditor;
 
-	public VariablesTable()
-	{
-		super();
-		defaultEditor.addActionListener(this);
-		dropDownEditor = new DropDownCellEditor(this);
-		dropDownEditor.addActionListener(this);
-	}
+  public VariablesTable() {
+    super();
+    defaultEditor.addActionListener(this);
+    dropDownEditor = new DropDownCellEditor(this);
+    dropDownEditor.addActionListener(this);
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt)
-	{
-		int editRow = getEditingRow();
-		stopEditing();
-		userStoppedEditing(editRow);
-	}
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    int editRow = getEditingRow();
+    stopEditing();
+    userStoppedEditing(editRow);
+  }
 
-	@Override
-	public TableCellEditor getCellEditor(int row, int column)
-	{
-		if (column == 0)
-		{
-			return super.getCellEditor(row, column);
-		}
-		String varName = (String)getValueAt(row, 0);
+  @Override
+  public TableCellEditor getCellEditor(int row, int column) {
+    if (column == 0) {
+      return super.getCellEditor(row, column);
+    }
+    String varName = (String) getValueAt(row, 0);
 
-		List<String> values = VariablePool.getInstance().getLookupValues(varName);
+    List<String> values = VariablePool.getInstance().getLookupValues(varName);
 
-		if (CollectionUtil.isEmpty(values))
-		{
-			return super.getCellEditor(row, column);
-		}
-		dropDownEditor.setValues(values);
-		return dropDownEditor;
-	}
+    if (CollectionUtil.isEmpty(values)) {
+      return super.getCellEditor(row, column);
+    }
+    dropDownEditor.setValues(values);
+    return dropDownEditor;
+  }
 
-	public abstract void userStoppedEditing(int row);
+  public abstract void userStoppedEditing(int row);
 
 }

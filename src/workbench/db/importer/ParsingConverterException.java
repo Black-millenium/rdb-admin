@@ -25,15 +25,12 @@ package workbench.db.importer;
 import org.xml.sax.SAXException;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class ParsingConverterException
-	extends SAXException
-{
-	public ParsingConverterException()
-	{
-		super("Error when converting data");
-	}
-	
+    extends SAXException {
+  public ParsingConverterException() {
+    super("Error when converting data");
+  }
+
 }

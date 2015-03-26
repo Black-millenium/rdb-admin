@@ -23,11 +23,9 @@
 package workbench.resource;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum DataTooltipType
-{
+public enum DataTooltipType {
   none,
   lastExec,
   full;

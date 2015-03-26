@@ -22,91 +22,72 @@
  */
 package workbench.gui.macros;
 
-import java.awt.Color;
-import java.awt.Component;
+import workbench.resource.IconMgr;
+import workbench.sql.macros.MacroDefinition;
+import workbench.util.HtmlUtil;
+import workbench.util.StringUtil;
 
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultTreeCellRenderer;
-
-import workbench.resource.IconMgr;
-
-import workbench.sql.macros.MacroDefinition;
-
-import workbench.util.HtmlUtil;
-import workbench.util.StringUtil;
+import java.awt.*;
 
 /**
  * A tree cell renderer that can indicate a drop target
+ *
  * @author Thomas Kellerer
  */
 public class MacroTreeCellRenderer
-	extends DefaultTreeCellRenderer
-{
-	private MacroTreeNode dropTarget;
-	private DragType type = DragType.none;
-	private final ReorderBorder reorderBorder = new ReorderBorder();
-	private final Border moveToGroupBorder;
-	private final Border standardBorder = new EmptyBorder(2, 2, 2, 2);
+    extends DefaultTreeCellRenderer {
+  private final ReorderBorder reorderBorder = new ReorderBorder();
+  private final Border moveToGroupBorder;
+  private final Border standardBorder = new EmptyBorder(2, 2, 2, 2);
+  private MacroTreeNode dropTarget;
+  private DragType type = DragType.none;
 
-	public MacroTreeCellRenderer()
-	{
-		super();
-		setIconTextGap(5);
-		setLeafIcon(IconMgr.getInstance().getLabelIcon("macro"));
-		setOpenIcon(IconMgr.getInstance().getLabelIcon("folder-open"));
-		setClosedIcon(IconMgr.getInstance().getLabelIcon("folder"));
-		moveToGroupBorder = new CompoundBorder(new LineBorder(Color.DARK_GRAY, 1), new EmptyBorder(1, 1, 1, 1));
-	}
+  public MacroTreeCellRenderer() {
+    super();
+    setIconTextGap(5);
+    setLeafIcon(IconMgr.getInstance().getLabelIcon("macro"));
+    setOpenIcon(IconMgr.getInstance().getLabelIcon("folder-open"));
+    setClosedIcon(IconMgr.getInstance().getLabelIcon("folder"));
+    moveToGroupBorder = new CompoundBorder(new LineBorder(Color.DARK_GRAY, 1), new EmptyBorder(1, 1, 1, 1));
+  }
 
-	public void setDragType(DragType dragType, MacroTreeNode targetItem)
-	{
-		type = dragType;
-		dropTarget = targetItem;
-	}
+  public void setDragType(DragType dragType, MacroTreeNode targetItem) {
+    type = dragType;
+    dropTarget = targetItem;
+  }
 
-	@Override
-	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean isLeaf, int row, boolean hasFocus)
-	{
-		Component result = super.getTreeCellRendererComponent(tree, value, isSelected, expanded, isLeaf, row, hasFocus);
-		if (value instanceof MacroTreeNode)
-		{
-			MacroTreeNode node = (MacroTreeNode)value;
+  @Override
+  public Component getTreeCellRendererComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean isLeaf, int row, boolean hasFocus) {
+    Component result = super.getTreeCellRendererComponent(tree, value, isSelected, expanded, isLeaf, row, hasFocus);
+    if (value instanceof MacroTreeNode) {
+      MacroTreeNode node = (MacroTreeNode) value;
 
-			if (!node.getAllowsChildren())
-			{
-				MacroDefinition macro = (MacroDefinition) node.getDataObject();
-				if (macro.getExpandWhileTyping())
-				{
-					setIcon(IconMgr.getInstance().getLabelIcon("macro_expand"));
-				}
-				else
-				{
-					setIcon(IconMgr.getInstance().getLabelIcon("macro"));
-				}
-				setToolTipText("<html><pre>" + HtmlUtil.escapeXML(StringUtil.getMaxSubstring(macro.getText(), 500)) + "</pre></html>");
-			}
-			else
-			{
-				setToolTipText(null);
-			}
-		}
+      if (!node.getAllowsChildren()) {
+        MacroDefinition macro = (MacroDefinition) node.getDataObject();
+        if (macro.getExpandWhileTyping()) {
+          setIcon(IconMgr.getInstance().getLabelIcon("macro_expand"));
+        } else {
+          setIcon(IconMgr.getInstance().getLabelIcon("macro"));
+        }
+        setToolTipText("<html><pre>" + HtmlUtil.escapeXML(StringUtil.getMaxSubstring(macro.getText(), 500)) + "</pre></html>");
+      } else {
+        setToolTipText(null);
+      }
+    }
 
-		if (dropTarget == value && type == DragType.moveItems)
-		{
-			setBorder(moveToGroupBorder);
-		}
-		else if (dropTarget == value && type == DragType.reorderItems)
-		{
-			setBorder(reorderBorder);
-		}
-		else
-		{
-			setBorder(standardBorder);
-		}
-		return result;
-	}
+    if (dropTarget == value && type == DragType.moveItems) {
+      setBorder(moveToGroupBorder);
+    } else if (dropTarget == value && type == DragType.reorderItems) {
+      setBorder(reorderBorder);
+    } else {
+      setBorder(standardBorder);
+    }
+    return result;
+  }
 }

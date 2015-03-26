@@ -22,36 +22,32 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
 import workbench.interfaces.Searchable;
 import workbench.resource.PlatformShortcuts;
 import workbench.resource.ResourceMgr;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
- *	@author Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class FindAction extends WbAction
-{
-	private Searchable client;
+public class FindAction extends WbAction {
+  private Searchable client;
 
-	public FindAction(Searchable aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtFind", KeyStroke.getKeyStroke(KeyEvent.VK_F, PlatformShortcuts.getDefaultModifier()));
-		this.setIcon("find");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-		this.setCreateToolbarSeparator(true);
-		this.setDescriptiveName(ResourceMgr.getString("TxtEdPrefix") + " " + getMenuLabel());
-	}
+  public FindAction(Searchable aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtFind", KeyStroke.getKeyStroke(KeyEvent.VK_F, PlatformShortcuts.getDefaultModifier()));
+    this.setIcon("find");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+    this.setCreateToolbarSeparator(true);
+    this.setDescriptiveName(ResourceMgr.getString("TxtEdPrefix") + " " + getMenuLabel());
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.find();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.find();
+  }
 }

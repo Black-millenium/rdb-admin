@@ -22,55 +22,47 @@
  */
 package workbench.gui.editor.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import workbench.gui.editor.InputHandler;
 import workbench.gui.editor.JEditTextArea;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class PreviousPage
-	extends EditorAction
-{
-	protected boolean select;
+    extends EditorAction {
+  protected boolean select;
 
-	public PreviousPage()
-	{
-		super("TxtEdPrvPage", KeyEvent.VK_PAGE_UP, 0);
-		select = false;
-	}
+  public PreviousPage() {
+    super("TxtEdPrvPage", KeyEvent.VK_PAGE_UP, 0);
+    select = false;
+  }
 
-	public PreviousPage(String resourceKey, int key, int modifier)
-	{
-		super(resourceKey, key, modifier);
-	}
+  public PreviousPage(String resourceKey, int key, int modifier) {
+    super(resourceKey, key, modifier);
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt)
-	{
-		JEditTextArea textArea = InputHandler.getTextArea(evt);
-		int firstLine = textArea.getFirstLine();
-		int visibleLines = textArea.getVisibleLines();
-		int line = textArea.getCaretLine();
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    JEditTextArea textArea = InputHandler.getTextArea(evt);
+    int firstLine = textArea.getFirstLine();
+    int visibleLines = textArea.getVisibleLines();
+    int line = textArea.getCaretLine();
 
-		if (firstLine < visibleLines)
-		{
-			firstLine = visibleLines;
-		}
+    if (firstLine < visibleLines) {
+      firstLine = visibleLines;
+    }
 
-		textArea.setFirstLine(firstLine - visibleLines);
+    textArea.setFirstLine(firstLine - visibleLines);
 
-		int caret = textArea.getLineStartOffset(Math.max(0, line - visibleLines));
+    int caret = textArea.getLineStartOffset(Math.max(0, line - visibleLines));
 
-		if (select)
-		{
-			textArea.select(textArea.getMarkPosition(), caret);
-		}
-		else
-		{
-			textArea.setCaretPosition(caret);
-		}
-	}
+    if (select) {
+      textArea.select(textArea.getMarkPosition(), caret);
+    } else {
+      textArea.setCaretPosition(caret);
+    }
+  }
 }

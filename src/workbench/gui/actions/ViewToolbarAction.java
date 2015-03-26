@@ -25,15 +25,12 @@ package workbench.gui.actions;
 import workbench.resource.Settings;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class ViewToolbarAction 
-	extends CheckBoxAction
-{
-	public ViewToolbarAction()
-	{
-		super("MnuTxtShowToolbar", Settings.PROPERTY_SHOW_TOOLBAR);
-	}
+public class ViewToolbarAction
+    extends CheckBoxAction {
+  public ViewToolbarAction() {
+    super("MnuTxtShowToolbar", Settings.PROPERTY_SHOW_TOOLBAR);
+  }
 
 }

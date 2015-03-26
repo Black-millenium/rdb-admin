@@ -28,30 +28,25 @@ import java.util.List;
 import java.util.TreeMap;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class ProfileGroupMap
-	extends TreeMap<String, List<ConnectionProfile>>
-{
-	public ProfileGroupMap(List<ConnectionProfile> profiles)
-	{
-		super();
+    extends TreeMap<String, List<ConnectionProfile>> {
+  public ProfileGroupMap(List<ConnectionProfile> profiles) {
+    super();
 
-		// If the complete list is sorted by name at the beginning
-		// the sublists per group will be sorted automatically.
-		Collections.sort(profiles, ConnectionProfile.getNameComparator());
+    // If the complete list is sorted by name at the beginning
+    // the sublists per group will be sorted automatically.
+    Collections.sort(profiles, ConnectionProfile.getNameComparator());
 
-		for (ConnectionProfile profile : profiles)
-		{
-			String group = profile.getGroup();
-			List<ConnectionProfile> l = get(group);
-			if (l == null)
-			{
-				l = new ArrayList<>();
-				put(group, l);
-			}
-			l.add(profile);
-		}
-	}
+    for (ConnectionProfile profile : profiles) {
+      String group = profile.getGroup();
+      List<ConnectionProfile> l = get(group);
+      if (l == null) {
+        l = new ArrayList<>();
+        put(group, l);
+      }
+      l.add(profile);
+    }
+  }
 }

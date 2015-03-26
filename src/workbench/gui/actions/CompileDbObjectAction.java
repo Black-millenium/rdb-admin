@@ -22,162 +22,129 @@
  */
 package workbench.gui.actions;
 
-import java.awt.EventQueue;
+import workbench.db.DbObject;
+import workbench.db.ProcedureDefinition;
+import workbench.db.WbConnection;
+import workbench.db.oracle.OracleObjectCompiler;
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.dbobjects.DbObjectList;
+import workbench.gui.dbobjects.ObjectCompilerUI;
+import workbench.log.LogMgr;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JMenuItem;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
-import workbench.log.LogMgr;
-
-import workbench.db.DbObject;
-import workbench.db.ProcedureDefinition;
-import workbench.db.WbConnection;
-import workbench.db.oracle.OracleObjectCompiler;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.dbobjects.DbObjectList;
-import workbench.gui.dbobjects.ObjectCompilerUI;
-
 /**
  * @author Thomas Kellerer
  */
 public class CompileDbObjectAction
-	extends WbAction
-	implements ListSelectionListener
-{
-	private JMenuItem menuItem;
-	private DbObjectList source;
-	private ListSelectionModel selection;
+    extends WbAction
+    implements ListSelectionListener {
+  private JMenuItem menuItem;
+  private DbObjectList source;
+  private ListSelectionModel selection;
 
-	public CompileDbObjectAction(DbObjectList client, ListSelectionModel list)
-	{
-		super();
-		this.initMenuDefinition("MnuTxtRecompile");
-		this.source = client;
-		this.selection = list;
-		setVisible(false);
-		setEnabled(false);
-	}
+  public CompileDbObjectAction(DbObjectList client, ListSelectionModel list) {
+    super();
+    this.initMenuDefinition("MnuTxtRecompile");
+    this.source = client;
+    this.selection = list;
+    setVisible(false);
+    setEnabled(false);
+  }
 
-	public void setVisible(boolean flag)
-	{
-		if (this.menuItem == null)
-		{
-			menuItem = getMenuItem();
-		}
-		menuItem.setVisible(flag);
-	}
+  public void setVisible(boolean flag) {
+    if (this.menuItem == null) {
+      menuItem = getMenuItem();
+    }
+    menuItem.setVisible(flag);
+  }
 
-	public void setConnection(WbConnection conn)
-	{
-		if (conn != null && conn.getMetadata().isOracle())
-		{
-			this.setVisible(true);
-			selection.addListSelectionListener(this);
-			checkState();
-		}
-		else
-		{
-			selection.removeListSelectionListener(this);
-			this.setVisible(false);
-			this.setEnabled(false);
-		}
-	}
+  public void setConnection(WbConnection conn) {
+    if (conn != null && conn.getMetadata().isOracle()) {
+      this.setVisible(true);
+      selection.addListSelectionListener(this);
+      checkState();
+    } else {
+      selection.removeListSelectionListener(this);
+      this.setVisible(false);
+      this.setEnabled(false);
+    }
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		compileObjects();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    compileObjects();
+  }
 
-	private void compileObjects()
-	{
-		if (!WbSwingUtilities.isConnectionIdle(source.getComponent(), source.getConnection()))
-		{
-			return;
-		}
+  private void compileObjects() {
+    if (!WbSwingUtilities.isConnectionIdle(source.getComponent(), source.getConnection())) {
+      return;
+    }
 
-		List<DbObject> objects = getSelectedObjects();
-		if (objects == null || objects.isEmpty())
-		{
-			return;
-		}
+    List<DbObject> objects = getSelectedObjects();
+    if (objects == null || objects.isEmpty()) {
+      return;
+    }
 
-		try
-		{
-			ObjectCompilerUI compilerUI = new ObjectCompilerUI(objects, this.source.getConnection());
-			compilerUI.show(SwingUtilities.getWindowAncestor(source.getComponent()));
-		}
-		catch (SQLException e)
-		{
-			LogMgr.logError("ProcedureListPanel.compileObjects()", "Error initializing ObjectCompilerUI", e);
-		}
-	}
+    try {
+      ObjectCompilerUI compilerUI = new ObjectCompilerUI(objects, this.source.getConnection());
+      compilerUI.show(SwingUtilities.getWindowAncestor(source.getComponent()));
+    } catch (SQLException e) {
+      LogMgr.logError("ProcedureListPanel.compileObjects()", "Error initializing ObjectCompilerUI", e);
+    }
+  }
 
-	private List<DbObject> getSelectedObjects()
-	{
-		List<? extends DbObject> selected = this.source.getSelectedObjects();
-		if (selected == null || selected.isEmpty())
-		{
-			return null;
-		}
+  private List<DbObject> getSelectedObjects() {
+    List<? extends DbObject> selected = this.source.getSelectedObjects();
+    if (selected == null || selected.isEmpty()) {
+      return null;
+    }
 
-		List<String> catalogs = new ArrayList<>();
-		List<DbObject> objects = new ArrayList<>();
-		for (DbObject dbo : selected)
-		{
-			if (!OracleObjectCompiler.canCompile(dbo))
-			{
-				// next selected element
-				continue;
-			}
+    List<String> catalogs = new ArrayList<>();
+    List<DbObject> objects = new ArrayList<>();
+    for (DbObject dbo : selected) {
+      if (!OracleObjectCompiler.canCompile(dbo)) {
+        // next selected element
+        continue;
+      }
 
-			if (dbo instanceof ProcedureDefinition)
-			{
-				ProcedureDefinition pd = (ProcedureDefinition) dbo;
-				if (pd.isOraclePackage())
-				{
-					// keep only one package-procedure per catalog
-					if (!catalogs.contains(pd.getCatalog()))
-					{
-						catalogs.add(pd.getCatalog());
-					}
-					else
-					{
-						// a stored procedure was already added for the catalog
-						continue;
-					}
-				}
-			}
-			objects.add(dbo);
-		}
+      if (dbo instanceof ProcedureDefinition) {
+        ProcedureDefinition pd = (ProcedureDefinition) dbo;
+        if (pd.isOraclePackage()) {
+          // keep only one package-procedure per catalog
+          if (!catalogs.contains(pd.getCatalog())) {
+            catalogs.add(pd.getCatalog());
+          } else {
+            // a stored procedure was already added for the catalog
+            continue;
+          }
+        }
+      }
+      objects.add(dbo);
+    }
 
-		return objects;
-	}
+    return objects;
+  }
 
-	private void checkState()
-	{
-		List<DbObject> selected = getSelectedObjects();
-		this.setEnabled(selected != null && selected.size() > 0);
-	}
+  private void checkState() {
+    List<DbObject> selected = getSelectedObjects();
+    this.setEnabled(selected != null && selected.size() > 0);
+  }
 
-	@Override
-	public void valueChanged(ListSelectionEvent e)
-	{
-		EventQueue.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				checkState();
-			}
-		});
-	}
+  @Override
+  public void valueChanged(ListSelectionEvent e) {
+    EventQueue.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        checkState();
+      }
+    });
+  }
 }

@@ -20,38 +20,32 @@
 
 package workbench.db.importer;
 
-import java.sql.SQLException;
-
 import workbench.db.TableIdentifier;
 
+import java.sql.SQLException;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class TableStatementError
-	extends SQLException
-{
-	private TableIdentifier table;
+    extends SQLException {
+  private TableIdentifier table;
 
-	public TableStatementError(Throwable cause, TableIdentifier tbl)
-	{
-		super(cause);
-		this.table = tbl;
-	}
+  public TableStatementError(Throwable cause, TableIdentifier tbl) {
+    super(cause);
+    this.table = tbl;
+  }
 
-	@Override
-	public String getMessage()
-	{
-		if (this.getCause() != null)
-		{
-			return this.getCause().getMessage();
-		}
-		return super.getMessage();
-	}
+  @Override
+  public String getMessage() {
+    if (this.getCause() != null) {
+      return this.getCause().getMessage();
+    }
+    return super.getMessage();
+  }
 
-	public TableIdentifier getTable()
-	{
-		return table;
-	}
+  public TableIdentifier getTable() {
+    return table;
+  }
 
 }

@@ -22,121 +22,103 @@
  */
 package workbench.gui.dbobjects;
 
-import java.awt.Frame;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import javax.swing.JDialog;
 import workbench.gui.WbSwingUtilities;
 import workbench.interfaces.Interruptable;
 import workbench.storage.RowActionMonitor;
 import workbench.util.WbThread;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class ProgressDialog
-	extends JDialog
-	implements WindowListener
-{
-	private ProgressPanel progressPanel;
-	private Interruptable worker;
-	private final Frame parentWindow;
+    extends JDialog
+    implements WindowListener {
+  private final Frame parentWindow;
+  private ProgressPanel progressPanel;
+  private Interruptable worker;
 
-	/**
-	 *
-	 * @param parent the window acting as the parent for the progress monitor
-	 * @param workerThread
-	 */
-	public ProgressDialog(String title, Frame parent, final Interruptable workerThread)
-	{
-		super(parent, true);
-		setTitle(title);
-		worker = workerThread;
-		parentWindow = parent;
-		progressPanel = new ProgressPanel(worker);
-		progressPanel.setParentDialog(this);
+  /**
+   * @param parent       the window acting as the parent for the progress monitor
+   * @param workerThread
+   */
+  public ProgressDialog(String title, Frame parent, final Interruptable workerThread) {
+    super(parent, true);
+    setTitle(title);
+    worker = workerThread;
+    parentWindow = parent;
+    progressPanel = new ProgressPanel(worker);
+    progressPanel.setParentDialog(this);
 //		progressPanel.setInfoText(ResourceMgr.getString("MsgSpoolStart"));
-		getContentPane().add(progressPanel);
-		pack();
-		addWindowListener(this);
-	}
+    getContentPane().add(progressPanel);
+    pack();
+    addWindowListener(this);
+  }
 
 
-	public ProgressPanel getInfoPanel()
-	{
-		return progressPanel;
-	}
+  public ProgressPanel getInfoPanel() {
+    return progressPanel;
+  }
 
-	public void finished()
-	{
-		removeWindowListener(this);
-		setVisible(false);
-	}
+  public void finished() {
+    removeWindowListener(this);
+    setVisible(false);
+  }
 
-	public RowActionMonitor getMonitor()
-	{
-		return progressPanel;
-	}
+  public RowActionMonitor getMonitor() {
+    return progressPanel;
+  }
 
-	/**
-	 * Open the progress monitor window.
-	 */
-	public void showProgress()
-	{
-		WbThread t = new WbThread("ShowProgress")
-		{
-			@Override
-			public void run()
-			{
-				WbSwingUtilities.invoke(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						WbSwingUtilities.center(ProgressDialog.this, parentWindow);
-						setVisible(true);
-					}
-				});
-			}
-		};
-		t.start();
-	}
+  /**
+   * Open the progress monitor window.
+   */
+  public void showProgress() {
+    WbThread t = new WbThread("ShowProgress") {
+      @Override
+      public void run() {
+        WbSwingUtilities.invoke(new Runnable() {
+          @Override
+          public void run() {
+            WbSwingUtilities.center(ProgressDialog.this, parentWindow);
+            setVisible(true);
+          }
+        });
+      }
+    };
+    t.start();
+  }
 
-	@Override
-	public void windowOpened(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowOpened(WindowEvent e) {
+  }
 
-	@Override
-	public void windowClosing(WindowEvent e)
-	{
-		worker.cancelExecution();
-	}
+  @Override
+  public void windowClosing(WindowEvent e) {
+    worker.cancelExecution();
+  }
 
-	@Override
-	public void windowClosed(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowClosed(WindowEvent e) {
+  }
 
-	@Override
-	public void windowIconified(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowIconified(WindowEvent e) {
+  }
 
-	@Override
-	public void windowDeiconified(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowDeiconified(WindowEvent e) {
+  }
 
-	@Override
-	public void windowActivated(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowActivated(WindowEvent e) {
+  }
 
-	@Override
-	public void windowDeactivated(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowDeactivated(WindowEvent e) {
+  }
 
 }

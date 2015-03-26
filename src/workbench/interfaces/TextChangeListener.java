@@ -25,10 +25,8 @@ package workbench.interfaces;
 import java.util.EventListener;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface TextChangeListener extends EventListener
-{
-	void textStatusChanged(boolean modified);
+public interface TextChangeListener extends EventListener {
+  void textStatusChanged(boolean modified);
 }

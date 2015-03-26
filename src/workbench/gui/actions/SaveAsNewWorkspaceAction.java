@@ -22,31 +22,28 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.gui.MainWindow;
 import workbench.resource.ResourceMgr;
 
+import java.awt.event.ActionEvent;
+
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class SaveAsNewWorkspaceAction extends WbAction
-{
-	private MainWindow client;
+public class SaveAsNewWorkspaceAction extends WbAction {
+  private MainWindow client;
 
-	public SaveAsNewWorkspaceAction(MainWindow aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtSaveAsNewWorkspace");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_FILE);
-		this.setIcon(null);
-	}
+  public SaveAsNewWorkspaceAction(MainWindow aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtSaveAsNewWorkspace");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_FILE);
+    this.setIcon(null);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.saveWorkspace(null, false);
-	}
-	
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.saveWorkspace(null, false);
+  }
+
 }

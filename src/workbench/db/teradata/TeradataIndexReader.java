@@ -19,42 +19,33 @@
  */
 package workbench.db.teradata;
 
-import workbench.db.DbMetadata;
-import workbench.db.IndexDefinition;
-import workbench.db.JdbcIndexReader;
-import workbench.db.TableIdentifier;
-import workbench.db.WbConnection;
+import workbench.db.*;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class TeradataIndexReader
-	extends JdbcIndexReader
-{
+    extends JdbcIndexReader {
 
-	public TeradataIndexReader(DbMetadata meta)
-	{
-		super(meta);
-	}
+  public TeradataIndexReader(DbMetadata meta) {
+    super(meta);
+  }
 
-	@Override
-	public CharSequence getIndexSource(TableIdentifier table, IndexDefinition idx)
-	{
-		if (table == null) return null;
-		if (idx == null) return null;
+  @Override
+  public CharSequence getIndexSource(TableIdentifier table, IndexDefinition idx) {
+    if (table == null) return null;
+    if (idx == null) return null;
 
-		String sql = "CREATE";
-		if (idx.isUnique())
-		{
-			sql += " UNIQUE";
-		}
+    String sql = "CREATE";
+    if (idx.isUnique()) {
+      sql += " UNIQUE";
+    }
 
-		WbConnection con = metaData == null ? null : metaData.getWbConnection();
+    WbConnection con = metaData == null ? null : metaData.getWbConnection();
 
-		sql += " INDEX (" + idx.getColumnList() + ") ON " + table.getTableExpression(con) + ";";
-		
-		return sql;
-	}
+    sql += " INDEX (" + idx.getColumnList() + ") ON " + table.getTableExpression(con) + ";";
+
+    return sql;
+  }
 
 }

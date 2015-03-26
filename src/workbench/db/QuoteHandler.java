@@ -22,79 +22,75 @@
  */
 package workbench.db;
 
-import java.util.regex.Matcher;
-
 import workbench.util.SqlUtil;
 
+import java.util.regex.Matcher;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public interface QuoteHandler
-{
-	/**
-	 * Check if the given name is already quoted.
-	 * @param name  the SQL name to check
-	 * @return true if it's quoted, false otherwise
-	 */
-	boolean isQuoted(String name);
+public interface QuoteHandler {
+  /**
+   * A QuoteHandler implementing ANSI quoting.
+   *
+   * @see SqlUtil#SQL_IDENTIFIER
+   * @see SqlUtil#quoteObjectname(java.lang.String)
+   * @see SqlUtil#removeObjectQuotes(java.lang.String)
+   */
+  QuoteHandler STANDARD_HANDLER = new QuoteHandler() {
+    @Override
+    public boolean isQuoted(String name) {
+      if (name == null) return false;
+      name = name.trim();
+      if (name.isEmpty()) return false;
+      return name.charAt(0) == '"' && name.charAt(name.length() - 1) == '"';
+    }
 
-	/**
-	 * Removes the quotes from the SQL name if any are present.
-	 * @param name  the SQL name to change
-	 * @return the SQL name without quotes
-	 */
-	String removeQuotes(String name);
+    @Override
+    public String removeQuotes(String name) {
+      return SqlUtil.removeObjectQuotes(name);
+    }
 
-	/**
-	 * Encloses the given object name in double quotes if necessary.
-	 * @param name the SQL name to quote
-	 */
-	String quoteObjectname(String name);
+    @Override
+    public String quoteObjectname(String name) {
+      return SqlUtil.quoteObjectname(name, false, true, '"');
+    }
 
-	/**
-	 * Checks if the given SQL name needs quoting.
-	 *
-	 * @param name  the SQL name to check
-	 * @return true if it needs quoting, false otherwise
-	 */
-	boolean needsQuotes(String name);
+    @Override
+    public boolean needsQuotes(String name) {
+      Matcher m = SqlUtil.SQL_IDENTIFIER.matcher(name);
+      return !m.matches();
+    }
+  };
 
-	/**
-	 * A QuoteHandler implementing ANSI quoting.
-	 *
-	 * @see SqlUtil#SQL_IDENTIFIER
-	 * @see SqlUtil#quoteObjectname(java.lang.String)
-	 * @see SqlUtil#removeObjectQuotes(java.lang.String)
-	 */
-	QuoteHandler STANDARD_HANDLER = new QuoteHandler()
-	{
-		@Override
-		public boolean isQuoted(String name)
-		{
-			if (name == null) return false;
-			name = name.trim();
-			if (name.isEmpty()) return false;
-			return name.charAt(0) == '"' && name.charAt(name.length() - 1) == '"';
-		}
+  /**
+   * Check if the given name is already quoted.
+   *
+   * @param name the SQL name to check
+   * @return true if it's quoted, false otherwise
+   */
+  boolean isQuoted(String name);
 
-		@Override
-		public String removeQuotes(String name)
-		{
-			return SqlUtil.removeObjectQuotes(name);
-		}
+  /**
+   * Removes the quotes from the SQL name if any are present.
+   *
+   * @param name the SQL name to change
+   * @return the SQL name without quotes
+   */
+  String removeQuotes(String name);
 
-		@Override
-		public String quoteObjectname(String name)
-		{
-			return SqlUtil.quoteObjectname(name, false, true, '"');
-		}
+  /**
+   * Encloses the given object name in double quotes if necessary.
+   *
+   * @param name the SQL name to quote
+   */
+  String quoteObjectname(String name);
 
-		@Override
-		public boolean needsQuotes(String name)
-		{
-			Matcher m = SqlUtil.SQL_IDENTIFIER.matcher(name);
-			return !m.matches();
-		}
-	};
+  /**
+   * Checks if the given SQL name needs quoting.
+   *
+   * @param name the SQL name to check
+   * @return true if it needs quoting, false otherwise
+   */
+  boolean needsQuotes(String name);
 }

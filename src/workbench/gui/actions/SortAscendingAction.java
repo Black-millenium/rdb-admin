@@ -27,23 +27,20 @@ import java.awt.event.ActionListener;
 
 
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class SortAscendingAction extends WbAction
-{
-	private ActionListener client;
+public class SortAscendingAction extends WbAction {
+  private ActionListener client;
 
-	public SortAscendingAction(ActionListener aClient)
-	{
-		super();
-		this.client = aClient;
-		this.setMenuTextByKey("MnuTxtSortAscending");
-	}
+  public SortAscendingAction(ActionListener aClient) {
+    super();
+    this.client = aClient;
+    this.setMenuTextByKey("MnuTxtSortAscending");
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		e.setSource(this);
-		this.client.actionPerformed(e);
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    e.setSource(this);
+    this.client.actionPerformed(e);
+  }
 }

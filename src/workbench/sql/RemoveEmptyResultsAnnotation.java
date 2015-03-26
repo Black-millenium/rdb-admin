@@ -21,17 +21,14 @@
 package workbench.sql;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class RemoveEmptyResultsAnnotation
-	extends WbAnnotation
-{
-	public static final String ANNOTATION = "WbRemoveEmpty";
+    extends WbAnnotation {
+  public static final String ANNOTATION = "WbRemoveEmpty";
 
-	public RemoveEmptyResultsAnnotation()
-	{
-		super(ANNOTATION);
-	}
+  public RemoveEmptyResultsAnnotation() {
+    super(ANNOTATION);
+  }
 
 }

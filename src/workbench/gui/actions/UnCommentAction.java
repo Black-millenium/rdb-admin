@@ -22,37 +22,33 @@
  */
 package workbench.gui.actions;
 
+import workbench.gui.editor.TextCommenter;
+import workbench.gui.sql.EditorPanel;
+import workbench.resource.PlatformShortcuts;
+import workbench.resource.ResourceMgr;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.KeyStroke;
-import workbench.gui.editor.TextCommenter;
-import workbench.gui.sql.EditorPanel;
-
-import workbench.resource.PlatformShortcuts;
-import workbench.resource.ResourceMgr;
-
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class UnCommentAction
-	extends WbAction
-{
-	private EditorPanel client;
+    extends WbAction {
+  private EditorPanel client;
 
-	public UnCommentAction(EditorPanel aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtUnCommentSelection",KeyStroke.getKeyStroke(KeyEvent.VK_U, PlatformShortcuts.getDefaultModifier() + InputEvent.SHIFT_MASK));
-		this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-	}
+  public UnCommentAction(EditorPanel aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtUnCommentSelection", KeyStroke.getKeyStroke(KeyEvent.VK_U, PlatformShortcuts.getDefaultModifier() + InputEvent.SHIFT_MASK));
+    this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		TextCommenter commenter = new TextCommenter(client);
-		commenter.unCommentSelection();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    TextCommenter commenter = new TextCommenter(client);
+    commenter.unCommentSelection();
+  }
 }

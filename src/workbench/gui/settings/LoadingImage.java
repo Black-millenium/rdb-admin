@@ -22,82 +22,68 @@
  */
 package workbench.gui.settings;
 
-import java.awt.Image;
-
-import javax.swing.ImageIcon;
-
 import workbench.resource.IconMgr;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * A container to store the name and the real image for the busy icon dropdown.
  *
  * @author Thomas Kellerer
  */
-class LoadingImage
-{
-	private String imageName;
-	private ImageIcon image;
+class LoadingImage {
+  private String imageName;
+  private ImageIcon image;
 
-	LoadingImage()
-	{
+  LoadingImage() {
 
-	}
+  }
 
-	LoadingImage(String name)
-	{
-		imageName = name;
-		image = IconMgr.getInstance().getLoadingImage(name);
-	}
+  LoadingImage(String name) {
+    imageName = name;
+    image = IconMgr.getInstance().getLoadingImage(name);
+  }
 
-	public void setName(String name)
-	{
-		imageName = name;
-	}
+  public String getName() {
+    return imageName;
+  }
 
-	public String getName()
-	{
-		return imageName;
-	}
+  public void setName(String name) {
+    imageName = name;
+  }
 
-	public ImageIcon getImageIcon()
-	{
-		return image;
-	}
+  public ImageIcon getImageIcon() {
+    return image;
+  }
 
-	public Image getImage()
-	{
-		if (image == null) return null;
-		return image.getImage();
-	}
+  public Image getImage() {
+    if (image == null) return null;
+    return image.getImage();
+  }
 
-	public void dispose()
-	{
-		Image img = getImage();
-		if (img != null)
-		{
-			img.flush();
-		}
-	}
+  public void dispose() {
+    Image img = getImage();
+    if (img != null) {
+      img.flush();
+    }
+  }
 
-	@Override
-	public boolean equals(Object other)
-	{
-		if (other instanceof String)
-		{
-			return this.imageName.equals((String)other);
-		}
-		if (other instanceof LoadingImage)
-		{
-			return this.imageName.equals(((LoadingImage)other).imageName);
-		}
-		return false;
-	}
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof String) {
+      return this.imageName.equals((String) other);
+    }
+    if (other instanceof LoadingImage) {
+      return this.imageName.equals(((LoadingImage) other).imageName);
+    }
+    return false;
+  }
 
-	@Override
-	public int hashCode()
-	{
-		int hash = 3;
-		hash = 31 * hash + (this.imageName != null ? this.imageName.hashCode() : 0);
-		return hash;
-	}
+  @Override
+  public int hashCode() {
+    int hash = 3;
+    hash = 31 * hash + (this.imageName != null ? this.imageName.hashCode() : 0);
+    return hash;
+  }
 }

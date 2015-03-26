@@ -23,16 +23,16 @@
 package workbench.interfaces;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface ValidatingComponent
-{
-	/**
-	 * Validate the input and display an error message if not valid.
-	 * @return true, everything OK
-	 *         false, input is not valid
-	 */
-	boolean validateInput();
-	void componentDisplayed();
+public interface ValidatingComponent {
+  /**
+   * Validate the input and display an error message if not valid.
+   *
+   * @return true, everything OK
+   * false, input is not valid
+   */
+  boolean validateInput();
+
+  void componentDisplayed();
 }

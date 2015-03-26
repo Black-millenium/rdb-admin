@@ -20,35 +20,30 @@
 
 package workbench.db.postgres;
 
-import java.sql.Types;
-
 import workbench.db.ColumnIdentifier;
 import workbench.db.DefaultExpressionBuilder;
 import workbench.db.WbConnection;
 
+import java.sql.Types;
+
 
 public class PostgresExpressionBuilder
-	extends DefaultExpressionBuilder
-{
+    extends DefaultExpressionBuilder {
 
-	public PostgresExpressionBuilder(WbConnection conn)
-	{
-		super(conn);
-	}
+  public PostgresExpressionBuilder(WbConnection conn) {
+    super(conn);
+  }
 
-	@Override
-	public String getDmlExpression(ColumnIdentifier column)
-	{
-		String expression = settings.getDmlExpressionValue(column.getDbmsType());
-		if (expression != null)
-		{
-			return expression;
-		}
-		if (column.getDataType() == Types.STRUCT)
-		{
-			return "cast(? as " + column.getDbmsType() + ")";
-		}
-		return "?";
-	}
+  @Override
+  public String getDmlExpression(ColumnIdentifier column) {
+    String expression = settings.getDmlExpressionValue(column.getDbmsType());
+    if (expression != null) {
+      return expression;
+    }
+    if (column.getDataType() == Types.STRUCT) {
+      return "cast(? as " + column.getDbmsType() + ")";
+    }
+    return "?";
+  }
 
 }

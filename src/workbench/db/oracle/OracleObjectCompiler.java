@@ -22,124 +22,103 @@
  */
 package workbench.db.oracle;
 
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Set;
-
-import workbench.log.LogMgr;
-import workbench.resource.Settings;
-
 import workbench.db.DbObject;
 import workbench.db.WbConnection;
-
+import workbench.log.LogMgr;
+import workbench.resource.Settings;
 import workbench.sql.ErrorDescriptor;
-
 import workbench.util.CollectionUtil;
 import workbench.util.SqlUtil;
 import workbench.util.StringUtil;
 
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Set;
+
 /**
  * A class to re-compile Oracle objects like stored procedures, packages.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class OracleObjectCompiler
-{
-	private WbConnection dbConnection;
-	private OracleErrorInformationReader errorReader;
+public class OracleObjectCompiler {
+  private static final Set<String> COMPILABLE_TYPES = CollectionUtil.caseInsensitiveSet(
+      "VIEW", "PROCEDURE", "MATERIALIZED VIEW", "FUNCTION", "PACKAGE", "TRIGGER", "TYPE"
+  );
+  private WbConnection dbConnection;
+  private OracleErrorInformationReader errorReader;
 
-	private static final Set<String> COMPILABLE_TYPES = CollectionUtil.caseInsensitiveSet(
-		"VIEW", "PROCEDURE", "MATERIALIZED VIEW", "FUNCTION", "PACKAGE", "TRIGGER", "TYPE"
-	);
+  public OracleObjectCompiler(WbConnection conn)
+      throws SQLException {
+    dbConnection = conn;
+    errorReader = new OracleErrorInformationReader(dbConnection);
+  }
 
-	public OracleObjectCompiler(WbConnection conn)
-		throws SQLException
-	{
-		dbConnection = conn;
-		errorReader = new OracleErrorInformationReader(dbConnection);
-	}
+  public static boolean canCompile(DbObject object) {
+    if (object == null) return false;
+    String type = object.getObjectType();
+    return COMPILABLE_TYPES.contains(type);
+  }
 
-	/**
-	 * Recompile the given object.
-	 *
-	 * @param object the object to recompile
-	 * @return the error message if the compile was not successful
-	 *         null if the compile was ok.
-	 */
-	public String compileObject(DbObject object)
-	{
-		String sql = createCompileStatement(object);
+  /**
+   * Recompile the given object.
+   *
+   * @param object the object to recompile
+   * @return the error message if the compile was not successful
+   * null if the compile was ok.
+   */
+  public String compileObject(DbObject object) {
+    String sql = createCompileStatement(object);
 
-		if (Settings.getInstance().getLogAllStatements())
-		{
-			LogMgr.logInfo("OracleObjectCompiler.compileObject()", "Compiling " + object.getObjectType() + " " + object.getObjectName() + " using: " + sql);
-		}
+    if (Settings.getInstance().getLogAllStatements()) {
+      LogMgr.logInfo("OracleObjectCompiler.compileObject()", "Compiling " + object.getObjectType() + " " + object.getObjectName() + " using: " + sql);
+    }
 
-		Statement stmt = null;
-		try
-		{
-			stmt = dbConnection.createStatement();
-			this.dbConnection.setBusy(true);
-			stmt.executeUpdate(sql);
+    Statement stmt = null;
+    try {
+      stmt = dbConnection.createStatement();
+      this.dbConnection.setBusy(true);
+      stmt.executeUpdate(sql);
       String type = object.getObjectType();
       String name = object.getObjectName();
-      if ("PACKAGE".equals(type))
-      {
+      if ("PACKAGE".equals(type)) {
         // an "alter package .. compile"  will report errors for the package body, not the package
         type = "PACKAGE BODY";
       }
-      
-      if ("PACKAGE BODY".equals(type))
-      {
+
+      if ("PACKAGE BODY".equals(type)) {
         // the errors will be reported for the package name, not the procedure name
         name = object.getCatalog();
       }
       ErrorDescriptor error = errorReader.getErrorInfo(null, name, type, false);
-			if (error == null)
-			{
-				return null;
-			}
-			return error.getErrorMessage();
-		}
-		catch (SQLException e)
-		{
-			return e.getMessage();
-		}
-		finally
-		{
-			SqlUtil.closeStatement(stmt);
-			this.dbConnection.setBusy(false);
-		}
-	}
+      if (error == null) {
+        return null;
+      }
+      return error.getErrorMessage();
+    } catch (SQLException e) {
+      return e.getMessage();
+    } finally {
+      SqlUtil.closeStatement(stmt);
+      this.dbConnection.setBusy(false);
+    }
+  }
 
-	String createCompileStatement(DbObject object)
-	{
-		StringBuilder sql = new StringBuilder(50);
-		sql.append("ALTER ");
+  String createCompileStatement(DbObject object) {
+    StringBuilder sql = new StringBuilder(50);
+    sql.append("ALTER ");
 
-		if (StringUtil.isNonBlank(object.getCatalog()))
-		{
-			// If it's a package, compile the whole package.
-			sql.append("PACKAGE ");
-			sql.append(object.getSchema());
-			sql.append('.');
-			sql.append(object.getCatalog());
-		}
-		else
-		{
-			sql.append(object.getObjectType());
-			sql.append(' ');
-			sql.append(object.getFullyQualifiedName(dbConnection));
-		}
-		sql.append(" COMPILE");
-		return sql.toString();
-	}
-
-	public static boolean canCompile(DbObject object)
-	{
-		if (object == null) return false;
-		String type = object.getObjectType();
-		return COMPILABLE_TYPES.contains(type);
-	}
+    if (StringUtil.isNonBlank(object.getCatalog())) {
+      // If it's a package, compile the whole package.
+      sql.append("PACKAGE ");
+      sql.append(object.getSchema());
+      sql.append('.');
+      sql.append(object.getCatalog());
+    } else {
+      sql.append(object.getObjectType());
+      sql.append(' ');
+      sql.append(object.getFullyQualifiedName(dbConnection));
+    }
+    sql.append(" COMPILE");
+    return sql.toString();
+  }
 
 }

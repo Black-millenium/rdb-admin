@@ -22,270 +22,226 @@
  */
 package workbench.sql;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import workbench.util.SqlUtil;
 import workbench.util.StringUtil;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Encapsulate the alternate delimiter
+ *
  * @author Thomas Kellerer
  */
-public class DelimiterDefinition
-{
-	/**
-	 * The default delimiter for ANSI SQL: a semicolon
-	 */
-	public static final DelimiterDefinition STANDARD_DELIMITER = new DelimiterDefinition(";", true);
+public class DelimiterDefinition {
+  /**
+   * The default delimiter for ANSI SQL: a semicolon
+   */
+  public static final DelimiterDefinition STANDARD_DELIMITER = new DelimiterDefinition(";", true);
 
-	/**
-	 * A default alternate delimiter. This is Oracle's slash on a single line
-	 */
-	public static final DelimiterDefinition DEFAULT_ORA_DELIMITER = new DelimiterDefinition("/", true);
+  /**
+   * A default alternate delimiter. This is Oracle's slash on a single line
+   */
+  public static final DelimiterDefinition DEFAULT_ORA_DELIMITER = new DelimiterDefinition("/", true);
 
-	/**
-	 * A default alternate delimiter that matches SQL Server's GO command
-	 */
-	public static final DelimiterDefinition DEFAULT_MS_DELIMITER = new DelimiterDefinition("GO", true);
+  /**
+   * A default alternate delimiter that matches SQL Server's GO command
+   */
+  public static final DelimiterDefinition DEFAULT_MS_DELIMITER = new DelimiterDefinition("GO", true);
 
-	private String delimiter;
-	private boolean singleLineDelimiter;
-	private boolean changed;
-	private Pattern slePattern;
-	private boolean isImmutable;
-	private boolean isStandard;
+  private String delimiter;
+  private boolean singleLineDelimiter;
+  private boolean changed;
+  private Pattern slePattern;
+  private boolean isImmutable;
+  private boolean isStandard;
 
-	public DelimiterDefinition()
-	{
-		this.delimiter = "";
-		this.changed = false;
-		this.slePattern = null;
-	}
+  public DelimiterDefinition() {
+    this.delimiter = "";
+    this.changed = false;
+    this.slePattern = null;
+  }
 
-	private DelimiterDefinition(boolean immutable)
-	{
-		this.delimiter = "";
-		this.changed = false;
-		this.slePattern = null;
-		this.isImmutable = immutable;
-		this.isStandard = false;
-	}
+  private DelimiterDefinition(boolean immutable) {
+    this.delimiter = "";
+    this.changed = false;
+    this.slePattern = null;
+    this.isImmutable = immutable;
+    this.isStandard = false;
+  }
 
-	private DelimiterDefinition(String delim, boolean immutable)
-	{
-		setDelimiter(delim);
-		this.changed = false;
-		initPattern();
-		isImmutable = immutable;
-	}
+  private DelimiterDefinition(String delim, boolean immutable) {
+    setDelimiter(delim);
+    this.changed = false;
+    initPattern();
+    isImmutable = immutable;
+  }
 
-	public DelimiterDefinition(String delim)
-	{
-		setDelimiter(delim);
-		this.changed = false;
-		initPattern();
-	}
+  public DelimiterDefinition(String delim) {
+    setDelimiter(delim);
+    this.changed = false;
+    initPattern();
+  }
 
-	public DelimiterDefinition createCopy()
-	{
-		if (this.isImmutable) return this;
-		DelimiterDefinition copy = new DelimiterDefinition(this.delimiter);
-		copy.changed = false;
-		return copy;
-	}
+  public static DelimiterDefinition parseCmdLineArgument(String arg) {
+    if (StringUtil.isEmptyString(arg)) return null;
 
-	public boolean isEmpty()
-	{
-		return (this.delimiter == null || this.delimiter.length() == 0);
-	}
+    arg = arg.trim();
+    if ("ORA".equalsIgnoreCase(arg) || "ORACLE".equalsIgnoreCase(arg) || "SQLPLUS".equalsIgnoreCase(arg)) {
+      return DEFAULT_ORA_DELIMITER;
+    } else if ("MSSQL".equalsIgnoreCase(arg)) {
+      return DEFAULT_MS_DELIMITER;
+    }
 
-	public boolean isStandard()
-	{
-		return this.isStandard;
-	}
+    if (arg.equals(";")) {
+      return STANDARD_DELIMITER;
+    }
 
-	public boolean isNonStandard()
-	{
-		return !this.isStandard();
-	}
+    String delim = arg;
 
-	public void resetChanged()
-	{
-		this.changed = false;
-	}
+    int pos = arg.indexOf(':');
+    if (pos == -1) {
+      pos = arg.indexOf(';', 1);
+    }
 
-	public static DelimiterDefinition parseCmdLineArgument(String arg)
-	{
-		if (StringUtil.isEmptyString(arg)) return null;
+    if (pos > -1) {
+      delim = delim.substring(0, pos);
+    }
+    return new DelimiterDefinition(delim);
+  }
 
-		arg = arg.trim();
-		if ("ORA".equalsIgnoreCase(arg) || "ORACLE".equalsIgnoreCase(arg) || "SQLPLUS".equalsIgnoreCase(arg))
-		{
-			return DEFAULT_ORA_DELIMITER;
-		}
-		else if ("MSSQL".equalsIgnoreCase(arg))
-		{
-			return DEFAULT_MS_DELIMITER;
-		}
+  public DelimiterDefinition createCopy() {
+    if (this.isImmutable) return this;
+    DelimiterDefinition copy = new DelimiterDefinition(this.delimiter);
+    copy.changed = false;
+    return copy;
+  }
 
-		if (arg.equals(";"))
-		{
-			return STANDARD_DELIMITER;
-		}
+  public boolean isEmpty() {
+    return (this.delimiter == null || this.delimiter.length() == 0);
+  }
 
-		String delim = arg;
+  public boolean isStandard() {
+    return this.isStandard;
+  }
 
-		int pos = arg.indexOf(':');
-		if (pos == -1)
-		{
-			pos = arg.indexOf(';', 1);
-		}
+  public boolean isNonStandard() {
+    return !this.isStandard();
+  }
 
-		if (pos > -1)
-		{
-			delim  = delim.substring(0, pos);
-		}
-		return new DelimiterDefinition(delim);
-	}
+  public void resetChanged() {
+    this.changed = false;
+  }
 
-	@Override
-	public String toString()
-	{
-		return delimiter;
-	}
+  @Override
+  public String toString() {
+    return delimiter;
+  }
 
-	public String getDelimiter()
-	{
-		return this.delimiter;
-	}
+  public String getDelimiter() {
+    return this.delimiter;
+  }
 
-	public final void setDelimiter(String newDelimiter)
-	{
-		if (isImmutable) return;
-		if (newDelimiter == null) return;
+  public final void setDelimiter(String newDelimiter) {
+    if (isImmutable) return;
+    if (newDelimiter == null) return;
 
-    if (StringUtil.stringsAreNotEqual(this.delimiter, newDelimiter))
-    {
+    if (StringUtil.stringsAreNotEqual(this.delimiter, newDelimiter)) {
       this.delimiter = newDelimiter.trim();
       this.singleLineDelimiter = !delimiter.equals(";");
       this.changed = true;
       this.isStandard = delimiter.equals(";");
       initPattern();
     }
-	}
+  }
 
-  public boolean isChanged()
-  {
+  public boolean isChanged() {
     return this.changed;
   }
 
-  public boolean isSingleLine()
-  {
+  public boolean isSingleLine() {
     return this.singleLineDelimiter;
   }
 
-  public void setSingleLine(boolean flag)
-  {
+  public void setSingleLine(boolean flag) {
     if (isImmutable) return;
 
-    if (flag != this.singleLineDelimiter)
-    {
+    if (flag != this.singleLineDelimiter) {
       this.singleLineDelimiter = flag;
       this.changed = true;
       initPattern();
     }
   }
 
-	/**
-	 * Return true if the given SQL script ends
-	 * with this delimiter
-	 * @param sql
-	 */
-	public boolean terminatesScript(String sql, boolean checkNonStandardComments)
-	{
-		if (StringUtil.isEmptyString(sql)) return false;
+  /**
+   * Return true if the given SQL script ends
+   * with this delimiter
+   *
+   * @param sql
+   */
+  public boolean terminatesScript(String sql, boolean checkNonStandardComments) {
+    if (StringUtil.isEmptyString(sql)) return false;
 
-		// cleaning the SQL from all "noise" ensures that the alternate delimiter is still
-		// recognized even if the script is terminated with only comments.
-		sql = SqlUtil.makeCleanSql(sql, true, false, checkNonStandardComments, false);
+    // cleaning the SQL from all "noise" ensures that the alternate delimiter is still
+    // recognized even if the script is terminated with only comments.
+    sql = SqlUtil.makeCleanSql(sql, true, false, checkNonStandardComments, false);
 
-		if (this.isSingleLine())
-		{
-			return slePattern.matcher(sql).find();
-		}
-		else
-		{
-			return sql.endsWith(this.delimiter);
-		}
-	}
+    if (this.isSingleLine()) {
+      return slePattern.matcher(sql).find();
+    } else {
+      return sql.endsWith(this.delimiter);
+    }
+  }
 
-	public boolean equals(String other)
-	{
-		return StringUtil.equalStringIgnoreCase(this.delimiter, other);
-	}
+  public boolean equals(String other) {
+    return StringUtil.equalStringIgnoreCase(this.delimiter, other);
+  }
 
-	@Override
-	public boolean equals(Object other)
-	{
-		if (other == null) return false;
+  @Override
+  public boolean equals(Object other) {
+    if (other == null) return false;
 
-		if (other instanceof DelimiterDefinition)
-		{
-			DelimiterDefinition od = (DelimiterDefinition)other;
-			if (this.singleLineDelimiter == od.singleLineDelimiter)
-			{
-				return StringUtil.equalStringIgnoreCase(this.delimiter, od.delimiter);
-			}
-			return false;
-		}
-		else if (other instanceof String)
-		{
-			return StringUtil.equalStringIgnoreCase(this.delimiter, (String)other);
-		}
-		return false;
-	}
+    if (other instanceof DelimiterDefinition) {
+      DelimiterDefinition od = (DelimiterDefinition) other;
+      if (this.singleLineDelimiter == od.singleLineDelimiter) {
+        return StringUtil.equalStringIgnoreCase(this.delimiter, od.delimiter);
+      }
+      return false;
+    } else if (other instanceof String) {
+      return StringUtil.equalStringIgnoreCase(this.delimiter, (String) other);
+    }
+    return false;
+  }
 
-	@Override
-	public int hashCode()
-	{
-		return (this.delimiter + Boolean.toString(this.singleLineDelimiter)).hashCode();
-	}
+  @Override
+  public int hashCode() {
+    return (this.delimiter + Boolean.toString(this.singleLineDelimiter)).hashCode();
+  }
 
-	private void initPattern()
-	{
-		if (this.singleLineDelimiter && this.delimiter != null)
-		{
-			slePattern = Pattern.compile("(?i)[\\r\\n|\\n]+[ \t]*" + StringUtil.quoteRegexMeta(this.delimiter) + "[ \t]*[\\r\\n|\\n]*$");
-		}
-		else
-		{
-			slePattern = null;
-		}
-	}
+  private void initPattern() {
+    if (this.singleLineDelimiter && this.delimiter != null) {
+      slePattern = Pattern.compile("(?i)[\\r\\n|\\n]+[ \t]*" + StringUtil.quoteRegexMeta(this.delimiter) + "[ \t]*[\\r\\n|\\n]*$");
+    } else {
+      slePattern = null;
+    }
+  }
 
-	public String removeFromEnd(String sql)
-	{
-		if (StringUtil.isEmptyString(sql)) return sql;
-		int startPos = -1;
-		if (this.isSingleLine())
-		{
-			Matcher m = slePattern.matcher(sql);
-			boolean found = m.find();
-			if (found)
-			{
-				startPos = m.start();
-			}
-		}
-		else
-		{
-			startPos = sql.lastIndexOf(this.delimiter);
-		}
-		if (startPos > -1)
-		{
-			return sql.substring(0,startPos).trim();
-		}
-		return sql;
-	}
+  public String removeFromEnd(String sql) {
+    if (StringUtil.isEmptyString(sql)) return sql;
+    int startPos = -1;
+    if (this.isSingleLine()) {
+      Matcher m = slePattern.matcher(sql);
+      boolean found = m.find();
+      if (found) {
+        startPos = m.start();
+      }
+    } else {
+      startPos = sql.lastIndexOf(this.delimiter);
+    }
+    if (startPos > -1) {
+      return sql.substring(0, startPos).trim();
+    }
+    return sql;
+  }
 
 }

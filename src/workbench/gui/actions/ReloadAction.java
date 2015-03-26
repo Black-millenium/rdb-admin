@@ -22,43 +22,38 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.interfaces.Reloadable;
 
+import java.awt.event.ActionEvent;
+
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class ReloadAction
-	extends WbAction
-{
-	private Reloadable client;
-	private boolean ctrlPressed;
+    extends WbAction {
+  private Reloadable client;
+  private boolean ctrlPressed;
 
-	public ReloadAction(Reloadable aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("TxtReload");
-		this.setIcon("refresh");
-	}
+  public ReloadAction(Reloadable aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("TxtReload");
+    this.setIcon("refresh");
+  }
 
-	public boolean ctrlPressed()
-	{
-		return ctrlPressed;
-	}
+  public boolean ctrlPressed() {
+    return ctrlPressed;
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.ctrlPressed = isCtrlPressed(e) && invokedByMouse(e);
-		this.client.reload();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.ctrlPressed = isCtrlPressed(e) && invokedByMouse(e);
+    this.client.reload();
+  }
 
-	@Override
-	public boolean allowDuplicate()
-	{
-		return false;
-	}
+  @Override
+  public boolean allowDuplicate() {
+    return false;
+  }
 
 }

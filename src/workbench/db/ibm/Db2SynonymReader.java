@@ -22,20 +22,18 @@
  */
 package workbench.db.ibm;
 
+import workbench.db.SynonymReader;
+import workbench.db.TableIdentifier;
+import workbench.db.WbConnection;
+import workbench.log.LogMgr;
+import workbench.resource.Settings;
+import workbench.util.SqlUtil;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
-
-import workbench.log.LogMgr;
-import workbench.resource.Settings;
-
-import workbench.db.SynonymReader;
-import workbench.db.TableIdentifier;
-import workbench.db.WbConnection;
-
-import workbench.util.SqlUtil;
 
 /**
  * A class to retrieve synonym definitions from a DB2 database.
@@ -43,103 +41,87 @@ import workbench.util.SqlUtil;
  * @author Thomas Kellerer
  */
 public class Db2SynonymReader
-	implements SynonymReader
-{
+    implements SynonymReader {
 
-	/**
-	 * Returns an empty list, as the standard JDBC driver
-	 * alread returns synonyms in the getObjects() method.
-	 *
-	 * @return an empty list
-	 */
-	@Override
-	public List<TableIdentifier> getSynonymList(WbConnection con, String catalog, String owner, String namePattern)
-		throws SQLException
-	{
-		return Collections.emptyList();
-	}
+  /**
+   * Returns an empty list, as the standard JDBC driver
+   * alread returns synonyms in the getObjects() method.
+   *
+   * @return an empty list
+   */
+  @Override
+  public List<TableIdentifier> getSynonymList(WbConnection con, String catalog, String owner, String namePattern)
+      throws SQLException {
+    return Collections.emptyList();
+  }
 
-	@Override
-	public String getSynonymTypeName()
-	{
-		return "ALIAS";
-	}
+  @Override
+  public String getSynonymTypeName() {
+    return "ALIAS";
+  }
 
-	@Override
-	public TableIdentifier getSynonymTable(WbConnection con, String catalog, String schemaPattern, String namePattern)
-		throws SQLException
-	{
-		StringBuilder sql = new StringBuilder(200);
+  @Override
+  public TableIdentifier getSynonymTable(WbConnection con, String catalog, String schemaPattern, String namePattern)
+      throws SQLException {
+    StringBuilder sql = new StringBuilder(200);
 
-		boolean isHostDB2 = con.getMetadata().getDbId().equals("db2h");
-		boolean isAS400 = con.getMetadata().getDbId().equals("db2i");
+    boolean isHostDB2 = con.getMetadata().getDbId().equals("db2h");
+    boolean isAS400 = con.getMetadata().getDbId().equals("db2i");
 
-		if (isAS400)
-		{
-			char catalogSeparator = con.getMetadata().getCatalogSeparator();
-			sql.append("SELECT base_table_schema, base_table_name FROM qsys2").append(catalogSeparator).append("systables");
-			sql.append(" WHERE table_type = 'A' AND table_name = ? AND table_owner = ?");
-		}
-		else if (isHostDB2)
-		{
-			sql.append("SELECT tbcreator, tbname FROM sysibm.syssynonyms ");
-			sql.append(" WHERE name = ? and creator = ?");
+    if (isAS400) {
+      char catalogSeparator = con.getMetadata().getCatalogSeparator();
+      sql.append("SELECT base_table_schema, base_table_name FROM qsys2").append(catalogSeparator).append("systables");
+      sql.append(" WHERE table_type = 'A' AND table_name = ? AND table_owner = ?");
+    } else if (isHostDB2) {
+      sql.append("SELECT tbcreator, tbname FROM sysibm.syssynonyms ");
+      sql.append(" WHERE name = ? and creator = ?");
 
-		}
-		else
-		{
-			sql.append("SELECT base_tabschema, base_tabname FROM syscat.tables ");
-			sql.append(" WHERE type = 'A' and tabname = ? and tabschema = ?");
-		}
+    } else {
+      sql.append("SELECT base_tabschema, base_tabname FROM syscat.tables ");
+      sql.append(" WHERE type = 'A' and tabname = ? and tabschema = ?");
+    }
 
-		if (Settings.getInstance().getDebugMetadataSql())
-		{
-			LogMgr.logInfo("Db2SynonymReader.getSynonymTable()", "Query to retrieve synonyms:\n" + sql);
-		}
+    if (Settings.getInstance().getDebugMetadataSql()) {
+      LogMgr.logInfo("Db2SynonymReader.getSynonymTable()", "Query to retrieve synonyms:\n" + sql);
+    }
 
-		PreparedStatement stmt = con.getSqlConnection().prepareStatement(sql.toString());
-		stmt.setString(1, namePattern);
-		stmt.setString(2, schemaPattern);
+    PreparedStatement stmt = con.getSqlConnection().prepareStatement(sql.toString());
+    stmt.setString(1, namePattern);
+    stmt.setString(2, schemaPattern);
 
-		ResultSet rs = stmt.executeQuery();
-		String table = null;
-		String owner = null;
-		TableIdentifier result = null;
-		try
-		{
-			if (rs.next())
-			{
-				owner = rs.getString(1);
-				table = rs.getString(2);
-				if (table != null)
-				{
-					result = new TableIdentifier(null, owner, table);
-				}
-			}
-		}
-		finally
-		{
-			SqlUtil.closeAll(rs, stmt);
-		}
+    ResultSet rs = stmt.executeQuery();
+    String table = null;
+    String owner = null;
+    TableIdentifier result = null;
+    try {
+      if (rs.next()) {
+        owner = rs.getString(1);
+        table = rs.getString(2);
+        if (table != null) {
+          result = new TableIdentifier(null, owner, table);
+        }
+      }
+    } finally {
+      SqlUtil.closeAll(rs, stmt);
+    }
 
-		return result;
-	}
+    return result;
+  }
 
-	@Override
-	public String getSynonymSource(WbConnection con, String catalog, String synonymSchema, String synonymName)
-		throws SQLException
-	{
-		TableIdentifier id = getSynonymTable(con, catalog, synonymSchema, synonymName);
-		StringBuilder result = new StringBuilder(200);
-		String nl = Settings.getInstance().getInternalEditorLineEnding();
-		result.append("CREATE ALIAS ");
-		result.append(SqlUtil.buildExpression(con, null, synonymSchema, synonymName));
-		result.append(nl).append("   FOR ");
-		result.append(id.getTableExpression());
-		result.append(';');
-		result.append(nl);
+  @Override
+  public String getSynonymSource(WbConnection con, String catalog, String synonymSchema, String synonymName)
+      throws SQLException {
+    TableIdentifier id = getSynonymTable(con, catalog, synonymSchema, synonymName);
+    StringBuilder result = new StringBuilder(200);
+    String nl = Settings.getInstance().getInternalEditorLineEnding();
+    result.append("CREATE ALIAS ");
+    result.append(SqlUtil.buildExpression(con, null, synonymSchema, synonymName));
+    result.append(nl).append("   FOR ");
+    result.append(id.getTableExpression());
+    result.append(';');
+    result.append(nl);
 
-		return result.toString();
-	}
+    return result.toString();
+  }
 
 }

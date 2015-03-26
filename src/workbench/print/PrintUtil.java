@@ -22,96 +22,86 @@
  */
 package workbench.print;
 
-import java.awt.print.PageFormat;
-
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttribute;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.standard.MediaPrintableArea;
 import javax.print.attribute.standard.OrientationRequested;
+import java.awt.print.PageFormat;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class PrintUtil
-{
+public class PrintUtil {
 
-	public static PrintRequestAttributeSet getPrintAttributes(PageFormat format)
-	{
-		PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
-		PrintRequestAttribute att = null;
-		int value = format.getOrientation();
-		switch (value)
-		{
-			case PageFormat.LANDSCAPE:
-				att = OrientationRequested.LANDSCAPE;
-				break;
-			case PageFormat.PORTRAIT:
-				att = OrientationRequested.PORTRAIT;
-				break;
-			case PageFormat.REVERSE_LANDSCAPE:
-				att = OrientationRequested.REVERSE_LANDSCAPE;
-				break;
-		}
-		attr.add(att);
-		att = new MediaPrintableArea((float)format.getImageableX(),
-		                             (float)format.getImageableY(),
-		                             (float)format.getImageableWidth(),
-		                             (float)format.getImageableHeight(), MediaPrintableArea.INCH);
-		attr.add(att);
+  public static PrintRequestAttributeSet getPrintAttributes(PageFormat format) {
+    PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
+    PrintRequestAttribute att = null;
+    int value = format.getOrientation();
+    switch (value) {
+      case PageFormat.LANDSCAPE:
+        att = OrientationRequested.LANDSCAPE;
+        break;
+      case PageFormat.PORTRAIT:
+        att = OrientationRequested.PORTRAIT;
+        break;
+      case PageFormat.REVERSE_LANDSCAPE:
+        att = OrientationRequested.REVERSE_LANDSCAPE;
+        break;
+    }
+    attr.add(att);
+    att = new MediaPrintableArea((float) format.getImageableX(),
+        (float) format.getImageableY(),
+        (float) format.getImageableWidth(),
+        (float) format.getImageableHeight(), MediaPrintableArea.INCH);
+    attr.add(att);
 
-		return attr;
-	}
+    return attr;
+  }
 
-	public static boolean pageFormatEquals(PageFormat first, PageFormat second)
-	{
-		if (first == null || second == null) return false;
-		if (first.getOrientation() != second.getOrientation()) return false;
-		if (first.getHeight() != second.getHeight()) return false;
-		if (first.getWidth() != second.getWidth()) return false;
-		if (first.getImageableX() != second.getImageableX()) return false;
-		if (first.getImageableY() != second.getImageableY()) return false;
-		if (first.getImageableWidth() != second.getImageableWidth()) return false;
-		if (first.getImageableHeight() != second.getImageableHeight()) return false;
-		return true;
-	}
+  public static boolean pageFormatEquals(PageFormat first, PageFormat second) {
+    if (first == null || second == null) return false;
+    if (first.getOrientation() != second.getOrientation()) return false;
+    if (first.getHeight() != second.getHeight()) return false;
+    if (first.getWidth() != second.getWidth()) return false;
+    if (first.getImageableX() != second.getImageableX()) return false;
+    if (first.getImageableY() != second.getImageableY()) return false;
+    if (first.getImageableWidth() != second.getImageableWidth()) return false;
+    if (first.getImageableHeight() != second.getImageableHeight()) return false;
+    return true;
+  }
 
-	public static double millimeterToPoints(double mm)
-	{
-		double inch = millimeterToInch(mm);
-		return (inch * 72);
-	}
-	public static double pointsToMillimeter(double points)
-	{
-		// convert mm to inch
-		double inch = points / 72;
-		return inchToMillimeter(inch);
-	}
+  public static double millimeterToPoints(double mm) {
+    double inch = millimeterToInch(mm);
+    return (inch * 72);
+  }
 
-	public static double millimeterToInch(double mm)
-	{
-		return (mm / 25.4);
-	}
+  public static double pointsToMillimeter(double points) {
+    // convert mm to inch
+    double inch = points / 72;
+    return inchToMillimeter(inch);
+  }
 
-	public static double inchToMillimeter(double inch)
-	{
-		return (inch * 25.4);
-	}
+  public static double millimeterToInch(double mm) {
+    return (mm / 25.4);
+  }
 
-	public static void printPageFormat(String aName, PageFormat aFormat)
-	{
-		double width = aFormat.getPaper().getWidth();
-		double height = aFormat.getPaper().getHeight();
+  public static double inchToMillimeter(double inch) {
+    return (inch * 25.4);
+  }
 
-		double leftmargin = aFormat.getImageableX();
-		double rightmargin = width - leftmargin - aFormat.getImageableWidth();
+  public static void printPageFormat(String aName, PageFormat aFormat) {
+    double width = aFormat.getPaper().getWidth();
+    double height = aFormat.getPaper().getHeight();
 
-		double topmargin = (int)aFormat.getImageableY();
-		double bottommargin = height - topmargin - aFormat.getImageableHeight();
+    double leftmargin = aFormat.getImageableX();
+    double rightmargin = width - leftmargin - aFormat.getImageableWidth();
 
-		System.out.println(aName + ": paper size=[" + width + "," + height + "]");
-		System.out.println(aName + ": imageable size=[" + aFormat.getImageableWidth() + "," + aFormat.getImageableHeight() + "]");
-		System.out.println(aName + ": margins (l,r,t,b)=" + leftmargin + "," + rightmargin + "," + topmargin + "," + bottommargin);
-	}
+    double topmargin = (int) aFormat.getImageableY();
+    double bottommargin = height - topmargin - aFormat.getImageableHeight();
+
+    System.out.println(aName + ": paper size=[" + width + "," + height + "]");
+    System.out.println(aName + ": imageable size=[" + aFormat.getImageableWidth() + "," + aFormat.getImageableHeight() + "]");
+    System.out.println(aName + ": margins (l,r,t,b)=" + leftmargin + "," + rightmargin + "," + topmargin + "," + bottommargin);
+  }
 }

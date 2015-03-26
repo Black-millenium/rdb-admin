@@ -22,39 +22,43 @@
  */
 package workbench.interfaces;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import workbench.db.DbObject;
 import workbench.db.TableIdentifier;
 import workbench.db.WbConnection;
-
 import workbench.storage.RowActionMonitor;
 
+import java.sql.SQLException;
+import java.util.List;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ObjectDropper
-{
-	boolean supportsCascade();
-	boolean supportsFKSorting();
-	void setCascade(boolean flag);
-	void setConnection(WbConnection con);
-	WbConnection getConnection();
-	void setObjectTable(TableIdentifier tbl);
+public interface ObjectDropper {
+  boolean supportsCascade();
 
-	void setObjects(List<? extends DbObject> objects);
-	List<? extends DbObject> getObjects();
+  boolean supportsFKSorting();
 
-	void dropObjects()
-		throws SQLException;
+  void setCascade(boolean flag);
 
-	void cancel()
-		throws SQLException;
+  WbConnection getConnection();
 
-	void setRowActionMonitor(RowActionMonitor monitor);
+  void setConnection(WbConnection con);
 
-	CharSequence getScript();
-	CharSequence getDropForObject(DbObject toDrop);
+  void setObjectTable(TableIdentifier tbl);
+
+  List<? extends DbObject> getObjects();
+
+  void setObjects(List<? extends DbObject> objects);
+
+  void dropObjects()
+      throws SQLException;
+
+  void cancel()
+      throws SQLException;
+
+  void setRowActionMonitor(RowActionMonitor monitor);
+
+  CharSequence getScript();
+
+  CharSequence getDropForObject(DbObject toDrop);
 }

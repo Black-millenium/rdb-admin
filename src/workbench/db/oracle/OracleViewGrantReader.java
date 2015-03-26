@@ -25,33 +25,28 @@ package workbench.db.oracle;
 import workbench.db.ViewGrantReader;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class OracleViewGrantReader
-	extends ViewGrantReader
-{
+    extends ViewGrantReader {
 
-	@Override
-	public String getViewGrantSql()
-	{
-		return "select grantee, privilege, grantable \n" +
-             "from ALL_TAB_PRIVS \n" +
-             "where table_name = ? \n" +
-             " and table_schema = ? ";
-	}
+  @Override
+  public String getViewGrantSql() {
+    return "select grantee, privilege, grantable \n" +
+        "from ALL_TAB_PRIVS \n" +
+        "where table_name = ? \n" +
+        " and table_schema = ? ";
+  }
 
 
-	@Override
-	public int getIndexForTableNameParameter()
-	{
-		return 1;
-	}
+  @Override
+  public int getIndexForTableNameParameter() {
+    return 1;
+  }
 
-	@Override
-	public int getIndexForSchemaParameter()
-	{
-		return 2;
-	}
+  @Override
+  public int getIndexForSchemaParameter() {
+    return 2;
+  }
 
 }

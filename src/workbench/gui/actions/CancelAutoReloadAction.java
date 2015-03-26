@@ -22,49 +22,42 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.gui.sql.DwPanel;
 import workbench.gui.sql.SqlPanel;
 
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class CancelAutoReloadAction
-	extends WbAction
-{
-	private SqlPanel client;
+    extends WbAction {
+  private SqlPanel client;
 
-	public CancelAutoReloadAction(SqlPanel panel)
-	{
-		initMenuDefinition("MnuTxtRemoveRefresh");
-		setClient(panel);
-	}
+  public CancelAutoReloadAction(SqlPanel panel) {
+    initMenuDefinition("MnuTxtRemoveRefresh");
+    setClient(panel);
+  }
 
-	public final void setClient(SqlPanel panel)
-	{
-		client = panel;
-		checkEnabled();
-	}
+  public final void setClient(SqlPanel panel) {
+    client = panel;
+    checkEnabled();
+  }
 
-	public void checkEnabled()
-	{
-		boolean isRegistered = false;
-    DwPanel dw =  client.getCurrentResult();
-    if (dw != null)
-    {
+  public void checkEnabled() {
+    boolean isRegistered = false;
+    DwPanel dw = client.getCurrentResult();
+    if (dw != null) {
       isRegistered = client.getRefreshMgr().isRegistered(dw);
     }
-		setEnabled(isRegistered);
-	}
+    setEnabled(isRegistered);
+  }
 
-	@Override
-	public void executeAction(ActionEvent evt)
-	{
-    DwPanel dw =  client.getCurrentResult();
+  @Override
+  public void executeAction(ActionEvent evt) {
+    DwPanel dw = client.getCurrentResult();
     client.getRefreshMgr().removeRefresh(dw);
     client.checkAutoRefreshIndicator(dw);
-	}
+  }
 
 }

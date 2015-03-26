@@ -22,36 +22,32 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
+import workbench.gui.sql.SqlPanel;
 import workbench.resource.ResourceMgr;
 
-import workbench.gui.sql.SqlPanel;
+import java.awt.event.ActionEvent;
 
 /**
  * An action to close all result tabs of a SqlPanel.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class CloseAllResultsAction
-	extends WbAction
-{
-	private SqlPanel panel;
+    extends WbAction {
+  private SqlPanel panel;
 
-	public CloseAllResultsAction(SqlPanel sqlPanel)
-	{
-		super();
-		panel = sqlPanel;
-		this.initMenuDefinition("MnuTxtCloseAllResults");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
-		this.setIcon(null);
-		this.setEnabled(panel.getResultTabCount() > 0);
-	}
+  public CloseAllResultsAction(SqlPanel sqlPanel) {
+    super();
+    panel = sqlPanel;
+    this.initMenuDefinition("MnuTxtCloseAllResults");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
+    this.setIcon(null);
+    this.setEnabled(panel.getResultTabCount() > 0);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		panel.closeAllResults();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    panel.closeAllResults();
+  }
 
 }

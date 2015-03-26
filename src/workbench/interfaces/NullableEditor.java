@@ -25,12 +25,12 @@ package workbench.interfaces;
 import javax.swing.text.JTextComponent;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface NullableEditor
-{
-	void setNull(boolean setToNull);
-	JTextComponent getEditor();
-	void restoreOriginal();
+public interface NullableEditor {
+  void setNull(boolean setToNull);
+
+  JTextComponent getEditor();
+
+  void restoreOriginal();
 }

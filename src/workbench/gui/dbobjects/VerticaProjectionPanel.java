@@ -22,49 +22,35 @@
  */
 package workbench.gui.dbobjects;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.sql.SQLException;
-
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.border.EtchedBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
+import workbench.db.TableIdentifier;
+import workbench.db.WbConnection;
+import workbench.db.vertica.VerticaProjectionReader;
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.actions.ReloadAction;
+import workbench.gui.actions.WbAction;
+import workbench.gui.components.*;
+import workbench.gui.renderer.RendererSetup;
+import workbench.gui.settings.PlacementChooser;
 import workbench.interfaces.PropertyStorage;
 import workbench.interfaces.Reloadable;
 import workbench.interfaces.Resettable;
 import workbench.log.LogMgr;
 import workbench.resource.Settings;
-
-import workbench.db.TableIdentifier;
-import workbench.db.WbConnection;
-import workbench.db.vertica.VerticaProjectionReader;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.actions.ReloadAction;
-import workbench.gui.actions.WbAction;
-import workbench.gui.components.DataStoreTableModel;
-import workbench.gui.components.WbScrollPane;
-import workbench.gui.components.WbSplitPane;
-import workbench.gui.components.WbTabbedPane;
-import workbench.gui.components.WbTable;
-import workbench.gui.components.WbToolbar;
-import workbench.gui.renderer.RendererSetup;
-import workbench.gui.settings.PlacementChooser;
-
 import workbench.storage.DataStore;
-
 import workbench.util.FilteredProperties;
 import workbench.util.WbThread;
 import workbench.util.WbWorkspace;
+
+import javax.swing.*;
+import javax.swing.border.EtchedBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 /**
  * A panel with projection information for Vertica
@@ -72,415 +58,340 @@ import workbench.util.WbWorkspace;
  * @author Tatiana Saltykova
  */
 public class VerticaProjectionPanel
-	extends JPanel
-	implements Resettable, Reloadable, ActionListener, ListSelectionListener, ChangeListener
-{
-	protected WbTable projectionList;
-	protected WbTable projectionBuddies;
-	protected WbTable projectionColumns;
-	private WbSplitPane splitPanel;
-	private JTabbedPane displayTab;
+    extends JPanel
+    implements Resettable, Reloadable, ActionListener, ListSelectionListener, ChangeListener {
+  protected WbTable projectionList;
+  protected WbTable projectionBuddies;
+  protected WbTable projectionColumns;
+  private WbSplitPane splitPanel;
+  private JTabbedPane displayTab;
 
-	private ReloadAction reloadProjections;
+  private ReloadAction reloadProjections;
 
-	private boolean isRetrieving;
-	private boolean isDetailsRetrieving;
-	private boolean initialized;
+  private boolean isRetrieving;
+  private boolean isDetailsRetrieving;
+  private boolean initialized;
 
-	private TableIdentifier currentTable;
-	private VerticaProjectionReader projectionReader;
-	private FilteredProperties workspaceProperties;
+  private TableIdentifier currentTable;
+  private VerticaProjectionReader projectionReader;
+  private FilteredProperties workspaceProperties;
 
-	public VerticaProjectionPanel()
-	{
-		super(new BorderLayout());
-		projectionReader = new VerticaProjectionReader();
-	}
+  public VerticaProjectionPanel() {
+    super(new BorderLayout());
+    projectionReader = new VerticaProjectionReader();
+  }
 
-	private void initGui()
-	{
-		if (initialized) return;
+  private void initGui() {
+    if (initialized) return;
 
-		WbSwingUtilities.invoke(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				_initGui();
-			}
-		});
-	}
+    WbSwingUtilities.invoke(new Runnable() {
+      @Override
+      public void run() {
+        _initGui();
+      }
+    });
+  }
 
-	private void _initGui()
-	{
-		this.projectionList = new WbTable();
-		this.projectionList.setAdjustToColumnLabel(false);
-		this.projectionList.setRendererSetup(RendererSetup.getBaseSetup());
-		this.projectionList.getSelectionModel().addListSelectionListener(this);
-		this.projectionList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		WbScrollPane scrollList = new WbScrollPane(this.projectionList);
+  private void _initGui() {
+    this.projectionList = new WbTable();
+    this.projectionList.setAdjustToColumnLabel(false);
+    this.projectionList.setRendererSetup(RendererSetup.getBaseSetup());
+    this.projectionList.getSelectionModel().addListSelectionListener(this);
+    this.projectionList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    WbScrollPane scrollList = new WbScrollPane(this.projectionList);
 
-		this.projectionBuddies = new WbTable();
-		this.projectionBuddies.setAdjustToColumnLabel(false);
-		this.projectionBuddies.setRendererSetup(RendererSetup.getBaseSetup());
-		this.projectionBuddies.getSelectionModel().addListSelectionListener(this);
-		this.projectionBuddies.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		WbScrollPane scrollDetail = new WbScrollPane(this.projectionBuddies);
+    this.projectionBuddies = new WbTable();
+    this.projectionBuddies.setAdjustToColumnLabel(false);
+    this.projectionBuddies.setRendererSetup(RendererSetup.getBaseSetup());
+    this.projectionBuddies.getSelectionModel().addListSelectionListener(this);
+    this.projectionBuddies.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    WbScrollPane scrollDetail = new WbScrollPane(this.projectionBuddies);
 
-		this.projectionColumns = new WbTable();
-		this.projectionColumns.setAdjustToColumnLabel(false);
-		this.projectionColumns.setRendererSetup(RendererSetup.getBaseSetup());
-		WbScrollPane scrollColumns = new WbScrollPane(this.projectionColumns);
+    this.projectionColumns = new WbTable();
+    this.projectionColumns.setAdjustToColumnLabel(false);
+    this.projectionColumns.setRendererSetup(RendererSetup.getBaseSetup());
+    WbScrollPane scrollColumns = new WbScrollPane(this.projectionColumns);
 
-		int location = PlacementChooser.getPlacementLocation();
-		displayTab = new WbTabbedPane(location);
-		displayTab.setBorder(WbSwingUtilities.EMPTY_BORDER);
-		displayTab.setName("displaytab");
-		displayTab.add("Buddies", scrollDetail);
-		displayTab.add("Columns", scrollColumns);
-		displayTab.addChangeListener(this);
+    int location = PlacementChooser.getPlacementLocation();
+    displayTab = new WbTabbedPane(location);
+    displayTab.setBorder(WbSwingUtilities.EMPTY_BORDER);
+    displayTab.setName("displaytab");
+    displayTab.add("Buddies", scrollDetail);
+    displayTab.add("Columns", scrollColumns);
+    displayTab.addChangeListener(this);
 
-		this.splitPanel = new WbSplitPane(JSplitPane.VERTICAL_SPLIT);
-		this.splitPanel.setDividerSize(8);
-		this.splitPanel.setTopComponent(scrollList);
-		this.splitPanel.setBottomComponent(displayTab);
+    this.splitPanel = new WbSplitPane(JSplitPane.VERTICAL_SPLIT);
+    this.splitPanel.setDividerSize(8);
+    this.splitPanel.setTopComponent(scrollList);
+    this.splitPanel.setBottomComponent(displayTab);
 
-		WbToolbar toolbar = new WbToolbar();
-		toolbar.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-		reloadProjections = new ReloadAction(this);
-		toolbar.add(reloadProjections);
-		toolbar.addSeparator();
+    WbToolbar toolbar = new WbToolbar();
+    toolbar.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+    reloadProjections = new ReloadAction(this);
+    toolbar.add(reloadProjections);
+    toolbar.addSeparator();
 
-		this.add(toolbar, BorderLayout.NORTH);
-		this.add(splitPanel, BorderLayout.CENTER);
+    this.add(toolbar, BorderLayout.NORTH);
+    this.add(splitPanel, BorderLayout.CENTER);
 
-		this.splitPanel.setDividerLocation(0.5d);
+    this.splitPanel.setDividerLocation(0.5d);
 
-		initialized = true;
+    initialized = true;
 
-		restoreSettings();
-		if (workspaceProperties != null)
-		{
-			readSettings(workspaceProperties, workspaceProperties.getFilterPrefix());
-			workspaceProperties = null;
-		}
-	}
+    restoreSettings();
+    if (workspaceProperties != null) {
+      readSettings(workspaceProperties, workspaceProperties.getFilterPrefix());
+      workspaceProperties = null;
+    }
+  }
 
-	public void setConnection(WbConnection conn)
-	{
-		reset();
-		projectionReader.setConnection(conn);
-	}
+  public void setConnection(WbConnection conn) {
+    reset();
+    projectionReader.setConnection(conn);
+  }
 
-	@Override
-	public void reset()
-	{
-		if (initialized)
-		{
-			projectionList.reset();
-			projectionBuddies.reset();
-			projectionColumns.reset();
-		}
-	}
+  @Override
+  public void reset() {
+    if (initialized) {
+      projectionList.reset();
+      projectionBuddies.reset();
+      projectionColumns.reset();
+    }
+  }
 
-	public boolean isRetrieving()
-	{
-		return isRetrieving || isDetailsRetrieving;
-	}
+  public boolean isRetrieving() {
+    return isRetrieving || isDetailsRetrieving;
+  }
 
-	public void reloadTable()
-	{
-		try
-		{
-			reset();
-			retrieve(currentTable);
-		}
-		catch (SQLException sql)
-		{
-			LogMgr.logError("VerticaProjectionPanel.reloadTable()", "Could not reload projections", sql);
-		}
-	}
+  public void reloadTable() {
+    try {
+      reset();
+      retrieve(currentTable);
+    } catch (SQLException sql) {
+      LogMgr.logError("VerticaProjectionPanel.reloadTable()", "Could not reload projections", sql);
+    }
+  }
 
-	protected void retrieve(TableIdentifier table)
-		throws SQLException
-	{
-		initGui();
-		try
-		{
-			currentTable = table;
-			isRetrieving = true;
+  protected void retrieve(TableIdentifier table)
+      throws SQLException {
+    initGui();
+    try {
+      currentTable = table;
+      isRetrieving = true;
 
-			final DataStoreTableModel model = new DataStoreTableModel(getProjectionDataStore(table));
-			WbSwingUtilities.invoke(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					projectionList.setModel(model, true);
-					projectionList.adjustRowsAndColumns();
-					projectionBuddies.reset();
-					projectionColumns.reset();
-				}
-			});
-		}
-		finally
-		{
-			isRetrieving = false;
-		}
-	}
+      final DataStoreTableModel model = new DataStoreTableModel(getProjectionDataStore(table));
+      WbSwingUtilities.invoke(new Runnable() {
+        @Override
+        public void run() {
+          projectionList.setModel(model, true);
+          projectionList.adjustRowsAndColumns();
+          projectionBuddies.reset();
+          projectionColumns.reset();
+        }
+      });
+    } finally {
+      isRetrieving = false;
+    }
+  }
 
-	private DataStore getProjectionDataStore(TableIdentifier table)
-		throws SQLException
-	{
-		return projectionReader.getProjectionList(table);
-	}
+  private DataStore getProjectionDataStore(TableIdentifier table)
+      throws SQLException {
+    return projectionReader.getProjectionList(table);
+  }
 
-	private DataStore getProjectionCopiesDataStore(String basename)
-		throws SQLException
-	{
-		return projectionReader.getProjectionCopies(basename);
-	}
+  private DataStore getProjectionCopiesDataStore(String basename)
+      throws SQLException {
+    return projectionReader.getProjectionCopies(basename);
+  }
 
-	private DataStore getProjectionColumnsDataStore(String projectionName)
-		throws SQLException
-	{
-		return projectionReader.getProjectionColumns(projectionName);
-	}
+  private DataStore getProjectionColumnsDataStore(String projectionName)
+      throws SQLException {
+    return projectionReader.getProjectionColumns(projectionName);
+  }
 
-	public void dispose()
-	{
-		reset();
-		WbAction.dispose(reloadProjections);
-	}
+  public void dispose() {
+    reset();
+    WbAction.dispose(reloadProjections);
+  }
 
-	protected void retrieveProjectionCopies()
-	{
-		try
-		{
-			int selected = Math.max(0, projectionList.getSelectedRow());
-			String basename = projectionList.getValueAsString(selected, 0);
+  protected void retrieveProjectionCopies() {
+    try {
+      int selected = Math.max(0, projectionList.getSelectedRow());
+      String basename = projectionList.getValueAsString(selected, 0);
 
-			final DataStoreTableModel model = new DataStoreTableModel(getProjectionCopiesDataStore(basename));
-			WbSwingUtilities.invoke(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					projectionBuddies.setModel(model, true);
-					projectionBuddies.adjustRowsAndColumns();
-				}
-			});
-		}
-		catch (SQLException se)
-		{
-			LogMgr.logError("VerticaProjectionPanel.retrieveProjectionCopies()", "Could not retrieve projection copies", se);
-		}
-	}
+      final DataStoreTableModel model = new DataStoreTableModel(getProjectionCopiesDataStore(basename));
+      WbSwingUtilities.invoke(new Runnable() {
+        @Override
+        public void run() {
+          projectionBuddies.setModel(model, true);
+          projectionBuddies.adjustRowsAndColumns();
+        }
+      });
+    } catch (SQLException se) {
+      LogMgr.logError("VerticaProjectionPanel.retrieveProjectionCopies()", "Could not retrieve projection copies", se);
+    }
+  }
 
-	protected void retrieveProjectionColumns()
-	{
-		try
-		{
-			int selected = Math.max(0, projectionList.getSelectedRow());
-			String basename = projectionList.getValueAsString(selected, 0);
+  protected void retrieveProjectionColumns() {
+    try {
+      int selected = Math.max(0, projectionList.getSelectedRow());
+      String basename = projectionList.getValueAsString(selected, 0);
 
-			final DataStoreTableModel model = new DataStoreTableModel(getProjectionColumnsDataStore(basename));
-			WbSwingUtilities.invoke(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					projectionColumns.setModel(model, true);
-					projectionColumns.adjustRowsAndColumns();
-				}
-			});
-		}
-		catch (SQLException se)
-		{
-			LogMgr.logError("VerticaProjectionPanel.retrieveProjectionColumns()", "Could not retrieve projection columns", se);
-		}
-	}
+      final DataStoreTableModel model = new DataStoreTableModel(getProjectionColumnsDataStore(basename));
+      WbSwingUtilities.invoke(new Runnable() {
+        @Override
+        public void run() {
+          projectionColumns.setModel(model, true);
+          projectionColumns.adjustRowsAndColumns();
+        }
+      });
+    } catch (SQLException se) {
+      LogMgr.logError("VerticaProjectionPanel.retrieveProjectionColumns()", "Could not retrieve projection columns", se);
+    }
+  }
 
-	protected void retrieveCurrentPanel()
-	{
-		if (projectionList.getSelectedRowCount() < 1)
-		{
-			return;
-		}
+  protected void retrieveCurrentPanel() {
+    if (projectionList.getSelectedRowCount() < 1) {
+      return;
+    }
 
-		switch (displayTab.getSelectedIndex())
-		{
-			case 0:
-				if (projectionBuddies.getRowCount() < 1)
-				{
-					retrieveProjectionCopies();
-				}
-				break;
-			case 1:
-				if (projectionColumns.getRowCount() < 1)
-				{
-					retrieveProjectionColumns();
-				}
-				break;
-		}
-	}
+    switch (displayTab.getSelectedIndex()) {
+      case 0:
+        if (projectionBuddies.getRowCount() < 1) {
+          retrieveProjectionCopies();
+        }
+        break;
+      case 1:
+        if (projectionColumns.getRowCount() < 1) {
+          retrieveProjectionColumns();
+        }
+        break;
+    }
+  }
 
-	@Override
-	public void reload()
-	{
-		reloadTable();
-	}
+  @Override
+  public void reload() {
+    reloadTable();
+  }
 
-	public void reloadDetails()
-	{
-		WbThread t = new WbThread("ProjectionDetailsRetriever")
-		{
-			@Override
-			public void run()
-			{
-				try
-				{
-					isDetailsRetrieving = true;
-					retrieveCurrentPanel();
-				}
-				finally
-				{
-					isDetailsRetrieving = false;
-					reloadProjections.setEnabled(true);
-					WbSwingUtilities.showDefaultCursor(VerticaProjectionPanel.this);
-				}
-			}
+  public void reloadDetails() {
+    WbThread t = new WbThread("ProjectionDetailsRetriever") {
+      @Override
+      public void run() {
+        try {
+          isDetailsRetrieving = true;
+          retrieveCurrentPanel();
+        } finally {
+          isDetailsRetrieving = false;
+          reloadProjections.setEnabled(true);
+          WbSwingUtilities.showDefaultCursor(VerticaProjectionPanel.this);
+        }
+      }
 
-		};
-		reloadProjections.setEnabled(false);
-		WbSwingUtilities.showWaitCursor(this);
-		t.start();
-	}
+    };
+    reloadProjections.setEnabled(false);
+    WbSwingUtilities.showWaitCursor(this);
+    t.start();
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		if (!initialized) return;
-		if (e.getSource() != this.reloadProjections) return;
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    if (!initialized) return;
+    if (e.getSource() != this.reloadProjections) return;
 
-		LogMgr.logDebug("VerticaProjectionPanel.actionPerformed()", "Trying to select projection copies");
-		WbSwingUtilities.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				reload();
-			}
+    LogMgr.logDebug("VerticaProjectionPanel.actionPerformed()", "Trying to select projection copies");
+    WbSwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        reload();
+      }
 
-		});
-	}
+    });
+  }
 
-	/**
-	 * Invoked when a projection is selected in the projection list
-	 */
-	@Override
-	public void valueChanged(ListSelectionEvent e)
-	{
-		if (!initialized) return;
+  /**
+   * Invoked when a projection is selected in the projection list
+   */
+  @Override
+  public void valueChanged(ListSelectionEvent e) {
+    if (!initialized) return;
 
-		if (e.getValueIsAdjusting()) return;
-		if (e.getSource() == this.projectionList.getSelectionModel())
-		{
-			projectionBuddies.reset();
-			projectionColumns.reset();
-			LogMgr.logDebug("VerticaProjectionPanel.actionPerformed()", "Trying to select projection copies");
-			WbSwingUtilities.invokeLater(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					reloadDetails();
-				}
+    if (e.getValueIsAdjusting()) return;
+    if (e.getSource() == this.projectionList.getSelectionModel()) {
+      projectionBuddies.reset();
+      projectionColumns.reset();
+      LogMgr.logDebug("VerticaProjectionPanel.actionPerformed()", "Trying to select projection copies");
+      WbSwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          reloadDetails();
+        }
 
-			});
-		}
-	}
+      });
+    }
+  }
 
-	/** Invoked when the displayed tab has changed.
-	 * Retrieve table detail information here.
-	 */
-	@Override
-	public void stateChanged(ChangeEvent e)
-	{
-		if (!initialized) return;
+  /**
+   * Invoked when the displayed tab has changed.
+   * Retrieve table detail information here.
+   */
+  @Override
+  public void stateChanged(ChangeEvent e) {
+    if (!initialized) return;
 
-		if (e.getSource() == this.displayTab)
-		{
-			EventQueue.invokeLater(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					reloadDetails();
-				}
+    if (e.getSource() == this.displayTab) {
+      EventQueue.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          reloadDetails();
+        }
 
-			});
-		}
-	}
+      });
+    }
+  }
 
-	private String getWorkspacePrefix(int index)
-	{
-		return "dbexplorer" + index + ".projections.";
-	}
+  private String getWorkspacePrefix(int index) {
+    return "dbexplorer" + index + ".projections.";
+  }
 
-	public void saveSettings()
-	{
-		if (initialized)
-		{
-			storeSettings(Settings.getInstance(), this.getClass().getName() + ".");
-		}
-	}
+  public void saveSettings() {
+    if (initialized) {
+      storeSettings(Settings.getInstance(), this.getClass().getName() + ".");
+    }
+  }
 
-	public void saveToWorkspace(WbWorkspace w, int index)
-	{
-		String prefix = getWorkspacePrefix(index);
-		if (initialized)
-		{
-			storeSettings(w.getSettings(), prefix);
-		}
-		else if (workspaceProperties != null)
-		{
-			workspaceProperties.copyTo(w.getSettings(), prefix);
-		}
-	}
+  public void saveToWorkspace(WbWorkspace w, int index) {
+    String prefix = getWorkspacePrefix(index);
+    if (initialized) {
+      storeSettings(w.getSettings(), prefix);
+    } else if (workspaceProperties != null) {
+      workspaceProperties.copyTo(w.getSettings(), prefix);
+    }
+  }
 
-	private void storeSettings(PropertyStorage props, String prefix)
-	{
-		props.setProperty(prefix + "divider", splitPanel.getDividerLocation());
-	}
+  private void storeSettings(PropertyStorage props, String prefix) {
+    props.setProperty(prefix + "divider", splitPanel.getDividerLocation());
+  }
 
-	public void restoreSettings()
-	{
-		if (initialized)
-		{
-			readSettings(Settings.getInstance(), this.getClass().getName() + ".");
-		}
-	}
+  public void restoreSettings() {
+    if (initialized) {
+      readSettings(Settings.getInstance(), this.getClass().getName() + ".");
+    }
+  }
 
-	public void readFromWorkspace(WbWorkspace w, int index)
-	{
-		String prefix = getWorkspacePrefix(index);
-		if (initialized)
-		{
-			readSettings(w.getSettings(), prefix);
-		}
-		else
-		{
-			workspaceProperties = new FilteredProperties(w.getSettings(), prefix);
-		}
-	}
+  public void readFromWorkspace(WbWorkspace w, int index) {
+    String prefix = getWorkspacePrefix(index);
+    if (initialized) {
+      readSettings(w.getSettings(), prefix);
+    } else {
+      workspaceProperties = new FilteredProperties(w.getSettings(), prefix);
+    }
+  }
 
-	private void readSettings(PropertyStorage props, String prefix)
-	{
-		if (initialized)
-		{
-			int loc = props.getIntProperty(prefix + "divider", 200);
-			splitPanel.setDividerLocation(loc);
-		}
-	}
+  private void readSettings(PropertyStorage props, String prefix) {
+    if (initialized) {
+      int loc = props.getIntProperty(prefix + "divider", 200);
+      splitPanel.setDividerLocation(loc);
+    }
+  }
 }

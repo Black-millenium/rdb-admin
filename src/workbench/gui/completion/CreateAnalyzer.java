@@ -21,11 +21,10 @@
  *
  */
 package workbench.gui.completion;
-import workbench.log.LogMgr;
 
 import workbench.db.TableIdentifier;
 import workbench.db.WbConnection;
-
+import workbench.log.LogMgr;
 import workbench.sql.lexer.SQLLexer;
 import workbench.sql.lexer.SQLLexerFactory;
 import workbench.sql.lexer.SQLToken;
@@ -38,104 +37,79 @@ import workbench.sql.lexer.SQLToken;
  * @see AlterTableAnalyzer
  */
 public class CreateAnalyzer
-	extends BaseAnalyzer
-{
+    extends BaseAnalyzer {
 
-	public CreateAnalyzer(WbConnection conn, String statement, int cursorPos)
-	{
-		super(conn, statement, cursorPos);
-	}
+  public CreateAnalyzer(WbConnection conn, String statement, int cursorPos) {
+    super(conn, statement, cursorPos);
+  }
 
-	@Override
-	protected void checkContext()
-	{
-		SQLLexer lexer = SQLLexerFactory.createLexer(dbConnection, this.sql);
+  @Override
+  protected void checkContext() {
+    SQLLexer lexer = SQLLexerFactory.createLexer(dbConnection, this.sql);
 
-		boolean isCreateIndex = false;
-		boolean showColumns = false;
-		boolean showTables = false;
-		int tableStartPos = -1;
-		int tableEndPos = -1;
-		int tokenCount = 0;
-		boolean afterCreate = true;
-		int bracketCount = 0;
+    boolean isCreateIndex = false;
+    boolean showColumns = false;
+    boolean showTables = false;
+    int tableStartPos = -1;
+    int tableEndPos = -1;
+    int tokenCount = 0;
+    boolean afterCreate = true;
+    int bracketCount = 0;
 
-		try
-		{
-			SQLToken token = lexer.getNextToken(false, false);
-			while (token != null)
-			{
-				final String t = token.getContents();
-				tokenCount++;
-				if (tokenCount == 2)
-				{
-					afterCreate = (token.getCharBegin() > this.cursorPos);
-				}
+    try {
+      SQLToken token = lexer.getNextToken(false, false);
+      while (token != null) {
+        final String t = token.getContents();
+        tokenCount++;
+        if (tokenCount == 2) {
+          afterCreate = (token.getCharBegin() > this.cursorPos);
+        }
 
-				if (isCreateIndex)
-				{
-					if ("ON".equalsIgnoreCase(t))
-					{
-						if (this.cursorPos > token.getCharEnd())
-						{
-							showTables = true;
-							showColumns = false;
-						}
-						tableStartPos = token.getCharEnd();
-					}
-					else if ("(".equals(t))
-					{
-						bracketCount ++;
-						if (bracketCount == 1)
-						{
-							tableEndPos = token.getCharBegin() - 1;
-							if (this.cursorPos >= token.getCharBegin())
-							{
-								showTables = false;
-								showColumns = true;
-							}
-						}
-					}
-					else if (")".equals(t))
-					{
-						bracketCount --;
-						if (bracketCount == 0 && this.cursorPos > token.getCharBegin())
-						{
-							showTables = false;
-							showColumns = false;
-						}
-					}
-				}
-				else if ("INDEX".equalsIgnoreCase(t))
-				{
-					isCreateIndex = true;
-				}
+        if (isCreateIndex) {
+          if ("ON".equalsIgnoreCase(t)) {
+            if (this.cursorPos > token.getCharEnd()) {
+              showTables = true;
+              showColumns = false;
+            }
+            tableStartPos = token.getCharEnd();
+          } else if ("(".equals(t)) {
+            bracketCount++;
+            if (bracketCount == 1) {
+              tableEndPos = token.getCharBegin() - 1;
+              if (this.cursorPos >= token.getCharBegin()) {
+                showTables = false;
+                showColumns = true;
+              }
+            }
+          } else if (")".equals(t)) {
+            bracketCount--;
+            if (bracketCount == 0 && this.cursorPos > token.getCharBegin()) {
+              showTables = false;
+              showColumns = false;
+            }
+          }
+        } else if ("INDEX".equalsIgnoreCase(t)) {
+          isCreateIndex = true;
+        }
 
-				token = lexer.getNextToken(false, false);
-			}
-		}
-		catch (Exception e)
-		{
-			LogMgr.logError("CreateAnalyzer", "Error parsing SQL", e);
-		}
+        token = lexer.getNextToken(false, false);
+      }
+    } catch (Exception e) {
+      LogMgr.logError("CreateAnalyzer", "Error parsing SQL", e);
+    }
 
-		if (showTables)
-		{
-			context = CONTEXT_TABLE_LIST;
-			this.schemaForTableList = getSchemaFromCurrentWord();
-		}
-		else if (showColumns)
-		{
-			context = CONTEXT_COLUMN_LIST;
-			if (tableEndPos == -1) tableEndPos = this.sql.length() - 1;
-			String table = this.sql.substring(tableStartPos, tableEndPos).trim();
-			this.tableForColumnList = new TableIdentifier(table, dbConnection);
-		}
-		else if (afterCreate)
-		{
-			context = CONTEXT_KW_LIST;
-			this.keywordFile = DdlAnalyzer.DDL_TYPES_FILE;
-		}
-	}
+    if (showTables) {
+      context = CONTEXT_TABLE_LIST;
+      this.schemaForTableList = getSchemaFromCurrentWord();
+    } else if (showColumns) {
+      context = CONTEXT_COLUMN_LIST;
+      if (tableEndPos == -1) tableEndPos = this.sql.length() - 1;
+      String table = this.sql.substring(tableStartPos, tableEndPos).trim();
+      this.tableForColumnList = new TableIdentifier(table, dbConnection);
+    } else if (afterCreate) {
+      context = CONTEXT_KW_LIST;
+      this.keywordFile = DdlAnalyzer.DDL_TYPES_FILE;
+    }
+  }
 
 }

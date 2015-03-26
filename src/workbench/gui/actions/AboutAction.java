@@ -22,38 +22,35 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.JDialog;
-
 import workbench.gui.MainWindow;
 import workbench.gui.WbSwingUtilities;
 import workbench.gui.dialogs.WbAboutDialog;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+
 /**
  * Action to display program version information
- * @see workbench.gui.dialogs.WbAboutDialog
+ *
  * @author Thomas Kellerer
+ * @see workbench.gui.dialogs.WbAboutDialog
  */
 public class AboutAction
-	extends WbAction
-{
-	private MainWindow mainWindow;
-	
-	public AboutAction(MainWindow parent)
-	{
-		super();
-		this.mainWindow = parent;
-		initMenuDefinition("MnuTxtAbout");
-		removeIcon();
-	}
+    extends WbAction {
+  private MainWindow mainWindow;
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		WbAboutDialog about = new WbAboutDialog(mainWindow);
-		about.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		WbSwingUtilities.center(about, mainWindow);
-		about.setVisible(true);
-	}
+  public AboutAction(MainWindow parent) {
+    super();
+    this.mainWindow = parent;
+    initMenuDefinition("MnuTxtAbout");
+    removeIcon();
+  }
+
+  @Override
+  public void executeAction(ActionEvent e) {
+    WbAboutDialog about = new WbAboutDialog(mainWindow);
+    about.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+    WbSwingUtilities.center(about, mainWindow);
+    about.setVisible(true);
+  }
 }

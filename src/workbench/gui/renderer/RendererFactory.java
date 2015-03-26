@@ -22,10 +22,11 @@
  */
 package workbench.gui.renderer;
 
-import java.lang.reflect.Constructor;
+import workbench.log.LogMgr;
+
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
-import workbench.log.LogMgr;
+import java.lang.reflect.Constructor;
 
 /**
  * A factory for TableCellRenderers.
@@ -33,51 +34,40 @@ import workbench.log.LogMgr;
  * Classes are created using  Class.forName() to avoid unnecessary class loading during startup.
  * This is used from within WbTable
  *
- * @see workbench.gui.components.WbTable#initDefaultRenderers()
- *
  * @author Thomas Kellerer
+ * @see workbench.gui.components.WbTable#initDefaultRenderers()
  */
-public class RendererFactory
-{
+public class RendererFactory {
 
-	private static TableCellRenderer createRenderer(String className)
-	{
-		TableCellRenderer rend = null;
-		try
-		{
-			Class cls = Class.forName(className);
-			rend = (TableCellRenderer)cls.newInstance();
-		}
-		catch (Exception e)
-		{
-			LogMgr.logError("RendererFactory.createRenderer()", "Error creating renderer", e);
-			rend = new DefaultTableCellRenderer();
-		}
-		return rend;
-	}
+  private static TableCellRenderer createRenderer(String className) {
+    TableCellRenderer rend = null;
+    try {
+      Class cls = Class.forName(className);
+      rend = (TableCellRenderer) cls.newInstance();
+    } catch (Exception e) {
+      LogMgr.logError("RendererFactory.createRenderer()", "Error creating renderer", e);
+      rend = new DefaultTableCellRenderer();
+    }
+    return rend;
+  }
 
-	public static TableCellRenderer getDateRenderer(String format)
-	{
-		TableCellRenderer rend = null;
-		try
-		{
-			Class cls = Class.forName("workbench.gui.renderer.DateColumnRenderer");
-			Class[] types = new Class[] { String.class };
-			Constructor cons = cls.getConstructor(types);
-			Object[] args = new Object[] { format };
-			rend = (TableCellRenderer)cons.newInstance(args);
-		}
-		catch (Exception e)
-		{
-			LogMgr.logError("RendererFactory.getDateRenderer()", "Error creating renderer", e);
-			return new DefaultTableCellRenderer();
-		}
-		return rend;
-	}
+  public static TableCellRenderer getDateRenderer(String format) {
+    TableCellRenderer rend = null;
+    try {
+      Class cls = Class.forName("workbench.gui.renderer.DateColumnRenderer");
+      Class[] types = new Class[]{String.class};
+      Constructor cons = cls.getConstructor(types);
+      Object[] args = new Object[]{format};
+      rend = (TableCellRenderer) cons.newInstance(args);
+    } catch (Exception e) {
+      LogMgr.logError("RendererFactory.getDateRenderer()", "Error creating renderer", e);
+      return new DefaultTableCellRenderer();
+    }
+    return rend;
+  }
 
-	public static TableCellRenderer getSqlTypeRenderer()
-	{
-		return createRenderer("workbench.gui.renderer.SqlTypeRenderer");
-	}
+  public static TableCellRenderer getSqlTypeRenderer() {
+    return createRenderer("workbench.gui.renderer.SqlTypeRenderer");
+  }
 
 }

@@ -22,17 +22,15 @@
  */
 package workbench.sql.wbcommands;
 
-import java.awt.Desktop;
-import java.sql.SQLException;
-
 import workbench.log.LogMgr;
 import workbench.resource.ResourceMgr;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
-
 import workbench.util.ArgumentParser;
 import workbench.util.WbFile;
+
+import java.awt.*;
+import java.sql.SQLException;
 
 /**
  * A workbench command to call an operating system program (or command)
@@ -40,65 +38,54 @@ import workbench.util.WbFile;
  * @author Thomas Kellerer
  */
 public class WbSysOpen
-	extends SqlCommand
-{
-	public static final String VERB = "WbSysOpen";
+    extends SqlCommand {
+  public static final String VERB = "WbSysOpen";
 
-	public WbSysOpen()
-	{
-		super();
-		cmdLine = new ArgumentParser();
-	}
+  public WbSysOpen() {
+    super();
+    cmdLine = new ArgumentParser();
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult(sql);
-		WbFile doc = evaluateFileArgument(getCommandLine(sql));
-		if (doc == null)
-		{
-			result.setFailure();
-			result.addMessageByKey("ErrSysOpenNoParm");
-			return result;
-		}
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult(sql);
+    WbFile doc = evaluateFileArgument(getCommandLine(sql));
+    if (doc == null) {
+      result.setFailure();
+      result.addMessageByKey("ErrSysOpenNoParm");
+      return result;
+    }
 
-		if (!doc.exists())
-		{
-			result.setFailure();
-			result.addMessage(ResourceMgr.getFormattedString("ErrFileNotFound", doc.getFullPath()));
-			return result;
-		}
+    if (!doc.exists()) {
+      result.setFailure();
+      result.addMessage(ResourceMgr.getFormattedString("ErrFileNotFound", doc.getFullPath()));
+      return result;
+    }
 
-		try
-		{
-			Desktop.getDesktop().open(doc);
-			result.setSuccess();
-		}
-		catch (Exception ex)
-		{
-			LogMgr.logError("WbSysOpen.execute()", "Could not open file " + getCommandLine(sql), ex);
-			result.setFailure();
-			result.addMessage(ex.getLocalizedMessage());
-		}
-		return result;
-	}
+    try {
+      Desktop.getDesktop().open(doc);
+      result.setSuccess();
+    } catch (Exception ex) {
+      LogMgr.logError("WbSysOpen.execute()", "Could not open file " + getCommandLine(sql), ex);
+      result.setFailure();
+      result.addMessage(ex.getLocalizedMessage());
+    }
+    return result;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 }

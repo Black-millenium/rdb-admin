@@ -25,25 +25,21 @@ package workbench.gui.sql;
 import workbench.resource.ResourceMgr;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum FileReloadType
-{
-	none("LblRldNever"),
-	prompt("LblRldPrompt"),
-	automatic("LblRldAuto");
+public enum FileReloadType {
+  none("LblRldNever"),
+  prompt("LblRldPrompt"),
+  automatic("LblRldAuto");
 
-	private String label;
+  private String label;
 
-	private FileReloadType(String resourceKey)
-	{
-		this.label = ResourceMgr.getString(resourceKey);
-	}
+  private FileReloadType(String resourceKey) {
+    this.label = ResourceMgr.getString(resourceKey);
+  }
 
-	@Override
-	public String toString()
-	{
-		return label;
-	}
+  @Override
+  public String toString() {
+    return label;
+  }
 }

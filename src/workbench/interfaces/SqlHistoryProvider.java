@@ -25,11 +25,10 @@ package workbench.interfaces;
 import java.util.List;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface SqlHistoryProvider
-{
-	List<String> getHistoryEntries();
-	String getHistoryEntry(int index);
+public interface SqlHistoryProvider {
+  List<String> getHistoryEntries();
+
+  String getHistoryEntry(int index);
 }

@@ -22,17 +22,19 @@
  */
 package workbench.gui.macros;
 
-import javax.swing.JComponent;
+import javax.swing.*;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface MacroClient
-{
-	void executeMacroSql(String sql, boolean replaceText, boolean appendResults);
-	String getStatementAtCursor();
-	String getSelectedText();
-	String getText();
-	JComponent getPanel();
+public interface MacroClient {
+  void executeMacroSql(String sql, boolean replaceText, boolean appendResults);
+
+  String getStatementAtCursor();
+
+  String getSelectedText();
+
+  String getText();
+
+  JComponent getPanel();
 }

@@ -22,17 +22,14 @@
  */
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-
 import workbench.resource.ResourceMgr;
-
-import workbench.storage.PkMapping;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
-
+import workbench.storage.PkMapping;
 import workbench.util.StringUtil;
 import workbench.util.WbStringTokenizer;
+
+import java.sql.SQLException;
 
 /**
  * Defines a primary key for a table or view. This is stored in a
@@ -42,65 +39,56 @@ import workbench.util.WbStringTokenizer;
  * @author Thomas Kellerer
  */
 public class WbDefinePk
-	extends SqlCommand
-{
-	public static final String VERB = "WbDefinePK";
+    extends SqlCommand {
+  public static final String VERB = "WbDefinePK";
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sqlCommand)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
+  @Override
+  public StatementRunnerResult execute(String sqlCommand)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult();
 
-		String sql = getCommandLine(sqlCommand);
+    String sql = getCommandLine(sqlCommand);
 
-		WbStringTokenizer tok = new WbStringTokenizer("=", true, "\"'", false);
-		tok.setSourceString(sql);
-		String columns = null;
-		String table = null;
+    WbStringTokenizer tok = new WbStringTokenizer("=", true, "\"'", false);
+    tok.setSourceString(sql);
+    String columns = null;
+    String table = null;
 
-		if (tok.hasMoreTokens()) table = tok.nextToken();
+    if (tok.hasMoreTokens()) table = tok.nextToken();
 
-		if (table == null)
-		{
-			result.addMessage(ResourceMgr.getString("ErrPkDefWrongParameter"));
-			result.setFailure();
-			return result;
-		}
+    if (table == null) {
+      result.addMessage(ResourceMgr.getString("ErrPkDefWrongParameter"));
+      result.setFailure();
+      return result;
+    }
 
-		if (tok.hasMoreTokens()) columns = tok.nextToken();
-		String msg = null;
-		if (columns == null)
-		{
-			PkMapping.getInstance().removeMapping(currentConnection, table);
-			msg = ResourceMgr.getString("MsgPkDefinitionRemoved");
-		}
-		else
-		{
-			PkMapping.getInstance().addMapping(table, columns);
-			msg = ResourceMgr.getString("MsgPkDefinitionAdded");
-		}
-		msg = StringUtil.replace(msg, "%table%", table);
-		result.setSuccess();
-		result.addMessage(msg);
-		return result;
-	}
+    if (tok.hasMoreTokens()) columns = tok.nextToken();
+    String msg = null;
+    if (columns == null) {
+      PkMapping.getInstance().removeMapping(currentConnection, table);
+      msg = ResourceMgr.getString("MsgPkDefinitionRemoved");
+    } else {
+      PkMapping.getInstance().addMapping(table, columns);
+      msg = ResourceMgr.getString("MsgPkDefinitionAdded");
+    }
+    msg = StringUtil.replace(msg, "%table%", table);
+    result.setSuccess();
+    result.addMessage(msg);
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 }

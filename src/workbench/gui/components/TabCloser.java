@@ -23,11 +23,10 @@
 package workbench.gui.components;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface TabCloser
-{
-	boolean canCloseTab(int index);
-	void tabCloseButtonClicked(int index);
+public interface TabCloser {
+  boolean canCloseTab(int index);
+
+  void tabCloseButtonClicked(int index);
 }

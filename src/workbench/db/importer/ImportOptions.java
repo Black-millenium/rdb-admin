@@ -23,17 +23,22 @@
 package workbench.db.importer;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ImportOptions
-{
-	void setDateFormat(String format);
-	String getDateFormat();
-	void setTimestampFormat(String format);
-	String getTimestampFormat();
-	void setEncoding(String enc);
-	String getEncoding();
-	void setMode(String mode);
-	String getMode();
+public interface ImportOptions {
+  String getDateFormat();
+
+  void setDateFormat(String format);
+
+  String getTimestampFormat();
+
+  void setTimestampFormat(String format);
+
+  String getEncoding();
+
+  void setEncoding(String enc);
+
+  String getMode();
+
+  void setMode(String mode);
 }

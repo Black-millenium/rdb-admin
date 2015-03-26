@@ -23,17 +23,22 @@
 package workbench.gui.dialogs.export;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ExportOptions
-{
-	void setDateFormat(String format);
-	String getDateFormat();
-	void setTimestampFormat(String format);
-	String getTimestampFormat();
-	void setEncoding(String enc);
-	String getEncoding();
-	String getNullString();
-	void setNullString(String value);
+public interface ExportOptions {
+  String getDateFormat();
+
+  void setDateFormat(String format);
+
+  String getTimestampFormat();
+
+  void setTimestampFormat(String format);
+
+  String getEncoding();
+
+  void setEncoding(String enc);
+
+  String getNullString();
+
+  void setNullString(String value);
 }

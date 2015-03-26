@@ -22,51 +22,45 @@
  */
 package workbench.db;
 
-import java.util.HashMap;
-import java.util.Map;
 import workbench.resource.Settings;
 import workbench.util.StringUtil;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public class ObjectListFilter
-{
-	private Map<String, ObjectNameFilter> filterMap = new HashMap<>();
+public class ObjectListFilter {
+  private Map<String, ObjectNameFilter> filterMap = new HashMap<>();
 
-	public ObjectListFilter(String dbid)
-	{
-		String synRegex = Settings.getInstance().getProperty("workbench.db." + dbid + ".exclude.synonyms", null);
-		addFilter(synRegex, "SYNONYM");
-		ObjectNameFilter f = filterMap.get("SYNONYM");
-		if (f != null)
-		{
-			filterMap.put("ALIAS", f);
-		}
+  public ObjectListFilter(String dbid) {
+    String synRegex = Settings.getInstance().getProperty("workbench.db." + dbid + ".exclude.synonyms", null);
+    addFilter(synRegex, "SYNONYM");
+    ObjectNameFilter f = filterMap.get("SYNONYM");
+    if (f != null) {
+      filterMap.put("ALIAS", f);
+    }
 
-		String tableRegex = Settings.getInstance().getProperty("workbench.db." + dbid + ".exclude.tables", null);
-		addFilter(tableRegex, "TABLE");
+    String tableRegex = Settings.getInstance().getProperty("workbench.db." + dbid + ".exclude.tables", null);
+    addFilter(tableRegex, "TABLE");
 
-		String viewRegex = Settings.getInstance().getProperty("workbench.db." + dbid + ".exclude.views", null);
-		addFilter(viewRegex, "VIEW");
-	}
+    String viewRegex = Settings.getInstance().getProperty("workbench.db." + dbid + ".exclude.views", null);
+    addFilter(viewRegex, "VIEW");
+  }
 
-	private void addFilter(String regex, String type)
-	{
-		if (StringUtil.isNonBlank(regex) && StringUtil.isNonBlank(type))
-		{
-			ObjectNameFilter filter = new ObjectNameFilter();
-			filter.setExpressionList(regex);
-			filterMap.put(type, filter);
-		}
-	}
+  private void addFilter(String regex, String type) {
+    if (StringUtil.isNonBlank(regex) && StringUtil.isNonBlank(type)) {
+      ObjectNameFilter filter = new ObjectNameFilter();
+      filter.setExpressionList(regex);
+      filterMap.put(type, filter);
+    }
+  }
 
-	public boolean isExcluded(String objectType, String objectName)
-	{
-		ObjectNameFilter filter = filterMap.get(objectType);
-		if (filter == null) return false;
-		return filter.isExcluded(objectName);
-	}
+  public boolean isExcluded(String objectType, String objectName) {
+    ObjectNameFilter filter = filterMap.get(objectType);
+    if (filter == null) return false;
+    return filter.isExcluded(objectName);
+  }
 
 }

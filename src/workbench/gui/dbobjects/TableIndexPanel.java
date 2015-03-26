@@ -22,39 +22,34 @@
  */
 package workbench.gui.dbobjects;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JPanel;
-
-import workbench.interfaces.Reloadable;
-import workbench.interfaces.Resettable;
-
 import workbench.gui.actions.ReloadAction;
 import workbench.gui.actions.WbAction;
 import workbench.gui.components.WbScrollPane;
 import workbench.gui.components.WbTable;
 import workbench.gui.components.WbToolbar;
+import workbench.interfaces.Reloadable;
+import workbench.interfaces.Resettable;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * @author Thomas Kellerer
  */
 public class TableIndexPanel
-  extends JPanel
-  implements Resettable
-{
+    extends JPanel
+    implements Resettable {
   private ReloadAction reloadIndex;
   private WbTable indexList;
   private WbToolbar toolbar;
 
-  public TableIndexPanel(WbTable indexTable, Reloadable reloader)
-  {
+  public TableIndexPanel(WbTable indexTable, Reloadable reloader) {
     super();
     this.setLayout(new BorderLayout());
     indexList = indexTable;
     WbScrollPane p = new WbScrollPane(indexTable);
     this.add(p, BorderLayout.CENTER);
-    if (reloader != null)
-    {
+    if (reloader != null) {
       reloadIndex = new ReloadAction(reloader);
       reloadIndex.setEnabled(true);
       toolbar = new WbToolbar();
@@ -64,19 +59,15 @@ public class TableIndexPanel
   }
 
   @Override
-  public void reset()
-  {
-    if (indexList != null)
-    {
+  public void reset() {
+    if (indexList != null) {
       indexList.reset();
     }
   }
 
-  public void dispose()
-  {
+  public void dispose() {
     WbAction.dispose(reloadIndex);
-    if (toolbar != null)
-    {
+    if (toolbar != null) {
       toolbar.removeAll();
     }
   }

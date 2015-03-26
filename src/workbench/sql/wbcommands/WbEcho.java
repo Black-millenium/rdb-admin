@@ -20,52 +20,44 @@
 
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
-
 import workbench.util.StringUtil;
 
+import java.sql.SQLException;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class WbEcho
-	extends SqlCommand
-{
-	public static final String VERB = "WbEcho";
+    extends SqlCommand {
+  public static final String VERB = "WbEcho";
 
-	public WbEcho()
-	{
-	}
+  public WbEcho() {
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult(sql);
-		String message = StringUtil.trimQuotes(getCommandLine(sql));
-		result.addMessage(message);
-		result.setSuccess();
-		return result;
-	}
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult(sql);
+    String message = StringUtil.trimQuotes(getCommandLine(sql));
+    result.addMessage(message);
+    result.setSuccess();
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 }

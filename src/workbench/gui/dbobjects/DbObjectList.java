@@ -21,22 +21,26 @@
  *
  */
 package workbench.gui.dbobjects;
-import java.awt.Component;
-import java.util.List;
+
 import workbench.db.DbObject;
 import workbench.db.TableIdentifier;
 import workbench.db.WbConnection;
 import workbench.interfaces.Reloadable;
+
+import java.awt.*;
+import java.util.List;
 
 /**
  * @author Thomas Kellerer
  */
 
 public interface DbObjectList
-	extends Reloadable
-{
-	TableIdentifier getObjectTable();
-	List<? extends DbObject> getSelectedObjects();
-	WbConnection getConnection();
-	Component getComponent();
+    extends Reloadable {
+  TableIdentifier getObjectTable();
+
+  List<? extends DbObject> getSelectedObjects();
+
+  WbConnection getConnection();
+
+  Component getComponent();
 }

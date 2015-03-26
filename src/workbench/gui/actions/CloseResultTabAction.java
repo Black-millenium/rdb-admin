@@ -22,38 +22,36 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import javax.swing.KeyStroke;
 import workbench.gui.sql.SqlPanel;
 import workbench.resource.PlatformShortcuts;
 import workbench.resource.ResourceMgr;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+
 /**
  * An action to close the currently selected result tab of a SqlPanel.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class CloseResultTabAction
-	extends WbAction
-{
-	private SqlPanel panel;
+    extends WbAction {
+  private SqlPanel panel;
 
-	public CloseResultTabAction(SqlPanel sqlPanel)
-	{
-		super();
-		panel = sqlPanel;
-		this.initMenuDefinition("MnuTxtCloseResultTab", KeyStroke.getKeyStroke(KeyEvent.VK_K, PlatformShortcuts.getDefaultModifier() | InputEvent.SHIFT_MASK ));
-		this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
-		this.setIcon(null);
-		this.setEnabled(panel.getCurrentResult() != null);
-	}
+  public CloseResultTabAction(SqlPanel sqlPanel) {
+    super();
+    panel = sqlPanel;
+    this.initMenuDefinition("MnuTxtCloseResultTab", KeyStroke.getKeyStroke(KeyEvent.VK_K, PlatformShortcuts.getDefaultModifier() | InputEvent.SHIFT_MASK));
+    this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
+    this.setIcon(null);
+    this.setEnabled(panel.getCurrentResult() != null);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		panel.closeCurrentResult();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    panel.closeCurrentResult();
+  }
 
 }

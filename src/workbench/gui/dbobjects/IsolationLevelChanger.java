@@ -21,38 +21,32 @@
  */
 package workbench.gui.dbobjects;
 
-import java.sql.Connection;
-
 import workbench.db.WbConnection;
 
+import java.sql.Connection;
+
 /**
- *
  * @author Thomas Kellerer
  */
-class IsolationLevelChanger
-{
-	private int oldLevel = Connection.TRANSACTION_NONE;
+class IsolationLevelChanger {
+  private int oldLevel = Connection.TRANSACTION_NONE;
 
-	public void restoreIsolationLevel(WbConnection dbConnection)
-	{
-		if (oldLevel == Connection.TRANSACTION_READ_COMMITTED ||
-			  oldLevel == Connection.TRANSACTION_REPEATABLE_READ ||
-			  oldLevel == Connection.TRANSACTION_SERIALIZABLE)
-		{
-			dbConnection.setIsolationLevel(oldLevel);
-		}
-	}
+  public void restoreIsolationLevel(WbConnection dbConnection) {
+    if (oldLevel == Connection.TRANSACTION_READ_COMMITTED ||
+        oldLevel == Connection.TRANSACTION_REPEATABLE_READ ||
+        oldLevel == Connection.TRANSACTION_SERIALIZABLE) {
+      dbConnection.setIsolationLevel(oldLevel);
+    }
+  }
 
-	public void changeIsolationLevel(WbConnection dbConnection)
-	{
-		oldLevel = Connection.TRANSACTION_NONE;
-		if (dbConnection == null) return;
+  public void changeIsolationLevel(WbConnection dbConnection) {
+    oldLevel = Connection.TRANSACTION_NONE;
+    if (dbConnection == null) return;
 
-		if (dbConnection.getProfile().getUseSeparateConnectionPerTab() && dbConnection.getDbSettings().useReadUncommittedForDbExplorer())
-		{
-			oldLevel = dbConnection.getIsolationLevel();
-			dbConnection.setIsolationLevel(Connection.TRANSACTION_READ_UNCOMMITTED);
-		}
-	}
+    if (dbConnection.getProfile().getUseSeparateConnectionPerTab() && dbConnection.getDbSettings().useReadUncommittedForDbExplorer()) {
+      oldLevel = dbConnection.getIsolationLevel();
+      dbConnection.setIsolationLevel(Connection.TRANSACTION_READ_UNCOMMITTED);
+    }
+  }
 
 }

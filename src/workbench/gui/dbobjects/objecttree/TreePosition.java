@@ -20,11 +20,9 @@
 package workbench.gui.dbobjects.objecttree;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum TreePosition
-{
+public enum TreePosition {
   left,
   right;
 }

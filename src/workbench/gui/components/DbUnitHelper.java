@@ -30,30 +30,24 @@ import workbench.log.LogMgr;
  *
  * @author Thomas Kellerer
  */
-public class DbUnitHelper
-{
-	private static boolean tested;
-	private static boolean available;
+public class DbUnitHelper {
+  private static boolean tested;
+  private static boolean available;
 
-	public static boolean isDbUnitAvailable()
-	{
-		if (tested)
-		{
-			return available;
-		}
+  public static boolean isDbUnitAvailable() {
+    if (tested) {
+      return available;
+    }
 
-		try
-		{
-			tested = true;
-			Class.forName("org.dbunit.dataset.ITable");
-			LogMgr.logInfo("DbUnitHelper.isDbUnitAvailable()", "DbUnit available");
-			available = true;
-		}
-		catch (Throwable th)
-		{
-			LogMgr.logDebug("DbUnitHelper.isDbUnitAvailable()", "DbUnit not available");
-			available = false;
-		}
-		return available;
-	}
+    try {
+      tested = true;
+      Class.forName("org.dbunit.dataset.ITable");
+      LogMgr.logInfo("DbUnitHelper.isDbUnitAvailable()", "DbUnit available");
+      available = true;
+    } catch (Throwable th) {
+      LogMgr.logDebug("DbUnitHelper.isDbUnitAvailable()", "DbUnit not available");
+      available = false;
+    }
+    return available;
+  }
 }

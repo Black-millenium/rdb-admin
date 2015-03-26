@@ -23,15 +23,13 @@
 package workbench.gui.profiles;
 
 
-import java.awt.Color;
-import java.awt.Component;
+import workbench.resource.IconMgr;
 
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultTreeCellRenderer;
-
-import workbench.resource.IconMgr;
+import java.awt.*;
 
 /**
  * A tree cell renderer that can indicate a drop target.
@@ -39,44 +37,37 @@ import workbench.resource.IconMgr;
  * @author Thomas Kellerer
  */
 public class ProfileTreeCellRenderer
-	extends DefaultTreeCellRenderer
-{
-	private Object dropTargetItem;
-	private Border dropBorder;
+    extends DefaultTreeCellRenderer {
+  private Object dropTargetItem;
+  private Border dropBorder;
 
-	public ProfileTreeCellRenderer()
-	{
-		super();
-		Color c = getBackgroundSelectionColor();
-		dropBorder = new LineBorder(c, 1);
-		setLeafIcon(IconMgr.getInstance().getLabelIcon("profile"));
-		setOpenIcon(IconMgr.getInstance().getLabelIcon("folder-open"));
-		setClosedIcon(IconMgr.getInstance().getLabelIcon("folder"));
-	}
+  public ProfileTreeCellRenderer() {
+    super();
+    Color c = getBackgroundSelectionColor();
+    dropBorder = new LineBorder(c, 1);
+    setLeafIcon(IconMgr.getInstance().getLabelIcon("profile"));
+    setOpenIcon(IconMgr.getInstance().getLabelIcon("folder-open"));
+    setClosedIcon(IconMgr.getInstance().getLabelIcon("folder"));
+  }
 
-	public void setDropTargetItem(Object target)
-	{
-		this.dropTargetItem = target;
-	}
+  public void setDropTargetItem(Object target) {
+    this.dropTargetItem = target;
+  }
 
-	@Override
-	public Component getTreeCellRendererComponent(JTree tree,
-	                                              Object value,
-	                                              boolean sel,
-	                                              boolean expanded,
-	                                              boolean leaf,
-	                                              int row,
-	                                              boolean hasFocus)
-	{
-		if (this.dropTargetItem != null && dropTargetItem == value)
-		{
-			setBorder(dropBorder);
-		}
-		else
-		{
-			setBorder(null);
-		}
-		return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-	}
+  @Override
+  public Component getTreeCellRendererComponent(JTree tree,
+                                                Object value,
+                                                boolean sel,
+                                                boolean expanded,
+                                                boolean leaf,
+                                                int row,
+                                                boolean hasFocus) {
+    if (this.dropTargetItem != null && dropTargetItem == value) {
+      setBorder(dropBorder);
+    } else {
+      setBorder(null);
+    }
+    return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+  }
 
 }

@@ -22,56 +22,50 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
 import workbench.gui.components.ClipBoardCopier;
-
 import workbench.gui.components.WbTable;
 import workbench.resource.PlatformShortcuts;
 import workbench.resource.ResourceMgr;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
  * Action to copy the contents of a table to the clipboard as SQL INSERT statements
+ *
+ * @author Thomas Kellerer
  * @see workbench.gui.components.ClipBoardCopier
- * @author  Thomas Kellerer
  */
-public class CopyAsSqlInsertAction extends WbAction
-{
-	private WbTable client;
+public class CopyAsSqlInsertAction extends WbAction {
+  private WbTable client;
 
-	public CopyAsSqlInsertAction(WbTable aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtCopyAsSqlInsert", KeyStroke.getKeyStroke(KeyEvent.VK_Q, PlatformShortcuts.getDefaultModifier()));
-		this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
-		this.setEnabled(false);
-	}
+  public CopyAsSqlInsertAction(WbTable aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtCopyAsSqlInsert", KeyStroke.getKeyStroke(KeyEvent.VK_Q, PlatformShortcuts.getDefaultModifier()));
+    this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
+    this.setEnabled(false);
+  }
 
-	@Override
-	public boolean hasCtrlModifier()
-	{
-		return true;
-	}
+  @Override
+  public boolean hasCtrlModifier() {
+    return true;
+  }
 
-	@Override
-	public boolean hasShiftModifier()
-	{
-		return true;
-	}
+  @Override
+  public boolean hasShiftModifier() {
+    return true;
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		ClipBoardCopier copier = new ClipBoardCopier(this.client);
-		boolean selectColumns = false;
-		if (invokedByMouse(e))
-		{
-			selectColumns = isCtrlPressed(e) ;
-		}
-		copier.copyAsSqlInsert(false, selectColumns);
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    ClipBoardCopier copier = new ClipBoardCopier(this.client);
+    boolean selectColumns = false;
+    if (invokedByMouse(e)) {
+      selectColumns = isCtrlPressed(e);
+    }
+    copier.copyAsSqlInsert(false, selectColumns);
+  }
 
 }

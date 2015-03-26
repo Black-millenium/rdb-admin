@@ -22,13 +22,11 @@
  */
 package workbench.gui.sql;
 
-import java.awt.EventQueue;
-
-import workbench.interfaces.ResultReceiver;
-
 import workbench.gui.MainWindow;
-
+import workbench.interfaces.ResultReceiver;
 import workbench.util.WbThread;
+
+import java.awt.*;
 
 /**
  * This class sends a SQL statement to one of the
@@ -36,116 +34,93 @@ import workbench.util.WbThread;
  *
  * @author Thomas Kellerer
  */
-public class PanelContentSender
-{
-	public static final int NEW_PANEL = -1;
+public class PanelContentSender {
+  public static final int NEW_PANEL = -1;
 
-	private MainWindow target;
-	private String newTabName;
+  private MainWindow target;
+  private String newTabName;
 
-	public PanelContentSender(MainWindow window, String objectName)
-	{
-		this.target = window;
-		newTabName = objectName;
-	}
+  public PanelContentSender(MainWindow window, String objectName) {
+    this.target = window;
+    newTabName = objectName;
+  }
 
-	public void showResult(final String sql, final String comment, final int panelIndex, final boolean logText)
-	{
-		if (sql == null) return;
+  public void showResult(final String sql, final String comment, final int panelIndex, final boolean logText) {
+    if (sql == null) return;
 
-		// This should not be done in the background thread
-		// to make sure it's running on the EDT (otherwise the new panel will not be initialized correctly)
-		final SqlPanel panel = selectPanel(panelIndex);
+    // This should not be done in the background thread
+    // to make sure it's running on the EDT (otherwise the new panel will not be initialized correctly)
+    final SqlPanel panel = selectPanel(panelIndex);
 
-		// When adding a new panel, a new connection
-		// might be initiated automatically. As that is done in a separate
-		// thread, the call to showResult() might occur before the connection is actually established.
-		//
-		// So we need to wait until the new panel is connected - that's what waitForConnection() is for.
+    // When adding a new panel, a new connection
+    // might be initiated automatically. As that is done in a separate
+    // thread, the call to showResult() might occur before the connection is actually established.
+    //
+    // So we need to wait until the new panel is connected - that's what waitForConnection() is for.
 
-		// As this code might be execute on the EDT we have to make sure
-		// we are not blocking the current thread, so a new thread
-		// is created that will wait for the connection to succeed.
-		// then the actual showing of the data can be executed on the EDT
-		WbThread t = new WbThread("ShowThread")
-		{
-			@Override
-			public void run()
-			{
-				target.waitForConnection();
+    // As this code might be execute on the EDT we have to make sure
+    // we are not blocking the current thread, so a new thread
+    // is created that will wait for the connection to succeed.
+    // then the actual showing of the data can be executed on the EDT
+    WbThread t = new WbThread("ShowThread") {
+      @Override
+      public void run() {
+        target.waitForConnection();
 
-				EventQueue.invokeLater(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						if (panel != null)
-						{
-							target.requestFocus();
-							panel.selectEditor();
-							ResultReceiver.ShowType type;
-							if (panelIndex == NEW_PANEL)
-							{
-								type = ResultReceiver.ShowType.replaceText;
-							}
-							else if (panel.hasFileLoaded())
-							{
-								type = ResultReceiver.ShowType.logText;
-							}
-							else
-							{
-								type = (logText ? ResultReceiver.ShowType.logText : ResultReceiver.ShowType.appendText);
-							}
-							panel.showResult(sql, comment, type);
-						}
-					}
-				});
-			}
-		};
-		t.start();
-	}
+        EventQueue.invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            if (panel != null) {
+              target.requestFocus();
+              panel.selectEditor();
+              ResultReceiver.ShowType type;
+              if (panelIndex == NEW_PANEL) {
+                type = ResultReceiver.ShowType.replaceText;
+              } else if (panel.hasFileLoaded()) {
+                type = ResultReceiver.ShowType.logText;
+              } else {
+                type = (logText ? ResultReceiver.ShowType.logText : ResultReceiver.ShowType.appendText);
+              }
+              panel.showResult(sql, comment, type);
+            }
+          }
+        });
+      }
+    };
+    t.start();
+  }
 
-	public void sendContent(final String text, final int panelIndex, final boolean appendText)
-	{
-		if (text == null) return;
+  public void sendContent(final String text, final int panelIndex, final boolean appendText) {
+    if (text == null) return;
 
-		final SqlPanel panel = selectPanel(panelIndex);
-		if (panel == null) return;
+    final SqlPanel panel = selectPanel(panelIndex);
+    if (panel == null) return;
 
-		EventQueue.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				if (appendText)
-				{
-					panel.appendStatementText(text);
-				}
-				else
-				{
-					panel.setStatementText(text);
-				}
-				target.requestFocus();
-				panel.selectEditor();
-			}
-		});
-	}
+    EventQueue.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        if (appendText) {
+          panel.appendStatementText(text);
+        } else {
+          panel.setStatementText(text);
+        }
+        target.requestFocus();
+        panel.selectEditor();
+      }
+    });
+  }
 
-	private SqlPanel selectPanel(int index)
-	{
-		SqlPanel panel;
+  private SqlPanel selectPanel(int index) {
+    SqlPanel panel;
 
-		if (index == NEW_PANEL)
-		{
-			panel = (SqlPanel)this.target.addTab();
-			panel.setTabName(newTabName);
-		}
-		else
-		{
-			panel = (SqlPanel)this.target.getSqlPanel(index);
-			target.selectTab(index);
-		}
-		return panel;
-	}
+    if (index == NEW_PANEL) {
+      panel = (SqlPanel) this.target.addTab();
+      panel.setTabName(newTabName);
+    } else {
+      panel = (SqlPanel) this.target.getSqlPanel(index);
+      target.selectTab(index);
+    }
+    return panel;
+  }
 }
 

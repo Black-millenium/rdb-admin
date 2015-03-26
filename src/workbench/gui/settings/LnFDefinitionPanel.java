@@ -22,12 +22,16 @@
  */
 package workbench.gui.settings;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.components.*;
+import workbench.gui.lnf.LnFDefinition;
+import workbench.gui.lnf.LnFLoader;
+import workbench.resource.GuiSettings;
+import workbench.resource.ResourceMgr;
+import workbench.util.ClassFinder;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -36,148 +40,118 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.LookAndFeel;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-
-import workbench.resource.GuiSettings;
-import workbench.resource.ResourceMgr;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.components.ClassFinderGUI;
-import workbench.gui.components.ClasspathEditor;
-import workbench.gui.components.FlatButton;
-import workbench.gui.components.StringPropertyEditor;
-import workbench.gui.components.TextComponentMouseListener;
-import workbench.gui.components.WbButton;
-import workbench.gui.components.WbStatusLabel;
-import workbench.gui.lnf.LnFDefinition;
-import workbench.gui.lnf.LnFLoader;
-
-import workbench.util.ClassFinder;
-
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class LnFDefinitionPanel
-	extends JPanel
-	implements ActionListener, PropertyChangeListener
-{
-	private LnFDefinition currentLnF;
-	private PropertyChangeListener changeListener;
-	private boolean ignoreChange;
+    extends JPanel
+    implements ActionListener, PropertyChangeListener {
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  public JButton changeLnfButton;
+  public ClasspathEditor classpathEditor;
+  public JLabel currentLabel;
+  public JTextArea infoText;
+  public JSeparator jSeparator1;
+  public JLabel lblClassName;
+  public JLabel lblLibrary;
+  public JLabel lblName;
+  public JButton selectClass;
+  public JLabel statusLabel;
+  public JTextField tfClassName;
 
-	public LnFDefinitionPanel()
-	{
-		super();
-		initComponents();
-		lblLibrary.setToolTipText(ResourceMgr.getDescription("LblLnFLib"));
-		classpathEditor.setLastDirProperty("workbench.lnf.lastdir");
-		tfName.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent evt)
-			{
-				nameFieldFocusLost(evt);
-			}
-		});
+  // Code for dispatching events from components to event handlers.
+  public JTextField tfName;
+  private LnFDefinition currentLnF;
+  private PropertyChangeListener changeListener;
+  private boolean ignoreChange;
 
-		Font f = UIManager.getDefaults().getFont("Label.font");
-		if (f != null)
-		{
-			f = f.deriveFont(Font.BOLD, (float)(f.getSize() * 1.2));
-			infoText.setFont(f);
-		}
-		String button = changeLnfButton.getText();
-		String info = ResourceMgr.getString("TxtChangeLnFInfo").replace("%button%", button);
-		infoText.setText(info);
-		infoText.setWrapStyleWord(true);
-		infoText.setLineWrap(true);
-		infoText.setBackground(this.getBackground());
-		classpathEditor.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				selectClass();
-			}
-		});
-	}
+  public LnFDefinitionPanel() {
+    super();
+    initComponents();
+    lblLibrary.setToolTipText(ResourceMgr.getDescription("LblLnFLib"));
+    classpathEditor.setLastDirProperty("workbench.lnf.lastdir");
+    tfName.addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusLost(FocusEvent evt) {
+        nameFieldFocusLost(evt);
+      }
+    });
 
-	public void setPropertyListener(PropertyChangeListener l)
-	{
-		this.changeListener = l;
-	}
+    Font f = UIManager.getDefaults().getFont("Label.font");
+    if (f != null) {
+      f = f.deriveFont(Font.BOLD, (float) (f.getSize() * 1.2));
+      infoText.setFont(f);
+    }
+    String button = changeLnfButton.getText();
+    String info = ResourceMgr.getString("TxtChangeLnFInfo").replace("%button%", button);
+    infoText.setText(info);
+    infoText.setWrapStyleWord(true);
+    infoText.setLineWrap(true);
+    infoText.setBackground(this.getBackground());
+    classpathEditor.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        selectClass();
+      }
+    });
+  }
 
-	public void nameFieldFocusLost(FocusEvent evt)
-	{
-		if (this.changeListener != null)
-		{
-			PropertyChangeEvent pEvt = new PropertyChangeEvent(this.currentLnF, "name", null, tfName.getText());
-			this.changeListener.propertyChange(pEvt);
-		}
-	}
+  public void setPropertyListener(PropertyChangeListener l) {
+    this.changeListener = l;
+  }
 
-	@Override
-	public void setEnabled(boolean flag)
-	{
-		this.tfClassName.setEnabled(flag);
-		this.classpathEditor.setFileSelectionEnabled(flag);
-		this.tfName.setEnabled(flag);
-		selectClass.setEnabled(flag);
-	}
+  public void nameFieldFocusLost(FocusEvent evt) {
+    if (this.changeListener != null) {
+      PropertyChangeEvent pEvt = new PropertyChangeEvent(this.currentLnF, "name", null, tfName.getText());
+      this.changeListener.propertyChange(pEvt);
+    }
+  }
 
-	private boolean testLnF(LnFDefinition lnf)
-	{
-		try
-		{
-			LnFLoader loader = new LnFLoader(lnf);
-			return loader.isAvailable();
-		}
-		catch (Exception e)
-		{
-			return false;
-		}
-	}
+  @Override
+  public void setEnabled(boolean flag) {
+    this.tfClassName.setEnabled(flag);
+    this.classpathEditor.setFileSelectionEnabled(flag);
+    this.tfName.setEnabled(flag);
+    selectClass.setEnabled(flag);
+  }
 
-	private void selectClass()
-	{
-		ClassFinder finder = new ClassFinder(LookAndFeel.class);
-		List<String> libs = classpathEditor.getLibraries();
+  private boolean testLnF(LnFDefinition lnf) {
+    try {
+      LnFLoader loader = new LnFLoader(lnf);
+      return loader.isAvailable();
+    } catch (Exception e) {
+      return false;
+    }
+  }
 
-		// this method is called when the library definition changes
-		// so we need to update the current LnF definition
-		currentLnF.setLibraries(libs);
-		ClassFinderGUI gui = new ClassFinderGUI(finder, tfClassName, statusLabel);
-		gui.setStatusBarKey("TxtSearchingLnF");
-		gui.setWindowTitleKey("TxtSelectLnF");
-		gui.setClassPath(libs);
-		gui.startCheck();
-	}
+  private void selectClass() {
+    ClassFinder finder = new ClassFinder(LookAndFeel.class);
+    List<String> libs = classpathEditor.getLibraries();
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt)
-	{
-		if (ignoreChange) return;
-		selectClass();
-	}
+    // this method is called when the library definition changes
+    // so we need to update the current LnF definition
+    currentLnF.setLibraries(libs);
+    ClassFinderGUI gui = new ClassFinderGUI(finder, tfClassName, statusLabel);
+    gui.setStatusBarKey("TxtSearchingLnF");
+    gui.setWindowTitleKey("TxtSelectLnF");
+    gui.setClassPath(libs);
+    gui.startCheck();
+  }
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+    if (ignoreChange) return;
+    selectClass();
+  }
+
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     GridBagConstraints gridBagConstraints;
 
     lblName = new JLabel();
@@ -273,7 +247,7 @@ public class LnFDefinitionPanel
     changeLnfButton.setMaximumSize(new Dimension(200, 50));
     changeLnfButton.setMinimumSize(new Dimension(140, 30));
     changeLnfButton.setPreferredSize(new Dimension(140, 30));
-    ((WbButton)changeLnfButton).setResourceKey("LblSwitchLnF");
+    ((WbButton) changeLnfButton).setResourceKey("LblSwitchLnF");
     changeLnfButton.addActionListener(this);
     gridBagConstraints = new GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -324,92 +298,61 @@ public class LnFDefinitionPanel
     add(classpathEditor, gridBagConstraints);
   }
 
-  // Code for dispatching events from components to event handlers.
-
-  public void actionPerformed(ActionEvent evt)
-  {
-    if (evt.getSource() == changeLnfButton)
-    {
+  public void actionPerformed(ActionEvent evt) {
+    if (evt.getSource() == changeLnfButton) {
       LnFDefinitionPanel.this.changeLnfButtonActionPerformed(evt);
-    }
-    else if (evt.getSource() == selectClass)
-    {
+    } else if (evt.getSource() == selectClass) {
       LnFDefinitionPanel.this.selectClassActionPerformed(evt);
     }
   }// </editor-fold>//GEN-END:initComponents
 
-	private void changeLnfButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_changeLnfButtonActionPerformed
-	{//GEN-HEADEREND:event_changeLnfButtonActionPerformed
-		LnFDefinition lnf = getDefinition();
-		if (testLnF(lnf))
-		{
-			String className = lnf.getClassName();
-			this.currentLabel.setText(lnf.getName());
-			GuiSettings.setLookAndFeelClass(className);
-			WbSwingUtilities.showMessage(SwingUtilities.getWindowAncestor(this), ResourceMgr.getString("MsgLnFChanged"));
-		}
-		else
-		{
-			WbSwingUtilities.showErrorMessageKey(this, "MsgLnFNotLoaded");
-		}
-	}//GEN-LAST:event_changeLnfButtonActionPerformed
+  private void changeLnfButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_changeLnfButtonActionPerformed
+  {//GEN-HEADEREND:event_changeLnfButtonActionPerformed
+    LnFDefinition lnf = getDefinition();
+    if (testLnF(lnf)) {
+      String className = lnf.getClassName();
+      this.currentLabel.setText(lnf.getName());
+      GuiSettings.setLookAndFeelClass(className);
+      WbSwingUtilities.showMessage(SwingUtilities.getWindowAncestor(this), ResourceMgr.getString("MsgLnFChanged"));
+    } else {
+      WbSwingUtilities.showErrorMessageKey(this, "MsgLnFNotLoaded");
+    }
+  }//GEN-LAST:event_changeLnfButtonActionPerformed
 
-	private void selectClassActionPerformed(ActionEvent evt)//GEN-FIRST:event_selectClassActionPerformed
-	{//GEN-HEADEREND:event_selectClassActionPerformed
-		selectClass();
-	}//GEN-LAST:event_selectClassActionPerformed
+  private void selectClassActionPerformed(ActionEvent evt)//GEN-FIRST:event_selectClassActionPerformed
+  {//GEN-HEADEREND:event_selectClassActionPerformed
+    selectClass();
+  }//GEN-LAST:event_selectClassActionPerformed
 
-	public void setCurrentLookAndFeeld(LnFDefinition lnf)
-	{
-		if (lnf != null) currentLabel.setText(lnf.getName());
-	}
+  public void setCurrentLookAndFeeld(LnFDefinition lnf) {
+    if (lnf != null) currentLabel.setText(lnf.getName());
+  }
 
-	public void setDefinition(LnFDefinition lnf)
-	{
-		try
-		{
-			ignoreChange = true;
-			this.currentLnF = lnf;
-			WbSwingUtilities.initPropertyEditors(this.currentLnF, this);
-			classpathEditor.setLibraries(lnf.getLibraries());
-			this.setEnabled(!lnf.isBuiltInLnF());
-		}
-		finally
-		{
-			ignoreChange = false;
-		}
-	}
+  public LnFDefinition getDefinition() {
+    return this.currentLnF;
+  }
 
-	public LnFDefinition getDefinition()
-	{
-		return this.currentLnF;
-	}
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  public JButton changeLnfButton;
-  public ClasspathEditor classpathEditor;
-  public JLabel currentLabel;
-  public JTextArea infoText;
-  public JSeparator jSeparator1;
-  public JLabel lblClassName;
-  public JLabel lblLibrary;
-  public JLabel lblName;
-  public JButton selectClass;
-  public JLabel statusLabel;
-  public JTextField tfClassName;
-  public JTextField tfName;
+  public void setDefinition(LnFDefinition lnf) {
+    try {
+      ignoreChange = true;
+      this.currentLnF = lnf;
+      WbSwingUtilities.initPropertyEditors(this.currentLnF, this);
+      classpathEditor.setLibraries(lnf.getLibraries());
+      this.setEnabled(!lnf.isBuiltInLnF());
+    } finally {
+      ignoreChange = false;
+    }
+  }
   // End of variables declaration//GEN-END:variables
 
-	static class HtmlLabel
-		extends JLabel
-	{
-		@Override
-		public void setText(String name)
-		{
-			setBackground(Color.WHITE);
-			setForeground(Color.BLACK);
-			super.setText("<html>" + ResourceMgr.getString("LblCurrLnf") + " <b>" + name + "</b></html>");
-		}
-	}
+  static class HtmlLabel
+      extends JLabel {
+    @Override
+    public void setText(String name) {
+      setBackground(Color.WHITE);
+      setForeground(Color.BLACK);
+      super.setText("<html>" + ResourceMgr.getString("LblCurrLnf") + " <b>" + name + "</b></html>");
+    }
+  }
 
 }

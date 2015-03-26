@@ -22,130 +22,109 @@
  */
 package workbench.gui.components;
 
-import java.awt.Component;
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.sql.SplitPaneExpander;
 
-import javax.swing.JSplitPane;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.SplitPaneUI;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.sql.SplitPaneExpander;
+import java.awt.*;
 
 /**
  * A JSplitPane which restores the divider size after a UI Change
  * and an updateUI()
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class WbSplitPane
-	extends JSplitPane
-{
-	public int DEFAULT_DIVIDER_SIZE = 7;
+    extends JSplitPane {
+  public int DEFAULT_DIVIDER_SIZE = 7;
   private SplitPaneExpander expander;
 
-	public WbSplitPane()
-	{
-		super();
-		this.initDefaults();
-	}
+  public WbSplitPane() {
+    super();
+    this.initDefaults();
+  }
 
-	public WbSplitPane(int orientation)
-	{
-		super(orientation);
-		this.initDefaults();
-	}
+  public WbSplitPane(int orientation) {
+    super(orientation);
+    this.initDefaults();
+  }
 
-	public WbSplitPane(int newOrientation, boolean newContinuousLayout)
-	{
-		super(newOrientation, newContinuousLayout);
-		this.initDefaults();
-	}
+  public WbSplitPane(int newOrientation, boolean newContinuousLayout) {
+    super(newOrientation, newContinuousLayout);
+    this.initDefaults();
+  }
 
-	public WbSplitPane(int newOrientation, boolean newContinuousLayout, Component newLeftComponent, Component newRightComponent)
-	{
-		super(newOrientation, newContinuousLayout, newLeftComponent, newRightComponent);
-		this.initDefaults();
-	}
+  public WbSplitPane(int newOrientation, boolean newContinuousLayout, Component newLeftComponent, Component newRightComponent) {
+    super(newOrientation, newContinuousLayout, newLeftComponent, newRightComponent);
+    this.initDefaults();
+  }
 
-	public WbSplitPane(int newOrientation, Component newLeftComponent, Component newRightComponent)
-	{
-		super(newOrientation, newLeftComponent, newRightComponent);
-		this.initDefaults();
-	}
+  public WbSplitPane(int newOrientation, Component newLeftComponent, Component newRightComponent) {
+    super(newOrientation, newLeftComponent, newRightComponent);
+    this.initDefaults();
+  }
 
-	@Override
-	public void updateUI()
-	{
-		int divider = this.getDividerSize();
-		this.setDividerSize(divider);
-		//super.updateUI();
-		if (this.getUI() == null)
-		{
-			super.setUI(new WbSplitPaneUI());
-		}
-		revalidate();
-	}
+  @Override
+  public void updateUI() {
+    int divider = this.getDividerSize();
+    this.setDividerSize(divider);
+    //super.updateUI();
+    if (this.getUI() == null) {
+      super.setUI(new WbSplitPaneUI());
+    }
+    revalidate();
+  }
 
-	@Override
-	public void setUI(ComponentUI newUI)
-	{
-		int divider = this.getDividerSize();
-		super.setUI(newUI);
-		this.setDividerSize(divider);
-	}
+  @Override
+  public void setUI(ComponentUI newUI) {
+    int divider = this.getDividerSize();
+    super.setUI(newUI);
+    this.setDividerSize(divider);
+  }
 
-	public void setOneTouchTooltip(String tip)
-	{
-		SplitPaneUI currentUI = getUI();
-		if (currentUI instanceof WbSplitPaneUI)
-		{
-			((WbSplitPaneUI)currentUI).setOneTouchTooltip(tip);
-		}
-	}
-	private void initDefaults()
-	{
-		this.setDividerSize(DEFAULT_DIVIDER_SIZE);
-		this.setBorder(WbSwingUtilities.EMPTY_BORDER);
-		this.setContinuousLayout(true);
+  public void setOneTouchTooltip(String tip) {
+    SplitPaneUI currentUI = getUI();
+    if (currentUI instanceof WbSplitPaneUI) {
+      ((WbSplitPaneUI) currentUI).setOneTouchTooltip(tip);
+    }
+  }
+
+  private void initDefaults() {
+    this.setDividerSize(DEFAULT_DIVIDER_SIZE);
+    this.setBorder(WbSwingUtilities.EMPTY_BORDER);
+    this.setContinuousLayout(true);
     expander = new SplitPaneExpander(this);
-	}
+  }
 
-  public SplitPaneExpander getExpander()
-  {
+  public SplitPaneExpander getExpander() {
     return expander;
   }
 
-	public Border getDividerBorder()
-	{
-		Border result = null;
-		try
-		{
-			BasicSplitPaneUI currentUI = (BasicSplitPaneUI)this.getUI();
-			BasicSplitPaneDivider div = currentUI.getDivider();
-			result = div.getBorder();
-		}
-		catch (Exception e)
-		{
-			result = null;
-		}
-		return result;
-	}
+  public Border getDividerBorder() {
+    Border result = null;
+    try {
+      BasicSplitPaneUI currentUI = (BasicSplitPaneUI) this.getUI();
+      BasicSplitPaneDivider div = currentUI.getDivider();
+      result = div.getBorder();
+    } catch (Exception e) {
+      result = null;
+    }
+    return result;
+  }
 
-	public void setDividerBorder(Border newBorder)
-	{
-		try
-		{
-			int divider = this.getDividerSize();
-			BasicSplitPaneUI currentUI = (BasicSplitPaneUI)this.getUI();
-			BasicSplitPaneDivider div = currentUI.getDivider();
-			div.setBorder(newBorder);
-			this.setDividerSize(divider);
-		}
-		catch (Exception e)
-		{
-		}
-	}
+  public void setDividerBorder(Border newBorder) {
+    try {
+      int divider = this.getDividerSize();
+      BasicSplitPaneUI currentUI = (BasicSplitPaneUI) this.getUI();
+      BasicSplitPaneDivider div = currentUI.getDivider();
+      div.setBorder(newBorder);
+      this.setDividerSize(divider);
+    } catch (Exception e) {
+    }
+  }
 }

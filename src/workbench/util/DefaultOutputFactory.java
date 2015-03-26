@@ -22,51 +22,40 @@
  */
 package workbench.util;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Writer;
+import java.io.*;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class DefaultOutputFactory
-	implements OutputFactory
-{
+    implements OutputFactory {
 
-	@Override
-	public boolean isArchive()
-	{
-		return false;
-	}
+  @Override
+  public boolean isArchive() {
+    return false;
+  }
 
-	@Override
-	public OutputStream createOutputStream(File output)
-		throws IOException
-	{
-		return new FileOutputStream(output);
-	}
+  @Override
+  public OutputStream createOutputStream(File output)
+      throws IOException {
+    return new FileOutputStream(output);
+  }
 
-	@Override
-	public Writer createWriter(File output, String encoding)
-		throws IOException
-	{
-		OutputStream out = createOutputStream(output);
-		return EncodingUtil.createWriter(out, encoding);
-	}
+  @Override
+  public Writer createWriter(File output, String encoding)
+      throws IOException {
+    OutputStream out = createOutputStream(output);
+    return EncodingUtil.createWriter(out, encoding);
+  }
 
-	@Override
-	public Writer createWriter(String filename, String encoding)
-		throws IOException
-	{
-		return createWriter(new File(filename), encoding);
-	}
+  @Override
+  public Writer createWriter(String filename, String encoding)
+      throws IOException {
+    return createWriter(new File(filename), encoding);
+  }
 
-	@Override
-	public void done()
-		throws IOException
-	{
-	}
+  @Override
+  public void done()
+      throws IOException {
+  }
 }

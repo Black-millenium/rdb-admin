@@ -22,74 +22,63 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
+import workbench.gui.sql.EditorPanel;
 import workbench.interfaces.Exporter;
 import workbench.interfaces.TextSelectionListener;
 import workbench.resource.ResourceMgr;
 
-import workbench.gui.sql.EditorPanel;
+import java.awt.event.ActionEvent;
 
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class SpoolDataAction
-	extends WbAction
-	implements TextSelectionListener
-{
-	private Exporter client;
-	private EditorPanel editor;
-	private boolean canExport = false;
+    extends WbAction
+    implements TextSelectionListener {
+  private Exporter client;
+  private EditorPanel editor;
+  private boolean canExport = false;
 
-	public SpoolDataAction(Exporter aClient)
-	{
-		this(aClient, "MnuTxtSpoolData");
-	}
-	public SpoolDataAction(Exporter aClient, String msgKey)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition(msgKey);
-		this.setIcon("spool-data");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
-		this.setEnabled(false);
-	}
+  public SpoolDataAction(Exporter aClient) {
+    this(aClient, "MnuTxtSpoolData");
+  }
 
-	public void canExport(boolean flag)
-	{
-		this.canExport = flag;
-		checkEnabled();
-	}
+  public SpoolDataAction(Exporter aClient, String msgKey) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition(msgKey);
+    this.setIcon("spool-data");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
+    this.setEnabled(false);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.exportData();
-	}
+  public void canExport(boolean flag) {
+    this.canExport = flag;
+    checkEnabled();
+  }
 
-	public void setEditor(EditorPanel ed)
-	{
-		this.editor = ed;
-		this.editor.addSelectionListener(this);
-		checkEnabled();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.exportData();
+  }
 
-	private void checkEnabled()
-	{
-		if (this.editor != null)
-		{
-			this.setEnabled(editor.isTextSelected() && canExport);
-		}
-		else
-		{
-			this.setEnabled(false);
-		}
-	}
+  public void setEditor(EditorPanel ed) {
+    this.editor = ed;
+    this.editor.addSelectionListener(this);
+    checkEnabled();
+  }
 
-	@Override
-	public void selectionChanged(int newStart, int newEnd)
-	{
-		checkEnabled();
-	}
+  private void checkEnabled() {
+    if (this.editor != null) {
+      this.setEnabled(editor.isTextSelected() && canExport);
+    } else {
+      this.setEnabled(false);
+    }
+  }
+
+  @Override
+  public void selectionChanged(int newStart, int newEnd) {
+    checkEnabled();
+  }
 
 }

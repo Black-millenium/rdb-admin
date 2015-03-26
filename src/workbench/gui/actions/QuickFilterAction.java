@@ -22,34 +22,32 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.interfaces.QuickFilter;
 import workbench.resource.ResourceMgr;
 
+import java.awt.event.ActionEvent;
+
 /**
- *	Filter data from a WbTable
- *	@author  Thomas Kellerer
+ * Filter data from a WbTable
+ *
+ * @author Thomas Kellerer
  */
 public class QuickFilterAction
-		extends WbAction
-{
-	private QuickFilter client;
+    extends WbAction {
+  private QuickFilter client;
 
-	public QuickFilterAction(QuickFilter filterGui)
-	{
-		super();
-		this.client = filterGui;
-		this.initMenuDefinition("MnuTxtQuickFilter");
-		this.setIcon("filter");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
-		this.setCreateToolbarSeparator(false);
-	}
+  public QuickFilterAction(QuickFilter filterGui) {
+    super();
+    this.client = filterGui;
+    this.initMenuDefinition("MnuTxtQuickFilter");
+    this.setIcon("filter");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
+    this.setCreateToolbarSeparator(false);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		client.applyQuickFilter();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    client.applyQuickFilter();
+  }
 
 }

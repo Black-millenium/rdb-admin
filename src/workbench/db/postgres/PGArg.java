@@ -23,41 +23,31 @@
 package workbench.db.postgres;
 
 /**
- *
  * @author Thomas Kellerer
  */
-class PGArg
-{
-	static enum ArgMode
-	{
-		in,
-		out,
-		inout,
-		returnValue;
-	};
+class PGArg {
+  public final PGType argType;
 
-	public final PGType argType;
-	public final ArgMode argMode;
+  ;
+  public final ArgMode argMode;
+  PGArg(PGType type, String mode) {
+    argType = type;
+    if ("inout".equalsIgnoreCase(mode)) {
+      argMode = ArgMode.inout;
+    } else if ("out".equalsIgnoreCase(mode)) {
+      argMode = ArgMode.out;
+    } else if ("return".equalsIgnoreCase(mode)) {
+      argMode = ArgMode.returnValue;
+    } else {
+      argMode = ArgMode.in;
+    }
+  }
 
-	PGArg(PGType type, String mode)
-	{
-		argType = type;
-		if ("inout".equalsIgnoreCase(mode))
-		{
-			argMode = ArgMode.inout;
-		}
-		else if ("out".equalsIgnoreCase(mode))
-		{
-			argMode = ArgMode.out;
-		}
-		else if ("return".equalsIgnoreCase(mode))
-		{
-			argMode = ArgMode.returnValue;
-		}
-		else
-		{
-			argMode = ArgMode.in;
-		}
-	}
+  static enum ArgMode {
+    in,
+    out,
+    inout,
+    returnValue;
+  }
 
 }

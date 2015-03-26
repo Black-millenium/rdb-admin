@@ -25,15 +25,12 @@ package workbench.gui.editor.actions;
 import java.awt.event.KeyEvent;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class SelectNextChar
-	extends NextChar
-{
-	public SelectNextChar()
-	{
-		super("TxtEdNxtCharSel", KeyEvent.VK_RIGHT, KeyEvent.SHIFT_MASK);
-		select = true;
-	}
+    extends NextChar {
+  public SelectNextChar() {
+    super("TxtEdNxtCharSel", KeyEvent.VK_RIGHT, KeyEvent.SHIFT_MASK);
+    select = true;
+  }
 }

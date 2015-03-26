@@ -22,59 +22,52 @@
  */
 package workbench.gui.components;
 
-import java.awt.Window;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.net.URL;
-import javax.swing.JTextArea;
 import workbench.gui.editor.SearchAndReplace;
 import workbench.interfaces.TextContainer;
 import workbench.resource.Settings;
 import workbench.util.EncodingUtil;
 import workbench.util.FileUtil;
 
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.net.URL;
+
 /**
  * @author Thomas Kellerer
  */
 public class SearchableTextPane
-	extends JTextArea
-	implements TextContainer
-{
-	public SearchableTextPane(Window owner)
-	{
-		super();
-		SearchAndReplace searcher = new SearchAndReplace(owner, this);
-		TextComponentMouseListener l = new TextComponentMouseListener(this);
-		l.addAction(searcher.getFindAction());
-		l.addAction(searcher.getFindNextAction());
-	}
+    extends JTextArea
+    implements TextContainer {
+  public SearchableTextPane(Window owner) {
+    super();
+    SearchAndReplace searcher = new SearchAndReplace(owner, this);
+    TextComponentMouseListener l = new TextComponentMouseListener(this);
+    l.addAction(searcher.getFindAction());
+    l.addAction(searcher.getFindNextAction());
+  }
 
-	@Override
-	public void setSelectedText(String aText)
-	{
-		this.setText(aText);
-	}
+  @Override
+  public void setSelectedText(String aText) {
+    this.setText(aText);
+  }
 
-	@Override
-	public boolean isTextSelected()
-	{
-		return getSelectionStart() < getSelectionEnd();
-	}
+  @Override
+  public boolean isTextSelected() {
+    return getSelectionStart() < getSelectionEnd();
+  }
 
-	public void setPage(URL url)
-		throws IOException
-	{
-		InputStream in = url.openStream();
-		try
-		{
-			Reader r = EncodingUtil.createReader(in, Settings.getInstance().getDefaultEncoding());
-			read(r, null);
-		}
-		finally
-		{
-			FileUtil.closeQuietely(in);
-		}
-	}
+  public void setPage(URL url)
+      throws IOException {
+    InputStream in = url.openStream();
+    try {
+      Reader r = EncodingUtil.createReader(in, Settings.getInstance().getDefaultEncoding());
+      read(r, null);
+    } finally {
+      FileUtil.closeQuietely(in);
+    }
+  }
 
 }

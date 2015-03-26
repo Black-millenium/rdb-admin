@@ -22,34 +22,30 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
 import workbench.interfaces.Searchable;
 import workbench.resource.ResourceMgr;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
- *	@author Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class FindPreviousAction
-	extends WbAction
-{
-	private Searchable client;
+    extends WbAction {
+  private Searchable client;
 
-	public FindPreviousAction(Searchable aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtFindPrevious", KeyStroke.getKeyStroke(KeyEvent.VK_F3, KeyEvent.SHIFT_MASK));
-		this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-		this.setDescriptiveName(ResourceMgr.getString("TxtEdPrefix") + " " + getMenuLabel());
-	}
+  public FindPreviousAction(Searchable aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtFindPrevious", KeyStroke.getKeyStroke(KeyEvent.VK_F3, KeyEvent.SHIFT_MASK));
+    this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+    this.setDescriptiveName(ResourceMgr.getString("TxtEdPrefix") + " " + getMenuLabel());
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.findPrevious();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.findPrevious();
+  }
 }

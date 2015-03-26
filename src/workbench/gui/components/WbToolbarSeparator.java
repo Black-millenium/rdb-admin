@@ -22,35 +22,31 @@
  */
 package workbench.gui.components;
 
-import java.awt.Dimension;
-
-import javax.swing.JPanel;
-
 import workbench.resource.IconMgr;
+
+import javax.swing.*;
+import java.awt.*;
 
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class WbToolbarSeparator
-	extends JPanel
-{
+    extends JPanel {
 
-	public WbToolbarSeparator()
-	{
-		super();
+  public WbToolbarSeparator() {
+    super();
     // creating a dummy button is used to calculate the size of a regular toolbar button
     // so that the separator can be adjusted to the same height
     WbToolbarButton button = new WbToolbarButton(IconMgr.getInstance().getToolbarIcon("save"));
     Dimension bs = button.getPreferredSize();
 
-		Dimension d = new Dimension((int)(bs.width * 0.3), bs.height);
-		setOpaque(false);
-		this.setPreferredSize(d);
-		this.setPreferredSize(d);
-		this.setMaximumSize(d);
-		this.setBorder(new DividerBorder(DividerBorder.VERTICAL_MIDDLE));
-	}
+    Dimension d = new Dimension((int) (bs.width * 0.3), bs.height);
+    setOpaque(false);
+    this.setPreferredSize(d);
+    this.setPreferredSize(d);
+    this.setMaximumSize(d);
+    this.setBorder(new DividerBorder(DividerBorder.VERTICAL_MIDDLE));
+  }
 
 }

@@ -37,9 +37,6 @@ public class RdbStatementHook
     showPlan = runner.getBoolSessionAttribute(SESS_ATTR_SHOWPLAN);
     planOnly = runner.getBoolSessionAttribute(SESS_ATTR_PLAN_ONLY);
     if (planOnly) {
-      // do not execute the statement
-      // this is important because a DML statement can also be explained
-      // and isql does not execute the statement at all when using set planonly on
       toExplain = sql;
       return null;
     }

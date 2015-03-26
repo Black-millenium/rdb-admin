@@ -23,10 +23,8 @@
 package workbench.gui.fontzoom;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface FontZoomProvider
-{
-	FontZoomer getFontZoomer();
+public interface FontZoomProvider {
+  FontZoomer getFontZoomer();
 }

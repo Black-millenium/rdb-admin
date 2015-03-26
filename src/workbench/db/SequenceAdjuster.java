@@ -19,51 +19,46 @@
  */
 package workbench.db;
 
-import java.sql.SQLException;
-
 import workbench.db.firebird.FirebirdSequenceAdjuster;
 import workbench.db.h2database.H2SequenceAdjuster;
 import workbench.db.hsqldb.HsqlSequenceAdjuster;
 import workbench.db.ibm.Db2SequenceAdjuster;
 import workbench.db.postgres.PostgresSequenceAdjuster;
+import workbench.db.rdb.RdbSequenceAdjuster;
+
+import java.sql.SQLException;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface SequenceAdjuster
-{
-	int adjustTableSequences(WbConnection connection, TableIdentifier table, boolean includeCommit)
-		throws SQLException;
+public interface SequenceAdjuster {
+  int adjustTableSequences(WbConnection connection, TableIdentifier table, boolean includeCommit)
+      throws SQLException;
 
-	public static class Factory
-	{
-		public static SequenceAdjuster getSequenceAdjuster(WbConnection conn)
-		{
-			if (conn == null) return null;
-			if (conn.getMetadata().isPostgres())
-			{
-				return new PostgresSequenceAdjuster();
-			}
-			if (conn.getMetadata().isH2())
-			{
-				return new H2SequenceAdjuster();
-			}
-			if (conn.getMetadata().isHsql() && JdbcUtils.hasMinimumServerVersion(conn, "2.0"))
-			{
-				return new HsqlSequenceAdjuster();
-			}
-			if (conn.getDbId().equals("db2"))
-			{
-				return new Db2SequenceAdjuster();
-			}
-			if (conn.getMetadata().isFirebird() && JdbcUtils.hasMinimumServerVersion(conn, "3.0"))
-			{
-				return new FirebirdSequenceAdjuster();
-			}
-			return null;
-		}
-	}
+  public static class Factory {
+    public static SequenceAdjuster getSequenceAdjuster(WbConnection conn) {
+      if (conn == null) return null;
+      if (conn.getMetadata().isPostgres()) {
+        return new PostgresSequenceAdjuster();
+      }
+      if (conn.getMetadata().isH2()) {
+        return new H2SequenceAdjuster();
+      }
+      if (conn.getMetadata().isHsql() && JdbcUtils.hasMinimumServerVersion(conn, "2.0")) {
+        return new HsqlSequenceAdjuster();
+      }
+      if (conn.getDbId().equals("db2")) {
+        return new Db2SequenceAdjuster();
+      }
+      if (conn.getMetadata().isFirebird() && JdbcUtils.hasMinimumServerVersion(conn, "3.0")) {
+        return new FirebirdSequenceAdjuster();
+      }
+      if (conn.getMetadata().isRdb() && JdbcUtils.hasMinimumServerVersion(conn, "3.0")) {
+        return new RdbSequenceAdjuster();
+      }
+      return null;
+    }
+  }
 
 
 }

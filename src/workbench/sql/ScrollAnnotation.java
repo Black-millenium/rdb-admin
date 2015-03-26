@@ -22,47 +22,39 @@
  */
 package workbench.sql;
 
-import java.util.Set;
-
 import workbench.util.CollectionUtil;
 import workbench.util.StringUtil;
 
+import java.util.Set;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class ScrollAnnotation
-	extends WbAnnotation
-{
-	public static final String ANNOTATION = "WbScrollTo";
-	public static final String END_KEYWORD = "end";
+    extends WbAnnotation {
+  public static final String ANNOTATION = "WbScrollTo";
+  public static final String END_KEYWORD = "end";
 
-	private static final Set<String> endKeywords = CollectionUtil.caseInsensitiveSet("bottom", "last", END_KEYWORD);
+  private static final Set<String> endKeywords = CollectionUtil.caseInsensitiveSet("bottom", "last", END_KEYWORD);
 
-	public ScrollAnnotation()
-	{
-		super(ANNOTATION);
-	}
+  public ScrollAnnotation() {
+    super(ANNOTATION);
+  }
 
-	public static String getScrollToEndAnnotation()
-	{
-		return "-- @" + ANNOTATION + " " + END_KEYWORD;
-	}
+  public static String getScrollToEndAnnotation() {
+    return "-- @" + ANNOTATION + " " + END_KEYWORD;
+  }
 
-	public static boolean scrollToEnd(String value)
-	{
-		return endKeywords.contains(value);
-	}
+  public static boolean scrollToEnd(String value) {
+    return endKeywords.contains(value);
+  }
 
-	public static int scrollToLine(String value)
-	{
-		if (StringUtil.isNonBlank(value))
-		{
-			if (value.startsWith("#"))
-			{
-				return StringUtil.getIntValue(value.substring(1), -1);
-			}
-		}
-		return -1;
-	}
+  public static int scrollToLine(String value) {
+    if (StringUtil.isNonBlank(value)) {
+      if (value.startsWith("#")) {
+        return StringUtil.getIntValue(value.substring(1), -1);
+      }
+    }
+    return -1;
+  }
 }

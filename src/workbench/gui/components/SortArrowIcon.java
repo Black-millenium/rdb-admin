@@ -22,99 +22,81 @@
  */
 package workbench.gui.components;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.util.HashMap;
-
-import javax.swing.Icon;
-
+import workbench.gui.renderer.ColorUtils;
 import workbench.resource.Settings;
 
-import workbench.gui.renderer.ColorUtils;
+import javax.swing.*;
+import java.awt.*;
+import java.util.HashMap;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class SortArrowIcon
-	implements Icon
-{
-	public enum Direction
-	{
-		UP,
-		DOWN;
-	}
+    implements Icon {
+  private static final HashMap<Integer, SortArrowIcon> sharedUpArrows = new HashMap<Integer, SortArrowIcon>();
+  private static final HashMap<Integer, SortArrowIcon> sharedDownArrows = new HashMap<Integer, SortArrowIcon>();
+  private final Direction direction;
+  private final int width;
+  private final int height;
+  private final int blendValue;
+  private SortArrowIcon(Direction dir, int size) {
+    direction = dir;
+    width = (int) (size * 1.1);
+    height = size;
+    blendValue = Settings.getInstance().getIntProperty("workbench.gui.sorticon.blend", 128);
+  }
 
-	private final Direction direction;
-	private final int width;
-	private final int height;
+  public static synchronized SortArrowIcon getIcon(Direction dir, int size) {
+    HashMap<Integer, SortArrowIcon> cache = (dir == Direction.UP ? sharedUpArrows : sharedDownArrows);
 
-	private static final HashMap<Integer, SortArrowIcon> sharedUpArrows = new HashMap<Integer, SortArrowIcon>();
-	private static final HashMap<Integer, SortArrowIcon> sharedDownArrows = new HashMap<Integer, SortArrowIcon>();
-	private final int blendValue;
+    Integer key = Integer.valueOf(size);
+    SortArrowIcon icon = cache.get(key);
+    if (icon == null) {
+      icon = new SortArrowIcon(dir, size);
+      cache.put(key, icon);
+    }
+    return icon;
+  }
 
-	public static synchronized SortArrowIcon getIcon(Direction dir, int size)
-	{
-		HashMap<Integer, SortArrowIcon> cache = (dir == Direction.UP ? sharedUpArrows : sharedDownArrows);
+  @Override
+  public int getIconWidth() {
+    return width;
+  }
 
-		Integer key = Integer.valueOf(size);
-		SortArrowIcon icon = cache.get(key);
-		if (icon == null)
-		{
-			icon = new SortArrowIcon(dir, size);
-			cache.put(key, icon);
-		}
-		return icon;
-	}
+  @Override
+  public int getIconHeight() {
+    return height;
+  }
 
-	private SortArrowIcon(Direction dir, int size)
-	{
-		direction = dir;
-		width = (int)(size * 1.1);
-		height = size;
-		blendValue = Settings.getInstance().getIntProperty("workbench.gui.sorticon.blend", 128);
-	}
+  @Override
+  public void paintIcon(Component c, Graphics g, int x, int y) {
+    Color bg = c.getBackground();
+    Color fg = c.getForeground();
 
-	@Override
-	public int getIconWidth()
-	{
-		return width;
-	}
+    Color arrowColor = ColorUtils.blend(bg, Color.BLACK, blendValue);
+    int w = width;
+    int h = height;
+    int top = y + h;
+    int bottom = y;
 
-	@Override
-	public int getIconHeight()
-	{
-		return height;
-	}
+    int[] xPoints = new int[]{x, x + w / 2, x + w}; // left, middle, right
+    int[] yPoints;
 
-	@Override
-	public void paintIcon(Component c, Graphics g, int x, int y)
-	{
-		Color bg = c.getBackground();
-		Color fg = c.getForeground();
+    if (direction == Direction.UP) {
+      yPoints = new int[]{top - 1, bottom - 1, top - 1};
+    } else {
+      yPoints = new int[]{bottom, top, bottom};
+    }
 
-		Color arrowColor = ColorUtils.blend(bg, Color.BLACK, blendValue);
-		int w = width;
-		int h = height;
-		int top = y + h;
-		int bottom = y;
+    g.setColor(arrowColor);
+    g.fillPolygon(xPoints, yPoints, 3);
+    g.setColor(fg);
+  }
 
-		int[] xPoints = new int[] {x, x + w/2, x + w}; // left, middle, right
-		int[] yPoints;
-
-		if (direction == Direction.UP)
-		{
-			yPoints = new int[] {top - 1, bottom - 1, top - 1};
-		}
-		else
-		{
-			yPoints = new int[] {bottom, top, bottom};
-		}
-
-		g.setColor(arrowColor);
-		g.fillPolygon(xPoints, yPoints, 3);
-		g.setColor(fg);
-	}
+  public enum Direction {
+    UP,
+    DOWN;
+  }
 }
 

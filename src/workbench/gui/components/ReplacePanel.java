@@ -22,137 +22,134 @@
  */
 package workbench.gui.components;
 
-import java.awt.Component;
-import java.awt.Dialog;
-import java.awt.EventQueue;
-import java.awt.Frame;
-import java.awt.Window;
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.actions.EscAction;
+import workbench.interfaces.Replaceable;
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
+import workbench.util.ExceptionUtil;
+import workbench.util.StringUtil;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.WindowListener;
 
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-
-import workbench.interfaces.Replaceable;
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.actions.EscAction;
-
-import workbench.util.ExceptionUtil;
-import workbench.util.StringUtil;
-
 /**
- *
  * @author Thomas Kellerer
  */
 public class ReplacePanel
-	extends JPanel
-	implements ActionListener, WindowListener, FocusListener
-{
-	private String settingsKey;
-	private String caseProperty;
-	private String wordProperty;
-	private String selectedProperty;
-	private String regexProperty;
-	private String criteriaProperty;
-	private String replacementProperty;
-	private String wrapProperty;
+    extends JPanel
+    implements ActionListener, WindowListener, FocusListener {
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  protected javax.swing.JButton closeButton;
+  protected javax.swing.JLabel criteriaLabel;
+  protected javax.swing.JButton findButton;
+  protected javax.swing.JButton findNextButton;
+  protected javax.swing.JCheckBox ignoreCaseCheckBox;
+  protected javax.swing.JPanel jPanel1;
+  protected javax.swing.JButton replaceAllButton;
+  protected javax.swing.JLabel replaceLabel;
+  protected javax.swing.JButton replaceNextButton;
+  protected javax.swing.JComboBox replaceValue;
+  protected javax.swing.JComboBox searchCriteria;
+  protected javax.swing.JCheckBox selectedTextCheckBox;
+  protected javax.swing.JPanel spacerPanel;
+  protected javax.swing.JCheckBox useRegexCheckBox;
+  protected javax.swing.JCheckBox wordsOnlyCheckBox;
+  protected javax.swing.JCheckBox wrapSearchCbx;
+  private String settingsKey;
+  private String caseProperty;
+  private String wordProperty;
+  private String selectedProperty;
+  private String regexProperty;
+  private String criteriaProperty;
+  private String replacementProperty;
+  private String wrapProperty;
+  private Replaceable client;
+  private int lastPos = -1;
+  private JDialog dialog;
+  private EscAction escAction;
 
-	private Replaceable client;
-	private int lastPos = -1;
-	private JDialog dialog;
-	private EscAction escAction;
+  public ReplacePanel(Replaceable aClient) {
+    this(aClient, "workbench.sql.replace", null);
+  }
 
-	public ReplacePanel(Replaceable aClient)
-	{
-		this(aClient, "workbench.sql.replace", null);
-	}
+  public ReplacePanel(Replaceable aClient, String key, String selectedText) {
+    super();
+    initComponents();
+    this.client = aClient;
+    settingsKey = key;
+    caseProperty = settingsKey + ".ignoreCase";
+    wordProperty = settingsKey + ".wholeWord";
+    selectedProperty = settingsKey + ".selectedText";
+    regexProperty = settingsKey + ".useRegEx";
+    wrapProperty = settingsKey + ".wrapSearch";
+    criteriaProperty = "criteria";
+    replacementProperty = "replacement";
 
-	public ReplacePanel(Replaceable aClient, String key, String selectedText)
-	{
-		super();
-		initComponents();
-		this.client = aClient;
-		settingsKey = key;
-		caseProperty = settingsKey + ".ignoreCase";
-		wordProperty = settingsKey + ".wholeWord";
-		selectedProperty = settingsKey + ".selectedText";
-		regexProperty = settingsKey + ".useRegEx";
-		wrapProperty = settingsKey + ".wrapSearch";
-		criteriaProperty = "criteria";
-		replacementProperty = "replacement";
+    WbTraversalPolicy policy = new WbTraversalPolicy();
+    policy.addComponent(this.searchCriteria.getEditor().getEditorComponent());
+    policy.addComponent(this.replaceValue.getEditor().getEditorComponent());
+    policy.addComponent(this.ignoreCaseCheckBox);
+    policy.addComponent(this.wordsOnlyCheckBox);
+    policy.addComponent(this.useRegexCheckBox);
+    policy.addComponent(this.selectedTextCheckBox);
+    policy.addComponent(this.wrapSearchCbx);
+    policy.addComponent(this.findButton);
+    policy.addComponent(this.replaceNextButton);
+    policy.addComponent(this.replaceAllButton);
+    policy.addComponent(this.closeButton);
+    policy.setDefaultComponent(searchCriteria.getEditor().getEditorComponent());
+    this.setFocusTraversalPolicy(policy);
 
-		WbTraversalPolicy policy = new WbTraversalPolicy();
-		policy.addComponent(this.searchCriteria.getEditor().getEditorComponent());
-		policy.addComponent(this.replaceValue.getEditor().getEditorComponent());
-		policy.addComponent(this.ignoreCaseCheckBox);
-		policy.addComponent(this.wordsOnlyCheckBox);
-		policy.addComponent(this.useRegexCheckBox);
-		policy.addComponent(this.selectedTextCheckBox);
-		policy.addComponent(this.wrapSearchCbx);
-		policy.addComponent(this.findButton);
-		policy.addComponent(this.replaceNextButton);
-		policy.addComponent(this.replaceAllButton);
-		policy.addComponent(this.closeButton);
-		policy.setDefaultComponent(searchCriteria.getEditor().getEditorComponent());
-		this.setFocusTraversalPolicy(policy);
+    this.findButton.addActionListener(this);
+    this.replaceNextButton.addActionListener(this);
+    this.replaceAllButton.addActionListener(this);
+    this.closeButton.addActionListener(this);
+    this.findNextButton.addActionListener(this);
 
-		this.findButton.addActionListener(this);
-		this.replaceNextButton.addActionListener(this);
-		this.replaceAllButton.addActionListener(this);
-		this.closeButton.addActionListener(this);
-		this.findNextButton.addActionListener(this);
+    this.replaceNextButton.setEnabled(false);
+    this.findNextButton.setEnabled(false);
 
-		this.replaceNextButton.setEnabled(false);
-		this.findNextButton.setEnabled(false);
+    ((HistoryTextField) searchCriteria).setColumns(30);
+    ((HistoryTextField) searchCriteria).setSettingsProperty(criteriaProperty);
+    ((HistoryTextField) replaceValue).setColumns(30);
+    ((HistoryTextField) replaceValue).setSettingsProperty(replacementProperty);
 
-		((HistoryTextField)searchCriteria).setColumns(30);
-		((HistoryTextField)searchCriteria).setSettingsProperty(criteriaProperty);
-		((HistoryTextField)replaceValue).setColumns(30);
-		((HistoryTextField)replaceValue).setSettingsProperty(replacementProperty);
+    this.restoreSettings();
 
-		this.restoreSettings();
+    if (selectedText != null) {
+      this.selectedTextCheckBox.setText(selectedText);
+    }
 
-		if (selectedText != null)
-		{
-			this.selectedTextCheckBox.setText(selectedText);
-		}
+    replaceValue.getEditor().getEditorComponent().addFocusListener(this);
+    searchCriteria.getEditor().getEditorComponent().addFocusListener(this);
+  }
 
-		replaceValue.getEditor().getEditorComponent().addFocusListener(this);
-		searchCriteria.getEditor().getEditorComponent().addFocusListener(this);
-	}
+  @Override
+  public void focusLost(FocusEvent e) {
+  }
 
-	@Override
-	public void focusLost(FocusEvent e)
-	{
-	}
+  @Override
+  public void focusGained(FocusEvent e) {
+    if (e.getComponent() == replaceValue.getEditor().getEditorComponent()) {
+      replaceValue.getEditor().selectAll();
+    } else if (e.getComponent() == searchCriteria.getEditor().getEditorComponent()) {
+      searchCriteria.getEditor().selectAll();
+    }
+  }
 
-	@Override
-	public void focusGained(FocusEvent e)
-	{
-		if (e.getComponent() == replaceValue.getEditor().getEditorComponent())
-		{
-			replaceValue.getEditor().selectAll();
-		}
-		else if (e.getComponent() == searchCriteria.getEditor().getEditorComponent())
-		{
-			searchCriteria.getEditor().selectAll();
-		}
-	}
-
-
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
 
     criteriaLabel = new javax.swing.JLabel();
@@ -321,10 +318,8 @@ public class ReplacePanel
     wrapSearchCbx.setText(ResourceMgr.getString("LblSearchWrap")); // NOI18N
     wrapSearchCbx.setToolTipText(ResourceMgr.getString("d_LblSearchWrap")); // NOI18N
     wrapSearchCbx.setBorder(null);
-    wrapSearchCbx.addActionListener(new java.awt.event.ActionListener()
-    {
-      public void actionPerformed(java.awt.event.ActionEvent evt)
-      {
+    wrapSearchCbx.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
         wrapSearchCbxActionPerformed(evt);
       }
     });
@@ -346,258 +341,189 @@ public class ReplacePanel
 
   private void wrapSearchCbxActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_wrapSearchCbxActionPerformed
   {//GEN-HEADEREND:event_wrapSearchCbxActionPerformed
-		this.client.setWrapSearch(wrapSearchCbx.isSelected());
+    this.client.setWrapSearch(wrapSearchCbx.isSelected());
   }//GEN-LAST:event_wrapSearchCbxActionPerformed
 
-	public void showReplaceDialog(Component caller, final String selectedText)
-	{
-		showReplaceDialog(caller, selectedText, ResourceMgr.getString("TxtWindowTitleReplaceText"));
-	}
+  public void showReplaceDialog(Component caller, final String selectedText) {
+    showReplaceDialog(caller, selectedText, ResourceMgr.getString("TxtWindowTitleReplaceText"));
+  }
 
-	public void showReplaceDialog(Component caller, final String selectedText, String title)
-	{
-		if (this.dialog != null)
-		{
-			this.dialog.setVisible(true);
-			this.dialog.requestFocus();
-			return;
-		}
-		try
-		{
-			Window w = WbSwingUtilities.getWindowAncestor(caller);
+  public void showReplaceDialog(Component caller, final String selectedText, String title) {
+    if (this.dialog != null) {
+      this.dialog.setVisible(true);
+      this.dialog.requestFocus();
+      return;
+    }
+    try {
+      Window w = WbSwingUtilities.getWindowAncestor(caller);
 
-			this.dialog = null;
+      this.dialog = null;
 
-			if (w instanceof Frame)
-			{
-				this.dialog = new JDialog((Frame)w);
-			}
-			else if (w instanceof Dialog)
-			{
-				this.dialog = new JDialog((Dialog)w);
-			}
-			this.dialog.setTitle(title);
-			this.dialog.getContentPane().add(this);
-			this.dialog.pack();
-			this.dialog.setResizable(false);
-			if (!Settings.getInstance().restoreWindowPosition(this.dialog, settingsKey + ".window"))
-			{
-				WbSwingUtilities.center(dialog, w);
-			}
-			this.dialog.addWindowListener(this);
+      if (w instanceof Frame) {
+        this.dialog = new JDialog((Frame) w);
+      } else if (w instanceof Dialog) {
+        this.dialog = new JDialog((Dialog) w);
+      }
+      this.dialog.setTitle(title);
+      this.dialog.getContentPane().add(this);
+      this.dialog.pack();
+      this.dialog.setResizable(false);
+      if (!Settings.getInstance().restoreWindowPosition(this.dialog, settingsKey + ".window")) {
+        WbSwingUtilities.center(dialog, w);
+      }
+      this.dialog.addWindowListener(this);
 
-			boolean hasSelectedText = false;
+      boolean hasSelectedText = false;
 
-			if (!StringUtil.isEmptyString(selectedText) && selectedText.indexOf('\n') == -1 && selectedText.indexOf('\r') == -1)
-			{
-				((HistoryTextField)searchCriteria).setText(selectedText);
-				hasSelectedText = true;
-			}
+      if (!StringUtil.isEmptyString(selectedText) && selectedText.indexOf('\n') == -1 && selectedText.indexOf('\r') == -1) {
+        ((HistoryTextField) searchCriteria).setText(selectedText);
+        hasSelectedText = true;
+      }
 
-			escAction = new EscAction(dialog, this);
+      escAction = new EscAction(dialog, this);
 
-			final boolean criteriaAdded = hasSelectedText;
+      final boolean criteriaAdded = hasSelectedText;
 
-			EventQueue.invokeLater(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					if (criteriaAdded)
-					{
-						((HistoryTextField)replaceValue).selectAll();
-						((HistoryTextField)replaceValue).requestFocus();
-					}
-					else
-					{
-						((HistoryTextField)searchCriteria).selectAll();
-						((HistoryTextField)searchCriteria).requestFocus();
-					}
-				}
-			});
-			this.dialog.setVisible(true);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
+      EventQueue.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          if (criteriaAdded) {
+            ((HistoryTextField) replaceValue).selectAll();
+            ((HistoryTextField) replaceValue).requestFocus();
+          } else {
+            ((HistoryTextField) searchCriteria).selectAll();
+            ((HistoryTextField) searchCriteria).requestFocus();
+          }
+        }
+      });
+      this.dialog.setVisible(true);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 
-	@Override
-	public void actionPerformed(java.awt.event.ActionEvent e)
-	{
-		Object source = e.getSource();
-		updateHistoryFields();
-		if (source == this.findButton)
-		{
-			this.findFirst();
-		}
-		else if (source == this.findNextButton)
-		{
-			findNext();
-		}
-		else if (source == this.replaceNextButton)
-		{
-			this.replaceNext();
-		}
-		else if (source == this.replaceAllButton)
-		{
-			this.replaceAll();
-		}
-		else if (source == this.closeButton || e.getActionCommand().equals(escAction.getActionName()))
-		{
-			this.closeWindow();
-		}
-	}
+  @Override
+  public void actionPerformed(java.awt.event.ActionEvent e) {
+    Object source = e.getSource();
+    updateHistoryFields();
+    if (source == this.findButton) {
+      this.findFirst();
+    } else if (source == this.findNextButton) {
+      findNext();
+    } else if (source == this.replaceNextButton) {
+      this.replaceNext();
+    } else if (source == this.replaceAllButton) {
+      this.replaceAll();
+    } else if (source == this.closeButton || e.getActionCommand().equals(escAction.getActionName())) {
+      this.closeWindow();
+    }
+  }
 
-	private void findNext()
-	{
-		try
-		{
-			this.lastPos = this.client.findNext();
-			this.replaceNextButton.setEnabled(this.lastPos > -1);
-			this.findNextButton.setEnabled(this.lastPos > -1);
-		}
-		catch (Exception e)
-		{
-			WbSwingUtilities.showErrorMessage(this, ExceptionUtil.getDisplay(e));
-		}
-	}
+  private void findNext() {
+    try {
+      this.lastPos = this.client.findNext();
+      this.replaceNextButton.setEnabled(this.lastPos > -1);
+      this.findNextButton.setEnabled(this.lastPos > -1);
+    } catch (Exception e) {
+      WbSwingUtilities.showErrorMessage(this, ExceptionUtil.getDisplay(e));
+    }
+  }
 
-	private void findFirst()
-	{
-		String toFind = ((HistoryTextField)searchCriteria).getText();
-		try
-		{
-			this.lastPos = this.client.findFirst(toFind, this.ignoreCaseCheckBox.isSelected(), this.wordsOnlyCheckBox.isSelected(), this.useRegexCheckBox.isSelected());
-			this.replaceNextButton.setEnabled(this.lastPos > -1);
-			this.findNextButton.setEnabled(this.lastPos > -1);
-		}
-		catch (Exception e)
-		{
-			WbSwingUtilities.showErrorMessage(this, ExceptionUtil.getDisplay(e));
-		}
-	}
+  private void findFirst() {
+    String toFind = ((HistoryTextField) searchCriteria).getText();
+    try {
+      this.lastPos = this.client.findFirst(toFind, this.ignoreCaseCheckBox.isSelected(), this.wordsOnlyCheckBox.isSelected(), this.useRegexCheckBox.isSelected());
+      this.replaceNextButton.setEnabled(this.lastPos > -1);
+      this.findNextButton.setEnabled(this.lastPos > -1);
+    } catch (Exception e) {
+      WbSwingUtilities.showErrorMessage(this, ExceptionUtil.getDisplay(e));
+    }
+  }
 
-	private void replaceNext()
-	{
-		if (this.lastPos < 0) this.findFirst();
+  private void replaceNext() {
+    if (this.lastPos < 0) this.findFirst();
 
-		if (this.client.replaceCurrent(((HistoryTextField)replaceValue).getText(), this.useRegexCheckBox.isSelected()))
-		{
-			this.findNext();
-		}
-		else
-		{
-			this.replaceNextButton.setEnabled(false);
-		}
-	}
+    if (this.client.replaceCurrent(((HistoryTextField) replaceValue).getText(), this.useRegexCheckBox.isSelected())) {
+      this.findNext();
+    } else {
+      this.replaceNextButton.setEnabled(false);
+    }
+  }
 
-	private void replaceAll()
-	{
-		boolean selected = this.selectedTextCheckBox.isEnabled() && this.selectedTextCheckBox.isSelected();
-		this.client.replaceAll(((HistoryTextField)searchCriteria).getText(),
-		                       ((HistoryTextField)replaceValue).getText(),
-													 selected,
-		                       this.ignoreCaseCheckBox.isSelected(),
-													 this.wordsOnlyCheckBox.isSelected(),
-													 this.useRegexCheckBox.isSelected());
-	}
+  private void replaceAll() {
+    boolean selected = this.selectedTextCheckBox.isEnabled() && this.selectedTextCheckBox.isSelected();
+    this.client.replaceAll(((HistoryTextField) searchCriteria).getText(),
+        ((HistoryTextField) replaceValue).getText(),
+        selected,
+        this.ignoreCaseCheckBox.isSelected(),
+        this.wordsOnlyCheckBox.isSelected(),
+        this.useRegexCheckBox.isSelected());
+  }
 
-	private void closeWindow()
-	{
-		if (this.dialog != null)
-		{
-			this.saveSettings();
-			this.escAction = null;
-			this.dialog.setVisible(false);
-			this.dialog.dispose();
-			this.dialog = null;
-		}
-	}
+  private void closeWindow() {
+    if (this.dialog != null) {
+      this.saveSettings();
+      this.escAction = null;
+      this.dialog.setVisible(false);
+      this.dialog.dispose();
+      this.dialog = null;
+    }
+  }
 
-	private void updateHistoryFields()
-	{
-		((HistoryTextField)searchCriteria).storeCurrent();
-		((HistoryTextField)replaceValue).storeCurrent();
-	}
+  private void updateHistoryFields() {
+    ((HistoryTextField) searchCriteria).storeCurrent();
+    ((HistoryTextField) replaceValue).storeCurrent();
+  }
 
-	private void saveSettings()
-	{
-		Settings.getInstance().setProperty(caseProperty, Boolean.toString(this.ignoreCaseCheckBox.isSelected()));
-		Settings.getInstance().setProperty(wordProperty, Boolean.toString(this.wordsOnlyCheckBox.isSelected()));
-		Settings.getInstance().setProperty(selectedProperty, Boolean.toString(this.selectedTextCheckBox.isSelected()));
-		Settings.getInstance().setProperty(regexProperty, Boolean.toString(this.useRegexCheckBox.isSelected()));
-		Settings.getInstance().setProperty(wrapProperty, Boolean.toString(this.wrapSearchCbx.isSelected()));
-		((HistoryTextField)searchCriteria).saveSettings(Settings.getInstance(), settingsKey + ".");
-		((HistoryTextField)replaceValue).saveSettings(Settings.getInstance(), settingsKey + ".");
-		Settings.getInstance().storeWindowPosition(this.dialog, settingsKey + ".window");
-	}
+  private void saveSettings() {
+    Settings.getInstance().setProperty(caseProperty, Boolean.toString(this.ignoreCaseCheckBox.isSelected()));
+    Settings.getInstance().setProperty(wordProperty, Boolean.toString(this.wordsOnlyCheckBox.isSelected()));
+    Settings.getInstance().setProperty(selectedProperty, Boolean.toString(this.selectedTextCheckBox.isSelected()));
+    Settings.getInstance().setProperty(regexProperty, Boolean.toString(this.useRegexCheckBox.isSelected()));
+    Settings.getInstance().setProperty(wrapProperty, Boolean.toString(this.wrapSearchCbx.isSelected()));
+    ((HistoryTextField) searchCriteria).saveSettings(Settings.getInstance(), settingsKey + ".");
+    ((HistoryTextField) replaceValue).saveSettings(Settings.getInstance(), settingsKey + ".");
+    Settings.getInstance().storeWindowPosition(this.dialog, settingsKey + ".window");
+  }
 
-	private void restoreSettings()
-	{
-		this.ignoreCaseCheckBox.setSelected(Settings.getInstance().getBoolProperty(caseProperty, true));
-		this.wordsOnlyCheckBox.setSelected(Settings.getInstance().getBoolProperty(wordProperty, false));
-		this.selectedTextCheckBox.setSelected(Settings.getInstance().getBoolProperty(selectedProperty, false));
-		this.useRegexCheckBox.setSelected(Settings.getInstance().getBoolProperty(regexProperty, true));
-		this.wrapSearchCbx.setSelected(Settings.getInstance().getBoolProperty(wrapProperty, false));
-		((HistoryTextField)searchCriteria).restoreSettings(Settings.getInstance(), settingsKey + ".");
-		((HistoryTextField)replaceValue).restoreSettings(Settings.getInstance(), settingsKey + ".");
-	}
+  private void restoreSettings() {
+    this.ignoreCaseCheckBox.setSelected(Settings.getInstance().getBoolProperty(caseProperty, true));
+    this.wordsOnlyCheckBox.setSelected(Settings.getInstance().getBoolProperty(wordProperty, false));
+    this.selectedTextCheckBox.setSelected(Settings.getInstance().getBoolProperty(selectedProperty, false));
+    this.useRegexCheckBox.setSelected(Settings.getInstance().getBoolProperty(regexProperty, true));
+    this.wrapSearchCbx.setSelected(Settings.getInstance().getBoolProperty(wrapProperty, false));
+    ((HistoryTextField) searchCriteria).restoreSettings(Settings.getInstance(), settingsKey + ".");
+    ((HistoryTextField) replaceValue).restoreSettings(Settings.getInstance(), settingsKey + ".");
+  }
 
-	@Override
-	public void windowActivated(java.awt.event.WindowEvent e)
-	{
-	}
+  @Override
+  public void windowActivated(java.awt.event.WindowEvent e) {
+  }
 
-	@Override
-	public void windowClosed(java.awt.event.WindowEvent e)
-	{
-	}
+  @Override
+  public void windowClosed(java.awt.event.WindowEvent e) {
+  }
 
-	@Override
-	public void windowClosing(java.awt.event.WindowEvent e)
-	{
-		this.closeWindow();
-	}
+  @Override
+  public void windowClosing(java.awt.event.WindowEvent e) {
+    this.closeWindow();
+  }
 
-	@Override
-	public void windowDeactivated(java.awt.event.WindowEvent e)
-	{
-	}
+  @Override
+  public void windowDeactivated(java.awt.event.WindowEvent e) {
+  }
 
-	@Override
-	public void windowDeiconified(java.awt.event.WindowEvent e)
-	{
-	}
+  @Override
+  public void windowDeiconified(java.awt.event.WindowEvent e) {
+  }
 
-	@Override
-	public void windowIconified(java.awt.event.WindowEvent e)
-	{
-	}
+  @Override
+  public void windowIconified(java.awt.event.WindowEvent e) {
+  }
 
-	@Override
-	public void windowOpened(java.awt.event.WindowEvent e)
-	{
-	}
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  protected javax.swing.JButton closeButton;
-  protected javax.swing.JLabel criteriaLabel;
-  protected javax.swing.JButton findButton;
-  protected javax.swing.JButton findNextButton;
-  protected javax.swing.JCheckBox ignoreCaseCheckBox;
-  protected javax.swing.JPanel jPanel1;
-  protected javax.swing.JButton replaceAllButton;
-  protected javax.swing.JLabel replaceLabel;
-  protected javax.swing.JButton replaceNextButton;
-  protected javax.swing.JComboBox replaceValue;
-  protected javax.swing.JComboBox searchCriteria;
-  protected javax.swing.JCheckBox selectedTextCheckBox;
-  protected javax.swing.JPanel spacerPanel;
-  protected javax.swing.JCheckBox useRegexCheckBox;
-  protected javax.swing.JCheckBox wordsOnlyCheckBox;
-  protected javax.swing.JCheckBox wrapSearchCbx;
+  @Override
+  public void windowOpened(java.awt.event.WindowEvent e) {
+  }
   // End of variables declaration//GEN-END:variables
 
 

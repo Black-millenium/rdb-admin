@@ -22,76 +22,61 @@
  */
 package workbench.gui.settings;
 
-import java.awt.*;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
 import workbench.gui.WbSwingUtilities;
 
+import javax.swing.*;
+import java.awt.*;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class ImagePanel
-	extends JPanel
-	implements ListCellRenderer
-{
-	private Image image;
-	private Dimension dim = new Dimension(32,18);
+    extends JPanel
+    implements ListCellRenderer {
+  private Image image;
+  private Dimension dim = new Dimension(32, 18);
 
-	public ImagePanel()
-	{
-		setOpaque(true);
-	}
+  public ImagePanel() {
+    setOpaque(true);
+  }
 
   @Override
-  public void paintComponent(Graphics g)
-  {
+  public void paintComponent(Graphics g) {
     super.paintComponent(g);
-    if (image != null)
-    {
+    if (image != null) {
       g.drawImage(image, 0, 0, this);
     }
   }
 
-	@Override
-	public Dimension getPreferredSize()
-	{
-		return dim;
-	}
+  @Override
+  public Dimension getPreferredSize() {
+    return dim;
+  }
 
-	@Override
-	public Dimension getMinimumSize()
-	{
-		return dim;
-	}
+  @Override
+  public Dimension getMinimumSize() {
+    return dim;
+  }
 
-	@Override
-	public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
-	{
-		if (value instanceof LoadingImage)
-		{
-			image = ((LoadingImage)value).getImage();
-		}
-		else
-		{
-			image = null;
-		}
+  @Override
+  public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+    if (value instanceof LoadingImage) {
+      image = ((LoadingImage) value).getImage();
+    } else {
+      image = null;
+    }
 
-		if (isSelected)
-		{
-			setBackground(list.getSelectionBackground());
-			setForeground(list.getSelectionForeground());
-		}
-		else
-		{
-			setBackground(list.getBackground());
-			setForeground(list.getForeground());
-		}
-		WbSwingUtilities.repaintLater(this);
-		WbSwingUtilities.repaintLater(list);
+    if (isSelected) {
+      setBackground(list.getSelectionBackground());
+      setForeground(list.getSelectionForeground());
+    } else {
+      setBackground(list.getBackground());
+      setForeground(list.getForeground());
+    }
+    WbSwingUtilities.repaintLater(this);
+    WbSwingUtilities.repaintLater(list);
 
-		return this;
-	}
+    return this;
+  }
 
 }

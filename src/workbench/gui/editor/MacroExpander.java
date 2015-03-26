@@ -22,176 +22,146 @@
  */
 package workbench.gui.editor;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Map;
-
+import workbench.gui.editor.actions.NextWord;
 import workbench.interfaces.MacroChangeListener;
 import workbench.resource.GuiSettings;
 import workbench.resource.Settings;
-
-import workbench.gui.editor.actions.NextWord;
-
 import workbench.sql.macros.MacroDefinition;
 import workbench.sql.macros.MacroManager;
 import workbench.sql.macros.MacroStorage;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Map;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class MacroExpander
-	implements MacroChangeListener, PropertyChangeListener
-{
+    implements MacroChangeListener, PropertyChangeListener {
 
-	public static final String CURSOR_PLACEHOLDER = "${c}";
-	public static final String SELECT_PLACEHOLDER = "${s}";
+  public static final String CURSOR_PLACEHOLDER = "${c}";
+  public static final String SELECT_PLACEHOLDER = "${s}";
 
-	private final Object lockMonitor = new Object();
+  private final Object lockMonitor = new Object();
+  private final int macroClientId;
+  private Map<String, MacroDefinition> macros;
+  private int maxTypingPause = 350;
+  private JEditTextArea editor;
 
-	private Map<String, MacroDefinition> macros;
-	private int maxTypingPause = 350;
+  public MacroExpander(int clientId, JEditTextArea textArea) {
+    macroClientId = clientId;
+    MacroManager.getInstance().getMacros(macroClientId).addChangeListener(this);
+    macros = MacroManager.getInstance().getExpandableMacros(macroClientId);
+    maxTypingPause = GuiSettings.getMaxExpansionPause();
+    Settings.getInstance().addPropertyChangeListener(this, GuiSettings.PROPERTY_EXPAND_MAXDURATION);
+    this.editor = textArea;
+  }
 
-	private JEditTextArea editor;
-	private final int macroClientId;
+  public void dispose() {
+    MacroStorage storage = MacroManager.getInstance().getMacros(macroClientId);
+    if (storage != null) {
+      storage.removeChangeListener(this);
+    }
+    Settings.getInstance().removePropertyChangeListener(this);
+  }
 
-	public MacroExpander(int clientId, JEditTextArea textArea)
-	{
-		macroClientId = clientId;
-		MacroManager.getInstance().getMacros(macroClientId).addChangeListener(this);
-		macros = MacroManager.getInstance().getExpandableMacros(macroClientId);
-		maxTypingPause = GuiSettings.getMaxExpansionPause();
-		Settings.getInstance().addPropertyChangeListener(this, GuiSettings.PROPERTY_EXPAND_MAXDURATION);
-		this.editor = textArea;
-	}
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+    maxTypingPause = GuiSettings.getMaxExpansionPause();
+  }
 
-	public void dispose()
-	{
-		MacroStorage storage = MacroManager.getInstance().getMacros(macroClientId);
-		if (storage != null)
-		{
-			storage.removeChangeListener(this);
-		}
-		Settings.getInstance().removePropertyChangeListener(this);
-	}
+  public int getMacroClientId() {
+    return macroClientId;
+  }
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt)
-	{
-		maxTypingPause = GuiSettings.getMaxExpansionPause();
-	}
+  private void readMap() {
+    synchronized (lockMonitor) {
+      macros = MacroManager.getInstance().getExpandableMacros(macroClientId);
+    }
+  }
 
-	public int getMacroClientId()
-	{
-		return macroClientId;
-	}
+  @Override
+  public void macroListChanged() {
+    readMap();
+  }
 
-	private void readMap()
-	{
-		synchronized (lockMonitor)
-		{
-			macros = MacroManager.getInstance().getExpandableMacros(macroClientId);
-		}
-	}
+  public boolean hasExpandableMacros() {
+    return macros.size() > 0;
+  }
 
-	@Override
-	public void macroListChanged()
-	{
-		readMap();
-	}
+  public String getReplacement(String word) {
+    MacroDefinition macro = macros.get(word);
+    if (macro == null) return null;
+    return macro.getText();
+  }
 
-	public boolean hasExpandableMacros()
-	{
-		return macros.size() > 0;
-	}
+  public boolean expandWordAtCursor() {
+    long duration = System.currentTimeMillis() - editor.getLastModifiedTime();
+    if (!hasExpandableMacros()) return false;
 
-	public String getReplacement(String word)
-	{
-		MacroDefinition macro = macros.get(word);
-		if (macro == null) return null;
-		return macro.getText();
-	}
+    if (duration > maxTypingPause) return false;
 
-	public boolean expandWordAtCursor()
-	{
-		long duration = System.currentTimeMillis() - editor.getLastModifiedTime();
-		if (!hasExpandableMacros()) return false;
+    int currentLine = editor.getCaretLine();
+    String line = editor.getLineText(currentLine);
+    int pos = editor.getCaretPositionInLine(currentLine);
+    if (pos < 0) return false;
 
-		if (duration > maxTypingPause) return false;
+    int start = TextUtilities.findWordStart(line, pos);
+    int end = TextUtilities.findWordEnd(line, pos);
 
-		int currentLine = editor.getCaretLine();
-		String line = editor.getLineText(currentLine);
-		int pos = editor.getCaretPositionInLine(currentLine);
-		if (pos < 0) return false;
+    if (start < end && start >= 0) {
+      String word = line.substring(start, end);
+      String replacement = getReplacement(word);
+      if (replacement != null) {
+        insertMacroText(replacement, start, end);
+        return true;
+      }
+    }
+    return false;
+  }
 
-		int start = TextUtilities.findWordStart(line, pos);
-		int end = TextUtilities.findWordEnd(line, pos);
+  public void insertMacroText(String replacement) {
+    insertMacroText(replacement, -1, -1);
+  }
 
-		if (start < end && start >= 0)
-		{
-			String word = line.substring(start, end);
-			String replacement = getReplacement(word);
-			if (replacement != null)
-			{
-				insertMacroText(replacement, start, end);
-				return true;
-			}
-		}
-		return false;
-	}
+  private void insertMacroText(String replacement, int start, int end) {
+    int newCaret = -1;
+    int currentLine = editor.getCaretLine();
+    int lineStart = editor.getLineStartOffset(currentLine);
 
-	public void insertMacroText(String replacement)
-	{
-		insertMacroText(replacement, -1, -1);
-	}
+    boolean doSelect = shouldSelect(replacement);
+    int cursorPos = getCaretPositionInString(replacement);
+    if (cursorPos > -1) {
+      newCaret = lineStart + start + cursorPos;
+    }
 
-	private void insertMacroText(String replacement, int start, int end)
-	{
-		int newCaret = -1;
-		int currentLine = editor.getCaretLine();
-		int lineStart = editor.getLineStartOffset(currentLine);
+    replacement = replacement.replace(CURSOR_PLACEHOLDER, "").replace(SELECT_PLACEHOLDER, "");
 
-		boolean doSelect = shouldSelect(replacement);
-		int cursorPos = getCaretPositionInString(replacement);
-		if (cursorPos > -1)
-		{
-			newCaret = lineStart + start + cursorPos;
-		}
+    if (start > -1 && end > -1) {
+      editor.replaceText(currentLine, start, end, replacement);
+    } else {
+      editor.insertText(replacement);
+    }
 
-		replacement = replacement.replace(CURSOR_PLACEHOLDER, "").replace(SELECT_PLACEHOLDER, "");
+    if (newCaret > -1) {
+      editor.setCaretPosition(newCaret);
+      if (doSelect) {
+        NextWord.jump(editor, true);
+      }
+    }
+  }
 
-		if (start > -1 && end > -1)
-		{
-			editor.replaceText(currentLine, start, end, replacement);
-		}
-		else
-		{
-			editor.insertText(replacement);
-		}
+  private int getCaretPositionInString(String replacement) {
+    int cursorPos = replacement.indexOf(CURSOR_PLACEHOLDER);
+    if (cursorPos == -1) {
+      cursorPos = cursorPos = replacement.indexOf(SELECT_PLACEHOLDER);
+    }
+    return cursorPos;
+  }
 
-		if (newCaret > -1)
-		{
-			editor.setCaretPosition(newCaret);
-			if (doSelect)
-			{
-				NextWord.jump(editor, true);
-			}
-		}
-	}
-
-	private int getCaretPositionInString(String replacement)
-	{
-		int cursorPos = replacement.indexOf(CURSOR_PLACEHOLDER);
-		if (cursorPos == -1)
-		{
-			cursorPos = cursorPos = replacement.indexOf(SELECT_PLACEHOLDER);
-		}
-		return cursorPos;
-	}
-
-	private boolean shouldSelect(String replacement)
-	{
-		return replacement.indexOf(SELECT_PLACEHOLDER) > -1;
-	}
+  private boolean shouldSelect(String replacement) {
+    return replacement.indexOf(SELECT_PLACEHOLDER) > -1;
+  }
 
 }

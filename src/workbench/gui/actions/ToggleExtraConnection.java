@@ -22,61 +22,48 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
+import workbench.gui.MainWindow;
 import workbench.resource.ResourceMgr;
 
-import workbench.gui.MainWindow;
+import java.awt.event.ActionEvent;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class ToggleExtraConnection
-	extends CheckBoxAction
-{
-	private MainWindow window;
+    extends CheckBoxAction {
+  private MainWindow window;
 
-	public ToggleExtraConnection(MainWindow client)
-	{
-		super("MnuTxtUseExtraConn", null);
-		this.setMenuItemName(ResourceMgr.MNU_TXT_FILE);
-		this.setEnabled(false);
-		this.window = client;
-		checkState();
-	}
+  public ToggleExtraConnection(MainWindow client) {
+    super("MnuTxtUseExtraConn", null);
+    this.setMenuItemName(ResourceMgr.MNU_TXT_FILE);
+    this.setEnabled(false);
+    this.window = client;
+    checkState();
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		if (this.window == null) return;
-		if (window.canUseSeparateConnection())
-		{
-			if (window.usesSeparateConnection())
-			{
-				this.window.disconnectCurrentPanel();
-				this.setSwitchedOn(false);
-			}
-			else
-			{
-				this.window.createNewConnectionForCurrentPanel();
-				this.setSwitchedOn(true);
-			}
-		}
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    if (this.window == null) return;
+    if (window.canUseSeparateConnection()) {
+      if (window.usesSeparateConnection()) {
+        this.window.disconnectCurrentPanel();
+        this.setSwitchedOn(false);
+      } else {
+        this.window.createNewConnectionForCurrentPanel();
+        this.setSwitchedOn(true);
+      }
+    }
+  }
 
-	public final void checkState()
-	{
-		if (this.window == null)
-		{
-			this.setEnabled(false);
-			this.setSwitchedOn(false);
-		}
-		else
-		{
-			this.setEnabled(window.canUseSeparateConnection());
-			this.setSwitchedOn(window.usesSeparateConnection());
-		}
-	}
+  public final void checkState() {
+    if (this.window == null) {
+      this.setEnabled(false);
+      this.setSwitchedOn(false);
+    } else {
+      this.setEnabled(window.canUseSeparateConnection());
+      this.setSwitchedOn(window.usesSeparateConnection());
+    }
+  }
 
 }

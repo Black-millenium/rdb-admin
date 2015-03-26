@@ -22,35 +22,32 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
 import workbench.interfaces.ResultLogger;
 import workbench.resource.ResourceMgr;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Action to clear the contents of the message display
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class ClearMessagesAction
-	extends WbAction
-{
-	private ResultLogger logdisplay;
-	
-	public ClearMessagesAction(ResultLogger log)
-	{
-		super();
-		logdisplay = log;
-		this.initMenuDefinition("MnuTxtClearLog");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-		this.setEnabled(true);
-	}
+    extends WbAction {
+  private ResultLogger logdisplay;
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		if (logdisplay != null)
-		{
-			logdisplay.clearLog();
-		}
-	}
+  public ClearMessagesAction(ResultLogger log) {
+    super();
+    logdisplay = log;
+    this.initMenuDefinition("MnuTxtClearLog");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+    this.setEnabled(true);
+  }
+
+  @Override
+  public void executeAction(ActionEvent e) {
+    if (logdisplay != null) {
+      logdisplay.clearLog();
+    }
+  }
 }

@@ -22,117 +22,138 @@
  */
 package workbench.gui.settings;
 
-import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import workbench.interfaces.Restoreable;
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
 import workbench.gui.components.WbColorPicker;
 import workbench.gui.editor.SyntaxStyle;
 import workbench.gui.editor.SyntaxUtilities;
 import workbench.gui.editor.Token;
+import workbench.interfaces.Restoreable;
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class EditorColorsPanel
-	extends JPanel
-	implements Restoreable
-{
+    extends JPanel
+    implements Restoreable {
 
-	public EditorColorsPanel()
-	{
-		initComponents();
-	}
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private WbColorPicker bgColor;
+  private JLabel bgColorLabel;
+  private WbColorPicker blockComments;
+  private JLabel blockCommentsLabel;
+  private WbColorPicker currLineColor;
+  private JLabel currLineLabel;
+  private WbColorPicker cursorColor;
+  private JLabel cursorLabel;
+  private JLabel dataTypesLabel;
+  private WbColorPicker datatypes;
+  private JPanel editorColors;
+  private WbColorPicker errorColor;
+  private JLabel errorColorLabel;
+  private JLabel functionsLabel;
+  private WbColorPicker keyword1;
+  private WbColorPicker keyword2;
+  private WbColorPicker keyword3;
+  private JLabel keywordsLabel;
+  private WbColorPicker lineComments;
+  private JLabel lineCommentsLabel;
+  private WbColorPicker literals;
+  private JLabel literalsLabel;
+  private WbColorPicker operators;
+  private JLabel operatorsLabel;
+  private JLabel quoteIdLabel;
+  private WbColorPicker quotedIds;
+  private WbColorPicker selectionColor;
+  private JLabel selectionColorLabel;
+  private JPanel syntaxColors;
+  private WbColorPicker textColor;
+  private JLabel textColorLabel;
+  private JLabel wbCommandsLabel;
+  public EditorColorsPanel() {
+    initComponents();
+  }
 
-	@Override
-	public void restoreSettings()
-	{
-		Settings sett = Settings.getInstance();
+  @Override
+  public void restoreSettings() {
+    Settings sett = Settings.getInstance();
 
-		SyntaxStyle[] defaultStyles = SyntaxUtilities.getDefaultSyntaxStyles();
+    SyntaxStyle[] defaultStyles = SyntaxUtilities.getDefaultSyntaxStyles();
 
-		textColor.setDefaultLabelKey("LblDefaultIndicator");
-		bgColor.setDefaultLabelKey("LblDefaultIndicator");
+    textColor.setDefaultLabelKey("LblDefaultIndicator");
+    bgColor.setDefaultLabelKey("LblDefaultIndicator");
 
-		Color fg = sett.getColor(Settings.PROPERTY_EDITOR_FG_COLOR, null);
-		textColor.setSelectedColor(fg);
+    Color fg = sett.getColor(Settings.PROPERTY_EDITOR_FG_COLOR, null);
+    textColor.setSelectedColor(fg);
 
-		Color bg = sett.getColor(Settings.PROPERTY_EDITOR_BG_COLOR, null);
-		bgColor.setSelectedColor(bg);
+    Color bg = sett.getColor(Settings.PROPERTY_EDITOR_BG_COLOR, null);
+    bgColor.setSelectedColor(bg);
 
-		Color c1 = sett.getColor("workbench.editor.color.comment1", defaultStyles[Token.COMMENT1].getColor());
-		blockComments.setSelectedColor(c1);
+    Color c1 = sett.getColor("workbench.editor.color.comment1", defaultStyles[Token.COMMENT1].getColor());
+    blockComments.setSelectedColor(c1);
 
-		Color c2 = sett.getColor("workbench.editor.color.comment2", defaultStyles[Token.COMMENT2].getColor());
-		lineComments.setSelectedColor(c2);
+    Color c2 = sett.getColor("workbench.editor.color.comment2", defaultStyles[Token.COMMENT2].getColor());
+    lineComments.setSelectedColor(c2);
 
-		Color k1 = sett.getColor("workbench.editor.color.keyword1", defaultStyles[Token.KEYWORD1].getColor());
-		keyword1.setSelectedColor(k1);
+    Color k1 = sett.getColor("workbench.editor.color.keyword1", defaultStyles[Token.KEYWORD1].getColor());
+    keyword1.setSelectedColor(k1);
 
-		Color k2 = sett.getColor("workbench.editor.color.keyword2", defaultStyles[Token.KEYWORD2].getColor());
-		keyword2.setSelectedColor(k2);
+    Color k2 = sett.getColor("workbench.editor.color.keyword2", defaultStyles[Token.KEYWORD2].getColor());
+    keyword2.setSelectedColor(k2);
 
-		Color k3 = sett.getColor("workbench.editor.color.keyword3", defaultStyles[Token.KEYWORD3].getColor());
-		keyword3.setSelectedColor(k3);
+    Color k3 = sett.getColor("workbench.editor.color.keyword3", defaultStyles[Token.KEYWORD3].getColor());
+    keyword3.setSelectedColor(k3);
 
-		Color l1 = sett.getColor("workbench.editor.color.literal1", defaultStyles[Token.LITERAL1].getColor());
-		literals.setSelectedColor(l1);
+    Color l1 = sett.getColor("workbench.editor.color.literal1", defaultStyles[Token.LITERAL1].getColor());
+    literals.setSelectedColor(l1);
 
-		Color l2 = sett.getColor("workbench.editor.color.literal2", defaultStyles[Token.LITERAL1].getColor());
-		quotedIds.setSelectedColor(l2);
+    Color l2 = sett.getColor("workbench.editor.color.literal2", defaultStyles[Token.LITERAL1].getColor());
+    quotedIds.setSelectedColor(l2);
 
-		Color op = sett.getColor("workbench.editor.color.operator", defaultStyles[Token.OPERATOR].getColor());
-		operators.setSelectedColor(op);
+    Color op = sett.getColor("workbench.editor.color.operator", defaultStyles[Token.OPERATOR].getColor());
+    operators.setSelectedColor(op);
 
-		Color dt = sett.getEditorDatatypeColor();
-		datatypes.setSelectedColor(dt);
+    Color dt = sett.getEditorDatatypeColor();
+    datatypes.setSelectedColor(dt);
 
-		errorColor.setSelectedColor(Settings.getInstance().getEditorErrorColor());
-		selectionColor.setSelectedColor(Settings.getInstance().getEditorSelectionColor());
-		currLineColor.setSelectedColor(Settings.getInstance().getEditorCurrentLineColor());
-		cursorColor.setSelectedColor(Settings.getInstance().getEditorCursorColor());
-	}
+    errorColor.setSelectedColor(Settings.getInstance().getEditorErrorColor());
+    selectionColor.setSelectedColor(Settings.getInstance().getEditorSelectionColor());
+    currLineColor.setSelectedColor(Settings.getInstance().getEditorCurrentLineColor());
+    cursorColor.setSelectedColor(Settings.getInstance().getEditorCursorColor());
+  }
 
-	@Override
-	public void saveSettings()
-	{
-		Settings sett = Settings.getInstance();
-		sett.setColor("workbench.editor.color.comment1", blockComments.getSelectedColor());
-		sett.setColor("workbench.editor.color.comment2", lineComments.getSelectedColor());
-		sett.setColor("workbench.editor.color.keyword1", keyword1.getSelectedColor());
-		sett.setColor("workbench.editor.color.keyword2", keyword2.getSelectedColor());
-		sett.setColor("workbench.editor.color.keyword3", keyword3.getSelectedColor());
-		sett.setColor("workbench.editor.color.literal1", literals.getSelectedColor());
-		sett.setColor("workbench.editor.color.operator", operators.getSelectedColor());
+  @Override
+  public void saveSettings() {
+    Settings sett = Settings.getInstance();
+    sett.setColor("workbench.editor.color.comment1", blockComments.getSelectedColor());
+    sett.setColor("workbench.editor.color.comment2", lineComments.getSelectedColor());
+    sett.setColor("workbench.editor.color.keyword1", keyword1.getSelectedColor());
+    sett.setColor("workbench.editor.color.keyword2", keyword2.getSelectedColor());
+    sett.setColor("workbench.editor.color.keyword3", keyword3.getSelectedColor());
+    sett.setColor("workbench.editor.color.literal1", literals.getSelectedColor());
+    sett.setColor("workbench.editor.color.operator", operators.getSelectedColor());
 
-		sett.setEditorErrorColor(errorColor.getSelectedColor());
-		sett.setEditorCurrentLineColor(currLineColor.getSelectedColor());
-		sett.setEditorSelectionColor(selectionColor.getSelectedColor());
-		sett.setEditorBackgroundColor(bgColor.getSelectedColor());
-		sett.setEditorTextColor(textColor.getSelectedColor());
-		sett.setEditorCursorColor(cursorColor.getSelectedColor());
-		sett.setEditorDatatypeColor(datatypes.getSelectedColor());
-	}
+    sett.setEditorErrorColor(errorColor.getSelectedColor());
+    sett.setEditorCurrentLineColor(currLineColor.getSelectedColor());
+    sett.setEditorSelectionColor(selectionColor.getSelectedColor());
+    sett.setEditorBackgroundColor(bgColor.getSelectedColor());
+    sett.setEditorTextColor(textColor.getSelectedColor());
+    sett.setEditorCursorColor(cursorColor.getSelectedColor());
+    sett.setEditorDatatypeColor(datatypes.getSelectedColor());
+  }
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
-	@SuppressWarnings("unchecked")
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
+  @SuppressWarnings("unchecked")
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     GridBagConstraints gridBagConstraints;
 
     syntaxColors = new JPanel();
@@ -441,39 +462,6 @@ public class EditorColorsPanel
     gridBagConstraints.insets = new Insets(7, 9, 7, 9);
     add(editorColors, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private WbColorPicker bgColor;
-  private JLabel bgColorLabel;
-  private WbColorPicker blockComments;
-  private JLabel blockCommentsLabel;
-  private WbColorPicker currLineColor;
-  private JLabel currLineLabel;
-  private WbColorPicker cursorColor;
-  private JLabel cursorLabel;
-  private JLabel dataTypesLabel;
-  private WbColorPicker datatypes;
-  private JPanel editorColors;
-  private WbColorPicker errorColor;
-  private JLabel errorColorLabel;
-  private JLabel functionsLabel;
-  private WbColorPicker keyword1;
-  private WbColorPicker keyword2;
-  private WbColorPicker keyword3;
-  private JLabel keywordsLabel;
-  private WbColorPicker lineComments;
-  private JLabel lineCommentsLabel;
-  private WbColorPicker literals;
-  private JLabel literalsLabel;
-  private WbColorPicker operators;
-  private JLabel operatorsLabel;
-  private JLabel quoteIdLabel;
-  private WbColorPicker quotedIds;
-  private WbColorPicker selectionColor;
-  private JLabel selectionColorLabel;
-  private JPanel syntaxColors;
-  private WbColorPicker textColor;
-  private JLabel textColorLabel;
-  private JLabel wbCommandsLabel;
   // End of variables declaration//GEN-END:variables
 
 }

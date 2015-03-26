@@ -22,11 +22,11 @@
  */
 package workbench.gui;
 
-import java.awt.Component;
-import java.awt.event.KeyEvent;
-import javax.swing.DefaultFocusManager;
-import javax.swing.KeyStroke;
 import workbench.gui.actions.WbAction;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
 
 /**
  * A focus manager which can grab focus traversal keys before they
@@ -43,81 +43,72 @@ import workbench.gui.actions.WbAction;
  * Currently only two (named) actions are supported, but this can easily
  * be changed to support a variable number of actions by storing them
  * in a Map.
+ *
  * @author Thomas Kellerer
  */
 public class WbFocusManager
-	extends DefaultFocusManager
-{
-	private WbAction nextTab;
-	private WbAction prevTab;
+    extends DefaultFocusManager {
+  private WbAction nextTab;
+  private WbAction prevTab;
 
-	protected static class LazyInstanceHolder
-	{
-		protected static final WbFocusManager instance = new WbFocusManager();
-	}
-	
-	public static WbFocusManager getInstance()
-	{
-		return LazyInstanceHolder.instance;
-	}
+  private WbFocusManager() {
+  }
 
-	private WbFocusManager()
-	{
-	}
+  public static WbFocusManager getInstance() {
+    return LazyInstanceHolder.instance;
+  }
 
-	/**
-	 * Define the two actions to be grabbed by this focus manager.
-	 * <br>
-	 * As these actions are window specific, the window that wants to
-	 * override the focus traversal keys, needs to regiters these actions
-	 * in the windowActivated event.
-	 * <br>
-	 * To make sure, the actions are executed for the correct window, the window
-	 * must de-register the actions in the windowDeactivated event by passing <tt>null</tt>
-	 * for the two parameters
-	 *
-	 * @param next the action for "Next tab", may be null
-	 * @param prev the action for "previous tab", may be null
-	 */
-	public void grabActions(WbAction next, WbAction prev)
-	{
-		synchronized (LazyInstanceHolder.instance)
-		{
-			nextTab = next;
-			prevTab = prev;
-		}
-	}
+  /**
+   * Define the two actions to be grabbed by this focus manager.
+   * <br>
+   * As these actions are window specific, the window that wants to
+   * override the focus traversal keys, needs to regiters these actions
+   * in the windowActivated event.
+   * <br>
+   * To make sure, the actions are executed for the correct window, the window
+   * must de-register the actions in the windowDeactivated event by passing <tt>null</tt>
+   * for the two parameters
+   *
+   * @param next the action for "Next tab", may be null
+   * @param prev the action for "previous tab", may be null
+   */
+  public void grabActions(WbAction next, WbAction prev) {
+    synchronized (LazyInstanceHolder.instance) {
+      nextTab = next;
+      prevTab = prev;
+    }
+  }
 
-	/**
-	 * Process the key event for focus traversal. If the keyStroke identified
-	 * by the passed event maps to one of the actions registered with grabActions()
-	 * the action is executed, and the event is marked as consumed.
-	 * <br>
-	 * The focusedComponent
-	 * @param focusedComponent
-	 * @param anEvent
-	 */
-	public void processKeyEvent(Component focusedComponent, KeyEvent anEvent)
-	{
-		KeyStroke key = KeyStroke.getKeyStrokeForEvent(anEvent);
+  /**
+   * Process the key event for focus traversal. If the keyStroke identified
+   * by the passed event maps to one of the actions registered with grabActions()
+   * the action is executed, and the event is marked as consumed.
+   * <br>
+   * The focusedComponent
+   *
+   * @param focusedComponent
+   * @param anEvent
+   */
+  public void processKeyEvent(Component focusedComponent, KeyEvent anEvent) {
+    KeyStroke key = KeyStroke.getKeyStrokeForEvent(anEvent);
 
-		synchronized (LazyInstanceHolder.instance)
-		{
-			if (nextTab != null && nextTab.getAccelerator().equals(key))
-			{
-				anEvent.consume();
-				nextTab.actionPerformed(null);
-				return;
-			}
-			else if (prevTab != null && prevTab.getAccelerator().equals(key))
-			{
-				anEvent.consume();
-				prevTab.actionPerformed(null);
-				return;
-			}
-		}
-		// the call to super may not be synchronized, otherwise I have seen
-		// deadlocks when tabbing through the controls of a dialog
-		super.processKeyEvent(focusedComponent, anEvent);
-	}
+    synchronized (LazyInstanceHolder.instance) {
+      if (nextTab != null && nextTab.getAccelerator().equals(key)) {
+        anEvent.consume();
+        nextTab.actionPerformed(null);
+        return;
+      } else if (prevTab != null && prevTab.getAccelerator().equals(key)) {
+        anEvent.consume();
+        prevTab.actionPerformed(null);
+        return;
+      }
+    }
+    // the call to super may not be synchronized, otherwise I have seen
+    // deadlocks when tabbing through the controls of a dialog
+    super.processKeyEvent(focusedComponent, anEvent);
+  }
+
+  protected static class LazyInstanceHolder {
+    protected static final WbFocusManager instance = new WbFocusManager();
+  }
 }

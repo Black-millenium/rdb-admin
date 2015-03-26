@@ -22,6 +22,15 @@
  */
 package workbench.console;
 
+import workbench.interfaces.ResultSetConsumer;
+import workbench.log.LogMgr;
+import workbench.resource.ResourceMgr;
+import workbench.sql.StatementRunnerResult;
+import workbench.storage.ResultInfo;
+import workbench.storage.RowData;
+import workbench.storage.RowDataReader;
+import workbench.storage.RowDataReaderFactory;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.PrintStream;
@@ -32,137 +41,110 @@ import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
-import workbench.interfaces.ResultSetConsumer;
-import workbench.log.LogMgr;
-import workbench.resource.ResourceMgr;
-
-import workbench.storage.*;
-
-import workbench.sql.StatementRunnerResult;
-
 /**
  * A class to print the contents of a ResultSet to a PrintStream.
  * The column widths are calculated by the suggested display size of the
  * columns of the ResultSet
  *
- * @see workbench.db.ColumnIdentifier#getDisplaySize()
- *
  * @author Thomas Kellerer
+ * @see workbench.db.ColumnIdentifier#getDisplaySize()
  */
 public class ResultSetPrinter
-	extends ConsolePrinter
-	implements ResultSetConsumer, PropertyChangeListener
-{
-	private static final int MAX_WIDTH = 80;
-	private PrintWriter pw;
-	private ResultInfo info;
+    extends ConsolePrinter
+    implements ResultSetConsumer, PropertyChangeListener {
+  private static final int MAX_WIDTH = 80;
+  private PrintWriter pw;
+  private ResultInfo info;
 
-	public ResultSetPrinter(PrintStream out)
-		throws SQLException
-	{
-		super();
-		pw = new PrintWriter(out);
-	}
+  public ResultSetPrinter(PrintStream out)
+      throws SQLException {
+    super();
+    pw = new PrintWriter(out);
+  }
 
-	@Override
-	public boolean ignoreMaxRows()
-	{
-		return false;
-	}
+  @Override
+  public boolean ignoreMaxRows() {
+    return false;
+  }
 
-	@Override
-	public void cancel()
-		throws SQLException
-	{
+  @Override
+  public void cancel()
+      throws SQLException {
 
-	}
+  }
 
-	@Override
-	public void done()
-	{
-	}
+  @Override
+  public void done() {
+  }
 
-	@Override
-	protected String getResultName()
-	{
-		return null;
-	}
+  @Override
+  protected String getResultName() {
+    return null;
+  }
 
-	@Override
-	protected int getColumnType(int col)
-	{
-		return (info == null ? Types.OTHER : info.getColumnType(col));
-	}
+  @Override
+  protected int getColumnType(int col) {
+    return (info == null ? Types.OTHER : info.getColumnType(col));
+  }
 
-	@Override
-	protected int getColumnCount()
-	{
-		return (info == null ? 0 : info.getColumnCount());
-	}
+  @Override
+  protected int getColumnCount() {
+    return (info == null ? 0 : info.getColumnCount());
+  }
 
-	@Override
-	protected String getColumnName(int col)
-	{
-		return (info == null ? "" : info.getColumnName(col));
-	}
+  @Override
+  protected String getColumnName(int col) {
+    return (info == null ? "" : info.getColumnName(col));
+  }
 
-	@Override
-	protected Map<Integer, Integer> getColumnSizes()
-	{
-		Map<Integer, Integer> widths = new HashMap<>();
-		for (int i=0; i < info.getColumnCount(); i++)
-		{
-			int nameWidth = info.getColumnName(i).length();
-			int colSize = info.getColumn(i).getDisplaySize();
+  @Override
+  protected Map<Integer, Integer> getColumnSizes() {
+    Map<Integer, Integer> widths = new HashMap<>();
+    for (int i = 0; i < info.getColumnCount(); i++) {
+      int nameWidth = info.getColumnName(i).length();
+      int colSize = info.getColumn(i).getDisplaySize();
 
-			int width = Math.max(nameWidth, colSize);
-			width = Math.min(width, MAX_WIDTH);
-			widths.put(Integer.valueOf(i), Integer.valueOf(width));
-		}
-		return widths;
-	}
+      int width = Math.max(nameWidth, colSize);
+      width = Math.min(width, MAX_WIDTH);
+      widths.put(Integer.valueOf(i), Integer.valueOf(width));
+    }
+    return widths;
+  }
 
-	@Override
-	public void consumeResult(StatementRunnerResult toConsume)
-	{
-		ResultSet data = toConsume.getResultSets().get(0);
+  @Override
+  public void consumeResult(StatementRunnerResult toConsume) {
+    ResultSet data = toConsume.getResultSets().get(0);
 
-		try
-		{
-			info = new ResultInfo(data.getMetaData(), null);
-			printHeader(pw);
+    try {
+      info = new ResultInfo(data.getMetaData(), null);
+      printHeader(pw);
 
-			//RowData row = new RowData(info);
-			RowDataReader reader = RowDataReaderFactory.createReader(info, null);
-			int count = 0;
-			while (data.next())
-			{
-				RowData row = reader.read(data, false);
-				printRow(pw, row, count);
-				reader.closeStreams();
-				count ++;
-			}
+      //RowData row = new RowData(info);
+      RowDataReader reader = RowDataReaderFactory.createReader(info, null);
+      int count = 0;
+      while (data.next()) {
+        RowData row = reader.read(data, false);
+        printRow(pw, row, count);
+        reader.closeStreams();
+        count++;
+      }
 
-			if (toConsume.getShowRowCount())
-			{
-				pw.println();
-				pw.println(ResourceMgr.getFormattedString("MsgRows", count));
-			}
-			pw.flush();
-		}
-		catch (Exception e)
-		{
-			LogMgr.logError("ResultSetPrinter.consumeResult", "Error when printing ResultSet", e);
-		}
-	}
+      if (toConsume.getShowRowCount()) {
+        pw.println();
+        pw.println(ResourceMgr.getFormattedString("MsgRows", count));
+      }
+      pw.flush();
+    } catch (Exception e) {
+      LogMgr.logError("ResultSetPrinter.consumeResult", "Error when printing ResultSet", e);
+    }
+  }
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt)
-	{
-		if (evt.getSource() != ConsoleSettings.getInstance()) return;
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+    if (evt.getSource() != ConsoleSettings.getInstance()) return;
 
-		RowDisplay newDisplay = ConsoleSettings.getInstance().getNextRowDisplay();
-		setPrintRowsAsLine(newDisplay == RowDisplay.SingleLine);
-	}
+    RowDisplay newDisplay = ConsoleSettings.getInstance().getNextRowDisplay();
+    setPrintRowsAsLine(newDisplay == RowDisplay.SingleLine);
+  }
 
 }

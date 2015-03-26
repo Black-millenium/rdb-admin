@@ -22,35 +22,32 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
 import workbench.interfaces.Replaceable;
 import workbench.resource.PlatformShortcuts;
 import workbench.resource.ResourceMgr;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
- *	Start search & replace in the editor
- *	@author  Thomas Kellerer
+ * Start search & replace in the editor
+ *
+ * @author Thomas Kellerer
  */
-public class ReplaceAction extends WbAction
-{
-	private Replaceable client;
+public class ReplaceAction extends WbAction {
+  private Replaceable client;
 
-	public ReplaceAction(Replaceable aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtReplace",KeyStroke.getKeyStroke(KeyEvent.VK_H, PlatformShortcuts.getDefaultModifier()));
-		this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-		this.setDescriptiveName(ResourceMgr.getString("TxtEdPrefix") + " " + getMenuLabel());
-	}
+  public ReplaceAction(Replaceable aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtReplace", KeyStroke.getKeyStroke(KeyEvent.VK_H, PlatformShortcuts.getDefaultModifier()));
+    this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+    this.setDescriptiveName(ResourceMgr.getString("TxtEdPrefix") + " " + getMenuLabel());
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.replace();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.replace();
+  }
 }

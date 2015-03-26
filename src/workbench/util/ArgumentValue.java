@@ -25,20 +25,17 @@ package workbench.util;
 import java.util.Comparator;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ArgumentValue
-{
-	String getDisplay();
-	String getValue();
+public interface ArgumentValue {
+  Comparator<ArgumentValue> COMPARATOR = new Comparator<ArgumentValue>() {
+    @Override
+    public int compare(ArgumentValue o1, ArgumentValue o2) {
+      return o1.getValue().compareToIgnoreCase(o2.getValue());
+    }
+  };
 
-	Comparator<ArgumentValue> COMPARATOR = new Comparator<ArgumentValue>()
-	{
-		@Override
-		public int compare(ArgumentValue o1, ArgumentValue o2)
-		{
-			return o1.getValue().compareToIgnoreCase(o2.getValue());
-		}
-	};
+  String getDisplay();
+
+  String getValue();
 }

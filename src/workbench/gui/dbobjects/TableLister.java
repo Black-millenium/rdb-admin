@@ -25,10 +25,8 @@ package workbench.gui.dbobjects;
 import workbench.db.TableIdentifier;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface TableLister
-{
-	void selectTable(TableIdentifier table);
+public interface TableLister {
+  void selectTable(TableIdentifier table);
 }

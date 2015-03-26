@@ -22,75 +22,63 @@
  */
 package workbench.gui.renderer;
 
-import java.awt.Component;
-import java.awt.Dimension;
-
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableCellRenderer;
-
 import workbench.resource.IconMgr;
 import workbench.resource.ResourceMgr;
-
 import workbench.storage.RowData;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
 
 /**
  * A renderer to display the status of a row in the result set.
  * <br/>
  * It displays different icons for new and modified, depending on the status of the row.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class RowStatusRenderer
-	extends DefaultTableCellRenderer
-{
-	private final ImageIcon modifiedIcon = IconMgr.getInstance().getLabelIcon("modifiedrow");
-	private final ImageIcon newIcon = IconMgr.getInstance().getLabelIcon("newrow");
+    extends DefaultTableCellRenderer {
+  private final ImageIcon modifiedIcon = IconMgr.getInstance().getLabelIcon("modifiedrow");
+  private final ImageIcon newIcon = IconMgr.getInstance().getLabelIcon("newrow");
 
-	private final String newTip = ResourceMgr.getString("TxtRowNew");
-	private final String modifiedTip = ResourceMgr.getString("TxtRowModified");
-	private final String notModifiedTip = ResourceMgr.getString("TxtRowNotModified");
+  private final String newTip = ResourceMgr.getString("TxtRowNew");
+  private final String modifiedTip = ResourceMgr.getString("TxtRowModified");
+  private final String notModifiedTip = ResourceMgr.getString("TxtRowNotModified");
 
-	public RowStatusRenderer()
-	{
-		super();
-		Dimension dim = new Dimension(modifiedIcon.getIconWidth() + 2, newIcon.getIconHeight() + 2);
-		this.setMaximumSize(dim);
-		this.setMinimumSize(dim);
-		this.setPreferredSize(dim);
-		this.setText(null);
-		this.setIconTextGap(0);
-		this.setHorizontalAlignment(JLabel.LEFT);
-	}
+  public RowStatusRenderer() {
+    super();
+    Dimension dim = new Dimension(modifiedIcon.getIconWidth() + 2, newIcon.getIconHeight() + 2);
+    this.setMaximumSize(dim);
+    this.setMinimumSize(dim);
+    this.setPreferredSize(dim);
+    this.setText(null);
+    this.setIconTextGap(0);
+    this.setHorizontalAlignment(JLabel.LEFT);
+  }
 
-	@Override
-	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
-	{
-		try
-		{
-			int status = (value == null ? RowData.NOT_MODIFIED : ((Integer)value).intValue());
-			switch (status)
-			{
-				case RowData.NEW:
-					this.setIcon(newIcon);
-					this.setToolTipText(newTip);
-					break;
-				case RowData.MODIFIED:
-					this.setIcon(modifiedIcon);
-					this.setToolTipText(modifiedTip);
-					break;
-				default:
-					this.setIcon(null);
-					this.setToolTipText(notModifiedTip);
-			}
-		}
-		catch (Exception e)
-		{
-			this.setIcon(null);
-			this.setToolTipText(notModifiedTip);
-		}
-		return this;
-	}
+  @Override
+  public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+    try {
+      int status = (value == null ? RowData.NOT_MODIFIED : ((Integer) value).intValue());
+      switch (status) {
+        case RowData.NEW:
+          this.setIcon(newIcon);
+          this.setToolTipText(newTip);
+          break;
+        case RowData.MODIFIED:
+          this.setIcon(modifiedIcon);
+          this.setToolTipText(modifiedTip);
+          break;
+        default:
+          this.setIcon(null);
+          this.setToolTipText(notModifiedTip);
+      }
+    } catch (Exception e) {
+      this.setIcon(null);
+      this.setToolTipText(notModifiedTip);
+    }
+    return this;
+  }
 
 }

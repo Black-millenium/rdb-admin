@@ -27,9 +27,9 @@ import java.sql.SQLException;
 /**
  * @author Thomas Kellerer
  */
-public interface BlobLiteralFormatter
-{
-	CharSequence getBlobLiteral(Object value)
-		throws SQLException;
-	BlobLiteralType getType();
+public interface BlobLiteralFormatter {
+  CharSequence getBlobLiteral(Object value)
+      throws SQLException;
+
+  BlobLiteralType getType();
 }

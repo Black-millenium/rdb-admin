@@ -22,16 +22,14 @@
  */
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-
 import workbench.log.LogMgr;
 import workbench.resource.ResourceMgr;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
-
 import workbench.util.ArgumentParser;
 import workbench.util.ArgumentType;
+
+import java.sql.SQLException;
 
 /**
  * Control the level of feedback during script execution.
@@ -39,112 +37,85 @@ import workbench.util.ArgumentType;
  * @author Thomas Kellerer
  */
 public class WbFeedback
-	extends SqlCommand
-{
-	public static final String VERB = "WbFeedback";
-	private final String command;
+    extends SqlCommand {
+  public static final String VERB = "WbFeedback";
+  private final String command;
 
-	public WbFeedback()
-	{
-		this(VERB);
-	}
+  public WbFeedback() {
+    this(VERB);
+  }
 
-	public WbFeedback(String verb)
-	{
-		super();
-		this.command = verb;
-		this.cmdLine = new ArgumentParser(false);
-		this.cmdLine.addArgument("on", ArgumentType.BoolSwitch);
-		this.cmdLine.addArgument("off", ArgumentType.BoolSwitch);
-		this.cmdLine.addArgument("quiet", ArgumentType.BoolSwitch);
-		this.cmdLine.addArgument("traceon", ArgumentType.BoolSwitch);
-		this.cmdLine.addArgument("traceoff", ArgumentType.BoolSwitch);
-	}
+  public WbFeedback(String verb) {
+    super();
+    this.command = verb;
+    this.cmdLine = new ArgumentParser(false);
+    this.cmdLine.addArgument("on", ArgumentType.BoolSwitch);
+    this.cmdLine.addArgument("off", ArgumentType.BoolSwitch);
+    this.cmdLine.addArgument("quiet", ArgumentType.BoolSwitch);
+    this.cmdLine.addArgument("traceon", ArgumentType.BoolSwitch);
+    this.cmdLine.addArgument("traceoff", ArgumentType.BoolSwitch);
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return command;
-	}
+  @Override
+  public String getVerb() {
+    return command;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
-		result.setSuccess();
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult();
+    result.setSuccess();
 
-		cmdLine.parse(getCommandLine(sql));
+    cmdLine.parse(getCommandLine(sql));
 
-		boolean quiet = cmdLine.getBoolean("quiet");
+    boolean quiet = cmdLine.getBoolean("quiet");
 
-		if (cmdLine.getBoolean("off"))
-		{
-			this.runner.setVerboseLogging(false);
-			if (quiet)
-			{
-				LogMgr.logInfo("WbFeedbac.execute()", "Feedback disabled");
-			}
-			else
-			{
-				result.addMessageByKey("MsgFeedbackDisabled");
-			}
-		}
-		else if (cmdLine.getBoolean("on"))
-		{
-			this.runner.setVerboseLogging(true);
-			if (quiet)
-			{
-				LogMgr.logInfo("WbFeedbac.execute()", "Feedback enabled");
-			}
-			else
-			{
-				result.addMessageByKey("MsgFeedbackEnabled");
-			}
-		}
-		else if (cmdLine.getBoolean("traceon"))
-		{
-			result.setSuccess();
-			this.runner.setTraceStatements(true);
-			if (!quiet) result.addMessageByKey("MsgTraceOn");
-		}
-		else if (cmdLine.getBoolean("traceoff"))
-		{
-			result.setSuccess();
-			this.runner.setTraceStatements(false);
-			if (!quiet) result.addMessageByKey("MsgTraceOff");
-		}
-		else if (cmdLine.hasUnknownArguments())
-		{
-			result.setFailure();
-			result.addMessage(ResourceMgr.getString("ErrFeedbackWrongParameter"));
-		}
-		else
-		{
-			// no parameter, show the current status
-			if (runner.getVerboseLogging())
-			{
-				result.addMessageByKey("MsgFeedbackEnabled");
-			}
-			else
-			{
-				result.addMessageByKey("MsgFeedbackDisabled");
-			}
-			result.setSuccess();
-		}
-		return result;
-	}
+    if (cmdLine.getBoolean("off")) {
+      this.runner.setVerboseLogging(false);
+      if (quiet) {
+        LogMgr.logInfo("WbFeedbac.execute()", "Feedback disabled");
+      } else {
+        result.addMessageByKey("MsgFeedbackDisabled");
+      }
+    } else if (cmdLine.getBoolean("on")) {
+      this.runner.setVerboseLogging(true);
+      if (quiet) {
+        LogMgr.logInfo("WbFeedbac.execute()", "Feedback enabled");
+      } else {
+        result.addMessageByKey("MsgFeedbackEnabled");
+      }
+    } else if (cmdLine.getBoolean("traceon")) {
+      result.setSuccess();
+      this.runner.setTraceStatements(true);
+      if (!quiet) result.addMessageByKey("MsgTraceOn");
+    } else if (cmdLine.getBoolean("traceoff")) {
+      result.setSuccess();
+      this.runner.setTraceStatements(false);
+      if (!quiet) result.addMessageByKey("MsgTraceOff");
+    } else if (cmdLine.hasUnknownArguments()) {
+      result.setFailure();
+      result.addMessage(ResourceMgr.getString("ErrFeedbackWrongParameter"));
+    } else {
+      // no parameter, show the current status
+      if (runner.getVerboseLogging()) {
+        result.addMessageByKey("MsgFeedbackEnabled");
+      } else {
+        result.addMessageByKey("MsgFeedbackDisabled");
+      }
+      result.setSuccess();
+    }
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 
 }

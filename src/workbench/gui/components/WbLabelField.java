@@ -22,14 +22,12 @@
  */
 package workbench.gui.components;
 
-import java.awt.Font;
+import workbench.gui.actions.WbAction;
 
-import javax.swing.JTextField;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicTextFieldUI;
-
-import workbench.gui.actions.WbAction;
+import java.awt.*;
 
 /**
  * A label that is built from a JTextField so that the text can
@@ -38,24 +36,20 @@ import workbench.gui.actions.WbAction;
  * @author Thomas Kellerer
  */
 public class WbLabelField
-  extends JTextField
-{
+    extends JTextField {
   private TextComponentMouseListener mouseListener;
 
-  public WbLabelField()
-  {
+  public WbLabelField() {
     super();
     init();
   }
 
-  public WbLabelField(String text)
-  {
+  public WbLabelField(String text) {
     super(text);
     init();
   }
 
-  private void init()
-  {
+  private void init() {
     setUI(new BasicTextFieldUI());
     setEditable(false);
     setOpaque(true);
@@ -69,28 +63,23 @@ public class WbLabelField
   }
 
   @Override
-  public void setText(String t)
-  {
+  public void setText(String t) {
     super.setText(t);
     setCaretPosition(0);
   }
 
-  public void useBoldFont()
-  {
+  public void useBoldFont() {
     Font std = getFont();
     Font bold = std.deriveFont(Font.BOLD);
     setFont(bold);
   }
 
-  public void addPopupAction(WbAction a)
-  {
+  public void addPopupAction(WbAction a) {
     mouseListener.addAction(a);
   }
 
-  public void dispose()
-  {
-    if (mouseListener != null)
-    {
+  public void dispose() {
+    if (mouseListener != null) {
       mouseListener.dispose();
     }
   }

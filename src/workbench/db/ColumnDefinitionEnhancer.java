@@ -23,10 +23,8 @@
 package workbench.db;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ColumnDefinitionEnhancer
-{
-	void updateColumnDefinition(TableDefinition table, WbConnection conn);
+public interface ColumnDefinitionEnhancer {
+  void updateColumnDefinition(TableDefinition table, WbConnection conn);
 }

@@ -25,11 +25,14 @@ package workbench.interfaces;
 /**
  * @author Thomas Kellerer
  */
-public interface StatusBar
-{
-	void setStatusMessage(String message);
-	void setStatusMessage(String message, int duration);
-	void clearStatusMessage();
-	void doRepaint();
-	String getText();
+public interface StatusBar {
+  void setStatusMessage(String message);
+
+  void setStatusMessage(String message, int duration);
+
+  void clearStatusMessage();
+
+  void doRepaint();
+
+  String getText();
 }

@@ -23,15 +23,18 @@
 package workbench.interfaces;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface DbData
-{
-	int addRow();
-	void deleteRow();
-	void deleteRowWithDependencies();
-	boolean startEdit();
-	int duplicateRow();
-	void endEdit();
+public interface DbData {
+  int addRow();
+
+  void deleteRow();
+
+  void deleteRowWithDependencies();
+
+  boolean startEdit();
+
+  int duplicateRow();
+
+  void endEdit();
 }

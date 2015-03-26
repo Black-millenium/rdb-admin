@@ -22,189 +22,175 @@
  */
 package workbench.gui.dialogs;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.List;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JDialog;
-
-import workbench.log.LogMgr;
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
 import workbench.gui.WbSwingUtilities;
 import workbench.gui.actions.EscAction;
 import workbench.gui.components.BlobHandler;
 import workbench.gui.components.EncodingPanel;
 import workbench.gui.components.FlatButton;
-
+import workbench.log.LogMgr;
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
 import workbench.util.ExceptionUtil;
 import workbench.util.FileDialogUtil;
 import workbench.util.StringUtil;
 import workbench.util.ToolDefinition;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.List;
+
 /**
  * A dialog to display information about a BLOB from a result set.
- *
+ * <p/>
  * The dialog offers the following features:
  * <ul>
- *	<li>Download the contents of the BLOB</li>
- *  <li>Upload a file to be stored in the BLOB column</li>
- *  <li>View the blob information as a hex dump</li>
- *  <li>View the BLOB information as an image</li>
- *  <li>Open the BLOB with an external tool</li>
+ * <li>Download the contents of the BLOB</li>
+ * <li>Upload a file to be stored in the BLOB column</li>
+ * <li>View the blob information as a hex dump</li>
+ * <li>View the BLOB information as an image</li>
+ * <li>Open the BLOB with an external tool</li>
  * </ul>
- * @author  Thomas Kellerer
+ *
+ * @author Thomas Kellerer
  */
 public class BlobInfoDialog
-	extends JDialog
-	implements ActionListener
-{
-	private Object blobValue;
-	private BlobHandler handler;
-	private EscAction escAction;
-	private File uploadFile;
-	private boolean hasTools = false;
-	private boolean setToNull = false;
+    extends JDialog
+    implements ActionListener {
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  public javax.swing.JButton closeButton;
+  public workbench.gui.components.EncodingPanel encodingPanel;
+  public javax.swing.JComboBox externalTools;
+  public javax.swing.JButton externalViewer;
+  public javax.swing.JLabel infoLabel;
+  public javax.swing.JPanel jPanel1;
+  public javax.swing.JButton saveAsButton;
+  public javax.swing.JButton setNullButton;
+  public javax.swing.JButton showAsTextButton;
+  public javax.swing.JButton showHexButton;
+  public javax.swing.JButton showImageButton;
+  public javax.swing.JButton uploadButton;
+  private Object blobValue;
+  private BlobHandler handler;
+  private EscAction escAction;
+  private File uploadFile;
+  private boolean hasTools = false;
+  private boolean setToNull = false;
 
-	public BlobInfoDialog(java.awt.Frame parent, boolean modal, boolean readOnly)
-	{
-		super(parent, modal);
-		initComponents();
-		handler = new BlobHandler();
+  public BlobInfoDialog(java.awt.Frame parent, boolean modal, boolean readOnly) {
+    super(parent, modal);
+    initComponents();
+    handler = new BlobHandler();
 
-		getRootPane().setDefaultButton(closeButton);
-		escAction = new EscAction(this, this);
+    getRootPane().setDefaultButton(closeButton);
+    escAction = new EscAction(this, this);
 
-		String encoding = Settings.getInstance().getDefaultBlobTextEncoding();
-		encodingPanel.setEncoding(encoding);
-		List<ToolDefinition> tools = Settings.getInstance().getExternalTools(true, true);
-		this.hasTools = (tools != null && tools.size() > 0);
-		this.externalViewer.setEnabled(hasTools);
-		this.externalTools.setEnabled(hasTools);
-		if (hasTools)
-		{
-			DefaultComboBoxModel model = new DefaultComboBoxModel();
-			String name = Settings.getInstance().getLastUsedBlobTool();
-			int toSelect = -1;
+    String encoding = Settings.getInstance().getDefaultBlobTextEncoding();
+    encodingPanel.setEncoding(encoding);
+    List<ToolDefinition> tools = Settings.getInstance().getExternalTools(true, true);
+    this.hasTools = (tools != null && tools.size() > 0);
+    this.externalViewer.setEnabled(hasTools);
+    this.externalTools.setEnabled(hasTools);
+    if (hasTools) {
+      DefaultComboBoxModel model = new DefaultComboBoxModel();
+      String name = Settings.getInstance().getLastUsedBlobTool();
+      int toSelect = -1;
 
-			for (int i = 0; i < tools.size(); i++)
-			{
-				model.addElement(tools.get(i));
-				if (StringUtil.equalString(name, tools.get(i).getName()))
-				{
-					toSelect = i;
-				}
-			}
+      for (int i = 0; i < tools.size(); i++) {
+        model.addElement(tools.get(i));
+        if (StringUtil.equalString(name, tools.get(i).getName())) {
+          toSelect = i;
+        }
+      }
 
-			this.externalTools.setModel(model);
-			if (toSelect != -1)
-			{
-				this.externalTools.setSelectedIndex(toSelect);
-			}
-		}
-		uploadButton.setEnabled(!readOnly);
-		setNullButton.setEnabled(!readOnly);
-		WbSwingUtilities.center(this, parent);
-	}
+      this.externalTools.setModel(model);
+      if (toSelect != -1) {
+        this.externalTools.setSelectedIndex(toSelect);
+      }
+    }
+    uploadButton.setEnabled(!readOnly);
+    setNullButton.setEnabled(!readOnly);
+    WbSwingUtilities.center(this, parent);
+  }
 
-	public File getUploadedFile()
-	{
-		return uploadFile;
-	}
+  public File getUploadedFile() {
+    return uploadFile;
+  }
 
-	public boolean setToNull()
-	{
-		return setToNull;
-	}
+  public boolean setToNull() {
+    return setToNull;
+  }
 
-	public byte[] getNewValue()
-	{
-		return handler.getNewValue();
-	}
+  public byte[] getNewValue() {
+    return handler.getNewValue();
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		if (e.getSource() == escAction)
-		{
-			closeWindow();
-		}
-	}
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == escAction) {
+      closeWindow();
+    }
+  }
 
-	private void closeWindow()
-	{
-		setVisible(false);
-		dispose();
-	}
+  private void closeWindow() {
+    setVisible(false);
+    dispose();
+  }
 
-	public void setBlobValue(Object value)
-	{
-		this.blobValue = value;
-		String lbl = null;
-		if (value instanceof File)
-		{
-			lbl = ResourceMgr.getString("LblFileSize");
-		}
-		else
-		{
-			lbl = ResourceMgr.getString("LblBlobSize");
-		}
-		long len = 0;
+  public void setBlobValue(Object value) {
+    this.blobValue = value;
+    String lbl = null;
+    if (value instanceof File) {
+      lbl = ResourceMgr.getString("LblFileSize");
+    } else {
+      lbl = ResourceMgr.getString("LblBlobSize");
+    }
+    long len = 0;
 
-		if (value == null)
-		{
-			lbl += ": (null)";
-		}
-		else
-		{
-			len = handler.getBlobSize(blobValue);
-			lbl = lbl + ": " + Long.toString(len) + " Byte";
-		}
-		infoLabel.setText(lbl);
-		if (value instanceof File)
-		{
-			infoLabel.setToolTipText(value.toString());
-		}
-		else
-		{
-			infoLabel.setToolTipText(handler.getByteDisplay(len).toString());
-		}
-		// Show as text is always enabled to allow text editing
-		// for null BLOBs as well.
+    if (value == null) {
+      lbl += ": (null)";
+    } else {
+      len = handler.getBlobSize(blobValue);
+      lbl = lbl + ": " + Long.toString(len) + " Byte";
+    }
+    infoLabel.setText(lbl);
+    if (value instanceof File) {
+      infoLabel.setToolTipText(value.toString());
+    } else {
+      infoLabel.setToolTipText(handler.getByteDisplay(len).toString());
+    }
+    // Show as text is always enabled to allow text editing
+    // for null BLOBs as well.
 
-		saveAsButton.setEnabled(len > 0);
-		showImageButton.setEnabled(len > 0);
-		showHexButton.setEnabled(len > 0);
-		showAsTextButton.setEnabled(len > 0);
-		externalViewer.setEnabled(len > 0 && hasTools);
-	}
+    saveAsButton.setEnabled(len > 0);
+    showImageButton.setEnabled(len > 0);
+    showHexButton.setEnabled(len > 0);
+    showAsTextButton.setEnabled(len > 0);
+    externalViewer.setEnabled(len > 0 && hasTools);
+  }
 
-	private void openWithExternalViewer()
-	{
-		try
-		{
-			File f = File.createTempFile("wb$tmp_", ".data");
-			f.deleteOnExit();
-			BlobHandler.saveBlobToFile(this.blobValue, f.getAbsolutePath());
-			ToolDefinition tool = (ToolDefinition)this.externalTools.getSelectedItem();
-			tool.runApplication(f.getAbsolutePath());
-			Settings.getInstance().setLastUsedBlobTool(tool.getName());
-		}
-		catch (Exception e)
-		{
-			LogMgr.logError("BlobInfoDialog.openWithExternalViewer()", "Error running external program", e);
-			String msg = ExceptionUtil.getDisplay(e);
-			WbSwingUtilities.showErrorMessage(this, msg);
-		}
-	}
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  private void openWithExternalViewer() {
+    try {
+      File f = File.createTempFile("wb$tmp_", ".data");
+      f.deleteOnExit();
+      BlobHandler.saveBlobToFile(this.blobValue, f.getAbsolutePath());
+      ToolDefinition tool = (ToolDefinition) this.externalTools.getSelectedItem();
+      tool.runApplication(f.getAbsolutePath());
+      Settings.getInstance().setLastUsedBlobTool(tool.getName());
+    } catch (Exception e) {
+      LogMgr.logError("BlobInfoDialog.openWithExternalViewer()", "Error running external program", e);
+      String msg = ExceptionUtil.getDisplay(e);
+      WbSwingUtilities.showErrorMessage(this, msg);
+    }
+  }
+
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
@@ -391,110 +377,87 @@ public class BlobInfoDialog
     pack();
   }// </editor-fold>//GEN-END:initComponents
 
-	private void setNullButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_setNullButtonActionPerformed
-	{//GEN-HEADEREND:event_setNullButtonActionPerformed
-		this.setToNull = true;
-		closeWindow();
-	}//GEN-LAST:event_setNullButtonActionPerformed
+  private void setNullButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_setNullButtonActionPerformed
+  {//GEN-HEADEREND:event_setNullButtonActionPerformed
+    this.setToNull = true;
+    closeWindow();
+  }//GEN-LAST:event_setNullButtonActionPerformed
 
-	private void showHexButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_showHexButtonActionPerformed
-	{//GEN-HEADEREND:event_showHexButtonActionPerformed
-		try
-		{
-			byte[] data = handler.getBlobAsArray(this.blobValue);
-			if (data == null)
-			{
-				WbSwingUtilities.showErrorMessageKey(this, "MsgBlobNotRetrieved");
-				return;
-			}
-			HexViewer v = new HexViewer(this, ResourceMgr.getString("TxtBlobData"));
-			v.setData(data);
-			v.setVisible(true);
-		}
-		catch (Exception e)
-		{
-			LogMgr.logError("BlobInfoDialog.showHexButtonActionPerformed()", "Error showing hex data", e);
-		}
-	}//GEN-LAST:event_showHexButtonActionPerformed
+  private void showHexButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_showHexButtonActionPerformed
+  {//GEN-HEADEREND:event_showHexButtonActionPerformed
+    try {
+      byte[] data = handler.getBlobAsArray(this.blobValue);
+      if (data == null) {
+        WbSwingUtilities.showErrorMessageKey(this, "MsgBlobNotRetrieved");
+        return;
+      }
+      HexViewer v = new HexViewer(this, ResourceMgr.getString("TxtBlobData"));
+      v.setData(data);
+      v.setVisible(true);
+    } catch (Exception e) {
+      LogMgr.logError("BlobInfoDialog.showHexButtonActionPerformed()", "Error showing hex data", e);
+    }
+  }//GEN-LAST:event_showHexButtonActionPerformed
 
-	private void showAsTextButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_showAsTextButtonActionPerformed
-	{//GEN-HEADEREND:event_showAsTextButtonActionPerformed
-		if (handler.showBlobAsText(this, this.blobValue, encodingPanel.getEncoding()))
-		{
-			// if the blob has been edited, then clear the upload file in case
-			// there was one.
-			this.uploadFile = null;
-		}
-	}//GEN-LAST:event_showAsTextButtonActionPerformed
+  private void showAsTextButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_showAsTextButtonActionPerformed
+  {//GEN-HEADEREND:event_showAsTextButtonActionPerformed
+    if (handler.showBlobAsText(this, this.blobValue, encodingPanel.getEncoding())) {
+      // if the blob has been edited, then clear the upload file in case
+      // there was one.
+      this.uploadFile = null;
+    }
+  }//GEN-LAST:event_showAsTextButtonActionPerformed
 
-	private void saveAsButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_saveAsButtonActionPerformed
-	{//GEN-HEADEREND:event_saveAsButtonActionPerformed
-		long fileSize = -1;
-		try
-		{
-			String file = FileDialogUtil.getBlobFile(this);
-			if (file == null) return;
+  private void saveAsButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_saveAsButtonActionPerformed
+  {//GEN-HEADEREND:event_saveAsButtonActionPerformed
+    long fileSize = -1;
+    try {
+      String file = FileDialogUtil.getBlobFile(this);
+      if (file == null) return;
 
-			fileSize = BlobHandler.saveBlobToFile(blobValue, file);
-			String msg = ResourceMgr.getString("MsgBlobSaved");
-			File f = new File(file);
-			msg = StringUtil.replace(msg, "%filename%", f.getAbsolutePath());
-			fileSize = f.length();
-			msg = StringUtil.replace(msg, "%filesize%", Long.toString(fileSize));
-			WbSwingUtilities.showMessage(this, msg);
-		}
-		catch (Exception ex)
-		{
-			LogMgr.logError("WbTable.saveBlobContent", "Error when writing data file", ex);
-			String msg = ResourceMgr.getString("ErrBlobSaveError");
-			msg += "\n" + ExceptionUtil.getDisplay(ex);
-			WbSwingUtilities.showErrorMessage(this, msg);
-		}
-	}//GEN-LAST:event_saveAsButtonActionPerformed
+      fileSize = BlobHandler.saveBlobToFile(blobValue, file);
+      String msg = ResourceMgr.getString("MsgBlobSaved");
+      File f = new File(file);
+      msg = StringUtil.replace(msg, "%filename%", f.getAbsolutePath());
+      fileSize = f.length();
+      msg = StringUtil.replace(msg, "%filesize%", Long.toString(fileSize));
+      WbSwingUtilities.showMessage(this, msg);
+    } catch (Exception ex) {
+      LogMgr.logError("WbTable.saveBlobContent", "Error when writing data file", ex);
+      String msg = ResourceMgr.getString("ErrBlobSaveError");
+      msg += "\n" + ExceptionUtil.getDisplay(ex);
+      WbSwingUtilities.showErrorMessage(this, msg);
+    }
+  }//GEN-LAST:event_saveAsButtonActionPerformed
 
-	private void uploadButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_uploadButtonActionPerformed
-	{//GEN-HEADEREND:event_uploadButtonActionPerformed
-		String file = FileDialogUtil.getBlobFile(this, false);
-		if (file != null)
-		{
-			this.uploadFile = new File(file);
-		}
-	}//GEN-LAST:event_uploadButtonActionPerformed
+  private void uploadButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_uploadButtonActionPerformed
+  {//GEN-HEADEREND:event_uploadButtonActionPerformed
+    String file = FileDialogUtil.getBlobFile(this, false);
+    if (file != null) {
+      this.uploadFile = new File(file);
+    }
+  }//GEN-LAST:event_uploadButtonActionPerformed
 
-	private void showImageButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_showImageButtonActionPerformed
-	{//GEN-HEADEREND:event_showImageButtonActionPerformed
-		this.handler.showBlobAsImage(this, this.blobValue);
-	}//GEN-LAST:event_showImageButtonActionPerformed
+  private void showImageButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_showImageButtonActionPerformed
+  {//GEN-HEADEREND:event_showImageButtonActionPerformed
+    this.handler.showBlobAsImage(this, this.blobValue);
+  }//GEN-LAST:event_showImageButtonActionPerformed
 
-	private void externalViewerActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_externalViewerActionPerformed
-	{//GEN-HEADEREND:event_externalViewerActionPerformed
-		openWithExternalViewer();
-	}//GEN-LAST:event_externalViewerActionPerformed
+  private void externalViewerActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_externalViewerActionPerformed
+  {//GEN-HEADEREND:event_externalViewerActionPerformed
+    openWithExternalViewer();
+  }//GEN-LAST:event_externalViewerActionPerformed
 
-	private void formWindowClosed(java.awt.event.WindowEvent evt)//GEN-FIRST:event_formWindowClosed
-	{//GEN-HEADEREND:event_formWindowClosed
-		String encoding = encodingPanel.getEncoding();
-		Settings.getInstance().setDefaultBlobTextEncoding(encoding);
-	}//GEN-LAST:event_formWindowClosed
+  private void formWindowClosed(java.awt.event.WindowEvent evt)//GEN-FIRST:event_formWindowClosed
+  {//GEN-HEADEREND:event_formWindowClosed
+    String encoding = encodingPanel.getEncoding();
+    Settings.getInstance().setDefaultBlobTextEncoding(encoding);
+  }//GEN-LAST:event_formWindowClosed
 
-	private void closeButtonMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_closeButtonMouseClicked
-	{//GEN-HEADEREND:event_closeButtonMouseClicked
-		closeWindow();
-	}//GEN-LAST:event_closeButtonMouseClicked
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  public javax.swing.JButton closeButton;
-  public workbench.gui.components.EncodingPanel encodingPanel;
-  public javax.swing.JComboBox externalTools;
-  public javax.swing.JButton externalViewer;
-  public javax.swing.JLabel infoLabel;
-  public javax.swing.JPanel jPanel1;
-  public javax.swing.JButton saveAsButton;
-  public javax.swing.JButton setNullButton;
-  public javax.swing.JButton showAsTextButton;
-  public javax.swing.JButton showHexButton;
-  public javax.swing.JButton showImageButton;
-  public javax.swing.JButton uploadButton;
+  private void closeButtonMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_closeButtonMouseClicked
+  {//GEN-HEADEREND:event_closeButtonMouseClicked
+    closeWindow();
+  }//GEN-LAST:event_closeButtonMouseClicked
   // End of variables declaration//GEN-END:variables
 
 }

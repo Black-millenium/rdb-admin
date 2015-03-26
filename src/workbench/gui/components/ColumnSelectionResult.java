@@ -22,17 +22,16 @@
  */
 package workbench.gui.components;
 
-import java.util.List;
 import workbench.db.ColumnIdentifier;
 
+import java.util.List;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public class ColumnSelectionResult
-{
-	public boolean includeHeaders;
-	public boolean selectedOnly;
-	public boolean formatText;
-	public List<ColumnIdentifier> columns;
+public class ColumnSelectionResult {
+  public boolean includeHeaders;
+  public boolean selectedOnly;
+  public boolean formatText;
+  public List<ColumnIdentifier> columns;
 }

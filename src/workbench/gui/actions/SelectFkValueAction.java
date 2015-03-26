@@ -22,36 +22,31 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.gui.components.WbTable;
 import workbench.gui.sql.LookupValuePicker;
 
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class SelectFkValueAction
-	extends WbAction
-{
-	private WbTable client;
+    extends WbAction {
+  private WbTable client;
 
-	public SelectFkValueAction(WbTable data)
-	{
-		initMenuDefinition("MnuTxtSelectFkValue");
-		client = data;
-	}
+  public SelectFkValueAction(WbTable data) {
+    initMenuDefinition("MnuTxtSelectFkValue");
+    client = data;
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		LookupValuePicker.openPicker(client);
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    LookupValuePicker.openPicker(client);
+  }
 
-	@Override
-	public boolean allowDuplicate()
-	{
-		return true;
-	}
+  @Override
+  public boolean allowDuplicate() {
+    return true;
+  }
 
 }

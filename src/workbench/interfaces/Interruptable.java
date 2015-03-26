@@ -23,11 +23,10 @@
 package workbench.interfaces;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface Interruptable
-{
-	void cancelExecution();
-	boolean confirmCancel();
+public interface Interruptable {
+  void cancelExecution();
+
+  boolean confirmCancel();
 }

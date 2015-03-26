@@ -25,30 +25,24 @@ package workbench.gui.fontzoom;
 import java.awt.event.KeyEvent;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class DecreaseFontSize
-	extends FontSizeAction
-{
-	public DecreaseFontSize()
-	{
-		super("TxtEdFntDecr", KeyEvent.VK_SUBTRACT, KeyEvent.CTRL_MASK, null);
-	}
+    extends FontSizeAction {
+  public DecreaseFontSize() {
+    super("TxtEdFntDecr", KeyEvent.VK_SUBTRACT, KeyEvent.CTRL_MASK, null);
+  }
 
-	public DecreaseFontSize(FontZoomer fontZoomer)
-	{
-		super("TxtEdFntDecr", KeyEvent.VK_SUBTRACT, KeyEvent.CTRL_MASK, fontZoomer);
-	}
+  public DecreaseFontSize(FontZoomer fontZoomer) {
+    super("TxtEdFntDecr", KeyEvent.VK_SUBTRACT, KeyEvent.CTRL_MASK, fontZoomer);
+  }
 
-	public DecreaseFontSize(String key, FontZoomer fontZoomer)
-	{
-		super(key, KeyEvent.VK_SUBTRACT, KeyEvent.CTRL_MASK, fontZoomer);
-	}
+  public DecreaseFontSize(String key, FontZoomer fontZoomer) {
+    super(key, KeyEvent.VK_SUBTRACT, KeyEvent.CTRL_MASK, fontZoomer);
+  }
 
-	@Override
-	public void doFontChange(FontZoomer fontZoomer)
-	{
-		fontZoomer.decreaseFontSize();
-	}
+  @Override
+  public void doFontChange(FontZoomer fontZoomer) {
+    fontZoomer.decreaseFontSize();
+  }
 }

@@ -22,42 +22,36 @@
  */
 package workbench.gui.renderer;
 
-import javax.swing.JLabel;
-
+import workbench.db.JdbcProcedureReader;
 import workbench.log.LogMgr;
 
-import workbench.db.JdbcProcedureReader;
+import javax.swing.*;
 
 /**
  * Displays the return type of a stored procedure as a readable text.
  * <br/>
- * @see workbench.db.JdbcProcedureReader#convertProcTypeToSQL(int)
  *
+ * @see workbench.db.JdbcProcedureReader#convertProcTypeToSQL(int)
+ * <p/>
  * * @author Thomas Kellerer
  */
 public class ProcStatusRenderer
-	extends ToolTipRenderer
-{
+    extends ToolTipRenderer {
 
-	public ProcStatusRenderer()
-	{
-		super();
-		this.setHorizontalAlignment(JLabel.LEFT);
-	}
+  public ProcStatusRenderer() {
+    super();
+    this.setHorizontalAlignment(JLabel.LEFT);
+  }
 
-	@Override
-	public void prepareDisplay(Object value)
-	{
-		try
-		{
-			Integer status = (Integer)value;
-			this.displayValue = JdbcProcedureReader.convertProcTypeToSQL(status.intValue());
-		}
-		catch (ClassCastException cce)
-		{
-			LogMgr.logWarning("ProdStatusRenderer.prepareDisplay()", "The current value (" + value + ") is not an Integer!", cce);
-			this.displayValue = (value == null ? "" : value.toString());
-		}
-	}
+  @Override
+  public void prepareDisplay(Object value) {
+    try {
+      Integer status = (Integer) value;
+      this.displayValue = JdbcProcedureReader.convertProcTypeToSQL(status.intValue());
+    } catch (ClassCastException cce) {
+      LogMgr.logWarning("ProdStatusRenderer.prepareDisplay()", "The current value (" + value + ") is not an Integer!", cce);
+      this.displayValue = (value == null ? "" : value.toString());
+    }
+  }
 
 }

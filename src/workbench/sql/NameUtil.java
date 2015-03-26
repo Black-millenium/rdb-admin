@@ -23,78 +23,68 @@
 package workbench.sql;
 
 import workbench.db.IdentifierCase;
-
 import workbench.util.SqlUtil;
 import workbench.util.StringUtil;
 
 /**
  * Utility methods that can be used in an XSLT Script.
- *
+ * <p/>
  * To use them, add a namespace for this class:
- *
+ * <p/>
  * <tt>xmlns:wb="workbench.sql.NameUtil"</tt>
- *
+ * <p/>
  * then inside the XSLT, this can be used like this:
- *
+ * <p/>
  * <code>
  * &lt;xsl:variable name="tablename" select="wb:camelCaseToSnake(table-name)"/&gt;
  * </code>
  *
  * @author Thomas Kellerer
  */
-public class NameUtil
-{
+public class NameUtil {
   private static final String INVALID_CHARS = "- .:\\/\"'!%&()=?+*";
 
   /**
    * Cleanup an identifier and convert CamelCase to SNAKE_CASE
    *
-   * @param input  the identifier to cleanup
+   * @param input the identifier to cleanup
    * @return a clean identifier in uppercase
    */
-  public static String camelCaseToSnakeUpper(String input)
-  {
+  public static String camelCaseToSnakeUpper(String input) {
     return camelCaseToSnake(input, IdentifierCase.upper);
   }
 
   /**
    * Cleanup an identifier and convert CamelCase to snake_case
    *
-   * @param input  the identifier to cleanup
+   * @param input the identifier to cleanup
    * @return a clean identifier in lowercase
    */
-  public static String camelCaseToSnakeLower(String input)
-  {
+  public static String camelCaseToSnakeLower(String input) {
     return camelCaseToSnake(input, IdentifierCase.lower);
   }
 
-  public static String camelCaseToSnake(String input)
-  {
+  public static String camelCaseToSnake(String input) {
     return camelCaseToSnake(input, IdentifierCase.mixed);
   }
 
-  public static String camelCaseToSnake(String input, IdentifierCase idCase)
-  {
+  public static String camelCaseToSnake(String input, IdentifierCase idCase) {
     if (input == null) return "";
     input = SqlUtil.removeObjectQuotes(input);
 
     StringBuilder result = new StringBuilder(input.length() + 5);
     char current = 0;
     char previous = 0;
-    for (int i=0; i < input.length(); i++)
-    {
+    for (int i = 0; i < input.length(); i++) {
       current = input.charAt(i);
-      if (Character.isUpperCase(current) && (Character.isLowerCase(previous) || Character.isWhitespace(previous)) && previous != '_')
-      {
+      if (Character.isUpperCase(current) && (Character.isLowerCase(previous) || Character.isWhitespace(previous)) && previous != '_') {
         result.append('_');
       }
-      if (Character.isWhitespace(current) || (!Character.isDigit(current) && !Character.isLetter(current)) || INVALID_CHARS.indexOf(current) > -1)
-      {
+      if (Character.isWhitespace(current) || (!Character.isDigit(current) && !Character.isLetter(current)) || INVALID_CHARS.indexOf(current) > -1) {
         current = '_';
       }
       previous = current;
-      switch (idCase)
-      {
+      switch (idCase) {
         case lower:
           result.append(Character.toLowerCase(current));
           break;
@@ -112,23 +102,20 @@ public class NameUtil
   /**
    * Cleanup an identifier and optionally convert to lowercase
    *
-   * @param input  the identifier to cleanup
+   * @param input the identifier to cleanup
    * @return a clean identifier
    */
-   public static String cleanupIdentifier(String input, String lowerCase)
-  {
+  public static String cleanupIdentifier(String input, String lowerCase) {
     if (input == null) return "";
     boolean toLowerCase = StringUtil.stringToBool(lowerCase);
     input = SqlUtil.removeObjectQuotes(input);
-    if (toLowerCase)
-    {
+    if (toLowerCase) {
       input = input.toLowerCase();
     }
     return SqlUtil.cleanupIdentifier(input);
   }
 
-   public static String quoteIfNeeded(String input)
-   {
-     return SqlUtil.quoteObjectname(input, false, true, '"');
-   }
+  public static String quoteIfNeeded(String input) {
+    return SqlUtil.quoteObjectname(input, false, true, '"');
+  }
 }

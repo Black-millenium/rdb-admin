@@ -22,78 +22,62 @@
  */
 package workbench.gui.renderer;
 
-import javax.swing.SwingConstants;
 import workbench.log.LogMgr;
 import workbench.util.WbDateFormatter;
+
+import javax.swing.*;
 
 /**
  * A class to render date and timestamp values.
  * <br/>
  * The values are formatted according to the global settings.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class DateColumnRenderer
-	extends ToolTipRenderer
-{
-	private final WbDateFormatter dateFormatter;
+    extends ToolTipRenderer {
+  public static final String DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss";
+  private final WbDateFormatter dateFormatter;
 
-	public static final String DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss";
+  public DateColumnRenderer() {
+    super();
+    this.dateFormatter = new WbDateFormatter(DEFAULT_FORMAT);
+    this.setHorizontalAlignment(SwingConstants.RIGHT);
+  }
 
-	public DateColumnRenderer()
-	{
-		super();
-		this.dateFormatter = new WbDateFormatter(DEFAULT_FORMAT);
-		this.setHorizontalAlignment(SwingConstants.RIGHT);
-	}
+  public DateColumnRenderer(String aDateFormat) {
+    this();
+    this.setFormat(aDateFormat);
+  }
 
-	public DateColumnRenderer(String aDateFormat)
-	{
-		this();
-		this.setFormat(aDateFormat);
-	}
+  public final void setFormat(String aDateFormat) {
+    try {
+      synchronized (this.dateFormatter) {
+        this.dateFormatter.applyPattern(aDateFormat);
+      }
+    } catch (Exception e) {
+      LogMgr.logWarning("DateColumnRenderer.setFormat()", "Error when setting date format [" + aDateFormat + "] default format [" + DEFAULT_FORMAT + "] will be used instead", e);
+      this.dateFormatter.applyPattern(DEFAULT_FORMAT);
+    }
+  }
 
-	public final void setFormat(String aDateFormat)
-	{
-		try
-		{
-			synchronized (this.dateFormatter)
-			{
-				this.dateFormatter.applyPattern(aDateFormat);
-			}
-		}
-		catch (Exception e)
-		{
-			LogMgr.logWarning("DateColumnRenderer.setFormat()", "Error when setting date format [" + aDateFormat + "] default format [" + DEFAULT_FORMAT + "] will be used instead", e);
-			this.dateFormatter.applyPattern(DEFAULT_FORMAT);
-		}
-	}
+  @Override
+  public void prepareDisplay(Object value) {
+    try {
+      java.util.Date d = (java.util.Date) value;
+      synchronized (this.dateFormatter) {
+        this.displayValue = this.dateFormatter.format(d);
+      }
 
-	@Override
-	public void prepareDisplay(Object value)
-	{
-		try
-		{
-			java.util.Date d = (java.util.Date)value;
-			synchronized (this.dateFormatter)
-			{
-				this.displayValue = this.dateFormatter.format(d);
-			}
-
-			if (showTooltip)
-			{
-				this.tooltip = displayValue;
-			}
-			else
-			{
-				this.tooltip = null;
-			}
-		}
-		catch (Throwable cc)
-		{
-			this.displayValue = value.toString();
-			setTooltip(displayValue);
-		}
-	}
+      if (showTooltip) {
+        this.tooltip = displayValue;
+      } else {
+        this.tooltip = null;
+      }
+    } catch (Throwable cc) {
+      this.displayValue = value.toString();
+      setTooltip(displayValue);
+    }
+  }
 
 }

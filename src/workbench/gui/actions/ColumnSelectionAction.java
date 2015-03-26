@@ -22,36 +22,33 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
 import workbench.gui.sql.EditorPanel;
 import workbench.resource.ResourceMgr;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
- *	Action to enable column selection for the next selection in the editor
- *	@author  Thomas Kellerer
+ * Action to enable column selection for the next selection in the editor
+ *
+ * @author Thomas Kellerer
  */
-public class ColumnSelectionAction extends WbAction
-{
-	private EditorPanel client;
+public class ColumnSelectionAction extends WbAction {
+  private EditorPanel client;
 
-	public ColumnSelectionAction(EditorPanel aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtColumnSelection", KeyStroke.getKeyStroke(KeyEvent.VK_Q,KeyEvent.ALT_MASK));
-		this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-		this.setEnabled(true);
-	}
+  public ColumnSelectionAction(EditorPanel aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtColumnSelection", KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.ALT_MASK));
+    this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+    this.setEnabled(true);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.setSelectionRectangular(true);
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.setSelectionRectangular(true);
+  }
 
 
 }

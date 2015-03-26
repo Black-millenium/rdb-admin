@@ -32,58 +32,43 @@ import workbench.db.mssql.SqlServerTableSourceBuilder;
 import workbench.db.mysql.MySQLTableSourceBuilder;
 import workbench.db.oracle.OracleTableSourceBuilder;
 import workbench.db.postgres.PostgresTableSourceBuilder;
+import workbench.db.rdb.RdbTableSourceBuilder;
 
 /**
  * A factory to create a TableSourceBuilder.
  *
  * @author Thomas Kellerer
  */
-public class TableSourceBuilderFactory
-{
+public class TableSourceBuilderFactory {
 
-	public static TableSourceBuilder getBuilder(WbConnection con)
-	{
-		if (con.getMetadata().isPostgres())
-		{
-			return new PostgresTableSourceBuilder(con);
-		}
-		else if (con.getMetadata().isApacheDerby())
-		{
-			return new DerbyTableSourceBuilder(con);
-		}
-		else if (con.getMetadata().isOracle())
-		{
-			return new OracleTableSourceBuilder(con);
-		}
-		else if (con.getMetadata().isH2())
-		{
-			return new H2TableSourceBuilder(con);
-		}
-		else if (con.getMetadata().isMySql())
-		{
-			return new MySQLTableSourceBuilder(con);
-		}
-		else if (con.getMetadata().isSqlServer())
-		{
-			return new SqlServerTableSourceBuilder(con);
-		}
-		else if (con.getMetadata().isHsql())
-		{
-			return new HsqlTableSourceBuilder(con);
-		}
-		else if (con.getDbId().equals("db2"))
-		{
-			return new Db2TableSourceBuilder(con);
-		}
-		if (con.getDbId().equals("informix_dynamic_server"))
-		{
-			return new InformixTableSourceBuilder(con);
-		}
-		if (con.getMetadata().isFirebird())
-		{
-			return new FirebirdTableSourceBuilder(con);
-		}
-		return new TableSourceBuilder(con);
-	}
+  public static TableSourceBuilder getBuilder(WbConnection con) {
+    if (con.getMetadata().isPostgres()) {
+      return new PostgresTableSourceBuilder(con);
+    } else if (con.getMetadata().isApacheDerby()) {
+      return new DerbyTableSourceBuilder(con);
+    } else if (con.getMetadata().isOracle()) {
+      return new OracleTableSourceBuilder(con);
+    } else if (con.getMetadata().isH2()) {
+      return new H2TableSourceBuilder(con);
+    } else if (con.getMetadata().isMySql()) {
+      return new MySQLTableSourceBuilder(con);
+    } else if (con.getMetadata().isSqlServer()) {
+      return new SqlServerTableSourceBuilder(con);
+    } else if (con.getMetadata().isHsql()) {
+      return new HsqlTableSourceBuilder(con);
+    } else if (con.getDbId().equals("db2")) {
+      return new Db2TableSourceBuilder(con);
+    }
+    if (con.getDbId().equals("informix_dynamic_server")) {
+      return new InformixTableSourceBuilder(con);
+    }
+    if (con.getMetadata().isFirebird()) {
+      return new FirebirdTableSourceBuilder(con);
+    }
+    if (con.getMetadata().isRdb()) {
+      return new RdbTableSourceBuilder(con);
+    }
+    return new TableSourceBuilder(con);
+  }
 
 }

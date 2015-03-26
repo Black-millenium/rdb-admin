@@ -22,62 +22,53 @@
  */
 package workbench.db.exporter;
 
-import java.util.regex.Pattern;
 import workbench.db.ColumnIdentifier;
 import workbench.storage.RowData;
 import workbench.util.SqlUtil;
 
+import java.util.regex.Pattern;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class RegexReplacingModifier
-	implements ExportDataModifier
-{
-	private Pattern searchPattern;
-	private String replacement;
+    implements ExportDataModifier {
+  private Pattern searchPattern;
+  private String replacement;
 
-	public RegexReplacingModifier(String searchRegex, String replaceWith)
-	{
-		searchPattern = Pattern.compile(searchRegex);
-		replacement = replaceWith;
-	}
+  public RegexReplacingModifier(String searchRegex, String replaceWith) {
+    searchPattern = Pattern.compile(searchRegex);
+    replacement = replaceWith;
+  }
 
-	public String getRegex()
-	{
-		return searchPattern.pattern();
-	}
+  public String getRegex() {
+    return searchPattern.pattern();
+  }
 
-	public String getReplacement()
-	{
-		return replacement;
-	}
-	
-	@Override
-	public void modifyData(RowDataConverter converter, RowData row, long currentRowNumber)
-	{
-		int colCount = row.getColumnCount();
+  public String getReplacement() {
+    return replacement;
+  }
 
-		for (int col=0; col < colCount; col ++)
-		{
-			ColumnIdentifier column = converter.getResultInfo().getColumn(col);
-			if (converter.includeColumnInExport(col) && SqlUtil.isCharacterType(column.getDataType()))
-			{
-				String value = (String)row.getValue(col);
-				if (value != null)
-				{
-					row.setValue(col, replacePattern(value));
-				}
-			}
-		}
-	}
+  @Override
+  public void modifyData(RowDataConverter converter, RowData row, long currentRowNumber) {
+    int colCount = row.getColumnCount();
 
-	public String replacePattern(String value)
-	{
-		if (value == null) return null;
-		if (searchPattern == null) return value;
-		if (replacement == null) return value;
-		
-		return searchPattern.matcher(value).replaceAll(replacement);
-	}
+    for (int col = 0; col < colCount; col++) {
+      ColumnIdentifier column = converter.getResultInfo().getColumn(col);
+      if (converter.includeColumnInExport(col) && SqlUtil.isCharacterType(column.getDataType())) {
+        String value = (String) row.getValue(col);
+        if (value != null) {
+          row.setValue(col, replacePattern(value));
+        }
+      }
+    }
+  }
+
+  public String replacePattern(String value) {
+    if (value == null) return null;
+    if (searchPattern == null) return value;
+    if (replacement == null) return value;
+
+    return searchPattern.matcher(value).replaceAll(replacement);
+  }
 }

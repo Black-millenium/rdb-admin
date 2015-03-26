@@ -21,17 +21,15 @@
  */
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-
-import workbench.resource.ResourceMgr;
-
 import workbench.db.TableIdentifier;
 import workbench.db.ViewReader;
 import workbench.db.ViewReaderFactory;
-
+import workbench.resource.ResourceMgr;
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
 import workbench.util.StringUtil;
+
+import java.sql.SQLException;
 
 /**
  * Display the source code of a view.
@@ -39,56 +37,47 @@ import workbench.util.StringUtil;
  * @author Thomas Kellerer
  */
 public class WbViewSource
-	extends SqlCommand
-{
+    extends SqlCommand {
 
-	public static final String VERB = "WbViewSource";
+  public static final String VERB = "WbViewSource";
 
-	public WbViewSource()
-	{
-		super();
-	}
+  public WbViewSource() {
+    super();
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
-		String args = getCommandLine(sql);
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult();
+    String args = getCommandLine(sql);
 
-		TableIdentifier object = new TableIdentifier(args, currentConnection);
-		TableIdentifier tbl = currentConnection.getMetadata().findObject(object);
+    TableIdentifier object = new TableIdentifier(args, currentConnection);
+    TableIdentifier tbl = currentConnection.getMetadata().findObject(object);
 
-		CharSequence source = null;
-		if (tbl != null)
-		{
-			ViewReader reader = ViewReaderFactory.createViewReader(currentConnection);
-			source = reader.getExtendedViewSource(tbl, false);
-		}
+    CharSequence source = null;
+    if (tbl != null) {
+      ViewReader reader = ViewReaderFactory.createViewReader(currentConnection);
+      source = reader.getExtendedViewSource(tbl, false);
+    }
 
-		if (StringUtil.isNonEmpty(source))
-		{
-			result.addMessage(source);
-			result.setSuccess();
-		}
-		else
-		{
-			result.addMessage(ResourceMgr.getFormattedString("ErrViewNotFound", object.getObjectExpression(currentConnection)));
-			result.setFailure();
-		}
+    if (StringUtil.isNonEmpty(source)) {
+      result.addMessage(source);
+      result.setSuccess();
+    } else {
+      result.addMessage(ResourceMgr.getFormattedString("ErrViewNotFound", object.getObjectExpression(currentConnection)));
+      result.setFailure();
+    }
 
-		return result;
-	}
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 }

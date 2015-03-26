@@ -19,34 +19,27 @@
  */
 package workbench.gui.components;
 
-import java.awt.Component;
-import java.awt.event.ActionListener;
-
-import javax.swing.ComboBoxEditor;
-import javax.swing.JTextField;
-import javax.swing.text.DefaultCaret;
-
 import workbench.util.MacOSHelper;
 
+import javax.swing.*;
+import javax.swing.text.DefaultCaret;
+import java.awt.*;
+import java.awt.event.ActionListener;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class ComboboxEditorWrapper
-  implements ComboBoxEditor
-{
+    implements ComboBoxEditor {
   private final ComboBoxEditor delegate;
 
-  public ComboboxEditorWrapper(ComboBoxEditor editor)
-  {
+  public ComboboxEditorWrapper(ComboBoxEditor editor) {
     this.delegate = editor;
-    if (MacOSHelper.isMacOS())
-    {
+    if (MacOSHelper.isMacOS()) {
       // inspired by: http://stackoverflow.com/questions/1543480/mac-lf-problems-differing-behavior-of-jtextfield-requestfocus
       Component comp = editor.getEditorComponent();
-      if (comp instanceof JTextField)
-      {
-        JTextField text = (JTextField)comp;
+      if (comp instanceof JTextField) {
+        JTextField text = (JTextField) comp;
         text.putClientProperty("Quaqua.TextComponent.autoSelect", Boolean.FALSE);
         text.putClientProperty("Quaqua.TextField.autoSelect", Boolean.FALSE);
         text.putClientProperty("TextComponent.autoSelect", Boolean.FALSE);
@@ -57,45 +50,38 @@ public class ComboboxEditorWrapper
   }
 
   @Override
-  public Component getEditorComponent()
-  {
+  public Component getEditorComponent() {
     return delegate.getEditorComponent();
   }
 
   @Override
-  public void setItem(Object anObject)
-  {
+  public Object getItem() {
+    return delegate.getItem();
+  }
+
+  @Override
+  public void setItem(Object anObject) {
     String text = anObject == null ? "" : anObject.toString();
-    JTextField editor = (JTextField)delegate.getEditorComponent();
-    if (!editor.getText().equals(text))
-    {
+    JTextField editor = (JTextField) delegate.getEditorComponent();
+    if (!editor.getText().equals(text)) {
       // only call setText() but do not call selectAll()
       editor.setText(text);
     }
   }
 
   @Override
-  public Object getItem()
-  {
-    return delegate.getItem();
-  }
-
-  @Override
-  public void selectAll()
-  {
+  public void selectAll() {
     // don't do anything.
     // this is to avoid any implicit (and unwanted) selectAll() calls
   }
 
   @Override
-  public void addActionListener(ActionListener l)
-  {
+  public void addActionListener(ActionListener l) {
     delegate.addActionListener(l);
   }
 
   @Override
-  public void removeActionListener(ActionListener l)
-  {
+  public void removeActionListener(ActionListener l) {
     delegate.removeActionListener(l);
   }
 

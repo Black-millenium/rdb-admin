@@ -25,15 +25,12 @@ package workbench.gui.editor.actions;
 import java.awt.event.KeyEvent;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class SelectPreviousPage
-	extends PreviousPage
-{
-	public SelectPreviousPage()
-	{
-		super("TxtEdPrvPageSel", KeyEvent.VK_PAGE_UP, KeyEvent.SHIFT_MASK);
-		select = true;
-	}
+    extends PreviousPage {
+  public SelectPreviousPage() {
+    super("TxtEdPrvPageSel", KeyEvent.VK_PAGE_UP, KeyEvent.SHIFT_MASK);
+    select = true;
+  }
 }

@@ -22,22 +22,19 @@
  */
 package workbench.sql.wbcommands.console;
 
-import java.sql.SQLException;
-import java.util.List;
-
-import workbench.resource.ResourceMgr;
-
 import workbench.db.ConnectionMgr;
 import workbench.db.ConnectionProfile;
 import workbench.db.ProfileGroupMap;
-
+import workbench.resource.ResourceMgr;
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
-
 import workbench.util.ArgumentParser;
 import workbench.util.ArgumentType;
 import workbench.util.CollectionUtil;
 import workbench.util.StringUtil;
+
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * List all defined profiles
@@ -45,83 +42,72 @@ import workbench.util.StringUtil;
  * @author Thomas Kellerer
  */
 public class WbListProfiles
-	extends SqlCommand
-{
-	public static final String VERB = "WbListProfiles";
-	public static final String ARG_GROUP = "group";
-	public static final String ARG_GROUPS_ONLY = "groupsOnly";
+    extends SqlCommand {
+  public static final String VERB = "WbListProfiles";
+  public static final String ARG_GROUP = "group";
+  public static final String ARG_GROUPS_ONLY = "groupsOnly";
 
-	public WbListProfiles()
-	{
-		super();
-		cmdLine = new ArgumentParser();
-		cmdLine.addArgument(ARG_GROUP);
-		cmdLine.addArgument(ARG_GROUPS_ONLY, ArgumentType.BoolSwitch);
-	}
+  public WbListProfiles() {
+    super();
+    cmdLine = new ArgumentParser();
+    cmdLine.addArgument(ARG_GROUP);
+    cmdLine.addArgument(ARG_GROUPS_ONLY, ArgumentType.BoolSwitch);
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException, Exception
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException, Exception {
+    StatementRunnerResult result = new StatementRunnerResult();
 
-		cmdLine.parse(getCommandLine(sql));
-		String groupToShow = null;
-		if (cmdLine.isArgPresent(ARG_GROUP))
-		{
-			groupToShow = cmdLine.getValue(ARG_GROUP);
-		}
+    cmdLine.parse(getCommandLine(sql));
+    String groupToShow = null;
+    if (cmdLine.isArgPresent(ARG_GROUP)) {
+      groupToShow = cmdLine.getValue(ARG_GROUP);
+    }
 
-		boolean groupsOnly = cmdLine.getBoolean(ARG_GROUPS_ONLY);
+    boolean groupsOnly = cmdLine.getBoolean(ARG_GROUPS_ONLY);
 
-		// getProfiles() returns an unmodifiable List, but ProfileGroupMap
-		// will sort the list - which is not possible with an unmodifieable List
-		// so we need to create a shallow copy of the list from getProfiles()
-		List<ConnectionProfile> prof = CollectionUtil.arrayList();
-		prof.addAll(ConnectionMgr.getInstance().getProfiles());
-		ProfileGroupMap map = new ProfileGroupMap(prof);
+    // getProfiles() returns an unmodifiable List, but ProfileGroupMap
+    // will sort the list - which is not possible with an unmodifieable List
+    // so we need to create a shallow copy of the list from getProfiles()
+    List<ConnectionProfile> prof = CollectionUtil.arrayList();
+    prof.addAll(ConnectionMgr.getInstance().getProfiles());
+    ProfileGroupMap map = new ProfileGroupMap(prof);
 
-		String userTxt = ResourceMgr.getString("TxtUsername");
-		for (String group : map.keySet())
-		{
-			if (groupToShow == null || groupToShow.equalsIgnoreCase(group))
-			{
-				result.addMessage(group);
-				if (groupsOnly) continue;
-				
-				List<ConnectionProfile> profiles = map.get(group);
-				for (ConnectionProfile profile : profiles)
-				{
-					String msg = "  " + profile.getName();
-					if (StringUtil.isNonBlank(profile.getUsername()))
-					{
-						msg += ", " + userTxt + "=" + profile.getUsername();
-					}
-					msg += ", URL=" + profile.getUrl();
-					result.addMessage(msg);
-				}
-			}
-		}
-		result.setSuccess();
-		return result;
-	}
+    String userTxt = ResourceMgr.getString("TxtUsername");
+    for (String group : map.keySet()) {
+      if (groupToShow == null || groupToShow.equalsIgnoreCase(group)) {
+        result.addMessage(group);
+        if (groupsOnly) continue;
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+        List<ConnectionProfile> profiles = map.get(group);
+        for (ConnectionProfile profile : profiles) {
+          String msg = "  " + profile.getName();
+          if (StringUtil.isNonBlank(profile.getUsername())) {
+            msg += ", " + userTxt + "=" + profile.getUsername();
+          }
+          msg += ", URL=" + profile.getUrl();
+          result.addMessage(msg);
+        }
+      }
+    }
+    result.setSuccess();
+    return result;
+  }
+
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 
 }

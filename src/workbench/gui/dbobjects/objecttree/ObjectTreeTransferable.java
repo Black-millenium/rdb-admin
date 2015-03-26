@@ -27,19 +27,16 @@ import java.io.Serializable;
 
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class ObjectTreeTransferable
-implements Transferable, Serializable
-{
-	public static final DataFlavor DATA_FLAVOR = new DataFlavor(ObjectTreeNode.class, "DbObjectNode");
+    implements Transferable, Serializable {
+  public static final DataFlavor DATA_FLAVOR = new DataFlavor(ObjectTreeNode.class, "DbObjectNode");
 
   private ObjectTreeNode[] selection;
   private String connectionId;
 
-  public ObjectTreeTransferable(ObjectTreeNode[] nodes, String connId)
-  {
+  public ObjectTreeTransferable(ObjectTreeNode[] nodes, String connId) {
     selection = nodes;
     // I can't figure out how to pass a component through the Transferable interface
     // Storing the JTree always results in exceptions when accessing this Transferable in the drop() event.
@@ -47,31 +44,26 @@ implements Transferable, Serializable
   }
 
   @Override
-  public DataFlavor[] getTransferDataFlavors()
-  {
-    return new DataFlavor[] { DATA_FLAVOR };
+  public DataFlavor[] getTransferDataFlavors() {
+    return new DataFlavor[]{DATA_FLAVOR};
   }
 
   @Override
-  public boolean isDataFlavorSupported(DataFlavor flavor)
-  {
+  public boolean isDataFlavorSupported(DataFlavor flavor) {
     return DATA_FLAVOR.equals(flavor);
   }
 
   @Override
   public Object getTransferData(DataFlavor flavor)
-    throws UnsupportedFlavorException, IOException
-  {
+      throws UnsupportedFlavorException, IOException {
     return this;
   }
 
-  public ObjectTreeNode[] getSelectedNodes()
-  {
+  public ObjectTreeNode[] getSelectedNodes() {
     return selection;
   }
 
-  public String getConnectionId()
-  {
+  public String getConnectionId() {
     return connectionId;
   }
 

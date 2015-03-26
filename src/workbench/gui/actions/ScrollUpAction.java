@@ -22,37 +22,33 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import javax.swing.KeyStroke;
 import workbench.gui.editor.LineScroller;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class ScrollUpAction
-	extends WbAction
-{
-	private LineScroller client;
+    extends WbAction {
+  private LineScroller client;
 
-	public ScrollUpAction(LineScroller scroller)
-	{
-		super();
-		client = scroller;
-		initMenuDefinition("MnuTxtScrollUp", KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_MASK));
-	}
+  public ScrollUpAction(LineScroller scroller) {
+    super();
+    client = scroller;
+    initMenuDefinition("MnuTxtScrollUp", KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_MASK));
+  }
 
-	@Override
-	public boolean isEnabled()
-	{
-		return client != null && client.canScrollUp();
-	}
+  @Override
+  public boolean isEnabled() {
+    return client != null && client.canScrollUp();
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		client.scrollUp();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    client.scrollUp();
+  }
 
 }

@@ -22,22 +22,21 @@
  */
 package workbench.db.exporter;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-
 import workbench.db.ibm.Db2FormatFileWriter;
 import workbench.db.mssql.SqlServerFormatFileWriter;
 import workbench.db.mysql.MySQLLoadDataWriter;
 import workbench.db.oracle.OracleControlFileWriter;
 import workbench.db.postgres.PostgresCopyStatementWriter;
-
 import workbench.util.StringUtil;
+
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Type definitions for various control file formats.
- *
+ * <p/>
  * Currently Oracle, SQL Server, PostgreSQL (COPY command), DB2 and MySQL (LOAD DATA INFILE ...) are covered
  *
  * @author Thomas Kellerer
@@ -47,52 +46,44 @@ import workbench.util.StringUtil;
  * @see Db2FormatFileWriter
  * @see MySQLLoadDataWriter
  */
-public enum ControlFileFormat
-{
-	none,
-	oracle,
-	sqlserver,
-	postgres,
-	db2,
-	mysql;
+public enum ControlFileFormat {
+  none,
+  oracle,
+  sqlserver,
+  postgres,
+  db2,
+  mysql;
 
-	public static Set<ControlFileFormat> parseCommandLine(String args)
-		throws WrongFormatFileException
-	{
-		if (StringUtil.isEmptyString(args)) return Collections.emptySet();
-		Set<ControlFileFormat> result = EnumSet.noneOf(ControlFileFormat.class);
-		List<String> formats = StringUtil.stringToList(args);
-		for (String fs : formats)
-		{
-			try
-			{
-				ControlFileFormat f = ControlFileFormat.valueOf(fs);
-				result.add(f);
-			}
-			catch (Exception e)
-			{
-				throw new WrongFormatFileException(fs);
-			}
-		}
-		return result;
-	}
+  public static Set<ControlFileFormat> parseCommandLine(String args)
+      throws WrongFormatFileException {
+    if (StringUtil.isEmptyString(args)) return Collections.emptySet();
+    Set<ControlFileFormat> result = EnumSet.noneOf(ControlFileFormat.class);
+    List<String> formats = StringUtil.stringToList(args);
+    for (String fs : formats) {
+      try {
+        ControlFileFormat f = ControlFileFormat.valueOf(fs);
+        result.add(f);
+      } catch (Exception e) {
+        throw new WrongFormatFileException(fs);
+      }
+    }
+    return result;
+  }
 
-	public static FormatFileWriter createFormatWriter(ControlFileFormat format)
-	{
-		switch (format)
-		{
-			case postgres:
-				return new PostgresCopyStatementWriter();
-			case oracle:
-				return new OracleControlFileWriter();
-			case sqlserver:
-				return new SqlServerFormatFileWriter();
-			case db2:
-				return new Db2FormatFileWriter();
-			case mysql:
-				return new MySQLLoadDataWriter();
-			default:
-				return null;
-		}
-	}
+  public static FormatFileWriter createFormatWriter(ControlFileFormat format) {
+    switch (format) {
+      case postgres:
+        return new PostgresCopyStatementWriter();
+      case oracle:
+        return new OracleControlFileWriter();
+      case sqlserver:
+        return new SqlServerFormatFileWriter();
+      case db2:
+        return new Db2FormatFileWriter();
+      case mysql:
+        return new MySQLLoadDataWriter();
+      default:
+        return null;
+    }
+  }
 }

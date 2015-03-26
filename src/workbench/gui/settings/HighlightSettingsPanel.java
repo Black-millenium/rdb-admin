@@ -22,83 +22,97 @@
  */
 package workbench.gui.settings;
 
-import java.awt.Color;
-
-import javax.swing.JPanel;
-
+import workbench.gui.components.TextFieldWidthAdjuster;
+import workbench.gui.components.WbColorPicker;
 import workbench.interfaces.Restoreable;
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
-
-import workbench.gui.components.TextFieldWidthAdjuster;
-import workbench.gui.components.WbColorPicker;
-
 import workbench.util.StringUtil;
 
+import javax.swing.*;
+import java.awt.*;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class HighlightSettingsPanel
-	extends JPanel
-	implements Restoreable
-{
+    extends JPanel
+    implements Restoreable {
 
-	public HighlightSettingsPanel()
-	{
-		initComponents();
-		TextFieldWidthAdjuster adjuster = new TextFieldWidthAdjuster();
-		adjuster.adjustField(selMinLength);
-	}
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private workbench.gui.components.WbColorPicker bracketHilite;
+  private javax.swing.JLabel bracketHiliteLabel;
+  private javax.swing.JCheckBox enableHilite;
+  private javax.swing.JCheckBox enableSelHilite;
+  private javax.swing.JRadioButton hiliteBoth;
+  private javax.swing.JRadioButton hiliteMatching;
+  private javax.swing.JCheckBox hiliteRec;
+  private javax.swing.ButtonGroup hiliteType;
+  private javax.swing.JCheckBox ignoreCase;
+  private javax.swing.JLabel jLabel1;
+  private javax.swing.JLabel jLabel2;
+  private javax.swing.JPanel jPanel1;
+  private javax.swing.JPanel jPanel2;
+  private javax.swing.JPanel jPanel3;
+  private javax.swing.JPanel jPanel4;
+  private javax.swing.JSeparator jSeparator1;
+  private javax.swing.JRadioButton matchLeft;
+  private javax.swing.JRadioButton matchRight;
+  private javax.swing.ButtonGroup matchType;
+  private javax.swing.JCheckBox noWhitespace;
+  private workbench.gui.components.WbColorPicker selHiliteColor;
+  private javax.swing.JTextField selMinLength;
+  public HighlightSettingsPanel() {
+    initComponents();
+    TextFieldWidthAdjuster adjuster = new TextFieldWidthAdjuster();
+    adjuster.adjustField(selMinLength);
+  }
 
-	@Override
-	public void restoreSettings()
-	{
-		Settings sett = Settings.getInstance();
-		Color hilite = sett.getEditorBracketHighlightColor();
-		enableHilite.setSelected(sett.isBracketHighlightEnabled());
-		bracketHilite.setSelectedColor(hilite);
-		matchLeft.setSelected(sett.getBracketHighlightLeft());
-		matchRight.setSelected(!sett.getBracketHighlightLeft());
-		hiliteRec.setSelected(sett.getBracketHighlightRectangle());
-		hiliteBoth.setSelected(sett.getBracketHighlightBoth());
-		hiliteMatching.setSelected(!sett.getBracketHighlightBoth());
-		enableSelHilite.setSelected(sett.getHighlightCurrentSelection());
-		noWhitespace.setSelected(sett.getSelectionHighlightNoWhitespace());
-		selMinLength.setText(Integer.toString(sett.getMinLengthForSelectionHighlight()));
-		selHiliteColor.setSelectedColor(sett.geSelectionHighlightColor());
-		ignoreCase.setSelected(sett.getSelectionHighlightIgnoreCase());
-	}
+  @Override
+  public void restoreSettings() {
+    Settings sett = Settings.getInstance();
+    Color hilite = sett.getEditorBracketHighlightColor();
+    enableHilite.setSelected(sett.isBracketHighlightEnabled());
+    bracketHilite.setSelectedColor(hilite);
+    matchLeft.setSelected(sett.getBracketHighlightLeft());
+    matchRight.setSelected(!sett.getBracketHighlightLeft());
+    hiliteRec.setSelected(sett.getBracketHighlightRectangle());
+    hiliteBoth.setSelected(sett.getBracketHighlightBoth());
+    hiliteMatching.setSelected(!sett.getBracketHighlightBoth());
+    enableSelHilite.setSelected(sett.getHighlightCurrentSelection());
+    noWhitespace.setSelected(sett.getSelectionHighlightNoWhitespace());
+    selMinLength.setText(Integer.toString(sett.getMinLengthForSelectionHighlight()));
+    selHiliteColor.setSelectedColor(sett.geSelectionHighlightColor());
+    ignoreCase.setSelected(sett.getSelectionHighlightIgnoreCase());
+  }
 
-	@Override
-	public void saveSettings()
-	{
-		Settings sett = Settings.getInstance();
-		sett.setColor(Settings.PROPERTY_EDITOR_BRACKET_HILITE_COLOR, bracketHilite.getSelectedColor());
-		sett.setBracketHighlight(enableHilite.isSelected());
-		sett.setBracketHighlightLeft(matchLeft.isSelected());
-		sett.setBracketHighlightRectangle(hiliteRec.isSelected());
-		sett.setBracketHighlightBoth(hiliteBoth.isSelected());
-		sett.setSelectionHighlightColor(selHiliteColor.getSelectedColor());
-		sett.setSelectionHighlightNoWhitespace(noWhitespace.isSelected());
-		sett.setHighlightCurrentSelection(enableSelHilite.isSelected());
-		sett.setSelectionHighlightIgnoreCase(ignoreCase.isSelected());
-		int minLength = StringUtil.getIntValue(selMinLength.getText(), -1);
-		if (minLength != -1)
-		{
-			sett.setMinLengthForSelectionHighlight(minLength);
-		}
-	}
+  @Override
+  public void saveSettings() {
+    Settings sett = Settings.getInstance();
+    sett.setColor(Settings.PROPERTY_EDITOR_BRACKET_HILITE_COLOR, bracketHilite.getSelectedColor());
+    sett.setBracketHighlight(enableHilite.isSelected());
+    sett.setBracketHighlightLeft(matchLeft.isSelected());
+    sett.setBracketHighlightRectangle(hiliteRec.isSelected());
+    sett.setBracketHighlightBoth(hiliteBoth.isSelected());
+    sett.setSelectionHighlightColor(selHiliteColor.getSelectedColor());
+    sett.setSelectionHighlightNoWhitespace(noWhitespace.isSelected());
+    sett.setHighlightCurrentSelection(enableSelHilite.isSelected());
+    sett.setSelectionHighlightIgnoreCase(ignoreCase.isSelected());
+    int minLength = StringUtil.getIntValue(selMinLength.getText(), -1);
+    if (minLength != -1) {
+      sett.setMinLengthForSelectionHighlight(minLength);
+    }
+  }
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
-	@SuppressWarnings("unchecked")
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
+  @SuppressWarnings("unchecked")
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
 
     matchType = new javax.swing.ButtonGroup();
@@ -326,31 +340,6 @@ public class HighlightSettingsPanel
     gridBagConstraints.insets = new java.awt.Insets(6, 8, 0, 0);
     add(jPanel4, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
-
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private workbench.gui.components.WbColorPicker bracketHilite;
-  private javax.swing.JLabel bracketHiliteLabel;
-  private javax.swing.JCheckBox enableHilite;
-  private javax.swing.JCheckBox enableSelHilite;
-  private javax.swing.JRadioButton hiliteBoth;
-  private javax.swing.JRadioButton hiliteMatching;
-  private javax.swing.JCheckBox hiliteRec;
-  private javax.swing.ButtonGroup hiliteType;
-  private javax.swing.JCheckBox ignoreCase;
-  private javax.swing.JLabel jLabel1;
-  private javax.swing.JLabel jLabel2;
-  private javax.swing.JPanel jPanel1;
-  private javax.swing.JPanel jPanel2;
-  private javax.swing.JPanel jPanel3;
-  private javax.swing.JPanel jPanel4;
-  private javax.swing.JSeparator jSeparator1;
-  private javax.swing.JRadioButton matchLeft;
-  private javax.swing.JRadioButton matchRight;
-  private javax.swing.ButtonGroup matchType;
-  private javax.swing.JCheckBox noWhitespace;
-  private workbench.gui.components.WbColorPicker selHiliteColor;
-  private javax.swing.JTextField selMinLength;
   // End of variables declaration//GEN-END:variables
 
 }

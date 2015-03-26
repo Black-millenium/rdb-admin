@@ -26,18 +26,15 @@ package workbench.db;
  * @author Thomas Kellerer
  */
 public class ViewDefinition
-	extends TableIdentifier
-{
-	public ViewDefinition(String name)
-	{
-		super(name);
-		this.setType("VIEW");
-	}
+    extends TableIdentifier {
+  public ViewDefinition(String name) {
+    super(name);
+    this.setType("VIEW");
+  }
 
-	public ViewDefinition(String schema, String name)
-	{
-		super(schema, name);
-		this.setType("VIEW");
-	}
-	
+  public ViewDefinition(String schema, String name) {
+    super(schema, name);
+    this.setType("VIEW");
+  }
+
 }

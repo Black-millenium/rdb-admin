@@ -25,15 +25,12 @@ package workbench.gui.editor.actions;
 import workbench.resource.PlatformShortcuts;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class SelectNextWord
-	extends NextWord
-{
-	public SelectNextWord()
-	{
-		super("TxtEdNxtWordSel", PlatformShortcuts.getDefaultNextWord(true));
-		select = true;
-	}
+    extends NextWord {
+  public SelectNextWord() {
+    super("TxtEdNxtWordSel", PlatformShortcuts.getDefaultNextWord(true));
+    select = true;
+  }
 }

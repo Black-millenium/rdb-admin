@@ -20,49 +20,43 @@
 
 package workbench.util;
 
+import workbench.gui.editor.SearchAndReplace;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import workbench.gui.editor.SearchAndReplace;
-
 /**
- *
  * @author Thomas Kellerer
  */
-public class Replacer
-{
-	private final String searchValue;
-	private final String replacement;
-	private boolean isRegex;
-	private Pattern replacePattern;
-	private boolean ignoreCase = true;
+public class Replacer {
+  private final String searchValue;
+  private final String replacement;
+  private boolean isRegex;
+  private Pattern replacePattern;
+  private boolean ignoreCase = true;
 
-	public Replacer(String value, String replaceWith, boolean ignoreCase, boolean useRegex)
-	{
-		this.searchValue = value;
-		this.replacement = replaceWith;
-		this.isRegex = useRegex;
-		this.ignoreCase = ignoreCase;
-		initPattern();
-	}
+  public Replacer(String value, String replaceWith, boolean ignoreCase, boolean useRegex) {
+    this.searchValue = value;
+    this.replacement = replaceWith;
+    this.isRegex = useRegex;
+    this.ignoreCase = ignoreCase;
+    initPattern();
+  }
 
-	private void initPattern()
-	{
-		String pattern = SearchAndReplace.getSearchExpression(searchValue, ignoreCase, false, isRegex);
-		replacePattern = Pattern.compile(pattern);
-	}
+  private void initPattern() {
+    String pattern = SearchAndReplace.getSearchExpression(searchValue, ignoreCase, false, isRegex);
+    replacePattern = Pattern.compile(pattern);
+  }
 
-	public void setIgnoreCase(boolean flag)
-	{
-		this.ignoreCase = flag;
-		initPattern();
-	}
+  public void setIgnoreCase(boolean flag) {
+    this.ignoreCase = flag;
+    initPattern();
+  }
 
-	public String replace(String input)
-	{
-		if (StringUtil.isEmptyString(input)) return input;
-		Matcher matcher = replacePattern.matcher(input);
-		return matcher.replaceAll(replacement);
-	}
+  public String replace(String input) {
+    if (StringUtil.isEmptyString(input)) return input;
+    Matcher matcher = replacePattern.matcher(input);
+    return matcher.replaceAll(replacement);
+  }
 
 }

@@ -23,16 +23,15 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ParameterPrompter
-{
-	/** 
-	 * Process the given SQL and prompt for any needed 
-	 * parameters. Either WB parameters or prepared statements
-	 * @return true - continue processing 
-	 *         false - do not run that statement
-	 */
-	boolean processParameterPrompts(String sql);
+public interface ParameterPrompter {
+  /**
+   * Process the given SQL and prompt for any needed
+   * parameters. Either WB parameters or prepared statements
+   *
+   * @return true - continue processing
+   * false - do not run that statement
+   */
+  boolean processParameterPrompts(String sql);
 }

@@ -22,16 +22,14 @@
  */
 package workbench.gui.renderer;
 
-import java.awt.Component;
-import java.awt.Insets;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
-import javax.swing.table.TableCellRenderer;
 import workbench.gui.WbSwingUtilities;
 import workbench.resource.GuiSettings;
 import workbench.resource.Settings;
 import workbench.util.StringUtil;
+
+import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
 
 /**
  * A renderer to display multi-line character data.
@@ -43,95 +41,77 @@ import workbench.util.StringUtil;
  * @author Thomas Kellerer
  */
 public class TextAreaRenderer
-	extends ToolTipRenderer
-	implements TableCellRenderer, WbRenderer
-{
-	public static final Insets AREA_INSETS = new Insets(1,0,0,0);
-	protected JTextArea textDisplay;
+    extends ToolTipRenderer
+    implements TableCellRenderer, WbRenderer {
+  public static final Insets AREA_INSETS = new Insets(1, 0, 0, 0);
+  protected JTextArea textDisplay;
 
-	public TextAreaRenderer()
-	{
-		super();
-		textDisplay = new JTextArea()
-		{
-			@Override
-			public Insets getInsets()
-			{
-				return AREA_INSETS;
-			}
+  public TextAreaRenderer() {
+    super();
+    textDisplay = new JTextArea() {
+      @Override
+      public Insets getInsets() {
+        return AREA_INSETS;
+      }
 
-			@Override
-			public Insets getMargin()
-			{
-				return WbSwingUtilities.EMPTY_INSETS;
-			}
+      @Override
+      public Insets getMargin() {
+        return WbSwingUtilities.EMPTY_INSETS;
+      }
 
-		};
+    };
 
-		boolean wrap = GuiSettings.getWrapMultilineRenderer();
-		textDisplay.setWrapStyleWord(wrap);
-		textDisplay.setLineWrap(wrap);
-		textDisplay.setAutoscrolls(false);
-		textDisplay.setTabSize(Settings.getInstance().getEditorTabWidth());
-		textDisplay.setBorder(WbSwingUtilities.EMPTY_BORDER);
-	}
+    boolean wrap = GuiSettings.getWrapMultilineRenderer();
+    textDisplay.setWrapStyleWord(wrap);
+    textDisplay.setLineWrap(wrap);
+    textDisplay.setAutoscrolls(false);
+    textDisplay.setTabSize(Settings.getInstance().getEditorTabWidth());
+    textDisplay.setBorder(WbSwingUtilities.EMPTY_BORDER);
+  }
 
-	@Override
-	public int getHorizontalAlignment()
-	{
-		return SwingConstants.LEFT;
-	}
+  @Override
+  public int getHorizontalAlignment() {
+    return SwingConstants.LEFT;
+  }
 
-	@Override
-	public Component getTableCellRendererComponent(JTable table, Object value,	boolean isSelected,	boolean hasFocus, int row, int col)
-	{
-		initDisplay(table, value, isSelected, hasFocus, row, col);
+  @Override
+  public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+    initDisplay(table, value, isSelected, hasFocus, row, col);
 
-		this.textDisplay.setFont(table.getFont());
+    this.textDisplay.setFont(table.getFont());
 
-		if (hasFocus)
-		{
-			this.textDisplay.setBorder(WbSwingUtilities.FOCUSED_CELL_BORDER);
-		}
-		else
-		{
-			this.textDisplay.setBorder(WbSwingUtilities.EMPTY_BORDER);
-		}
+    if (hasFocus) {
+      this.textDisplay.setBorder(WbSwingUtilities.FOCUSED_CELL_BORDER);
+    } else {
+      this.textDisplay.setBorder(WbSwingUtilities.EMPTY_BORDER);
+    }
 
-		prepareDisplay(value);
+    prepareDisplay(value);
 
-		this.textDisplay.setBackground(getBackgroundColor());
-		this.textDisplay.setForeground(getForegroundColor());
+    this.textDisplay.setBackground(getBackgroundColor());
+    this.textDisplay.setForeground(getForegroundColor());
 
-		return textDisplay;
-	}
+    return textDisplay;
+  }
 
-	@Override
-	public void prepareDisplay(Object value)
-	{
-		this.isNull = (value == null);
-		if (this.isNull)
-		{
-			this.displayValue = rendererSetup == null ? null : rendererSetup.nullString;
-			this.textDisplay.setText(displayValue);
-			this.textDisplay.setToolTipText(null);
-		}
-		else
-		{
-			try
-			{
-				this.displayValue = (String)value;
-			}
-			catch (ClassCastException cce)
-			{
-				this.displayValue = value.toString();
-			}
-			this.textDisplay.setText(this.displayValue);
-			if (showTooltip)
-			{
-				this.textDisplay.setToolTipText(StringUtil.getMaxSubstring(this.displayValue, maxTooltipSize));
-			}
-		}
-	}
+  @Override
+  public void prepareDisplay(Object value) {
+    this.isNull = (value == null);
+    if (this.isNull) {
+      this.displayValue = rendererSetup == null ? null : rendererSetup.nullString;
+      this.textDisplay.setText(displayValue);
+      this.textDisplay.setToolTipText(null);
+    } else {
+      try {
+        this.displayValue = (String) value;
+      } catch (ClassCastException cce) {
+        this.displayValue = value.toString();
+      }
+      this.textDisplay.setText(this.displayValue);
+      if (showTooltip) {
+        this.textDisplay.setToolTipText(StringUtil.getMaxSubstring(this.displayValue, maxTooltipSize));
+      }
+    }
+  }
 
 }

@@ -23,11 +23,9 @@
 package workbench.console;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum RowDisplay
-{
-	SingleLine,
-	Form;
+public enum RowDisplay {
+  SingleLine,
+  Form;
 }

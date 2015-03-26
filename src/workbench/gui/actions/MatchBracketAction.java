@@ -22,35 +22,31 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
 import workbench.gui.sql.EditorPanel;
 import workbench.resource.PlatformShortcuts;
 import workbench.resource.ResourceMgr;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class MatchBracketAction extends WbAction
-{
-	private EditorPanel client;
+public class MatchBracketAction extends WbAction {
+  private EditorPanel client;
 
-	public MatchBracketAction(EditorPanel aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtMatchBracket", KeyStroke.getKeyStroke(KeyEvent.VK_B, PlatformShortcuts.getDefaultModifier()));
-		this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-		this.setEnabled(true);
-	}
+  public MatchBracketAction(EditorPanel aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtMatchBracket", KeyStroke.getKeyStroke(KeyEvent.VK_B, PlatformShortcuts.getDefaultModifier()));
+    this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+    this.setEnabled(true);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.matchBracket();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.matchBracket();
+  }
 
 }

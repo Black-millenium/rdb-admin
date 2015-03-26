@@ -22,16 +22,14 @@
  */
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-
 import workbench.interfaces.ExecutionController;
 import workbench.resource.ResourceMgr;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
-
 import workbench.util.ArgumentParser;
 import workbench.util.StringUtil;
+
+import java.sql.SQLException;
 
 /**
  * A SQL Statement to pause a script and confirm execution by the user.
@@ -42,82 +40,70 @@ import workbench.util.StringUtil;
  * @author Thomas Kellerer
  */
 public class WbConfirm
-	extends SqlCommand
-{
-	public static final String VERB = "WbConfirm";
-	public static final String PARAM_MSG = "message";
-	public static final String PARAM_YES = "yesText";
-	public static final String PARAM_NO = "noText";
+    extends SqlCommand {
+  public static final String VERB = "WbConfirm";
+  public static final String PARAM_MSG = "message";
+  public static final String PARAM_YES = "yesText";
+  public static final String PARAM_NO = "noText";
 
-	public WbConfirm()
-	{
-		super();
-		cmdLine = new ArgumentParser();
-		cmdLine.addArgument(PARAM_MSG);
-		cmdLine.addArgument(PARAM_YES);
-		cmdLine.addArgument(PARAM_NO);
-		this.isUpdatingCommand = false;
-	}
+  public WbConfirm() {
+    super();
+    cmdLine = new ArgumentParser();
+    cmdLine.addArgument(PARAM_MSG);
+    cmdLine.addArgument(PARAM_YES);
+    cmdLine.addArgument(PARAM_NO);
+    this.isUpdatingCommand = false;
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException
-	{
-		String args = getCommandLine(sql);
-		cmdLine.parse(args);
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException {
+    String args = getCommandLine(sql);
+    cmdLine.parse(args);
 
-		String msg = null;
-		String yes = null;
-		String no = null;
+    String msg = null;
+    String yes = null;
+    String no = null;
 
-		if (cmdLine.hasArguments())
-		{
-			msg = cmdLine.getValue(PARAM_MSG);
-			yes = cmdLine.getValue(PARAM_YES);
-			no = cmdLine.getValue(PARAM_NO);
-		}
-		else
-		{
-			msg = StringUtil.trimQuotes(args);
-		}
-		StatementRunnerResult result = new StatementRunnerResult();
-		result.setStopScript(false);
-		result.setSuccess();
+    if (cmdLine.hasArguments()) {
+      msg = cmdLine.getValue(PARAM_MSG);
+      yes = cmdLine.getValue(PARAM_YES);
+      no = cmdLine.getValue(PARAM_NO);
+    } else {
+      msg = StringUtil.trimQuotes(args);
+    }
+    StatementRunnerResult result = new StatementRunnerResult();
+    result.setStopScript(false);
+    result.setSuccess();
 
-		ExecutionController controller = runner.getExecutionController();
-		if (controller != null)
-		{
-			if (StringUtil.isBlank(msg))
-			{
-				msg = ResourceMgr.getString("MsgConfirmContinue");
-			}
+    ExecutionController controller = runner.getExecutionController();
+    if (controller != null) {
+      if (StringUtil.isBlank(msg)) {
+        msg = ResourceMgr.getString("MsgConfirmContinue");
+      }
 
-			boolean continueScript = controller.confirmExecution(msg, yes, no);
+      boolean continueScript = controller.confirmExecution(msg, yes, no);
 
-			if (!continueScript)
-			{
-				result.setStopScript(true);
-			}
-		}
-		return result;
-	}
+      if (!continueScript) {
+        result.setStopScript(true);
+      }
+    }
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 
 }

@@ -27,8 +27,8 @@ import java.util.Map;
 /**
  * @author Thomas Kellerer
  */
-public interface FilterExpression
-{
-	boolean evaluate(Map<String, Object> columnValues);
-	boolean isColumnSpecific();
+public interface FilterExpression {
+  boolean evaluate(Map<String, Object> columnValues);
+
+  boolean isColumnSpecific();
 }

@@ -22,350 +22,281 @@
  */
 package workbench.gui.dbobjects;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
+import workbench.db.WbConnection;
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.actions.EscAction;
+import workbench.gui.components.WbStatusLabel;
+import workbench.gui.sql.SqlEditor;
+import workbench.interfaces.ResultLogger;
+import workbench.log.LogMgr;
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
+import workbench.sql.BatchRunner;
+import workbench.util.ExceptionUtil;
+import workbench.util.StringUtil;
+import workbench.util.WbThread;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-
-import workbench.interfaces.ResultLogger;
-import workbench.log.LogMgr;
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
-import workbench.db.WbConnection;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.actions.EscAction;
-import workbench.gui.components.WbStatusLabel;
-import workbench.gui.sql.SqlEditor;
-
-import workbench.sql.BatchRunner;
-
-import workbench.util.ExceptionUtil;
-import workbench.util.StringUtil;
-import workbench.util.WbThread;
-
 /**
- *
  * @author Thomas Kellerer
  */
 public class RunScriptPanel
-	extends JPanel
-	implements ActionListener, WindowListener
-{
-	private WbConnection dbConn;
-	private JDialog window;
-	private BatchRunner runner;
-	private Thread runThread;
-	private String sqlScript;
-	private EscAction escAction;
-	private boolean wasRun;
-	private boolean success;
+    extends JPanel
+    implements ActionListener, WindowListener {
+  private WbConnection dbConn;
+  private JDialog window;
+  private BatchRunner runner;
+  private Thread runThread;
+  private String sqlScript;
+  private EscAction escAction;
+  private boolean wasRun;
+  private boolean success;
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private JButton cancelButton;
+  private JButton closeButton;
+  private SqlEditor editor;
+  private JButton saveAsButton;
+  private JButton startButton;
+  private JLabel statusbar;
 
-	public RunScriptPanel(WbConnection con, String script)
-	{
-		initComponents();
-		statusbar.setText("");
-		dbConn = con;
-		editor.setDatabaseConnection(con);
-		sqlScript = script;
-		startButton.addActionListener(this);
-		cancelButton.addActionListener(this);
-		closeButton.addActionListener(this);
-		saveAsButton.setAction(editor.getFileSaveAsAction());
-		saveAsButton.setEnabled(true);
-	}
+  public RunScriptPanel(WbConnection con, String script) {
+    initComponents();
+    statusbar.setText("");
+    dbConn = con;
+    editor.setDatabaseConnection(con);
+    sqlScript = script;
+    startButton.addActionListener(this);
+    cancelButton.addActionListener(this);
+    closeButton.addActionListener(this);
+    saveAsButton.setAction(editor.getFileSaveAsAction());
+    saveAsButton.setEnabled(true);
+  }
 
-	public boolean wasRun()
-	{
-		return wasRun;
-	}
+  public boolean wasRun() {
+    return wasRun;
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		if (e.getSource() == startButton)
-		{
-			startScript();
-		}
-		else if (e.getSource() == closeButton || e.getSource() == escAction)
-		{
-			closeWindow();
-		}
-		else if (e.getSource() == cancelButton)
-		{
-			cancel();
-		}
-	}
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == startButton) {
+      startScript();
+    } else if (e.getSource() == closeButton || e.getSource() == escAction) {
+      closeWindow();
+    } else if (e.getSource() == cancelButton) {
+      cancel();
+    }
+  }
 
-	public void openWindow(Component comp, String title)
-	{
-		openWindow(comp, title, null);
-	}
+  public void openWindow(Component comp, String title) {
+    openWindow(comp, title, null);
+  }
 
-	public void openWindow(Component comp, String title, String highlight)
-	{
-		Frame parent = null;
-		Window w = SwingUtilities.getWindowAncestor(comp);
-		if (w instanceof Frame)
-		{
-			parent = (Frame) w;
-		}
-		openWindow(parent, title, highlight);
-	}
+  public void openWindow(Component comp, String title, String highlight) {
+    Frame parent = null;
+    Window w = SwingUtilities.getWindowAncestor(comp);
+    if (w instanceof Frame) {
+      parent = (Frame) w;
+    }
+    openWindow(parent, title, highlight);
+  }
 
-	public void openWindow(final Frame owner, final String title, final String highlight)
-	{
-		WbSwingUtilities.invoke(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				window = new JDialog(owner, title, true);
-				ResourceMgr.setWindowIcons(window, "script");
-				escAction = new EscAction(window, RunScriptPanel.this);
+  public void openWindow(final Frame owner, final String title, final String highlight) {
+    WbSwingUtilities.invoke(new Runnable() {
+      @Override
+      public void run() {
+        window = new JDialog(owner, title, true);
+        ResourceMgr.setWindowIcons(window, "script");
+        escAction = new EscAction(window, RunScriptPanel.this);
 
-				window.getContentPane().add(RunScriptPanel.this);
-				if (!Settings.getInstance().restoreWindowSize(window, "workbench.gui.runscript.window"))
-				{
-					window.setSize(600, 400);
-				}
-				WbSwingUtilities.center(window, owner);
-				window.addWindowListener(RunScriptPanel.this);
-				editor.setText(sqlScript);
-				editor.setCaretPosition(0);
+        window.getContentPane().add(RunScriptPanel.this);
+        if (!Settings.getInstance().restoreWindowSize(window, "workbench.gui.runscript.window")) {
+          window.setSize(600, 400);
+        }
+        WbSwingUtilities.center(window, owner);
+        window.addWindowListener(RunScriptPanel.this);
+        editor.setText(sqlScript);
+        editor.setCaretPosition(0);
 
-				if (highlight != null)
-				{
-					EventQueue.invokeLater(new Runnable()
-					{
-						@Override
-						public void run()
-						{
-							highlightText(highlight);
-						}
-					});
-				}
-				window.setVisible(true);
-			}
-		});
-	}
+        if (highlight != null) {
+          EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+              highlightText(highlight);
+            }
+          });
+        }
+        window.setVisible(true);
+      }
+    });
+  }
 
-	private void highlightText(String text)
-	{
-		if (StringUtil.isBlank(text)) return;
-		int start = editor.getReplacer().findFirst(text, true, true, false);
-		int end = start + text.length();
-		if (start > -1)
-		{
-			editor.select(start, end);
-		}
-		editor.requestFocusInWindow();
-	}
+  private void highlightText(String text) {
+    if (StringUtil.isBlank(text)) return;
+    int start = editor.getReplacer().findFirst(text, true, true, false);
+    int end = start + text.length();
+    if (start > -1) {
+      editor.select(start, end);
+    }
+    editor.requestFocusInWindow();
+  }
 
-	protected void closeWindow()
-	{
-		if (runner != null) return;
-		Settings.getInstance().storeWindowSize(window, "workbench.gui.runscript.window");
-		window.setVisible(false);
-		window.dispose();
-	}
+  protected void closeWindow() {
+    if (runner != null) return;
+    Settings.getInstance().storeWindowSize(window, "workbench.gui.runscript.window");
+    window.setVisible(false);
+    window.dispose();
+  }
 
-	protected void cancel()
-	{
-		if (runner != null)
-		{
-			runner.cancel();
-		}
-		try
-		{
-			if (runThread != null)
-			{
-				runThread.interrupt();
-			}
-			runThread = null;
-		}
-		catch (Exception e)
-		{
-			// ignore
-		}
-	}
+  protected void cancel() {
+    if (runner != null) {
+      runner.cancel();
+    }
+    try {
+      if (runThread != null) {
+        runThread.interrupt();
+      }
+      runThread = null;
+    } catch (Exception e) {
+      // ignore
+    }
+  }
 
-	protected void startScript()
-	{
-		if (runner != null) return;
+  protected void startScript() {
+    if (runner != null) return;
 
-		runThread = new WbThread("RunScript")
-		{
-			@Override
-			public void run()
-			{
-				runScript();
-			}
-		};
-		runThread.start();
-	}
+    runThread = new WbThread("RunScript") {
+      @Override
+      public void run() {
+        runScript();
+      }
+    };
+    runThread.start();
+  }
 
-	protected void runScript()
-	{
-		if (dbConn == null) return;
-		if (dbConn.isBusy()) return;
+  protected void runScript() {
+    if (dbConn == null) return;
+    if (dbConn.isBusy()) return;
 
-		runner = new BatchRunner();
-		runner.setConnection(dbConn);
-		success = false;
+    runner = new BatchRunner();
+    runner.setConnection(dbConn);
+    success = false;
 
-		try
-		{
-			runner.setRowMonitor(((WbStatusLabel)statusbar).getMonitor());
-			runner.setAbortOnError(true);
-			runner.setStoreErrors(true);
+    try {
+      runner.setRowMonitor(((WbStatusLabel) statusbar).getMonitor());
+      runner.setAbortOnError(true);
+      runner.setStoreErrors(true);
 
-			// Make sure nothing is written to system.out
-			runner.setResultLogger(new ResultLogger() {
-				@Override
-				public void clearLog()
-				{
-				}
+      // Make sure nothing is written to system.out
+      runner.setResultLogger(new ResultLogger() {
+        @Override
+        public void clearLog() {
+        }
 
-				@Override
-				public void appendToLog(String msg)
-				{
-				}
+        @Override
+        public void appendToLog(String msg) {
+        }
 
-				@Override
-				public void showLogMessage(String msg)
-				{
-				}
-			});
-			startButton.setEnabled(false);
-			cancelButton.setEnabled(true);
-			closeButton.setEnabled(false);
+        @Override
+        public void showLogMessage(String msg) {
+        }
+      });
+      startButton.setEnabled(false);
+      cancelButton.setEnabled(true);
+      closeButton.setEnabled(false);
 
-			success = !runner.runScript(editor.getText());
+      success = !runner.runScript(editor.getText());
 
-			final String statusMsg;
-			if (success)
-			{
-				statusMsg = ResourceMgr.getString("TxtScriptFinished");
-			}
-			else
-			{
-				statusMsg = ResourceMgr.getString("MsgBatchStatementError");
-			}
+      final String statusMsg;
+      if (success) {
+        statusMsg = ResourceMgr.getString("TxtScriptFinished");
+      } else {
+        statusMsg = ResourceMgr.getString("MsgBatchStatementError");
+      }
 
-			WbSwingUtilities.invoke(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					statusbar.setText(statusMsg);
-				}
-			});
+      WbSwingUtilities.invoke(new Runnable() {
+        @Override
+        public void run() {
+          statusbar.setText(statusMsg);
+        }
+      });
 
-			if (!success)
-			{
-				String errors = runner.getMessages();
-				if (errors != null)
-				{
-					WbSwingUtilities.showMultiLineError(this, ResourceMgr.TXT_PRODUCT_NAME, errors);
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			LogMgr.logError("RunScriptPanel.runScript()", "Error when running script", e);
-			final String error = ExceptionUtil.getDisplay(e);
-			WbSwingUtilities.invoke(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					statusbar.setText(error);
-				}
-			});
-			WbSwingUtilities.showMessage(this, error);
-		}
-		finally
-		{
-			wasRun = true;
-			startButton.setEnabled(true);
-			cancelButton.setEnabled(false);
-			closeButton.setEnabled(true);
-			runner = null;
-		}
-	}
+      if (!success) {
+        String errors = runner.getMessages();
+        if (errors != null) {
+          WbSwingUtilities.showMultiLineError(this, ResourceMgr.TXT_PRODUCT_NAME, errors);
+        }
+      }
+    } catch (Exception e) {
+      LogMgr.logError("RunScriptPanel.runScript()", "Error when running script", e);
+      final String error = ExceptionUtil.getDisplay(e);
+      WbSwingUtilities.invoke(new Runnable() {
+        @Override
+        public void run() {
+          statusbar.setText(error);
+        }
+      });
+      WbSwingUtilities.showMessage(this, error);
+    } finally {
+      wasRun = true;
+      startButton.setEnabled(true);
+      cancelButton.setEnabled(false);
+      closeButton.setEnabled(true);
+      runner = null;
+    }
+  }
 
-	public boolean isSuccess()
-	{
-		return success;
-	}
+  public boolean isSuccess() {
+    return success;
+  }
 
-	@Override
-	public void windowOpened(WindowEvent e)
-	{
-		editor.invalidate();
-		editor.validate();
-		editor.doLayout();
-		editor.requestFocusInWindow();
-	}
+  @Override
+  public void windowOpened(WindowEvent e) {
+    editor.invalidate();
+    editor.validate();
+    editor.doLayout();
+    editor.requestFocusInWindow();
+  }
 
-	@Override
-	public void windowClosing(WindowEvent e)
-	{
-		closeWindow();
-	}
+  @Override
+  public void windowClosing(WindowEvent e) {
+    closeWindow();
+  }
 
-	@Override
-	public void windowClosed(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowClosed(WindowEvent e) {
+  }
 
-	@Override
-	public void windowIconified(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowIconified(WindowEvent e) {
+  }
 
-	@Override
-	public void windowDeiconified(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowDeiconified(WindowEvent e) {
+  }
 
-	@Override
-	public void windowActivated(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowActivated(WindowEvent e) {
+  }
 
-	@Override
-	public void windowDeactivated(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowDeactivated(WindowEvent e) {
+  }
 
-
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
-	@SuppressWarnings("unchecked")
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
+  @SuppressWarnings("unchecked")
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     GridBagConstraints gridBagConstraints;
 
     editor = new SqlEditor();
@@ -429,12 +360,5 @@ public class RunScriptPanel
     gridBagConstraints.insets = new Insets(0, 6, 5, 0);
     add(saveAsButton, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private JButton cancelButton;
-  private JButton closeButton;
-  private SqlEditor editor;
-  private JButton saveAsButton;
-  private JButton startButton;
-  private JLabel statusbar;
   // End of variables declaration//GEN-END:variables
 }

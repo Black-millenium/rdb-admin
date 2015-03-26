@@ -22,82 +22,65 @@
  */
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-
 import workbench.WbManager;
-import workbench.resource.ResourceMgr;
-
 import workbench.db.ConnectionInfoBuilder;
-
+import workbench.resource.ResourceMgr;
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
 
+import java.sql.SQLException;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class WbConnInfo
-	extends SqlCommand
-{
-	public static final String VERB = "WbConnInfo";
+    extends SqlCommand {
+  public static final String VERB = "WbConnInfo";
 
-	public WbConnInfo()
-	{
-	}
+  public WbConnInfo() {
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException, Exception
-	{
-		StatementRunnerResult result = new StatementRunnerResult(sql);
-		result.setSuccess();
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException, Exception {
+    StatementRunnerResult result = new StatementRunnerResult(sql);
+    result.setSuccess();
 
-		if (this.currentConnection == null)
-		{
-			result.addMessage(ResourceMgr.getString("TxtNotConnected"));
-		}
-		else
-		{
-			try
-			{
-				currentConnection.setBusy(false);
-				int indent = 0;
-				ConnectionInfoBuilder info = new ConnectionInfoBuilder();
-				if (WbManager.getInstance().isConsoleMode())
-				{
-					result.addMessage(" ");
-					indent = 2;
-				}
-				result.addMessage(info.getPlainTextDisplay(currentConnection, indent));
-				if (WbManager.getInstance().isConsoleMode())
-				{
-					result.addMessage("");
-				}
-			}
-			finally
-			{
-				currentConnection.setBusy(true);
-			}
-		}
-		return result;
-	}
+    if (this.currentConnection == null) {
+      result.addMessage(ResourceMgr.getString("TxtNotConnected"));
+    } else {
+      try {
+        currentConnection.setBusy(false);
+        int indent = 0;
+        ConnectionInfoBuilder info = new ConnectionInfoBuilder();
+        if (WbManager.getInstance().isConsoleMode()) {
+          result.addMessage(" ");
+          indent = 2;
+        }
+        result.addMessage(info.getPlainTextDisplay(currentConnection, indent));
+        if (WbManager.getInstance().isConsoleMode()) {
+          result.addMessage("");
+        }
+      } finally {
+        currentConnection.setBusy(true);
+      }
+    }
+    return result;
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 
 }

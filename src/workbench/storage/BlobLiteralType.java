@@ -25,13 +25,12 @@ package workbench.storage;
 /**
  * @author Thomas Kellerer
  */
-public enum BlobLiteralType
-{
-	hex,
-	octal,
-	unicode,
-	base64,
-	pgEscape,
-	pgDecode,
-	pgHex;
+public enum BlobLiteralType {
+  hex,
+  octal,
+  unicode,
+  base64,
+  pgEscape,
+  pgDecode,
+  pgHex;
 }

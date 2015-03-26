@@ -20,65 +20,56 @@
 
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
+import workbench.gui.menu.RecentFileManager;
 import workbench.interfaces.MacroChangeListener;
 import workbench.resource.ResourceMgr;
-
-import workbench.gui.menu.RecentFileManager;
-
 import workbench.sql.macros.MacroFileSelector;
 import workbench.sql.macros.MacroManager;
 import workbench.sql.macros.MacroStorage;
-
 import workbench.util.WbFile;
 
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class SaveMacrosAction
-	extends WbAction
-	implements MacroChangeListener
-{
-	private final int macroClientId;
+    extends WbAction
+    implements MacroChangeListener {
+  private final int macroClientId;
 
-	public SaveMacrosAction(int clientId)
-	{
-		super();
-		this.macroClientId = clientId;
-		this.initMenuDefinition("MnuTxtSaveMacros");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_MACRO);
-		this.setIcon(null);
-		MacroStorage macros = MacroManager.getInstance().getMacros(macroClientId);
-		macros.addChangeListener(this);
-		String fname = macros.getCurrentMacroFilename();
-		setTooltip(fname);
-	}
+  public SaveMacrosAction(int clientId) {
+    super();
+    this.macroClientId = clientId;
+    this.initMenuDefinition("MnuTxtSaveMacros");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_MACRO);
+    this.setIcon(null);
+    MacroStorage macros = MacroManager.getInstance().getMacros(macroClientId);
+    macros.addChangeListener(this);
+    String fname = macros.getCurrentMacroFilename();
+    setTooltip(fname);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		MacroFileSelector selector = new MacroFileSelector();
-		WbFile f = selector.selectStorageForSave(macroClientId);
-		if (f == null) return;
-		MacroManager.getInstance().saveAs(macroClientId, f);
-		RecentFileManager.getInstance().macrosLoaded(f);
-		setTooltip(f.getFullPath());
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    MacroFileSelector selector = new MacroFileSelector();
+    WbFile f = selector.selectStorageForSave(macroClientId);
+    if (f == null) return;
+    MacroManager.getInstance().saveAs(macroClientId, f);
+    RecentFileManager.getInstance().macrosLoaded(f);
+    setTooltip(f.getFullPath());
+  }
 
-	@Override
-	public void macroListChanged()
-	{
-		String fname = MacroManager.getInstance().getMacros(macroClientId).getCurrentMacroFilename();
-		setTooltip(fname);
-	}
+  @Override
+  public void macroListChanged() {
+    String fname = MacroManager.getInstance().getMacros(macroClientId).getCurrentMacroFilename();
+    setTooltip(fname);
+  }
 
-	@Override
-	public void dispose()
-	{
-		super.dispose();
-		MacroManager.getInstance().getMacros(macroClientId).removeChangeListener(this);
-	}
+  @Override
+  public void dispose() {
+    super.dispose();
+    MacroManager.getInstance().getMacros(macroClientId).removeChangeListener(this);
+  }
 
 }

@@ -22,187 +22,147 @@
  */
 package workbench.sql.commands;
 
+import workbench.log.LogMgr;
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
+import workbench.sql.SqlCommand;
+import workbench.sql.StatementRunnerResult;
+import workbench.util.LowMemoryException;
+import workbench.util.SqlUtil;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import workbench.log.LogMgr;
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
-import workbench.sql.SqlCommand;
-import workbench.sql.StatementRunnerResult;
-
-import workbench.util.LowMemoryException;
-import workbench.util.SqlUtil;
-
 /**
  * Implementation of the SELECT statement.
- *
+ * <p/>
  * The result of the SELECT is passed back in the StatementRunnerResult object.
  * If a ResultSetConsumer is registered in the StatementRunner instance that is executing this
  * select, the ResultSet will be returned directly, otherwise the ResultSet will be completely
  * read into a DataStore (see {@link SqlCommand#processResults(workbench.sql.StatementRunnerResult, boolean)}.
  *
  * @author Thomas Kellerer
- *
  */
 public class SelectCommand
-	extends SqlCommand
-{
-	public static final String VERB = "SELECT";
+    extends SqlCommand {
+  public static final String VERB = "SELECT";
 
-	/**
-	 * Runs the passed SQL statement using Statement.executeQuery()
-	 *
-	 * @param sql the statement to execute
-	 * @return the result of the execution
-	 * @throws java.sql.SQLException
-	 */
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException
-	{
-		this.isCancelled = false;
+  /**
+   * Runs the passed SQL statement using Statement.executeQuery()
+   *
+   * @param sql the statement to execute
+   * @return the result of the execution
+   * @throws java.sql.SQLException
+   */
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException {
+    this.isCancelled = false;
 
-		StatementRunnerResult result = new StatementRunnerResult(sql);
-		result.setWarning(false);
+    StatementRunnerResult result = new StatementRunnerResult(sql);
+    result.setWarning(false);
 
-		try
-		{
-			boolean isPrepared = false;
+    try {
+      boolean isPrepared = false;
 
-			this.runner.setSavepoint();
+      this.runner.setSavepoint();
 
-			if (Settings.getInstance().getCheckPreparedStatements() && currentConnection.getPreparedStatementPool().isRegistered(sql))
-			{
-				this.currentStatement = currentConnection.getPreparedStatementPool().prepareStatement(sql);
-				if (this.currentStatement != null)
-				{
-					isPrepared = true;
-				}
-			}
+      if (Settings.getInstance().getCheckPreparedStatements() && currentConnection.getPreparedStatementPool().isRegistered(sql)) {
+        this.currentStatement = currentConnection.getPreparedStatementPool().prepareStatement(sql);
+        if (this.currentStatement != null) {
+          isPrepared = true;
+        }
+      }
 
-			if (this.currentStatement == null)
-			{
-				this.currentStatement = currentConnection.createStatementForQuery();
-			}
+      if (this.currentStatement == null) {
+        this.currentStatement = currentConnection.createStatementForQuery();
+      }
 
-			try
-			{
-				if (this.queryTimeout > 0 && currentConnection.supportsQueryTimeout())
-				{
-					LogMgr.logTrace("SelectCommand.execute()", "Setting query timeout to: " + this.queryTimeout);
-					this.currentStatement.setQueryTimeout(this.queryTimeout);
-				}
-			}
-			catch (Exception th)
-			{
-				LogMgr.logWarning("SelectCommand.execute()", "Error when setting query timeout: " + th.getMessage(), null);
-			}
+      try {
+        if (this.queryTimeout > 0 && currentConnection.supportsQueryTimeout()) {
+          LogMgr.logTrace("SelectCommand.execute()", "Setting query timeout to: " + this.queryTimeout);
+          this.currentStatement.setQueryTimeout(this.queryTimeout);
+        }
+      } catch (Exception th) {
+        LogMgr.logWarning("SelectCommand.execute()", "Error when setting query timeout: " + th.getMessage(), null);
+      }
 
-			try
-			{
-				LogMgr.logTrace("SelectCommand.execute()", "Setting maxrows to: " + maxRows);
-				this.currentStatement.setMaxRows(this.maxRows);
-			}
-			catch (Exception e)
-			{
-				LogMgr.logWarning("SelectCommand.execute()", "The JDBC driver does not support the setMaxRows() function! (" +e.getMessage() + ")");
-			}
+      try {
+        LogMgr.logTrace("SelectCommand.execute()", "Setting maxrows to: " + maxRows);
+        this.currentStatement.setMaxRows(this.maxRows);
+      } catch (Exception e) {
+        LogMgr.logWarning("SelectCommand.execute()", "The JDBC driver does not support the setMaxRows() function! (" + e.getMessage() + ")");
+      }
 
-			ResultSet rs = null;
-			boolean hasResult = true;
+      ResultSet rs = null;
+      boolean hasResult = true;
 
-			// we can safely remove the comments here, as the StatementRunnerResult was already
-			// initialized with the "real" statement that contains the comments (and which potentially
-			// can contain a "wbdoc" to identify the result tab
-			sql = getSqlToExecute(sql);
+      // we can safely remove the comments here, as the StatementRunnerResult was already
+      // initialized with the "real" statement that contains the comments (and which potentially
+      // can contain a "wbdoc" to identify the result tab
+      sql = getSqlToExecute(sql);
 
-			if (isPrepared)
-			{
-				rs = ((PreparedStatement)this.currentStatement).executeQuery();
-			}
-			else
-			{
-				if (currentConnection.getDbSettings().getUseGenericExecuteForSelect())
-				{
-					LogMgr.logDebug("SelectCommand.execute()", "Using execute() instead of executeQuery()");
-					hasResult = this.currentStatement.execute(sql);
-				}
-				else
-				{
-					rs = this.currentStatement.executeQuery(sql);
-				}
-			}
+      if (isPrepared) {
+        rs = ((PreparedStatement) this.currentStatement).executeQuery();
+      } else {
+        if (currentConnection.getDbSettings().getUseGenericExecuteForSelect()) {
+          LogMgr.logDebug("SelectCommand.execute()", "Using execute() instead of executeQuery()");
+          hasResult = this.currentStatement.execute(sql);
+        } else {
+          rs = this.currentStatement.executeQuery(sql);
+        }
+      }
 
-			if (this.isCancelled)
-			{
-				result.addMessage(ResourceMgr.getString("MsgStatementCancelled"));
-				result.setFailure();
-			}
-			else
-			{
-				processResults(result, hasResult, rs);
+      if (this.isCancelled) {
+        result.addMessage(ResourceMgr.getString("MsgStatementCancelled"));
+        result.setFailure();
+      } else {
+        processResults(result, hasResult, rs);
 
-				if (isCancelled)
-				{
-					result.addMessage(ResourceMgr.getString("MsgStatementCancelled"));
-				}
-				else
-				{
-					this.appendSuccessMessage(result);
-				}
-				result.setSuccess();
-			}
+        if (isCancelled) {
+          result.addMessage(ResourceMgr.getString("MsgStatementCancelled"));
+        } else {
+          this.appendSuccessMessage(result);
+        }
+        result.setSuccess();
+      }
 
-			this.runner.releaseSavepoint();
-		}
-		catch (LowMemoryException mem)
-		{
-			result.clear();
-			result.setFailure();
-			this.runner.rollbackSavepoint();
-			throw mem;
-		}
-		catch (Exception e)
-		{
-			addErrorInfo(result, sql, e);
+      this.runner.releaseSavepoint();
+    } catch (LowMemoryException mem) {
+      result.clear();
+      result.setFailure();
+      this.runner.rollbackSavepoint();
+      throw mem;
+    } catch (Exception e) {
+      addErrorInfo(result, sql, e);
 
-			// this config is only for MySQL because it repeats the error message
-			// as a warning on the statement instance
-			if (currentConnection.getDbSettings().addWarningsOnError())
-			{
-				appendWarnings(result, true);
-			}
-			else
-			{
-				SqlUtil.clearWarnings(currentConnection, currentStatement);
-			}
-			LogMgr.logUserSqlError("SelectCommand.execute()", sql, e);
-			this.runner.rollbackSavepoint();
-		}
+      // this config is only for MySQL because it repeats the error message
+      // as a warning on the statement instance
+      if (currentConnection.getDbSettings().addWarningsOnError()) {
+        appendWarnings(result, true);
+      } else {
+        SqlUtil.clearWarnings(currentConnection, currentStatement);
+      }
+      LogMgr.logUserSqlError("SelectCommand.execute()", sql, e);
+      this.runner.rollbackSavepoint();
+    }
 
-		return result;
-	}
+    return result;
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	public void setMaxRows(int max)
-	{
-		if (max >= 0)
-		{
-			this.maxRows = max;
-		}
-		else
-		{
-			this.maxRows = 0;
-		}
-	}
+  @Override
+  public void setMaxRows(int max) {
+    if (max >= 0) {
+      this.maxRows = max;
+    } else {
+      this.maxRows = 0;
+    }
+  }
 
 }

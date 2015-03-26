@@ -22,16 +22,6 @@
  */
 package workbench.db;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import workbench.log.LogMgr;
-import workbench.resource.Settings;
-
 import workbench.db.derby.DerbyColumnEnhancer;
 import workbench.db.firebird.FirebirdColumnEnhancer;
 import workbench.db.h2database.H2ColumnEnhancer;
@@ -44,22 +34,28 @@ import workbench.db.mysql.MySQLColumnEnhancer;
 import workbench.db.nuodb.NuoDbColumnEnhancer;
 import workbench.db.postgres.PostgresColumnEnhancer;
 import workbench.db.progress.OpenEdgeColumnEnhancer;
-
+import workbench.db.rdb.RdbColumnEnhancer;
+import workbench.log.LogMgr;
+import workbench.resource.Settings;
 import workbench.util.CollectionUtil;
 import workbench.util.SqlUtil;
 import workbench.util.StringUtil;
 
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class JdbcTableDefinitionReader
-  implements TableDefinitionReader
-{
+    implements TableDefinitionReader {
   protected final WbConnection dbConnection;
 
-  public JdbcTableDefinitionReader(WbConnection conn)
-  {
+  public JdbcTableDefinitionReader(WbConnection conn) {
     dbConnection = conn;
   }
 
@@ -68,17 +64,15 @@ public class JdbcTableDefinitionReader
    * <br/>
    * To display the columns for a table in a DataStore create an instance of {@link TableColumnsDatastore}.
    *
-   * @param table The table for which the definition should be retrieved
+   * @param table        The table for which the definition should be retrieved
    * @param typeResolver the DataTypeResolver to be used. If null, it will be taken from the connection
-   *
-   * @throws SQLException
    * @return the definition of the table.
+   * @throws SQLException
    * @see TableColumnsDatastore
    */
   @Override
   public List<ColumnIdentifier> getTableColumns(TableIdentifier table, DataTypeResolver typeResolver)
-    throws SQLException
-  {
+      throws SQLException {
     DbSettings dbSettings = dbConnection.getDbSettings();
     DbMetadata dbmeta = dbConnection.getMetadata();
 
@@ -91,18 +85,15 @@ public class JdbcTableDefinitionReader
     String schema = SqlUtil.removeObjectQuotes(table.getSchema());
     String catalog = SqlUtil.removeObjectQuotes(table.getCatalog());
 
-    if (dbConnection.getDbSettings().supportsMetaDataWildcards())
-    {
+    if (dbConnection.getDbSettings().supportsMetaDataWildcards()) {
       tablename = SqlUtil.escapeUnderscore(tablename, dbConnection);
     }
 
-    if (dbConnection.getDbSettings().supportsMetaDataSchemaWildcards())
-    {
+    if (dbConnection.getDbSettings().supportsMetaDataSchemaWildcards()) {
       schema = SqlUtil.escapeUnderscore(schema, dbConnection);
     }
 
-    if (dbConnection.getDbSettings().supportsMetaDataCatalogWildcards())
-    {
+    if (dbConnection.getDbSettings().supportsMetaDataCatalogWildcards()) {
       catalog = SqlUtil.escapeUnderscore(catalog, dbConnection);
     }
 
@@ -112,41 +103,35 @@ public class JdbcTableDefinitionReader
     PkDefinition primaryKey = table.getPrimaryKey();
     Set<String> primaryKeyColumns = CollectionUtil.caseInsensitiveSet();
 
-    if (primaryKey != null)
-    {
+    if (primaryKey != null) {
       primaryKeyColumns.addAll(primaryKey.getColumns());
     }
 
-    try
-    {
+    try {
       rs = dbmeta.getJdbcMetaData().getColumns(catalog, schema, tablename, "%");
 
       ResultSetMetaData rsmeta = rs.getMetaData();
 
-      if (Settings.getInstance().getDebugMetadataSql())
-      {
+      if (Settings.getInstance().getDebugMetadataSql()) {
         String fqn = SqlUtil.fullyQualifiedName(dbConnection, table);
         SqlUtil.dumpResultSetInfo("DatabaseMetaData.getColumns() for " + fqn, rsmeta);
       }
 
       boolean jdbc4 = false;
       boolean jdbc41 = false;
-      if (rsmeta.getColumnCount() > 22)
-      {
+      if (rsmeta.getColumnCount() > 22) {
         String name = rsmeta.getColumnName(23);
 
         // HSQLDB 1.8 returns 23 columns, but is not JDBC4, so I need to check for the name as well.
         jdbc4 = name.equals("IS_AUTOINCREMENT");
       }
 
-      if (rsmeta.getColumnCount() > 23)
-      {
+      if (rsmeta.getColumnCount() > 23) {
         String name = rsmeta.getColumnName(24);
         jdbc41 = name.equals("IS_GENERATEDCOLUMN");
       }
 
-      while (rs.next())
-      {
+      while (rs.next()) {
         String colName = StringUtil.trim(useColumnNames ? rs.getString("COLUMN_NAME") : rs.getString(4));
         int sqlType = useColumnNames ? rs.getInt("DATA_TYPE") : rs.getInt(5);
         String typeName = StringUtil.trim(useColumnNames ? rs.getString("TYPE_NAME") : rs.getString(6));
@@ -156,12 +141,9 @@ public class JdbcTableDefinitionReader
 
         int size = useColumnNames ? rs.getInt("COLUMN_SIZE") : rs.getInt(7);
         int digits = -1;
-        try
-        {
+        try {
           digits = useColumnNames ? rs.getInt("DECIMAL_DIGITS") : rs.getInt(9);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
           digits = -1;
         }
         if (rs.wasNull()) digits = -1;
@@ -169,18 +151,14 @@ public class JdbcTableDefinitionReader
         String remarks = getString(rs, "REMARKS", 12, useColumnNames);
         String defaultValue = getString(rs, "COLUMN_DEF", 13, useColumnNames);
 
-        if (defaultValue != null && dbSettings.trimDefaults())
-        {
+        if (defaultValue != null && dbSettings.trimDefaults()) {
           defaultValue = defaultValue.trim();
         }
 
         int position = -1;
-        try
-        {
+        try {
           position = useColumnNames ? rs.getInt("ORDINAL_POSITION") : rs.getInt(17);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
           LogMgr.logWarning("DbMetadata", "JDBC driver does not suport ORDINAL_POSITION column for getColumns()", e);
           position = -1;
         }
@@ -188,25 +166,22 @@ public class JdbcTableDefinitionReader
         String nullable = getString(rs, "IS_NULLABLE", 18, useColumnNames);
 
         String increment = "NO";
-        if (jdbc4)
-        {
+        if (jdbc4) {
           increment = useColumnNames ? rs.getString("IS_AUTOINCREMENT") : rs.getString(23);
         }
         boolean autoincrement = StringUtil.stringToBool(increment);
 
         String display = typeResolver.getSqlTypeDisplay(typeName, sqlType, size, digits);
 
-        if (dbConnection.getMetadata().isSqlServer() && dbSettings.fixSqlServerAutoincrement())
-        {
-					// The Microsoft JDBC Driver does not return the autoincrement attribute correctly for identity columns.
+        if (dbConnection.getMetadata().isSqlServer() && dbSettings.fixSqlServerAutoincrement()) {
+          // The Microsoft JDBC Driver does not return the autoincrement attribute correctly for identity columns.
           // (And they refuse to fix this: http://social.msdn.microsoft.com/Forums/en/sqldataaccess/thread/20df12f3-d1bf-4526-9daa-239a83a8e435)
           // This hack works around Microsoft's ignorance regarding Java and JDBC
           autoincrement = display.contains("identity");
         }
 
         boolean isGenerated = false;
-        if (jdbc41)
-        {
+        if (jdbc41) {
           String generated = useColumnNames ? rs.getString("IS_GENERATEDCOLUMN") : rs.getString(24);
           isGenerated = StringUtil.stringToBool(generated);
           col.setIsGenerated(Boolean.valueOf(isGenerated));
@@ -223,27 +198,21 @@ public class JdbcTableDefinitionReader
         col.setPosition(position);
         columns.add(col);
       }
-    }
-    finally
-    {
+    } finally {
       SqlUtil.closeResult(rs);
     }
 
-		// Some JDBC drivers (e.g. Ingres) do not return the columns in the correct order, so we need to make sure they are sorted correctly
+    // Some JDBC drivers (e.g. Ingres) do not return the columns in the correct order, so we need to make sure they are sorted correctly
     // for any DBMS returning them in the correct order, this shouldn't make a difference.
     ColumnIdentifier.sortByPosition(columns);
 
     return columns;
   }
 
-  private String getString(ResultSet rs, String colName, int colIndex, boolean useColumnNames)
-  {
-    try
-    {
+  private String getString(ResultSet rs, String colName, int colIndex, boolean useColumnNames) {
+    try {
       return useColumnNames ? rs.getString(colName) : rs.getString(colIndex);
-    }
-    catch (Exception ex)
-    {
+    } catch (Exception ex) {
       LogMgr.logError("JdbcTableDefinitionReader.getString()", "Could not read column " + colName, ex);
     }
     return null;
@@ -256,15 +225,13 @@ public class JdbcTableDefinitionReader
    *
    * @param toRead         The table for which the definition should be retrieved
    * @param readPrimaryKey If true the PK information for the table will also be retrieved
-   *
-   * @throws SQLException
    * @return the definition of the table.
+   * @throws SQLException
    * @see TableColumnsDatastore
    */
   @Override
   public TableDefinition getTableDefinition(TableIdentifier toRead, boolean readPrimaryKey)
-    throws SQLException
-  {
+      throws SQLException {
     if (toRead == null) return null;
 
     TableIdentifier table = toRead.createCopy();
@@ -275,27 +242,23 @@ public class JdbcTableDefinitionReader
     String tablename = SqlUtil.removeObjectQuotes(table.getTableName());
 
     DbMetadata meta = dbConnection.getMetadata();
-    if (schema == null)
-    {
+    if (schema == null) {
       schema = meta.getCurrentSchema();
       table.setSchema(schema);
     }
 
-    if (catalog == null)
-    {
+    if (catalog == null) {
       catalog = meta.getCurrentCatalog();
       table.setCatalog(catalog);
     }
 
     TableIdentifier retrieve = table;
 
-    if (dbConnection.getDbSettings().isSynonymType(table.getType()))
-    {
+    if (dbConnection.getDbSettings().isSynonymType(table.getType())) {
       TableIdentifier id = table.getRealTable();
       if (id == null) id = meta.getSynonymTable(catalog, schema, tablename);
 
-      if (id != null)
-      {
+      if (id != null) {
         schema = id.getSchema();
         tablename = id.getTableName();
         catalog = null;
@@ -306,8 +269,7 @@ public class JdbcTableDefinitionReader
       }
     }
 
-    if (readPrimaryKey)
-    {
+    if (readPrimaryKey) {
       PkDefinition pk = meta.getIndexReader().getPrimaryKey(retrieve);
       retrieve.setPrimaryKey(pk);
     }
@@ -318,62 +280,52 @@ public class JdbcTableDefinitionReader
     TableDefinition result = new TableDefinition(retrieve, columns);
 
     ColumnDefinitionEnhancer columnEnhancer = getColumnEnhancer(dbConnection);
-    if (columnEnhancer != null)
-    {
+    if (columnEnhancer != null) {
       columnEnhancer.updateColumnDefinition(result, dbConnection);
     }
 
     return result;
   }
 
-  private ColumnDefinitionEnhancer getColumnEnhancer(WbConnection con)
-  {
+  private ColumnDefinitionEnhancer getColumnEnhancer(WbConnection con) {
     if (con == null) return null;
     DbMetadata meta = con.getMetadata();
     if (meta == null) return null;
 
-    if (meta.isPostgres())
-    {
+    if (meta.isPostgres()) {
       return new PostgresColumnEnhancer();
     }
-    if (meta.isH2())
-    {
+    if (meta.isH2()) {
       return new H2ColumnEnhancer();
     }
-    if (meta.isApacheDerby())
-    {
+    if (meta.isApacheDerby()) {
       return new DerbyColumnEnhancer();
     }
-    if (meta.isMySql())
-    {
+    if (meta.isMySql()) {
       return new MySQLColumnEnhancer();
     }
-    if (con.getDbId().equals("db2"))
-    {
+    if (con.getDbId().equals("db2")) {
       return new Db2ColumnEnhancer();
     }
-    if (con.getDbId().equals("informix_dynamic_server"))
-    {
+    if (con.getDbId().equals("informix_dynamic_server")) {
       return new InformixColumnEnhancer();
     }
-    if (meta.isSqlServer() && SqlServerUtil.isSqlServer2000(con))
-    {
+    if (meta.isSqlServer() && SqlServerUtil.isSqlServer2000(con)) {
       return new SqlServerColumnEnhancer();
     }
-    if (meta.isFirebird())
-    {
+    if (meta.isFirebird()) {
       return new FirebirdColumnEnhancer();
     }
-    if (con.getDbId().equals("nuodb"))
-    {
+    if (meta.isRdb()) {
+      return new RdbColumnEnhancer();
+    }
+    if (con.getDbId().equals("nuodb")) {
       return new NuoDbColumnEnhancer();
     }
-    if (meta.isHsql() && JdbcUtils.hasMinimumServerVersion(con, "2.0"))
-    {
+    if (meta.isHsql() && JdbcUtils.hasMinimumServerVersion(con, "2.0")) {
       return new HsqlColumnEnhancer();
     }
-    if (meta.getDbId().equals(DbMetadata.DBID_OPENEDGE))
-    {
+    if (meta.getDbId().equals(DbMetadata.DBID_OPENEDGE)) {
       return new OpenEdgeColumnEnhancer();
     }
     return null;

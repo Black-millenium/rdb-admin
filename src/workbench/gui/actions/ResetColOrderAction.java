@@ -22,36 +22,32 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
 import workbench.gui.components.ColumnOrderMgr;
 import workbench.gui.components.WbTable;
 
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class ResetColOrderAction
-	extends WbAction
-{
-	private WbTable table;
+    extends WbAction {
+  private WbTable table;
 
-	public ResetColOrderAction(WbTable client)
-	{
-		super();
-		initMenuDefinition("MnuTxtClearColOrder");
-		table = client;
-	}
+  public ResetColOrderAction(WbTable client) {
+    super();
+    initMenuDefinition("MnuTxtClearColOrder");
+    table = client;
+  }
 
-	@Override
-	public boolean isEnabled()
-	{
-		return ColumnOrderMgr.getInstance().isOrderSaved(table);
-	}
+  @Override
+  public boolean isEnabled() {
+    return ColumnOrderMgr.getInstance().isOrderSaved(table);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		ColumnOrderMgr.getInstance().resetColumnOrder(table);
-	}
-	
+  @Override
+  public void executeAction(ActionEvent e) {
+    ColumnOrderMgr.getInstance().resetColumnOrder(table);
+  }
+
 }

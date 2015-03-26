@@ -22,31 +22,26 @@ package workbench.sql.wbcommands;
 import workbench.resource.ResourceMgr;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class InvalidConnectionDescriptor
-	extends Exception
-{
-	private String logMessage;
-	private String localizedMessage;
+    extends Exception {
+  private String logMessage;
+  private String localizedMessage;
 
-	public InvalidConnectionDescriptor(String logMessage, String message)
-	{
-		this.logMessage = logMessage;
-		this.localizedMessage = message;
-	}
+  public InvalidConnectionDescriptor(String logMessage, String message) {
+    this.logMessage = logMessage;
+    this.localizedMessage = message;
+  }
 
-	@Override
-	public String getLocalizedMessage()
-	{
-		return ResourceMgr.getString("ErrInvalidConnection") + ": " + localizedMessage;
-	}
+  @Override
+  public String getLocalizedMessage() {
+    return ResourceMgr.getString("ErrInvalidConnection") + ": " + localizedMessage;
+  }
 
-	@Override
-	public String getMessage()
-	{
-		return logMessage;
-	}
+  @Override
+  public String getMessage() {
+    return logMessage;
+  }
 
 }

@@ -22,104 +22,87 @@
  */
 package workbench.gui.actions;
 
-import java.awt.BorderLayout;
-import java.awt.Frame;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
-
 import workbench.WbManager;
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
 import workbench.gui.WbSwingUtilities;
 import workbench.gui.components.ValidatingDialog;
 import workbench.gui.components.WbTabbedPane;
 import workbench.gui.sql.EditorPanel;
 import workbench.gui.sql.SqlPanel;
-
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
 import workbench.util.StringUtil;
 
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class ShowSourceQueryAction
-	extends WbAction
-{
-	private SqlPanel panel;
+    extends WbAction {
+  private SqlPanel panel;
 
-	public ShowSourceQueryAction(SqlPanel handler)
-	{
-		panel = handler;
-		isConfigurable = false;
-		initMenuDefinition("MnuTxtShowQuery");
-	}
+  public ShowSourceQueryAction(SqlPanel handler) {
+    panel = handler;
+    isConfigurable = false;
+    initMenuDefinition("MnuTxtShowQuery");
+  }
 
-	@Override
-	public boolean isEnabled()
-	{
-		return (panel != null && panel.getSourceQuery() != null);
-	}
+  @Override
+  public boolean isEnabled() {
+    return (panel != null && panel.getSourceQuery() != null);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		showQuery();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    showQuery();
+  }
 
-	public void showQuery()
-	{
-		EditorPanel editor = EditorPanel.createSqlEditor();
-		WbTabbedPane tab = new WbTabbedPane();
+  public void showQuery() {
+    EditorPanel editor = EditorPanel.createSqlEditor();
+    WbTabbedPane tab = new WbTabbedPane();
 
-		String sql = panel.getSourceQuery();
+    String sql = panel.getSourceQuery();
 
-		JPanel display = new JPanel(new BorderLayout(0,5));
+    JPanel display = new JPanel(new BorderLayout(0, 5));
 
-		editor.setText(sql);
-		editor.setCaretPosition(0);
-		editor.setEditable(false);
-		Window w = SwingUtilities.getWindowAncestor(panel);
-		Frame f = null;
-		if (w instanceof Frame)
-		{
-			f = (Frame)w;
-		}
-		else
-		{
-			f = WbManager.getInstance().getCurrentWindow();
-		}
+    editor.setText(sql);
+    editor.setCaretPosition(0);
+    editor.setEditable(false);
+    Window w = SwingUtilities.getWindowAncestor(panel);
+    Frame f = null;
+    if (w instanceof Frame) {
+      f = (Frame) w;
+    } else {
+      f = WbManager.getInstance().getCurrentWindow();
+    }
 
-		String loadedAt = StringUtil.formatIsoTimestamp(panel.getLoadedAt());
-		String msg = ResourceMgr.getFormattedString("TxtLastExec", loadedAt);
-		JLabel lbl = new JLabel(msg);
-		Border etched = new EtchedBorder(EtchedBorder.LOWERED);
-		lbl.setBorder(new CompoundBorder(etched, new EmptyBorder(3, 2, 2, 0)));
+    String loadedAt = StringUtil.formatIsoTimestamp(panel.getLoadedAt());
+    String msg = ResourceMgr.getFormattedString("TxtLastExec", loadedAt);
+    JLabel lbl = new JLabel(msg);
+    Border etched = new EtchedBorder(EtchedBorder.LOWERED);
+    lbl.setBorder(new CompoundBorder(etched, new EmptyBorder(3, 2, 2, 0)));
 
-		display.add(editor, BorderLayout.CENTER);
-		display.add(lbl, BorderLayout.NORTH);
+    display.add(editor, BorderLayout.CENTER);
+    display.add(lbl, BorderLayout.NORTH);
 
-		ResultSetInfoPanel resultInfo = new ResultSetInfoPanel(panel.getCurrentResult());
+    ResultSetInfoPanel resultInfo = new ResultSetInfoPanel(panel.getCurrentResult());
 
-		tab.addTab("SQL", display);
-		tab.addTab(ResourceMgr.getString("LblResultMeta"), resultInfo);
+    tab.addTab("SQL", display);
+    tab.addTab(ResourceMgr.getString("LblResultMeta"), resultInfo);
 
-		ValidatingDialog d = new ValidatingDialog(f, panel.getCurrentResultTitle(), tab, false);
-		if (!Settings.getInstance().restoreWindowSize(d, "workbench.resultquery.display"))
-		{
-			d.setSize(500,350);
-		}
-		WbSwingUtilities.center(d, f);
-		WbSwingUtilities.repaintLater(editor);
-		d.setVisible(true);
-		Settings.getInstance().storeWindowSize(d,"workbench.resultquery.display");
-	}
+    ValidatingDialog d = new ValidatingDialog(f, panel.getCurrentResultTitle(), tab, false);
+    if (!Settings.getInstance().restoreWindowSize(d, "workbench.resultquery.display")) {
+      d.setSize(500, 350);
+    }
+    WbSwingUtilities.center(d, f);
+    WbSwingUtilities.repaintLater(editor);
+    d.setVisible(true);
+    Settings.getInstance().storeWindowSize(d, "workbench.resultquery.display");
+  }
 }

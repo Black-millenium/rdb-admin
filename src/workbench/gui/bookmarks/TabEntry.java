@@ -23,54 +23,44 @@ package workbench.gui.bookmarks;
 import java.util.Comparator;
 
 /**
- *
  * @author Thomas Kellerer
  */
-class TabEntry
-{
-	private final String id;
-	private final String label;
-	private final int index;
+class TabEntry {
+  private final String id;
+  private final String label;
+  private final int index;
 
-	static final Comparator<TabEntry> INDEX_SORTER = new Comparator<TabEntry>()
-	{
-		@Override
-		public int compare(TabEntry o1, TabEntry o2)
-		{
-			return o1.index - o2.index;
-		}
-	};
+  static final Comparator<TabEntry> INDEX_SORTER = new Comparator<TabEntry>() {
+    @Override
+    public int compare(TabEntry o1, TabEntry o2) {
+      return o1.index - o2.index;
+    }
+  };
 
-	TabEntry(String tabId, String tabLabel, int tabIndex)
-	{
-		this.id = tabId;
-		this.label = tabLabel;
-		this.index = tabIndex;
-	}
+  TabEntry(String tabId, String tabLabel, int tabIndex) {
+    this.id = tabId;
+    this.label = tabLabel;
+    this.index = tabIndex;
+  }
 
-	String getId()
-	{
-		return id;
-	}
+  String getId() {
+    return id;
+  }
 
-	String getLabel()
-	{
-		return label;
-	}
+  String getLabel() {
+    return label;
+  }
 
-	int getIndex()
-	{
-		return index;
-	}
+  int getIndex() {
+    return index;
+  }
 
-	@Override
-	public String toString()
-	{
-		if (index < 0)
-		{
-			return label;
-		}
-		return label + " - " + (index + 1);
-	}
+  @Override
+  public String toString() {
+    if (index < 0) {
+      return label;
+    }
+    return label + " - " + (index + 1);
+  }
 
 }

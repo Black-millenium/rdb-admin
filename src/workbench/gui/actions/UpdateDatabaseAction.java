@@ -22,25 +22,22 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
+import workbench.db.WbConnection;
 import workbench.interfaces.DbUpdater;
 import workbench.resource.IconMgr;
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
 
-import workbench.db.WbConnection;
+import java.awt.event.ActionEvent;
 
 /**
  * @author Thomas Kellerer
  */
 public class UpdateDatabaseAction
-  extends WbAction
-{
+    extends WbAction {
   private DbUpdater panel;
 
-  public UpdateDatabaseAction(DbUpdater aPanel)
-  {
+  public UpdateDatabaseAction(DbUpdater aPanel) {
     super();
     this.panel = aPanel;
     this.initMenuDefinition("MnuTxtUpdateDatabase");
@@ -51,13 +48,11 @@ public class UpdateDatabaseAction
   }
 
   @Override
-  public void executeAction(ActionEvent e)
-  {
+  public void executeAction(ActionEvent e) {
     boolean confirm = Settings.getInstance().getPreviewDml();
 
     WbConnection connection = panel.getConnection();
-    if (connection != null)
-    {
+    if (connection != null) {
       confirm = confirm || connection.confirmUpdatesInSession();
     }
     confirm = confirm || isCtrlPressed(e);
@@ -65,8 +60,7 @@ public class UpdateDatabaseAction
     panel.saveChangesToDatabase(confirm);
   }
 
-  public void setClient(DbUpdater client)
-  {
+  public void setClient(DbUpdater client) {
     this.panel = client;
   }
 

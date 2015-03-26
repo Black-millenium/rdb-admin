@@ -22,86 +22,90 @@
  */
 package workbench.gui.settings;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-
 import workbench.interfaces.Restoreable;
 import workbench.resource.GeneratedIdentifierCase;
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class SqlGenerationOptionsPanel
-	extends JPanel
-	implements Restoreable
-{
+    extends JPanel
+    implements Restoreable {
 
-	public SqlGenerationOptionsPanel()
-	{
-		super();
-		initComponents();
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private JLabel copyLiteralLabel;
+  private JLabel diffLiteralsLabel;
+  private JComboBox diffLiteralsType;
+  private JLabel exportLiteralLabel;
+  private JComboBox exportLiteralTypes;
+  private JCheckBox formatDeletes;
+  private JCheckBox formatInserts;
+  private JCheckBox formatUpdates;
+  private JCheckBox ignoreIdentity;
+  private JCheckBox includeEmptyComments;
+  private JCheckBox includeOwner;
+  private JPanel jPanel1;
+  private JPanel jPanel2;
+  private JPanel jPanel3;
+  private JPanel jPanel5;
+  private JComboBox literalTypes;
+  private JComboBox tableNameCase;
+  private JLabel tableNameCaseLabel;
+  public SqlGenerationOptionsPanel() {
+    super();
+    initComponents();
 
-		List<String> types = Settings.getInstance().getLiteralTypeList();
-		ComboBoxModel model1 = new DefaultComboBoxModel(types.toArray());
-		literalTypes.setModel(model1);
-		ComboBoxModel model2 = new DefaultComboBoxModel(types.toArray());
-		exportLiteralTypes.setModel(model2);
-		ComboBoxModel model3 = new DefaultComboBoxModel(types.toArray());
-		diffLiteralsType.setModel(model3);
-		tableNameCase.setModel(new DefaultComboBoxModel(GeneratedIdentifierCase.values()));
-	}
+    List<String> types = Settings.getInstance().getLiteralTypeList();
+    ComboBoxModel model1 = new DefaultComboBoxModel(types.toArray());
+    literalTypes.setModel(model1);
+    ComboBoxModel model2 = new DefaultComboBoxModel(types.toArray());
+    exportLiteralTypes.setModel(model2);
+    ComboBoxModel model3 = new DefaultComboBoxModel(types.toArray());
+    diffLiteralsType.setModel(model3);
+    tableNameCase.setModel(new DefaultComboBoxModel(GeneratedIdentifierCase.values()));
+  }
 
-	@Override
-	public void restoreSettings()
-	{
-		GeneratedIdentifierCase genCase = Settings.getInstance().getGeneratedSqlTableCase();
-		this.tableNameCase.setSelectedItem(genCase);
+  @Override
+  public void restoreSettings() {
+    GeneratedIdentifierCase genCase = Settings.getInstance().getGeneratedSqlTableCase();
+    this.tableNameCase.setSelectedItem(genCase);
 
-		this.literalTypes.setSelectedItem(Settings.getInstance().getDefaultCopyDateLiteralType());
-		this.exportLiteralTypes.setSelectedItem(Settings.getInstance().getDefaultExportDateLiteralType());
-		this.diffLiteralsType.setSelectedItem(Settings.getInstance().getDefaultDiffDateLiteralType());
-		this.includeEmptyComments.setSelected(Settings.getInstance().getIncludeEmptyComments());
-		ignoreIdentity.setSelected(Settings.getInstance().getGenerateInsertIgnoreIdentity());
-	}
+    this.literalTypes.setSelectedItem(Settings.getInstance().getDefaultCopyDateLiteralType());
+    this.exportLiteralTypes.setSelectedItem(Settings.getInstance().getDefaultExportDateLiteralType());
+    this.diffLiteralsType.setSelectedItem(Settings.getInstance().getDefaultDiffDateLiteralType());
+    this.includeEmptyComments.setSelected(Settings.getInstance().getIncludeEmptyComments());
+    ignoreIdentity.setSelected(Settings.getInstance().getGenerateInsertIgnoreIdentity());
+  }
 
-	@Override
-	public void saveSettings()
-	{
-		Settings set = Settings.getInstance();
-		set.setDoFormatUpdates(formatUpdates.isSelected());
-		set.setDoFormatInserts(formatInserts.isSelected());
-		set.setDoFormatDeletes(formatDeletes.isSelected());
-		set.setIncludeOwnerInSqlExport(includeOwner.isSelected());
-		set.setGeneratedSqlTableCase((GeneratedIdentifierCase)tableNameCase.getSelectedItem());
-		set.setDefaultCopyDateLiteralType((String)literalTypes.getSelectedItem());
-		set.setDefaultExportDateLiteralType((String)exportLiteralTypes.getSelectedItem());
-		set.setDefaultDiffDateLiteralType((String)diffLiteralsType.getSelectedItem());
-		set.setIncludeEmptyComments(includeEmptyComments.isSelected());
-		set.setGenerateInsertIgnoreIdentity(ignoreIdentity.isSelected());
-	}
+  @Override
+  public void saveSettings() {
+    Settings set = Settings.getInstance();
+    set.setDoFormatUpdates(formatUpdates.isSelected());
+    set.setDoFormatInserts(formatInserts.isSelected());
+    set.setDoFormatDeletes(formatDeletes.isSelected());
+    set.setIncludeOwnerInSqlExport(includeOwner.isSelected());
+    set.setGeneratedSqlTableCase((GeneratedIdentifierCase) tableNameCase.getSelectedItem());
+    set.setDefaultCopyDateLiteralType((String) literalTypes.getSelectedItem());
+    set.setDefaultExportDateLiteralType((String) exportLiteralTypes.getSelectedItem());
+    set.setDefaultDiffDateLiteralType((String) diffLiteralsType.getSelectedItem());
+    set.setIncludeEmptyComments(includeEmptyComments.isSelected());
+    set.setGenerateInsertIgnoreIdentity(ignoreIdentity.isSelected());
+  }
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     GridBagConstraints gridBagConstraints;
 
     formatUpdates = new JCheckBox();
@@ -198,7 +202,7 @@ public class SqlGenerationOptionsPanel
     gridBagConstraints.insets = new Insets(11, 12, 0, 0);
     add(tableNameCaseLabel, gridBagConstraints);
 
-    tableNameCase.setModel(new DefaultComboBoxModel(new String[] { "As is", "Lowercase", "Uppercase" }));
+    tableNameCase.setModel(new DefaultComboBoxModel(new String[]{"As is", "Lowercase", "Uppercase"}));
     tableNameCase.setToolTipText(ResourceMgr.getDescription("LblGenTableNameCase"));
     gridBagConstraints = new GridBagConstraints();
     gridBagConstraints.gridx = 1;
@@ -329,27 +333,6 @@ public class SqlGenerationOptionsPanel
     gridBagConstraints.weighty = 1.0;
     add(jPanel5, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
-
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private JLabel copyLiteralLabel;
-  private JLabel diffLiteralsLabel;
-  private JComboBox diffLiteralsType;
-  private JLabel exportLiteralLabel;
-  private JComboBox exportLiteralTypes;
-  private JCheckBox formatDeletes;
-  private JCheckBox formatInserts;
-  private JCheckBox formatUpdates;
-  private JCheckBox ignoreIdentity;
-  private JCheckBox includeEmptyComments;
-  private JCheckBox includeOwner;
-  private JPanel jPanel1;
-  private JPanel jPanel2;
-  private JPanel jPanel3;
-  private JPanel jPanel5;
-  private JComboBox literalTypes;
-  private JComboBox tableNameCase;
-  private JLabel tableNameCaseLabel;
   // End of variables declaration//GEN-END:variables
 
 }

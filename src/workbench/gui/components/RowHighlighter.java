@@ -22,10 +22,8 @@
 package workbench.gui.components;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface RowHighlighter
-{
-	boolean hightlightColumn(int row, String column, Object columnValue);
+public interface RowHighlighter {
+  boolean hightlightColumn(int row, String column, Object columnValue);
 }

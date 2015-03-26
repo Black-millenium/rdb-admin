@@ -22,30 +22,28 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
 import workbench.gui.MainWindow;
 import workbench.interfaces.MainPanel;
 
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class CloseOtherTabsAction
-	extends WbAction
-{
-	private MainPanel keepOpen;
-	private MainWindow client;
-	public CloseOtherTabsAction(MainWindow window)
-	{
-		keepOpen = window.getCurrentPanel();
-		client = window;
-		initMenuDefinition("MnuTxtCloseOthers");
-	}
+    extends WbAction {
+  private MainPanel keepOpen;
+  private MainWindow client;
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		client.closeOtherPanels(keepOpen);
-	}
+  public CloseOtherTabsAction(MainWindow window) {
+    keepOpen = window.getCurrentPanel();
+    client = window;
+    initMenuDefinition("MnuTxtCloseOthers");
+  }
+
+  @Override
+  public void executeAction(ActionEvent e) {
+    client.closeOtherPanels(keepOpen);
+  }
 
 }

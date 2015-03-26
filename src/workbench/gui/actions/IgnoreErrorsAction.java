@@ -22,55 +22,48 @@
  */
 package workbench.gui.actions;
 
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
-
+import workbench.gui.components.WbToolbarButton;
 import workbench.resource.IconMgr;
 import workbench.resource.Settings;
 
-import workbench.gui.components.WbToolbarButton;
+import javax.swing.*;
 
 /**
- *	Toggle the "ignore errors" settings
- *	@author  Thomas Kellerer
+ * Toggle the "ignore errors" settings
+ *
+ * @author Thomas Kellerer
  */
 public class IgnoreErrorsAction
-	extends CheckBoxAction
-{
-	private JToggleButton toggleButton;
+    extends CheckBoxAction {
+  private JToggleButton toggleButton;
 
-	public IgnoreErrorsAction()
-	{
-		super("MnuTxtIgnoreErrors", null);
-		super.setSwitchedOn(Settings.getInstance().getIgnoreErrors());
-	}
+  public IgnoreErrorsAction() {
+    super("MnuTxtIgnoreErrors", null);
+    super.setSwitchedOn(Settings.getInstance().getIgnoreErrors());
+  }
 
-	public JToggleButton createButton()
-	{
-		this.toggleButton = new JToggleButton(this);
-		this.toggleButton.setText(null);
-		this.toggleButton.setMargin(WbToolbarButton.MARGIN);
-		this.toggleButton.setIcon(IconMgr.getInstance().getToolbarIcon("ignore_error"));
-		this.toggleButton.setSelected(isSwitchedOn());
-		return this.toggleButton;
-	}
+  public JToggleButton createButton() {
+    this.toggleButton = new JToggleButton(this);
+    this.toggleButton.setText(null);
+    this.toggleButton.setMargin(WbToolbarButton.MARGIN);
+    this.toggleButton.setIcon(IconMgr.getInstance().getToolbarIcon("ignore_error"));
+    this.toggleButton.setSelected(isSwitchedOn());
+    return this.toggleButton;
+  }
 
-	@Override
-	public void addToToolbar(JToolBar aToolbar)
-	{
-		if (this.toggleButton == null) this.createButton();
-		aToolbar.add(this.toggleButton);
-	}
+  @Override
+  public void addToToolbar(JToolBar aToolbar) {
+    if (this.toggleButton == null) this.createButton();
+    aToolbar.add(this.toggleButton);
+  }
 
-	@Override
-	public void setSwitchedOn(boolean aFlag)
-	{
-		super.setSwitchedOn(aFlag);
-		if (this.toggleButton != null)
-		{
-			this.toggleButton.setSelected(isSwitchedOn());
-		}
-		Settings.getInstance().setIgnoreErrors(isSwitchedOn());
-	}
+  @Override
+  public void setSwitchedOn(boolean aFlag) {
+    super.setSwitchedOn(aFlag);
+    if (this.toggleButton != null) {
+      this.toggleButton.setSelected(isSwitchedOn());
+    }
+    Settings.getInstance().setIgnoreErrors(isSwitchedOn());
+  }
 
 }

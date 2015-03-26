@@ -23,21 +23,30 @@
 package workbench.interfaces;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface TextContainer
-{
-	String getText();
-	String getSelectedText();
-	void setSelectedText(String aText);
-	void setText(String aText);
-	void setCaretPosition(int pos);
-	int getCaretPosition();
-	int getSelectionStart();
-	int getSelectionEnd();
-	void select(int start, int end);
-	void setEditable(boolean flag);
-	boolean isEditable();
-	boolean isTextSelected();
+public interface TextContainer {
+  String getText();
+
+  void setText(String aText);
+
+  String getSelectedText();
+
+  void setSelectedText(String aText);
+
+  int getCaretPosition();
+
+  void setCaretPosition(int pos);
+
+  int getSelectionStart();
+
+  int getSelectionEnd();
+
+  void select(int start, int end);
+
+  boolean isEditable();
+
+  void setEditable(boolean flag);
+
+  boolean isTextSelected();
 }

@@ -23,28 +23,23 @@
 package workbench.sql.wbcommands;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class MissingWidthDefinition
-	extends Exception
-{
-	private String colname;
+    extends Exception {
+  private String colname;
 
-	public MissingWidthDefinition(String col)
-	{
-		super();
-		colname = col;
-	}
+  public MissingWidthDefinition(String col) {
+    super();
+    colname = col;
+  }
 
-	public String getColumnName()
-	{
-		return colname;
-	}
+  public String getColumnName() {
+    return colname;
+  }
 
-	@Override
-	public String getMessage()
-	{
-		return "Missing or invalid width definition for: " + colname;
-	}
+  @Override
+  public String getMessage() {
+    return "Missing or invalid width definition for: " + colname;
+  }
 }

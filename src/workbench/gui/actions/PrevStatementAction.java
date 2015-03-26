@@ -22,35 +22,33 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
+import workbench.gui.sql.SqlHistory;
 import workbench.resource.PlatformShortcuts;
 import workbench.resource.ResourceMgr;
 
-import workbench.gui.sql.SqlHistory;
+import java.awt.event.ActionEvent;
 
 /**
- *	Display the previous statement from the SQL History
- *	@author  Thomas Kellerer
+ * Display the previous statement from the SQL History
+ *
+ * @author Thomas Kellerer
  */
 public class PrevStatementAction
-	extends WbAction
-{
-	private SqlHistory history;
-	public PrevStatementAction(SqlHistory aHistory)
-	{
-		super();
-		this.history = aHistory;
-		this.initMenuDefinition("MnuTxtPrevStatement", PlatformShortcuts.getDefaultPrevStatement());
-		this.setIcon("Back");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
-		this.setCreateMenuSeparator(false);
-		this.setCreateToolbarSeparator(false);
-	}
+    extends WbAction {
+  private SqlHistory history;
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.history.showPreviousStatement();
-	}
+  public PrevStatementAction(SqlHistory aHistory) {
+    super();
+    this.history = aHistory;
+    this.initMenuDefinition("MnuTxtPrevStatement", PlatformShortcuts.getDefaultPrevStatement());
+    this.setIcon("Back");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
+    this.setCreateMenuSeparator(false);
+    this.setCreateToolbarSeparator(false);
+  }
+
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.history.showPreviousStatement();
+  }
 }

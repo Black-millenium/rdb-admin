@@ -20,6 +20,18 @@
  */
 package workbench.sql.wbcommands;
 
+import workbench.db.DbSettings;
+import workbench.db.WbConnection;
+import workbench.interfaces.JobErrorHandler;
+import workbench.resource.Settings;
+import workbench.sql.SqlCommand;
+import workbench.sql.StatementRunnerResult;
+import workbench.storage.DataStore;
+import workbench.storage.DmlStatement;
+import workbench.storage.RowData;
+import workbench.util.ArgumentParser;
+import workbench.util.StringUtil;
+
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Collections;
@@ -28,260 +40,203 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import workbench.db.DbSettings;
-import workbench.interfaces.JobErrorHandler;
-import workbench.resource.Settings;
-
-import workbench.db.WbConnection;
-
-import workbench.storage.DataStore;
-import workbench.storage.DmlStatement;
-import workbench.storage.RowData;
-
-import workbench.sql.SqlCommand;
-import workbench.sql.StatementRunnerResult;
-
-import workbench.util.ArgumentParser;
-import workbench.util.StringUtil;
-
 /**
- *
  * @author Thomas Kellerer
  */
 public class WbShowProps
-	extends SqlCommand
-{
-	public static final String VERB = "WbProps";
-	public static final String ALTERNATE_VERB = "WbShowProps";
+    extends SqlCommand {
+  public static final String VERB = "WbProps";
+  public static final String ALTERNATE_VERB = "WbShowProps";
 
-	public WbShowProps()
-	{
-		super();
-		cmdLine = new ArgumentParser();
-		cmdLine.addArgument("type", StringUtil.stringToList("wb,system,db"));
-	}
+  public WbShowProps() {
+    super();
+    cmdLine = new ArgumentParser();
+    cmdLine.addArgument("type", StringUtil.stringToList("wb,system,db"));
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException, Exception
-	{
-		StatementRunnerResult result = new StatementRunnerResult(sql);
+  static DataStore getWbProperties(String prefix) {
+    DataStore data = new PropertyDataStore(true);
+    Set<String> keys = Settings.getInstance().getKeys();
 
-		String args = getCommandLine(sql);
-		cmdLine.parse(args);
+    for (String key : keys) {
+      if (isWorkbenchProperty(key) && (prefix == null || key.startsWith(prefix))) {
+        int row = data.addRow();
+        data.setValue(row, 0, key);
+        data.setValue(row, 1, Settings.getInstance().getProperty(key, null));
+      }
+    }
+    data.sortByColumn(0, true);
+    data.setResultName("Workbench Properties");
+    data.resetStatus();
+    return data;
+  }
 
-		if (cmdLine.hasArguments() || StringUtil.isBlank(args))
-		{
-			List<String> types = cmdLine.getListValue("type");
+  private static boolean isWorkbenchProperty(String key) {
+    return key.startsWith("workbench.db")
+        || key.startsWith("workbench.settings.")
+        || (key.startsWith("workbench.sql") && !key.startsWith("workbench.sql.replace.")
+        && !key.startsWith("workbench.sql.formatter.")
+        && !key.startsWith("workbench.sql.search."));
+  }
 
-			if (types.contains("wb"))
-			{
-				result.addDataStore(getWbProperties(null));
-			}
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException, Exception {
+    StatementRunnerResult result = new StatementRunnerResult(sql);
 
-			if (types.isEmpty() || types.contains("system"))
-			{
-				result.addDataStore(getSystemProperties());
-			}
+    String args = getCommandLine(sql);
+    cmdLine.parse(args);
 
-			if (types.contains("db") && currentConnection != null)
-			{
-				result.addDataStore(getWbProperties("workbench.db." + currentConnection.getDbId()));
-			}
-		}
-		else if (StringUtil.isNonBlank(args))
-		{
-			if (currentConnection != null)
-			{
-				args = args.toLowerCase().replace(DbSettings.DBID_PLACEHOLDER, currentConnection.getDbId());
-			}
-			DataStore ds = getWbProperties(args);
-			if (ds.getRowCount() > 0)
-			{
-				result.addDataStore(ds);
-			}
-		}
+    if (cmdLine.hasArguments() || StringUtil.isBlank(args)) {
+      List<String> types = cmdLine.getListValue("type");
 
-		result.setSuccess();
-		return result;
-	}
+      if (types.contains("wb")) {
+        result.addDataStore(getWbProperties(null));
+      }
 
-	static DataStore getWbProperties(String prefix)
-	{
-		DataStore data = new PropertyDataStore(true);
-		Set<String> keys = Settings.getInstance().getKeys();
+      if (types.isEmpty() || types.contains("system")) {
+        result.addDataStore(getSystemProperties());
+      }
 
-		for (String key : keys)
-		{
-			if (isWorkbenchProperty(key) && (prefix == null || key.startsWith(prefix)))
-			{
-				int row = data.addRow();
-				data.setValue(row, 0, key);
-				data.setValue(row, 1, Settings.getInstance().getProperty(key, null));
-			}
-		}
-		data.sortByColumn(0, true);
-		data.setResultName("Workbench Properties");
-		data.resetStatus();
-		return data;
-	}
+      if (types.contains("db") && currentConnection != null) {
+        result.addDataStore(getWbProperties("workbench.db." + currentConnection.getDbId()));
+      }
+    } else if (StringUtil.isNonBlank(args)) {
+      if (currentConnection != null) {
+        args = args.toLowerCase().replace(DbSettings.DBID_PLACEHOLDER, currentConnection.getDbId());
+      }
+      DataStore ds = getWbProperties(args);
+      if (ds.getRowCount() > 0) {
+        result.addDataStore(ds);
+      }
+    }
 
-	private static boolean isWorkbenchProperty(String key)
-	{
-		return key.startsWith("workbench.db")
-			    || key.startsWith("workbench.settings.")
-			    || (key.startsWith("workbench.sql") && !key.startsWith("workbench.sql.replace.")
-				                                      && !key.startsWith("workbench.sql.formatter.")
-				                                      && !key.startsWith("workbench.sql.search."));
-	}
+    result.setSuccess();
+    return result;
+  }
 
-	private DataStore getSystemProperties()
-	{
-		DataStore data = new PropertyDataStore(false);
-		Set<Entry<Object, Object>> entries = System.getProperties().entrySet();
-		for (Map.Entry<Object, Object> entry : entries)
-		{
-			int row = data.addRow();
-			data.setValue(row, 0, entry.getKey().toString());
-			data.setValue(row, 1, entry.getValue().toString());
-		}
-		data.sortByColumn(0, true);
-		data.setResultName("System Properties");
-		data.resetStatus();
-		return data;
-	}
+  private DataStore getSystemProperties() {
+    DataStore data = new PropertyDataStore(false);
+    Set<Entry<Object, Object>> entries = System.getProperties().entrySet();
+    for (Map.Entry<Object, Object> entry : entries) {
+      int row = data.addRow();
+      data.setValue(row, 0, entry.getKey().toString());
+      data.setValue(row, 1, entry.getValue().toString());
+    }
+    data.sortByColumn(0, true);
+    data.setResultName("System Properties");
+    data.resetStatus();
+    return data;
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	public String getAlternateVerb()
-	{
-		return ALTERNATE_VERB;
-	}
+  @Override
+  public String getAlternateVerb() {
+    return ALTERNATE_VERB;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	static class PropertyDataStore
-		extends DataStore
-	{
-		private boolean wbProps;
-		PropertyDataStore(boolean isWbProps)
-		{
-			super(new String[] { "PROPERTY", "VALUE"}, new int[] { Types.VARCHAR, Types.VARCHAR} );
-			wbProps = isWbProps;
-			getColumns()[0].setIsPkColumn(true);
-		}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 
-		@Override
-		public boolean checkUpdateTable()
-		{
-			return true;
-		}
+  static class PropertyDataStore
+      extends DataStore {
+    private boolean wbProps;
 
-		@Override
-		public boolean checkUpdateTable(WbConnection aConn)
-		{
-			return true;
-		}
+    PropertyDataStore(boolean isWbProps) {
+      super(new String[]{"PROPERTY", "VALUE"}, new int[]{Types.VARCHAR, Types.VARCHAR});
+      wbProps = isWbProps;
+      getColumns()[0].setIsPkColumn(true);
+    }
 
-		@Override
-		public boolean hasPkColumns()
-		{
-			return true;
-		}
+    @Override
+    public boolean checkUpdateTable() {
+      return true;
+    }
 
-		@Override
-		public boolean hasUpdateableColumns()
-		{
-			return true;
-		}
+    @Override
+    public boolean checkUpdateTable(WbConnection aConn) {
+      return true;
+    }
 
-		@Override
-		public boolean isUpdateable()
-		{
-			return true;
-		}
+    @Override
+    public boolean hasPkColumns() {
+      return true;
+    }
 
-		@Override
-		public boolean needPkForUpdate()
-		{
-			return true;
-		}
+    @Override
+    public boolean hasUpdateableColumns() {
+      return true;
+    }
 
-		@Override
-		public boolean pkColumnsComplete()
-		{
-			return true;
-		}
+    @Override
+    public boolean isUpdateable() {
+      return true;
+    }
 
-		@Override
-		public synchronized int updateDb(WbConnection aConnection, JobErrorHandler errorHandler)
-			throws SQLException
-		{
-			int rows = 0;
-			this.resetUpdateRowCounters();
+    @Override
+    public boolean needPkForUpdate() {
+      return true;
+    }
 
-			for (int row=0; row < getRowCount(); row++)
-			{
-				RowData rowData = getRow(row);
-				if (!rowData.isOriginal())
-				{
-					String key = getValueAsString(row, 0);
-					String value = getValueAsString(row, 1);
-					if (wbProps)
-					{
-						Settings.getInstance().setProperty(key, value);
-					}
-					else
-					{
-						System.setProperty(key, value);
-					}
-					getRow(row).resetStatus();
-					rows ++;
-				}
-			}
+    @Override
+    public boolean pkColumnsComplete() {
+      return true;
+    }
 
-			resetUpdateRowCounters();
-			RowData row = this.getNextDeletedRow();
-			while (row != null)
-			{
-				String key = row.getValue(0).toString();
-				if (wbProps)
-				{
-					Settings.getInstance().removeProperty(key);
-				}
-				else
-				{
-					System.clearProperty(key);
-				}
-				row = this.getNextDeletedRow();
-				rows ++;
-			}
-			resetStatus();
-			return rows;
-		}
+    @Override
+    public synchronized int updateDb(WbConnection aConnection, JobErrorHandler errorHandler)
+        throws SQLException {
+      int rows = 0;
+      this.resetUpdateRowCounters();
 
-		@Override
-		public List<DmlStatement> getUpdateStatements(WbConnection aConnection)
-			throws SQLException
-		{
-			return Collections.emptyList();
-		}
-	}
+      for (int row = 0; row < getRowCount(); row++) {
+        RowData rowData = getRow(row);
+        if (!rowData.isOriginal()) {
+          String key = getValueAsString(row, 0);
+          String value = getValueAsString(row, 1);
+          if (wbProps) {
+            Settings.getInstance().setProperty(key, value);
+          } else {
+            System.setProperty(key, value);
+          }
+          getRow(row).resetStatus();
+          rows++;
+        }
+      }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+      resetUpdateRowCounters();
+      RowData row = this.getNextDeletedRow();
+      while (row != null) {
+        String key = row.getValue(0).toString();
+        if (wbProps) {
+          Settings.getInstance().removeProperty(key);
+        } else {
+          System.clearProperty(key);
+        }
+        row = this.getNextDeletedRow();
+        rows++;
+      }
+      resetStatus();
+      return rows;
+    }
+
+    @Override
+    public List<DmlStatement> getUpdateStatements(WbConnection aConnection)
+        throws SQLException {
+      return Collections.emptyList();
+    }
+  }
 
 }
 

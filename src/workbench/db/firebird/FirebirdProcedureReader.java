@@ -25,92 +25,74 @@ package workbench.db.firebird;
 import workbench.db.JdbcProcedureReader;
 import workbench.db.ProcedureReader;
 import workbench.db.WbConnection;
-
 import workbench.storage.DataStore;
-
 import workbench.util.StringUtil;
 
 /**
  * An implementation of the ProcedureReader interface for the
  * <a href="http://www.firebirdsql.org">Firebird</a> database server.
- *
+ * <p/>
  * The new packages in Firebird 3.0 are not handled properly yes.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class FirebirdProcedureReader
-	extends JdbcProcedureReader
-{
-	public FirebirdProcedureReader(WbConnection conn)
-	{
-		super(conn);
-	}
+    extends JdbcProcedureReader {
+  public FirebirdProcedureReader(WbConnection conn) {
+    super(conn);
+  }
 
-	@Override
-	public boolean needsHeader(CharSequence procedureBody)
-	{
-		// Our statement to retrieve the procedure source will return
-		// the full package definition for a packaged procedure
-		String packageHeader = "CREATE PACKAGE";
-		if (procedureBody.subSequence(0, packageHeader.length()).equals(packageHeader))
-		{
-			return false;
-		}
-		return true;
-	}
+  @Override
+  public boolean needsHeader(CharSequence procedureBody) {
+    // Our statement to retrieve the procedure source will return
+    // the full package definition for a packaged procedure
+    String packageHeader = "CREATE PACKAGE";
+    if (procedureBody.subSequence(0, packageHeader.length()).equals(packageHeader)) {
+      return false;
+    }
+    return true;
+  }
 
-	@Override
-	public StringBuilder getProcedureHeader(String aCatalog, String aSchema, String aProcname, int procType)
-	{
-		// TODO: handle packages properly (e.g. like in Oracle)
+  @Override
+  public StringBuilder getProcedureHeader(String aCatalog, String aSchema, String aProcname, int procType) {
+    // TODO: handle packages properly (e.g. like in Oracle)
 
-		StringBuilder source = new StringBuilder();
-		try
-		{
-			DataStore ds = this.getProcedureColumns(aCatalog, aSchema, aProcname, null);
-			source.append("CREATE PROCEDURE ");
-			source.append(aProcname);
-			String retType = null;
-			int count = ds.getRowCount();
-			int added = 0;
-			for (int i=0; i < count; i++)
-			{
-				String vartype = ds.getValueAsString(i, ProcedureReader.COLUMN_IDX_PROC_COLUMNS_DATA_TYPE);
-				String name = ds.getValueAsString(i, ProcedureReader.COLUMN_IDX_PROC_COLUMNS_COL_NAME);
-				String ret = ds.getValueAsString(i, ProcedureReader.COLUMN_IDX_PROC_COLUMNS_RESULT_TYPE);
-				if ("OUT".equals(ret))
-				{
-					retType = "(" + name + " " + vartype + ")";
-				}
-				else
-				{
-					if (added > 0)
-					{
-						source.append(',');
-					}
-					else
-					{
-						source.append(" (");
-					}
-					source.append(name);
-					source.append(' ');
-					source.append(vartype);
-					added ++;
-				}
-			}
-			if (added > 0) source.append(')');
-			if (retType != null)
-			{
-				source.append("\nRETURNS ");
-				source.append(retType);
-			}
-			source.append("\nAS\n");
-		}
-		catch (Exception e)
-		{
-			source = StringUtil.emptyBuilder();
-		}
-		return source;
-	}
+    StringBuilder source = new StringBuilder();
+    try {
+      DataStore ds = this.getProcedureColumns(aCatalog, aSchema, aProcname, null);
+      source.append("CREATE PROCEDURE ");
+      source.append(aProcname);
+      String retType = null;
+      int count = ds.getRowCount();
+      int added = 0;
+      for (int i = 0; i < count; i++) {
+        String vartype = ds.getValueAsString(i, ProcedureReader.COLUMN_IDX_PROC_COLUMNS_DATA_TYPE);
+        String name = ds.getValueAsString(i, ProcedureReader.COLUMN_IDX_PROC_COLUMNS_COL_NAME);
+        String ret = ds.getValueAsString(i, ProcedureReader.COLUMN_IDX_PROC_COLUMNS_RESULT_TYPE);
+        if ("OUT".equals(ret)) {
+          retType = "(" + name + " " + vartype + ")";
+        } else {
+          if (added > 0) {
+            source.append(',');
+          } else {
+            source.append(" (");
+          }
+          source.append(name);
+          source.append(' ');
+          source.append(vartype);
+          added++;
+        }
+      }
+      if (added > 0) source.append(')');
+      if (retType != null) {
+        source.append("\nRETURNS ");
+        source.append(retType);
+      }
+      source.append("\nAS\n");
+    } catch (Exception e) {
+      source = StringUtil.emptyBuilder();
+    }
+    return source;
+  }
 
 }

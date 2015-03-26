@@ -22,63 +22,55 @@
  */
 package workbench.gui.menu;
 
-import javax.swing.JPopupMenu;
-
-import workbench.interfaces.ClipboardSupport;
-
 import workbench.gui.actions.CopyAction;
 import workbench.gui.actions.CutAction;
 import workbench.gui.actions.PasteAction;
 import workbench.gui.actions.WbAction;
 import workbench.gui.components.WbMenu;
+import workbench.interfaces.ClipboardSupport;
+
+import javax.swing.*;
 
 /**
  * A popup menu with the usual Cut, Copy and Paste entries for text fields.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class CutCopyPastePopup
-	extends JPopupMenu
-{
-	private CopyAction copy;
-	private PasteAction paste;
-	private CutAction cut;
+    extends JPopupMenu {
+  private CopyAction copy;
+  private PasteAction paste;
+  private CutAction cut;
 
-	public CutCopyPastePopup(ClipboardSupport aClient)
-	{
-		super();
-		this.cut = new CutAction(aClient);
-		this.add(cut.getMenuItem());
-		this.copy = new CopyAction(aClient);
-		this.add(this.copy.getMenuItem());
-		this.paste = new PasteAction(aClient);
-		this.add(this.paste.getMenuItem());
-	}
+  public CutCopyPastePopup(ClipboardSupport aClient) {
+    super();
+    this.cut = new CutAction(aClient);
+    this.add(cut.getMenuItem());
+    this.copy = new CopyAction(aClient);
+    this.add(this.copy.getMenuItem());
+    this.paste = new PasteAction(aClient);
+    this.add(this.paste.getMenuItem());
+  }
 
-	public void addAction(WbAction anAction, boolean withSep)
-	{
-		if (withSep) this.addSeparator();
-		this.add(anAction.getMenuItem());
-	}
+  public void addAction(WbAction anAction, boolean withSep) {
+    if (withSep) this.addSeparator();
+    this.add(anAction.getMenuItem());
+  }
 
-	public WbAction getCopyAction()
-	{
-		return this.copy;
-	}
+  public WbAction getCopyAction() {
+    return this.copy;
+  }
 
-	public WbAction getCutAction()
-	{
-		return this.cut;
-	}
+  public WbAction getCutAction() {
+    return this.cut;
+  }
 
-	public WbAction getPasteAction()
-	{
-		return this.paste;
-	}
+  public WbAction getPasteAction() {
+    return this.paste;
+  }
 
-	public void dispose()
-	{
-		WbMenu.disposeMenu(this);
-	}
+  public void dispose() {
+    WbMenu.disposeMenu(this);
+  }
 
 }

@@ -21,12 +21,10 @@
 package workbench;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum RunMode
-{
-	GUI,
-	Batch,
-	Console;
+public enum RunMode {
+  GUI,
+  Batch,
+  Console;
 }

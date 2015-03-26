@@ -25,27 +25,23 @@ package workbench.db.importer;
 import workbench.db.TableIdentifier;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class CycleErrorException
-	extends Exception
-{
-	private TableIdentifier root;
-	public CycleErrorException(TableIdentifier tbl)
-	{
-		super();
-		root = tbl;
-	}
+    extends Exception {
+  private TableIdentifier root;
 
-	@Override
-	public String getMessage()
-	{
-		return "A cyclic dependency was detected for root table '" + root.getTableExpression() + "'";
-	}
+  public CycleErrorException(TableIdentifier tbl) {
+    super();
+    root = tbl;
+  }
 
-	public TableIdentifier getRootTable()
-	{
-		return root;
-	}
+  @Override
+  public String getMessage() {
+    return "A cyclic dependency was detected for root table '" + root.getTableExpression() + "'";
+  }
+
+  public TableIdentifier getRootTable() {
+    return root;
+  }
 }

@@ -22,71 +22,40 @@
  */
 package workbench.gui.dbobjects;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import workbench.db.DbMetadata;
+import workbench.db.JdbcUtils;
+import workbench.db.TableIdentifier;
+import workbench.db.WbConnection;
+import workbench.db.search.TableDataSearcher;
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.actions.ReloadAction;
+import workbench.gui.actions.WbAction;
+import workbench.gui.components.*;
+import workbench.gui.renderer.RendererSetup;
+import workbench.gui.sql.EditorPanel;
+import workbench.interfaces.*;
+import workbench.log.LogMgr;
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
+import workbench.storage.DataStore;
+import workbench.util.FilteredProperties;
+import workbench.util.NumberStringCache;
+import workbench.util.StringUtil;
+import workbench.util.WbWorkspace;
 
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableModel;
-
-import workbench.interfaces.DbExecutionListener;
-import workbench.interfaces.DbExecutionNotifier;
-import workbench.interfaces.PropertyStorage;
-import workbench.interfaces.ShareableDisplay;
-import workbench.interfaces.TableSearchConsumer;
-import workbench.log.LogMgr;
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
-import workbench.db.DbMetadata;
-import workbench.db.JdbcUtils;
-import workbench.db.TableIdentifier;
-import workbench.db.WbConnection;
-import workbench.db.search.TableDataSearcher;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.actions.ReloadAction;
-import workbench.gui.actions.WbAction;
-import workbench.gui.components.DataStoreTableModel;
-import workbench.gui.components.DividerBorder;
-import workbench.gui.components.EmptyTableModel;
-import workbench.gui.components.FlatButton;
-import workbench.gui.components.WbScrollPane;
-import workbench.gui.components.WbSplitPane;
-import workbench.gui.components.WbStatusLabel;
-import workbench.gui.components.WbTabbedPane;
-import workbench.gui.components.WbTable;
-import workbench.gui.components.WbToolbar;
-import workbench.gui.renderer.RendererSetup;
-import workbench.gui.sql.EditorPanel;
-
-import workbench.storage.DataStore;
-
-import workbench.util.FilteredProperties;
-import workbench.util.NumberStringCache;
-import workbench.util.StringUtil;
-import workbench.util.WbWorkspace;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -95,586 +64,506 @@ import workbench.util.WbWorkspace;
  * @author Thomas Kellerer
  */
 public class TableSearchPanel
-	extends JPanel
-	implements TableSearchConsumer, ListSelectionListener, KeyListener, DbExecutionNotifier
-{
-	private TableModel tableListModel;
-	private TableDataSearcher searcher;
-	private WbConnection connection;
-	private String fixedStatusText;
-	private ShareableDisplay tableListSource;
-	private EditorPanel sqlDisplay;
-	private JButton startButton;
-	private List<DbExecutionListener> execListener;
-	private ClientSideTableSearchPanel clientSearcherCriteria;
-	private ServerSideTableSearchPanel serverSearcherCriteria;
+    extends JPanel
+    implements TableSearchConsumer, ListSelectionListener, KeyListener, DbExecutionNotifier {
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  protected javax.swing.ButtonGroup buttonGroup1;
+  protected javax.swing.JPanel buttonPanel;
+  protected javax.swing.JPanel criteriaContainer;
+  protected javax.swing.JPanel entryPanel;
+  protected javax.swing.JCheckBox excludeClobs;
+  protected javax.swing.JPanel jPanel2;
+  protected javax.swing.JPanel jPanel3;
+  protected javax.swing.JSeparator jSeparator1;
+  protected javax.swing.JSeparator jSeparator2;
+  protected javax.swing.JSeparator jSeparator3;
+  protected javax.swing.JSeparator jSeparator4;
+  protected javax.swing.JSplitPane jSplitPane1;
+  protected javax.swing.JLabel labelRowCount;
+  protected javax.swing.JPanel resultPanel;
+  protected javax.swing.JScrollPane resultScrollPane;
+  protected javax.swing.JTabbedPane resultTabPane;
+  protected javax.swing.JTextField rowCount;
+  protected javax.swing.JButton selectAllButton;
+  protected javax.swing.JPanel selectButtonPanel;
+  protected javax.swing.JButton selectNoneButton;
+  protected javax.swing.JCheckBox serverSideSearch;
+  protected javax.swing.JLabel statusInfo;
+  protected javax.swing.JScrollPane tableListScrollPane;
+  protected javax.swing.JTable tableNames;
+  protected javax.swing.JPanel tablePane;
+  private TableModel tableListModel;
+  private TableDataSearcher searcher;
+  private WbConnection connection;
+  private String fixedStatusText;
+  private ShareableDisplay tableListSource;
+  private EditorPanel sqlDisplay;
+  private JButton startButton;
+  private List<DbExecutionListener> execListener;
+  private ClientSideTableSearchPanel clientSearcherCriteria;
+  private ServerSideTableSearchPanel serverSearcherCriteria;
+  private boolean initialized;
+  private FilteredProperties workspaceSettings;
+  private int tableCount;
 
-	private boolean initialized;
-	private FilteredProperties workspaceSettings;
+  public TableSearchPanel(ShareableDisplay source) {
+    super();
+    this.tableListSource = source;
+  }
 
-	private int tableCount;
+  private void initGui() {
+    if (initialized) return;
 
-	public TableSearchPanel(ShareableDisplay source)
-	{
-		super();
-		this.tableListSource = source;
-	}
+    WbSwingUtilities.invoke(new Runnable() {
+      @Override
+      public void run() {
+        _initGui();
+      }
+    });
+  }
 
-	private void initGui()
-	{
-		if (initialized) return;
+  private void _initGui() {
+    if (initialized) return;
 
-		WbSwingUtilities.invoke(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				_initGui();
-			}
-		});
-	}
+    this.tableListModel = EmptyTableModel.EMPTY_MODEL;
+    initComponents();
 
-	private void _initGui()
-	{
-		if (initialized) return;
+    JScrollBar sb = this.resultScrollPane.getVerticalScrollBar();
+    sb.setUnitIncrement(25); // approx. one line
+    sb.setBlockIncrement(25 * 5); // approx. 5 lines
 
-		this.tableListModel = EmptyTableModel.EMPTY_MODEL;
-		initComponents();
+    sqlDisplay = EditorPanel.createSqlEditor();
+    this.resultTabPane.addTab(ResourceMgr.getString("LblTableSearchSqlLog"), sqlDisplay);
 
-		JScrollBar sb = this.resultScrollPane.getVerticalScrollBar();
-		sb.setUnitIncrement(25); // approx. one line
-		sb.setBlockIncrement(25 * 5); // approx. 5 lines
+    WbTable tables = (WbTable) this.tableNames;
+    tables.setAdjustToColumnLabel(false);
 
-		sqlDisplay = EditorPanel.createSqlEditor();
-		this.resultTabPane.addTab(ResourceMgr.getString("LblTableSearchSqlLog"), sqlDisplay);
+    WbToolbar toolbar = new WbToolbar();
 
-		WbTable tables = (WbTable)this.tableNames;
-		tables.setAdjustToColumnLabel(false);
-
-		WbToolbar toolbar = new WbToolbar();
-
-		WbAction reload = new ReloadAction(this.tableListSource);
+    WbAction reload = new ReloadAction(this.tableListSource);
     reload.setUseLabelIconSize(true);
-		reload.setTooltip(ResourceMgr.getString("TxtRefreshTableList"));
-		toolbar.add(reload);
-		buttonPanel.add(toolbar);
+    reload.setTooltip(ResourceMgr.getString("TxtRefreshTableList"));
+    toolbar.add(reload);
+    buttonPanel.add(toolbar);
 
-		startButton = new JButton();
-		startButton.setText(ResourceMgr.getString("LblStartSearch"));
-		startButton.addActionListener(new java.awt.event.ActionListener()
-		{
-			@Override
-			public void actionPerformed(java.awt.event.ActionEvent evt)
-			{
-				startSearch();
-			}
-		});
-		buttonPanel.add(startButton);
+    startButton = new JButton();
+    startButton.setText(ResourceMgr.getString("LblStartSearch"));
+    startButton.addActionListener(new java.awt.event.ActionListener() {
+      @Override
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        startSearch();
+      }
+    });
+    buttonPanel.add(startButton);
 
-		this.tableNames.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		((WbTable)tableNames).setRendererSetup(RendererSetup.getBaseSetup());
-		this.fixedStatusText = ResourceMgr.getString("TxtSearchingTable") + " ";
-		tables.getSelectionModel().addListSelectionListener(this);
-		this.startButton.setEnabled(false);
+    this.tableNames.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+    ((WbTable) tableNames).setRendererSetup(RendererSetup.getBaseSetup());
+    this.fixedStatusText = ResourceMgr.getString("TxtSearchingTable") + " ";
+    tables.getSelectionModel().addListSelectionListener(this);
+    this.startButton.setEnabled(false);
 
-		CompoundBorder infoBorder = new CompoundBorder(this.statusInfo.getBorder(), new EmptyBorder(0,2,0,0));
-		this.statusInfo.setBorder(infoBorder);
-		CompoundBorder entryBorder = new CompoundBorder(new DividerBorder(DividerBorder.BOTTOM), new EmptyBorder(2,0,3,0));
-		entryPanel.setBorder(entryBorder);
-		initCriteriaPanel();
-		initialized = true;
+    CompoundBorder infoBorder = new CompoundBorder(this.statusInfo.getBorder(), new EmptyBorder(0, 2, 0, 0));
+    this.statusInfo.setBorder(infoBorder);
+    CompoundBorder entryBorder = new CompoundBorder(new DividerBorder(DividerBorder.BOTTOM), new EmptyBorder(2, 0, 3, 0));
+    entryPanel.setBorder(entryBorder);
+    initCriteriaPanel();
+    initialized = true;
 
-		restoreSettings();
+    restoreSettings();
 
-		if (workspaceSettings != null)
-		{
-			restoreSettings(workspaceSettings.getFilterPrefix(), workspaceSettings);
-			workspaceSettings = null;
-		}
-		setConnection(connection);
-	}
+    if (workspaceSettings != null) {
+      restoreSettings(workspaceSettings.getFilterPrefix(), workspaceSettings);
+      workspaceSettings = null;
+    }
+    setConnection(connection);
+  }
 
-	private TableSearchCriteriaGUI getCriteriaPanel()
-	{
-		return (TableSearchCriteriaGUI)criteriaContainer.getComponent(0);
-	}
+  private TableSearchCriteriaGUI getCriteriaPanel() {
+    return (TableSearchCriteriaGUI) criteriaContainer.getComponent(0);
+  }
 
-	private void initCriteriaPanel()
-	{
-		serverSearcherCriteria = new ServerSideTableSearchPanel();
-		serverSearcherCriteria.addKeyListenerForCriteria(this);
-		clientSearcherCriteria = new ClientSideTableSearchPanel();
-		clientSearcherCriteria.addKeyListenerForCriteria(this);
-	}
+  private void initCriteriaPanel() {
+    serverSearcherCriteria = new ServerSideTableSearchPanel();
+    serverSearcherCriteria.addKeyListenerForCriteria(this);
+    clientSearcherCriteria = new ClientSideTableSearchPanel();
+    clientSearcherCriteria.addKeyListenerForCriteria(this);
+  }
 
-	private void showTableSearcherCriteria()
-	{
-		criteriaContainer.removeAll();
-		if (serverSideSearch.isSelected())
-		{
-			clientSearcherCriteria.setVisible(false);
-			criteriaContainer.add(serverSearcherCriteria, BorderLayout.CENTER, 0);
-			serverSearcherCriteria.setVisible(true);
-		}
-		else
-		{
-			serverSearcherCriteria.setVisible(false);
-			criteriaContainer.add(clientSearcherCriteria, BorderLayout.CENTER, 0);
-			clientSearcherCriteria.setVisible(true);
-		}
-		WbSwingUtilities.repaintLater(criteriaContainer);
-	}
+  private void showTableSearcherCriteria() {
+    criteriaContainer.removeAll();
+    if (serverSideSearch.isSelected()) {
+      clientSearcherCriteria.setVisible(false);
+      criteriaContainer.add(serverSearcherCriteria, BorderLayout.CENTER, 0);
+      serverSearcherCriteria.setVisible(true);
+    } else {
+      serverSearcherCriteria.setVisible(false);
+      criteriaContainer.add(clientSearcherCriteria, BorderLayout.CENTER, 0);
+      clientSearcherCriteria.setVisible(true);
+    }
+    WbSwingUtilities.repaintLater(criteriaContainer);
+  }
 
-	private void startSearch()
-	{
-		if (searcher != null && this.searcher.isRunning())
-		{
-			startButton.setEnabled(false);
-			this.searcher.cancelSearch();
-		}
-		else
-		{
-			this.searchData();
-		}
-	}
+  private void startSearch() {
+    if (searcher != null && this.searcher.isRunning()) {
+      startButton.setEnabled(false);
+      this.searcher.cancelSearch();
+    } else {
+      this.searchData();
+    }
+  }
 
-	@Override
-	public void tableSearched(final TableIdentifier table, final DataStore result)
-	{
-		if (result.getRowCount() == 0)
-		{
-			return;
-		}
+  @Override
+  public void tableSearched(final TableIdentifier table, final DataStore result) {
+    if (result.getRowCount() == 0) {
+      return;
+    }
 
-		tableCount ++;
+    tableCount++;
 
-		// Make sure everything happens on the EDT thread
-		EventQueue.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				try
-				{
-					WbTable display = new WbTable(true, true, false);
+    // Make sure everything happens on the EDT thread
+    EventQueue.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          WbTable display = new WbTable(true, true, false);
 
-					DataStoreTableModel model = new DataStoreTableModel(result);
-					display.setModel(model, true);
-					display.applyHighlightExpression(searcher.getSearchExpression());
+          DataStoreTableModel model = new DataStoreTableModel(result);
+          display.setModel(model, true);
+          display.applyHighlightExpression(searcher.getSearchExpression());
 
-					display.checkCopyActions();
+          display.checkCopyActions();
 
-					JScrollPane pane = new ParentWidthScrollPane(display);
+          JScrollPane pane = new ParentWidthScrollPane(display);
 
-					int rows = display.getRowCount();
+          int rows = display.getRowCount();
 
-					String label = table.getTableExpression() + " " + ResourceMgr.getFormattedString("MsgRows", rows);
-					TitledBorder b = new TitledBorder(" " + label);
-					pane.setBorder(b);
-					Font f = b.getTitleFont();
-					if (f == null)
-					{
-						// With JDK 7, getTitleFont() seems to return null...
-						UIDefaults def = UIManager.getDefaults();
-						f = def.getFont("Label.font");
-					}
+          String label = table.getTableExpression() + " " + ResourceMgr.getFormattedString("MsgRows", rows);
+          TitledBorder b = new TitledBorder(" " + label);
+          pane.setBorder(b);
+          Font f = b.getTitleFont();
+          if (f == null) {
+            // With JDK 7, getTitleFont() seems to return null...
+            UIDefaults def = UIManager.getDefaults();
+            f = def.getFont("Label.font");
+          }
 
-					// Check for != null again - just to make sure.
-					// Because if a NPE is thrown here, nothing will be shown to the user
-					if (f != null)
-					{
-						f = f.deriveFont(Font.BOLD);
-						b.setTitleFont(f);
-					}
+          // Check for != null again - just to make sure.
+          // Because if a NPE is thrown here, nothing will be shown to the user
+          if (f != null) {
+            f = f.deriveFont(Font.BOLD);
+            b.setTitleFont(f);
+          }
 
-					// only the last component should have weighty = 1.0
-					// so reset the weighty attribute for the component that is currently the last one
-					int count = resultPanel.getComponentCount();
-					if (count > 0)
-					{
-						Component comp = resultPanel.getComponent(count - 1);
-						GridBagLayout layout = (GridBagLayout)resultPanel.getLayout();
-						GridBagConstraints prev = layout.getConstraints(comp);
-						prev.weighty = 0;
-						layout.setConstraints(comp, prev);
-					}
+          // only the last component should have weighty = 1.0
+          // so reset the weighty attribute for the component that is currently the last one
+          int count = resultPanel.getComponentCount();
+          if (count > 0) {
+            Component comp = resultPanel.getComponent(count - 1);
+            GridBagLayout layout = (GridBagLayout) resultPanel.getLayout();
+            GridBagConstraints prev = layout.getConstraints(comp);
+            prev.weighty = 0;
+            layout.setConstraints(comp, prev);
+          }
 
-					GridBagConstraints constraints = new GridBagConstraints();
-					constraints.gridx = 0;
-					constraints.fill = GridBagConstraints.HORIZONTAL;
-					constraints.weightx = 1.0;
-					constraints.weighty = 1.0;
-					constraints.anchor = GridBagConstraints.NORTHWEST;
-					resultPanel.add(pane, constraints);
+          GridBagConstraints constraints = new GridBagConstraints();
+          constraints.gridx = 0;
+          constraints.fill = GridBagConstraints.HORIZONTAL;
+          constraints.weightx = 1.0;
+          constraints.weighty = 1.0;
+          constraints.anchor = GridBagConstraints.NORTHWEST;
+          resultPanel.add(pane, constraints);
 
-					int height = display.getRowHeight();
-					int width = pane.getWidth();
+          int height = display.getRowHeight();
+          int width = pane.getWidth();
 
-					Dimension size = pane.getPreferredSize();
-					if (rows > 25)
-					{
-						rows = 25;
-					}
-					size.setSize(width - 20, (rows + 4) * height);
-					pane.setPreferredSize(size);
-				}
-				catch (Exception e)
-				{
-					LogMgr.logError("TableSearchPanel.tableSearched()", "Error adding result.", e);
-				}
-			}
-		});
-	}
+          Dimension size = pane.getPreferredSize();
+          if (rows > 25) {
+            rows = 25;
+          }
+          size.setSize(width - 20, (rows + 4) * height);
+          pane.setPreferredSize(size);
+        } catch (Exception e) {
+          LogMgr.logError("TableSearchPanel.tableSearched()", "Error adding result.", e);
+        }
+      }
+    });
+  }
 
-	@Override
-	public void error(final String msg)
-	{
-		EventQueue.invokeLater(new Runnable() {
+  @Override
+  public void error(final String msg) {
+    EventQueue.invokeLater(new Runnable() {
 
-			@Override
-			public void run()
-			{
-				sqlDisplay.appendLine(msg);
-				sqlDisplay.appendLine("\n\n");
-			}
-		});
-	}
+      @Override
+      public void run() {
+        sqlDisplay.appendLine(msg);
+        sqlDisplay.appendLine("\n\n");
+      }
+    });
+  }
 
-	/**
-	 *	Call back function from the table searcher...
-	 */
-	@Override
-	public synchronized void setCurrentTable(final String table, final String sql, final long currentObject, final long totalObjects)
-	{
-		EventQueue.invokeLater(new Runnable() {
+  /**
+   * Call back function from the table searcher...
+   */
+  @Override
+  public synchronized void setCurrentTable(final String table, final String sql, final long currentObject, final long totalObjects) {
+    EventQueue.invokeLater(new Runnable() {
 
-			@Override
-			public void run()
-			{
-				if (sql == null)
-				{
-					String msg = ResourceMgr.getFormattedString("MsgNoCharCols", table);
-					sqlDisplay.appendLine("-- " + msg);
-				}
-				else
-				{
-					StringBuilder info = new StringBuilder(fixedStatusText.length() + 25);
-					info.append(fixedStatusText); // the text already contains a trailing space
-					info.append(table);
-					info.append(" (");
-					info.append(NumberStringCache.getNumberString(currentObject));
-					info.append('/');
-					info.append(NumberStringCache.getNumberString(totalObjects));
-					info.append(')');
-					statusInfo.setText(info.toString());
-					sqlDisplay.appendLine(sql + ";");
-				}
-				sqlDisplay.appendLine("\n\n");
-			}
-		});
-	}
+      @Override
+      public void run() {
+        if (sql == null) {
+          String msg = ResourceMgr.getFormattedString("MsgNoCharCols", table);
+          sqlDisplay.appendLine("-- " + msg);
+        } else {
+          StringBuilder info = new StringBuilder(fixedStatusText.length() + 25);
+          info.append(fixedStatusText); // the text already contains a trailing space
+          info.append(table);
+          info.append(" (");
+          info.append(NumberStringCache.getNumberString(currentObject));
+          info.append('/');
+          info.append(NumberStringCache.getNumberString(totalObjects));
+          info.append(')');
+          statusInfo.setText(info.toString());
+          sqlDisplay.appendLine(sql + ";");
+        }
+        sqlDisplay.appendLine("\n\n");
+      }
+    });
+  }
 
-	@Override
-	public void setStatusText(String statusText)
-	{
-		this.statusInfo.setText(statusText);
-	}
+  @Override
+  public void setStatusText(String statusText) {
+    this.statusInfo.setText(statusText);
+  }
 
-	public void setConnection(WbConnection connection)
-	{
-		this.connection = connection;
-		if (tableNames != null)
-		{
-			this.tableListSource.addTableListDisplayClient(this.tableNames);
-		}
-	}
+  public void setConnection(WbConnection connection) {
+    this.connection = connection;
+    if (tableNames != null) {
+      this.tableListSource.addTableListDisplayClient(this.tableNames);
+    }
+  }
 
-	public void disconnect()
-	{
-		this.reset();
-		this.tableListSource.removeTableListDisplayClient(this.tableNames);
-	}
+  public void disconnect() {
+    this.reset();
+    this.tableListSource.removeTableListDisplayClient(this.tableNames);
+  }
 
-	@Override
-	public void setVisible(boolean aFlag)
-	{
-		super.setVisible(aFlag);
-		if (aFlag)
-		{
-			initGui();
-		}
-	}
+  @Override
+  public void setVisible(boolean aFlag) {
+    super.setVisible(aFlag);
+    if (aFlag) {
+      initGui();
+    }
+  }
 
-	public void reset()
-	{
-		if (!initialized) return;
+  public void reset() {
+    if (!initialized) return;
 
     // resultPanel.removeAll() does not work properly for some reason
     // the old tables just stay in there
     // so I re-create the actual result panel
-		WbSwingUtilities.invoke(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				resultPanel = new JPanel(new GridBagLayout());
-				resultScrollPane.setViewportView(resultPanel);
-				sqlDisplay.setText("");
-				setStatusText("");
-			}
-		});
-	}
+    WbSwingUtilities.invoke(new Runnable() {
+      @Override
+      public void run() {
+        resultPanel = new JPanel(new GridBagLayout());
+        resultScrollPane.setViewportView(resultPanel);
+        sqlDisplay.setText("");
+        setStatusText("");
+      }
+    });
+  }
 
-	public void searchData()
-	{
-		if (searcher != null && searcher.isRunning()) return;
+  public void searchData() {
+    if (searcher != null && searcher.isRunning()) return;
 
-		if (!WbSwingUtilities.isConnectionIdle(this, connection)) return;
+    if (!WbSwingUtilities.isConnectionIdle(this, connection)) return;
 
-		if (this.tableNames.getSelectedRowCount() == 0) return;
+    if (this.tableNames.getSelectedRowCount() == 0) return;
 
-		if (Settings.getInstance().getBoolProperty("workbench.searchdata.warn.buffer", true))
-		{
-			if (!serverSideSearch.isSelected() && JdbcUtils.driverMightBufferResults(connection))
-			{
-				boolean goOn = WbSwingUtilities.getYesNo(this, ResourceMgr.getString("MsgTableSearchBuffered"));
-				if (!goOn) return;
-			}
-		}
+    if (Settings.getInstance().getBoolProperty("workbench.searchdata.warn.buffer", true)) {
+      if (!serverSideSearch.isSelected() && JdbcUtils.driverMightBufferResults(connection)) {
+        boolean goOn = WbSwingUtilities.getYesNo(this, ResourceMgr.getString("MsgTableSearchBuffered"));
+        if (!goOn) return;
+      }
+    }
 
-		this.reset();
+    this.reset();
 
-		int[] selectedTables = this.tableNames.getSelectedRows();
+    int[] selectedTables = this.tableNames.getSelectedRows();
 
-		List<TableIdentifier> searchTables = new ArrayList<>(this.tableNames.getSelectedRowCount());
-		DataStore tables = ((WbTable)(this.tableNames)).getDataStore();
-		for (int i=0; i < selectedTables.length; i++)
-		{
-			String catalog = tables.getValueAsString(selectedTables[i], DbMetadata.COLUMN_IDX_TABLE_LIST_CATALOG);
-			String schema = tables.getValueAsString(selectedTables[i], DbMetadata.COLUMN_IDX_TABLE_LIST_SCHEMA);
-			String tablename = tables.getValueAsString(selectedTables[i], DbMetadata.COLUMN_IDX_TABLE_LIST_NAME);
-			String type = tables.getValueAsString(selectedTables[i], DbMetadata.COLUMN_IDX_TABLE_LIST_TYPE);
+    List<TableIdentifier> searchTables = new ArrayList<>(this.tableNames.getSelectedRowCount());
+    DataStore tables = ((WbTable) (this.tableNames)).getDataStore();
+    for (int i = 0; i < selectedTables.length; i++) {
+      String catalog = tables.getValueAsString(selectedTables[i], DbMetadata.COLUMN_IDX_TABLE_LIST_CATALOG);
+      String schema = tables.getValueAsString(selectedTables[i], DbMetadata.COLUMN_IDX_TABLE_LIST_SCHEMA);
+      String tablename = tables.getValueAsString(selectedTables[i], DbMetadata.COLUMN_IDX_TABLE_LIST_NAME);
+      String type = tables.getValueAsString(selectedTables[i], DbMetadata.COLUMN_IDX_TABLE_LIST_TYPE);
 
-			TableIdentifier tbl = new TableIdentifier(catalog, schema, tablename);
-			tbl.setNeverAdjustCase(true);
-			tbl.setType(type);
-			searchTables.add(tbl);
-		}
+      TableIdentifier tbl = new TableIdentifier(catalog, schema, tablename);
+      tbl.setNeverAdjustCase(true);
+      tbl.setType(type);
+      searchTables.add(tbl);
+    }
 
-		int maxRows = StringUtil.getIntValue(this.rowCount.getText(), 0);
+    int maxRows = StringUtil.getIntValue(this.rowCount.getText(), 0);
 
-		searcher = getCriteriaPanel().getSearcher();
-		searcher.setConnection(this.connection);
-		searcher.setConsumer(this);
-		searcher.setMaxRows(maxRows);
-		searcher.setRetrieveLobColumns(!excludeClobs.isSelected());
-		searcher.setTableNames(searchTables);
-		fireDbExecStart();
-		searcher.startBackgroundSearch();
-	}
+    searcher = getCriteriaPanel().getSearcher();
+    searcher.setConnection(this.connection);
+    searcher.setConsumer(this);
+    searcher.setMaxRows(maxRows);
+    searcher.setRetrieveLobColumns(!excludeClobs.isSelected());
+    searcher.setTableNames(searchTables);
+    fireDbExecStart();
+    searcher.startBackgroundSearch();
+  }
 
-	private String getWorkspacePrefix(int index)
-	{
-		return "dbexplorer" + index + ".tablesearcher";
-	}
+  private String getWorkspacePrefix(int index) {
+    return "dbexplorer" + index + ".tablesearcher";
+  }
 
-	public void saveToWorkspace(WbWorkspace wb, int index)
-	{
-		saveSettings(getWorkspacePrefix(index), wb.getSettings());
-	}
+  public void saveToWorkspace(WbWorkspace wb, int index) {
+    saveSettings(getWorkspacePrefix(index), wb.getSettings());
+  }
 
-	public void readFromWorkspace(WbWorkspace wb, int index)
-	{
-		restoreSettings(getWorkspacePrefix(index), wb.getSettings());
-	}
+  public void readFromWorkspace(WbWorkspace wb, int index) {
+    restoreSettings(getWorkspacePrefix(index), wb.getSettings());
+  }
 
-	public void saveSettings()
-	{
-		saveSettings(this.getClass().getName(), Settings.getInstance());
-	}
+  public void saveSettings() {
+    saveSettings(this.getClass().getName(), Settings.getInstance());
+  }
 
-	private void saveSettings(String prefix, PropertyStorage props)
-	{
-		if (initialized)
-		{
-			props.setProperty(prefix + ".serversearch", this.serverSideSearch.isSelected());
-			props.setProperty(prefix + ".divider", this.jSplitPane1.getDividerLocation());
-			if (clientSearcherCriteria != null)
-			{
-				clientSearcherCriteria.saveSettings(prefix, props);
-			}
-			if (serverSearcherCriteria != null)
-			{
-				serverSearcherCriteria.saveSettings(prefix, props);
-			}
-			props.setProperty(prefix + ".maxrows", this.rowCount.getText());
-			props.setProperty(prefix + ".excludelobs", excludeClobs.isSelected());
-		}
-		else if (workspaceSettings != null)
-		{
-			workspaceSettings.copyTo(props, prefix);
-		}
-	}
+  private void saveSettings(String prefix, PropertyStorage props) {
+    if (initialized) {
+      props.setProperty(prefix + ".serversearch", this.serverSideSearch.isSelected());
+      props.setProperty(prefix + ".divider", this.jSplitPane1.getDividerLocation());
+      if (clientSearcherCriteria != null) {
+        clientSearcherCriteria.saveSettings(prefix, props);
+      }
+      if (serverSearcherCriteria != null) {
+        serverSearcherCriteria.saveSettings(prefix, props);
+      }
+      props.setProperty(prefix + ".maxrows", this.rowCount.getText());
+      props.setProperty(prefix + ".excludelobs", excludeClobs.isSelected());
+    } else if (workspaceSettings != null) {
+      workspaceSettings.copyTo(props, prefix);
+    }
+  }
 
-	public void restoreSettings()
-	{
-		restoreSettings(this.getClass().getName(), Settings.getInstance());
-	}
+  public void restoreSettings() {
+    restoreSettings(this.getClass().getName(), Settings.getInstance());
+  }
 
-	private void restoreSettings(String prefix, PropertyStorage props)
-	{
-		if (initialized)
-		{
-			int loc = props.getIntProperty(prefix + ".divider",200);
-			this.jSplitPane1.setDividerLocation(loc);
-			this.serverSideSearch.setSelected(props.getBoolProperty(prefix + ".serversearch", false));
-			if (clientSearcherCriteria != null)
-			{
-				clientSearcherCriteria.restoreSettings(prefix, props);
-			}
-			if (serverSearcherCriteria != null)
-			{
-				serverSearcherCriteria.restoreSettings(prefix, props);
-			}
+  private void restoreSettings(String prefix, PropertyStorage props) {
+    if (initialized) {
+      int loc = props.getIntProperty(prefix + ".divider", 200);
+      this.jSplitPane1.setDividerLocation(loc);
+      this.serverSideSearch.setSelected(props.getBoolProperty(prefix + ".serversearch", false));
+      if (clientSearcherCriteria != null) {
+        clientSearcherCriteria.restoreSettings(prefix, props);
+      }
+      if (serverSearcherCriteria != null) {
+        serverSearcherCriteria.restoreSettings(prefix, props);
+      }
 
-			this.rowCount.setText(props.getProperty(prefix + ".maxrows", "0"));
-			this.excludeClobs.setSelected(props.getBoolProperty(prefix + ".excludelobs", true));
-			showTableSearcherCriteria();
-		}
-		else
-		{
-			workspaceSettings = new FilteredProperties(props, prefix);
-		}
-	}
+      this.rowCount.setText(props.getProperty(prefix + ".maxrows", "0"));
+      this.excludeClobs.setSelected(props.getBoolProperty(prefix + ".excludelobs", true));
+      showTableSearcherCriteria();
+    } else {
+      workspaceSettings = new FilteredProperties(props, prefix);
+    }
+  }
 
-	@Override
-	public void searchEnded()
-	{
-		fireDbExecEnd();
+  @Override
+  public void searchEnded() {
+    fireDbExecEnd();
 
-		EventQueue.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				resultPanel.doLayout();
-				getCriteriaPanel().enableControls();
-				serverSideSearch.setEnabled(true);
-				startButton.setText(ResourceMgr.getString("LblStartSearch"));
-				statusInfo.setText("");
-				startButton.setEnabled(tableNames.getSelectedRowCount() > 0);
-				statusInfo.setText(ResourceMgr.getFormattedString("MsgTablesFound", tableCount));
-			}
-		});
-	}
+    EventQueue.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        resultPanel.doLayout();
+        getCriteriaPanel().enableControls();
+        serverSideSearch.setEnabled(true);
+        startButton.setText(ResourceMgr.getString("LblStartSearch"));
+        statusInfo.setText("");
+        startButton.setEnabled(tableNames.getSelectedRowCount() > 0);
+        statusInfo.setText(ResourceMgr.getFormattedString("MsgTablesFound", tableCount));
+      }
+    });
+  }
 
-	@Override
-	public void searchStarted()
-	{
-		getCriteriaPanel().disableControls();
-		serverSideSearch.setEnabled(false);
-		startButton.setText(ResourceMgr.getString("LblCancelPlain"));
-		tableCount = 0;
-	}
+  @Override
+  public void searchStarted() {
+    getCriteriaPanel().disableControls();
+    serverSideSearch.setEnabled(false);
+    startButton.setText(ResourceMgr.getString("LblCancelPlain"));
+    tableCount = 0;
+  }
 
-	@Override
-	public void valueChanged(ListSelectionEvent e)
-	{
-		if (initialized)
-		{
-			this.startButton.setEnabled(this.tableNames.getSelectedRowCount() > 0);
-		}
-	}
+  @Override
+  public void valueChanged(ListSelectionEvent e) {
+    if (initialized) {
+      this.startButton.setEnabled(this.tableNames.getSelectedRowCount() > 0);
+    }
+  }
 
-	@Override
-	public void keyPressed(java.awt.event.KeyEvent e)
-	{
-		if (e.getKeyCode() == KeyEvent.VK_ENTER)
-		{
-			EventQueue.invokeLater(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					searchData();
-				}
-			}
-			);
-		}
-	}
+  @Override
+  public void keyPressed(java.awt.event.KeyEvent e) {
+    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+      EventQueue.invokeLater(new Runnable() {
+                               @Override
+                               public void run() {
+                                 searchData();
+                               }
+                             }
+      );
+    }
+  }
 
-	@Override
-	public void keyReleased(java.awt.event.KeyEvent e)
-	{
-	}
+  @Override
+  public void keyReleased(java.awt.event.KeyEvent e) {
+  }
 
-	@Override
-	public void keyTyped(java.awt.event.KeyEvent e)
-	{
-	}
+  @Override
+  public void keyTyped(java.awt.event.KeyEvent e) {
+  }
 
-	static class ParentWidthScrollPane
-		extends JScrollPane
-	{
-		private Dimension preferredSize = new Dimension(0,0);
+  @Override
+  public synchronized void addDbExecutionListener(DbExecutionListener l) {
+    if (this.execListener == null)
+      this.execListener = Collections.synchronizedList(new ArrayList<DbExecutionListener>());
+    this.execListener.add(l);
+  }
 
-		ParentWidthScrollPane(Component view)
-		{
-			super(view);
-		}
+  @Override
+  public synchronized void removeDbExecutionListener(DbExecutionListener l) {
+    if (this.execListener == null) return;
+    this.execListener.remove(l);
+  }
 
-		@Override
-		public Dimension getPreferredSize()
-		{
-			Dimension d = super.getPreferredSize();
-			Container parent = this.getParent();
-			this.preferredSize.setSize( (double)parent.getWidth() - 5, d.getHeight());
-			return this.preferredSize;
-		}
-	}
+  protected synchronized void fireDbExecStart() {
+    this.connection.executionStart(this.connection, this);
+    if (this.execListener == null) return;
+    for (DbExecutionListener l : execListener) {
+      if (l != null) l.executionStart(this.connection, this);
+    }
+  }
 
-	@Override
-	public synchronized void addDbExecutionListener(DbExecutionListener l)
-	{
-		if (this.execListener == null) this.execListener = Collections.synchronizedList(new ArrayList<DbExecutionListener>());
-		this.execListener.add(l);
-	}
+  protected synchronized void fireDbExecEnd() {
+    this.connection.executionEnd(this.connection, this);
+    if (this.execListener == null) return;
+    for (DbExecutionListener l : execListener) {
+      if (l != null) l.executionEnd(this.connection, this);
+    }
+  }
 
-	@Override
-	public synchronized void removeDbExecutionListener(DbExecutionListener l)
-	{
-		if (this.execListener == null) return;
-		this.execListener.remove(l);
-	}
-
-	protected synchronized void fireDbExecStart()
-	{
-		this.connection.executionStart(this.connection, this);
-		if (this.execListener == null) return;
-		for (DbExecutionListener l : execListener)
-		{
-			if (l != null) l.executionStart(this.connection, this);
-		}
-	}
-
-	protected synchronized void fireDbExecEnd()
-	{
-		this.connection.executionEnd(this.connection, this);
-		if (this.execListener == null) return;
-		for (DbExecutionListener l : execListener)
-		{
-			if (l != null) l.executionEnd(this.connection, this);
-		}
-	}
-
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
 
     buttonGroup1 = new javax.swing.ButtonGroup();
@@ -729,10 +618,8 @@ public class TableSearchPanel
     selectButtonPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 3));
 
     selectAllButton.setText(ResourceMgr.getString("LblSelectAll")); // NOI18N
-    selectAllButton.addActionListener(new java.awt.event.ActionListener()
-    {
-      public void actionPerformed(java.awt.event.ActionEvent evt)
-      {
+    selectAllButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
         selectAllButtonActionPerformed(evt);
       }
     });
@@ -744,10 +631,8 @@ public class TableSearchPanel
     selectButtonPanel.add(jPanel2);
 
     selectNoneButton.setText(ResourceMgr.getString("LblSelectNone"));
-    selectNoneButton.addActionListener(new java.awt.event.ActionListener()
-    {
-      public void actionPerformed(java.awt.event.ActionEvent evt)
-      {
+    selectNoneButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
         selectNoneButtonActionPerformed(evt);
       }
     });
@@ -783,10 +668,8 @@ public class TableSearchPanel
     serverSideSearch.setText(ResourceMgr.getString("LblSearchServer")); // NOI18N
     serverSideSearch.setToolTipText(ResourceMgr.getString("d_LblSearchServer")); // NOI18N
     serverSideSearch.setBorder(null);
-    serverSideSearch.addActionListener(new java.awt.event.ActionListener()
-    {
-      public void actionPerformed(java.awt.event.ActionEvent evt)
-      {
+    serverSideSearch.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
         serverSideSearchActionPerformed(evt);
       }
     });
@@ -859,47 +742,37 @@ public class TableSearchPanel
     add(entryPanel, java.awt.BorderLayout.NORTH);
   }// </editor-fold>//GEN-END:initComponents
 
-	private void selectNoneButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_selectNoneButtonActionPerformed
-	{//GEN-HEADEREND:event_selectNoneButtonActionPerformed
-		this.tableNames.getSelectionModel().removeSelectionInterval(0, this.tableNames.getRowCount() - 1);
-	}//GEN-LAST:event_selectNoneButtonActionPerformed
+  private void selectNoneButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_selectNoneButtonActionPerformed
+  {//GEN-HEADEREND:event_selectNoneButtonActionPerformed
+    this.tableNames.getSelectionModel().removeSelectionInterval(0, this.tableNames.getRowCount() - 1);
+  }//GEN-LAST:event_selectNoneButtonActionPerformed
 
-	private void selectAllButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_selectAllButtonActionPerformed
-	{//GEN-HEADEREND:event_selectAllButtonActionPerformed
-		this.tableNames.getSelectionModel().setSelectionInterval(0, this.tableNames.getRowCount() - 1);
-	}//GEN-LAST:event_selectAllButtonActionPerformed
+  private void selectAllButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_selectAllButtonActionPerformed
+  {//GEN-HEADEREND:event_selectAllButtonActionPerformed
+    this.tableNames.getSelectionModel().setSelectionInterval(0, this.tableNames.getRowCount() - 1);
+  }//GEN-LAST:event_selectAllButtonActionPerformed
 
-	private void serverSideSearchActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_serverSideSearchActionPerformed
-	{//GEN-HEADEREND:event_serverSideSearchActionPerformed
-		showTableSearcherCriteria();
-	}//GEN-LAST:event_serverSideSearchActionPerformed
+  private void serverSideSearchActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_serverSideSearchActionPerformed
+  {//GEN-HEADEREND:event_serverSideSearchActionPerformed
+    showTableSearcherCriteria();
+  }//GEN-LAST:event_serverSideSearchActionPerformed
 
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  protected javax.swing.ButtonGroup buttonGroup1;
-  protected javax.swing.JPanel buttonPanel;
-  protected javax.swing.JPanel criteriaContainer;
-  protected javax.swing.JPanel entryPanel;
-  protected javax.swing.JCheckBox excludeClobs;
-  protected javax.swing.JPanel jPanel2;
-  protected javax.swing.JPanel jPanel3;
-  protected javax.swing.JSeparator jSeparator1;
-  protected javax.swing.JSeparator jSeparator2;
-  protected javax.swing.JSeparator jSeparator3;
-  protected javax.swing.JSeparator jSeparator4;
-  protected javax.swing.JSplitPane jSplitPane1;
-  protected javax.swing.JLabel labelRowCount;
-  protected javax.swing.JPanel resultPanel;
-  protected javax.swing.JScrollPane resultScrollPane;
-  protected javax.swing.JTabbedPane resultTabPane;
-  protected javax.swing.JTextField rowCount;
-  protected javax.swing.JButton selectAllButton;
-  protected javax.swing.JPanel selectButtonPanel;
-  protected javax.swing.JButton selectNoneButton;
-  protected javax.swing.JCheckBox serverSideSearch;
-  protected javax.swing.JLabel statusInfo;
-  protected javax.swing.JScrollPane tableListScrollPane;
-  protected javax.swing.JTable tableNames;
-  protected javax.swing.JPanel tablePane;
+  static class ParentWidthScrollPane
+      extends JScrollPane {
+    private Dimension preferredSize = new Dimension(0, 0);
+
+    ParentWidthScrollPane(Component view) {
+      super(view);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+      Dimension d = super.getPreferredSize();
+      Container parent = this.getParent();
+      this.preferredSize.setSize((double) parent.getWidth() - 5, d.getHeight());
+      return this.preferredSize;
+    }
+  }
   // End of variables declaration//GEN-END:variables
 
 }

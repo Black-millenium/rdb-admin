@@ -19,131 +19,108 @@
  */
 package workbench.gui.dbobjects.objecttree;
 
-import java.awt.EventQueue;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.List;
+import workbench.db.WbConnection;
+import workbench.gui.WbSwingUtilities;
+import workbench.interfaces.ExpandableTree;
+import workbench.log.LogMgr;
+import workbench.util.WbThread;
 
-import javax.swing.JTree;
-import javax.swing.ToolTipManager;
+import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-
-import workbench.interfaces.ExpandableTree;
-import workbench.log.LogMgr;
-
-import workbench.db.WbConnection;
-
-import workbench.gui.WbSwingUtilities;
-
-import workbench.util.WbThread;
+import java.awt.*;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class DbObjectsTree
-  extends JTree
-  implements TreeExpansionListener, ExpandableTree, Serializable
-{
+    extends JTree
+    implements TreeExpansionListener, ExpandableTree, Serializable {
   private TreeLoader loader;
   private ObjectTreeDragSource dragSource;
 
-  public DbObjectsTree()
-  {
+  public DbObjectsTree() {
     super(new DbObjectTreeModel(new ObjectTreeNode("Database", "database")));
     setShowsRootHandles(true);
     addTreeExpansionListener(this);
-		setCellRenderer(new DbObjectNodeRenderer());
-		setAutoscrolls(true);
+    setCellRenderer(new DbObjectNodeRenderer());
+    setAutoscrolls(true);
 
-		setEditable(false);
-		setExpandsSelectedPaths(true);
+    setEditable(false);
+    setExpandsSelectedPaths(true);
     getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 
-		// setting the row height to 0 makes it dynamic
-		// so it will adjust properly to the font of the renderer
-		setRowHeight(0);
+    // setting the row height to 0 makes it dynamic
+    // so it will adjust properly to the font of the renderer
+    setRowHeight(0);
     ToolTipManager.sharedInstance().registerComponent(this);
     dragSource = new ObjectTreeDragSource(this);
   }
 
-  public WbConnection getConnection()
-  {
+  public WbConnection getConnection() {
     if (loader == null) return null;
     return loader.getConnection();
   }
 
-  public void setConnection(WbConnection conn)
-  {
+  public void setConnection(WbConnection conn) {
     clear();
-    if (conn != null)
-    {
+    if (conn != null) {
       loader = new TreeLoader(conn.getProfile().getName());
       loader.setConnection(conn);
     }
   }
 
-  public void setTypesToShow(List<String> types)
-  {
+  public void setTypesToShow(List<String> types) {
     loader.setSelectedTypes(types);
   }
 
-  public void clear()
-  {
-    if (loader != null)
-    {
+  public void clear() {
+    if (loader != null) {
       loader.clear();
       setModel(loader.getModel());
     }
   }
 
-  public void load()
-  {
+  public void load() {
     if (loader == null) return;
     if (!WbSwingUtilities.isConnectionIdle(this, loader.getConnection())) return;
 
     clear();
 
-    try
-    {
+    try {
       loader.load();
       setModel(loader.getModel());
 
-      EventQueue.invokeLater(new Runnable()
-      {
+      EventQueue.invokeLater(new Runnable() {
         @Override
-        public void run()
-        {
+        public void run() {
           selectCurrentSchema();
         }
       });
-    }
-    catch (SQLException ex)
-    {
+    } catch (SQLException ex) {
       LogMgr.logError("DbObjectsTree.<init>", "Could not load tree", ex);
     }
   }
 
-  public void expandNode(ObjectTreeNode node)
-  {
+  public void expandNode(ObjectTreeNode node) {
     TreeNode[] nodes = getTreeModel().getPathToRoot(node);
     selectPath(new TreePath(nodes));
   }
 
-	public void selectPath(TreePath path)
-	{
-		if (path == null) return;
-		expandPath(path);
-		setSelectionPath(path);
-		scrollPathToVisible(path);
-	}
+  public void selectPath(TreePath path) {
+    if (path == null) return;
+    expandPath(path);
+    setSelectionPath(path);
+    scrollPathToVisible(path);
+  }
 
-  public void selectCurrentSchema()
-  {
+  public void selectCurrentSchema() {
     WbConnection conn = loader.getConnection();
     if (conn == null || conn.isBusy()) return;
     String schema = conn.getCurrentSchema();
@@ -152,25 +129,20 @@ public class DbObjectsTree
   }
 
   @Override
-  public void treeExpanded(TreeExpansionEvent event)
-  {
+  public void treeExpanded(TreeExpansionEvent event) {
     if (loader == null) return;
     if (!WbSwingUtilities.isConnectionIdle(this, loader.getConnection())) return;
 
     TreePath path = event.getPath();
     Object obj = path.getLastPathComponent();
-    if (obj instanceof ObjectTreeNode)
-    {
-      final ObjectTreeNode node = (ObjectTreeNode)obj;
+    if (obj instanceof ObjectTreeNode) {
+      final ObjectTreeNode node = (ObjectTreeNode) obj;
 
-      if (!node.isLoaded())
-      {
-        WbThread load = new WbThread(new Runnable()
-        {
+      if (!node.isLoaded()) {
+        WbThread load = new WbThread(new Runnable() {
 
           @Override
-          public void run()
-          {
+          public void run() {
             doLoad(node);
           }
         }, "DbTree Load Thread");
@@ -179,50 +151,39 @@ public class DbObjectsTree
     }
   }
 
-  private void doLoad(final ObjectTreeNode node)
-  {
+  private void doLoad(final ObjectTreeNode node) {
     if (loader == null) return;
     if (!WbSwingUtilities.isConnectionIdle(this, loader.getConnection())) return;
 
-    try
-    {
+    try {
       WbSwingUtilities.showWaitCursor(this);
       loader.loadChildren(node);
-    }
-    catch (SQLException ex)
-    {
+    } catch (SQLException ex) {
       LogMgr.logError("DbObjectsTree.doLoad()", "Could not load node: " + node, ex);
-    }
-    finally
-    {
+    } finally {
       WbSwingUtilities.showDefaultCursor(this);
     }
   }
 
   @Override
-  public void treeCollapsed(TreeExpansionEvent event)
-  {
+  public void treeCollapsed(TreeExpansionEvent event) {
   }
 
-  public void dispose()
-  {
+  public void dispose() {
     clear();
     loader = null;
   }
 
   @Override
-	public void expandAll()
-  {
+  public void expandAll() {
   }
 
   @Override
-	public void collapseAll()
-  {
+  public void collapseAll() {
   }
 
-  private DbObjectTreeModel getTreeModel()
-  {
-    return (DbObjectTreeModel)getModel();
+  private DbObjectTreeModel getTreeModel() {
+    return (DbObjectTreeModel) getModel();
   }
 
 }

@@ -22,47 +22,43 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
 import workbench.gui.sql.EditorPanel;
 import workbench.interfaces.TextSelectionListener;
 import workbench.resource.PlatformShortcuts;
 import workbench.resource.ResourceMgr;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
- *	Make text lower case
+ * Make text lower case
+ *
+ * @author Thomas Kellerer
  * @see workbench.gui.sql.EditorPanel#toLowerCase()
- *	@author  Thomas Kellerer
  */
 public class MakeLowerCaseAction
-	extends WbAction
-	implements TextSelectionListener
-{
-	private EditorPanel client;
+    extends WbAction
+    implements TextSelectionListener {
+  private EditorPanel client;
 
-	public MakeLowerCaseAction(EditorPanel aClient)
-	{
-		super();
-		this.client = aClient;
-		this.client.addSelectionListener(this);
-		this.initMenuDefinition("MnuTxtMakeLowerCase", KeyStroke.getKeyStroke(KeyEvent.VK_L, PlatformShortcuts.getDefaultModifier()));
-		this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-		this.setEnabled(false);
-	}
+  public MakeLowerCaseAction(EditorPanel aClient) {
+    super();
+    this.client = aClient;
+    this.client.addSelectionListener(this);
+    this.initMenuDefinition("MnuTxtMakeLowerCase", KeyStroke.getKeyStroke(KeyEvent.VK_L, PlatformShortcuts.getDefaultModifier()));
+    this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+    this.setEnabled(false);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.toLowerCase();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.toLowerCase();
+  }
 
-	@Override
-	public void selectionChanged(int newStart, int newEnd)
-	{
-		this.setEnabled(newEnd > newStart);
-	}
+  @Override
+  public void selectionChanged(int newStart, int newEnd) {
+    this.setEnabled(newEnd > newStart);
+  }
 
 }

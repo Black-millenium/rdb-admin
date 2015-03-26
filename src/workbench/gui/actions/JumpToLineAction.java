@@ -22,70 +22,56 @@
  */
 package workbench.gui.actions;
 
-import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-
-import workbench.resource.ResourceMgr;
-
 import workbench.gui.WbSwingUtilities;
 import workbench.gui.sql.EditorPanel;
-
+import workbench.resource.ResourceMgr;
 import workbench.util.StringUtil;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class JumpToLineAction
-	extends WbAction
-{
-   private EditorPanel editor;
+    extends WbAction {
+  private EditorPanel editor;
 
-	public JumpToLineAction(EditorPanel panel)
-	{
-		super();
-		initMenuDefinition("MnuTxtJumpToLineNr");
-		setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-		editor = panel;
-	}
+  public JumpToLineAction(EditorPanel panel) {
+    super();
+    initMenuDefinition("MnuTxtJumpToLineNr");
+    setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+    editor = panel;
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt)
-	{
-		String lineInput = WbSwingUtilities.getUserInputNumber(editor, ResourceMgr.getString("TxtJumpToLine"), null);
-		if (StringUtil.isBlank(lineInput))
-		{
-			return;
-		}
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    String lineInput = WbSwingUtilities.getUserInputNumber(editor, ResourceMgr.getString("TxtJumpToLine"), null);
+    if (StringUtil.isBlank(lineInput)) {
+      return;
+    }
 
-		int line = -1;
-		try
-		{
-			line = Integer.valueOf(lineInput.trim()) - 1;
-		}
-		catch (NumberFormatException nfe)
-		{
-			return;
-		}
+    int line = -1;
+    try {
+      line = Integer.valueOf(lineInput.trim()) - 1;
+    } catch (NumberFormatException nfe) {
+      return;
+    }
 
-		if (line > 0)
-		{
-			int pos = editor.getLineStartOffset(line);
-			if (pos == -1)
-			{
-				pos = editor.getLineStartOffset(editor.getLineCount() - 1);
-			}
-			final int finalPos = pos;
-			EventQueue.invokeLater(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					editor.setCaretPosition(finalPos);
-				}
+    if (line > 0) {
+      int pos = editor.getLineStartOffset(line);
+      if (pos == -1) {
+        pos = editor.getLineStartOffset(editor.getLineCount() - 1);
+      }
+      final int finalPos = pos;
+      EventQueue.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          editor.setCaretPosition(finalPos);
+        }
 
-			});
-		}
-	}
+      });
+    }
+  }
 
 }

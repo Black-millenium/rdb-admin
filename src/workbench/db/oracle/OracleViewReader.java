@@ -22,52 +22,41 @@
  */
 package workbench.db.oracle;
 
+import workbench.db.*;
+
 import java.sql.SQLException;
-import workbench.db.DbMetadata;
-import workbench.db.DefaultViewReader;
-import workbench.db.NoConfigException;
-import workbench.db.TableDefinition;
-import workbench.db.TableIdentifier;
-import workbench.db.WbConnection;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class OracleViewReader
-	extends DefaultViewReader
-{
+    extends DefaultViewReader {
 
-	public OracleViewReader(WbConnection con)
-	{
-		super(con);
-	}
+  public OracleViewReader(WbConnection con) {
+    super(con);
+  }
 
-	@Override
-	public CharSequence getExtendedViewSource(TableDefinition view, boolean includeDrop, boolean includeCommit)
-		throws SQLException
-	{
-		String type = view.getTable().getType();
-		if (DbMetadata.MVIEW_NAME.equals(type))
-		{
-			OracleMViewReader reader = new OracleMViewReader();
-			CharSequence sql = reader.getMViewSource(this.connection, view, null, includeDrop, true);
-			return sql;
-		}
-		return super.getExtendedViewSource(view, includeDrop, includeCommit);
-	}
+  @Override
+  public CharSequence getExtendedViewSource(TableDefinition view, boolean includeDrop, boolean includeCommit)
+      throws SQLException {
+    String type = view.getTable().getType();
+    if (DbMetadata.MVIEW_NAME.equals(type)) {
+      OracleMViewReader reader = new OracleMViewReader();
+      CharSequence sql = reader.getMViewSource(this.connection, view, null, includeDrop, true);
+      return sql;
+    }
+    return super.getExtendedViewSource(view, includeDrop, includeCommit);
+  }
 
-	@Override
-	public CharSequence getViewSource(TableIdentifier viewId)
-		throws NoConfigException
-	{
-		if (DbMetadata.MVIEW_NAME.equalsIgnoreCase(viewId.getType()))
-		{
-			OracleMViewReader reader = new OracleMViewReader();
-			CharSequence sql = reader.getMViewSource(this.connection, new TableDefinition(viewId), null, false, false);
-			return sql;
-		}
-		return super.getViewSource(viewId);
-	}
+  @Override
+  public CharSequence getViewSource(TableIdentifier viewId)
+      throws NoConfigException {
+    if (DbMetadata.MVIEW_NAME.equalsIgnoreCase(viewId.getType())) {
+      OracleMViewReader reader = new OracleMViewReader();
+      CharSequence sql = reader.getMViewSource(this.connection, new TableDefinition(viewId), null, false, false);
+      return sql;
+    }
+    return super.getViewSource(viewId);
+  }
 
 }

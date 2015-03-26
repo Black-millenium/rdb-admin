@@ -22,405 +22,344 @@
  */
 package workbench.gui.dialogs.export;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import workbench.db.ColumnIdentifier;
+import workbench.db.TableIdentifier;
+import workbench.db.exporter.BlobMode;
+import workbench.db.exporter.ExportType;
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.components.ColumnSelectorPanel;
+import workbench.gui.components.FoldingPanel;
+import workbench.gui.components.KeyColumnSelectorPanel;
+import workbench.log.LogMgr;
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
+import workbench.storage.MergeGenerator;
+import workbench.storage.ResultInfo;
+import workbench.util.StringUtil;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.ButtonGroup;
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-
-import workbench.log.LogMgr;
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
-import workbench.db.ColumnIdentifier;
-import workbench.db.TableIdentifier;
-import workbench.db.exporter.BlobMode;
-import workbench.db.exporter.ExportType;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.components.ColumnSelectorPanel;
-import workbench.gui.components.FoldingPanel;
-import workbench.gui.components.KeyColumnSelectorPanel;
-
-import workbench.storage.MergeGenerator;
-import workbench.storage.ResultInfo;
-
-import workbench.util.StringUtil;
-
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class SqlOptionsPanel
-	extends JPanel
-	implements SqlOptions, ActionListener
-{
-	private List<String> keyColumns;
-	private ColumnSelectorPanel columnSelectorPanel;
-	private ResultInfo tableColumns;
+    extends JPanel
+    implements SqlOptions, ActionListener {
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  public JTextField alternateTable;
+  public JComboBox blobTypes;
+  public JLabel blobTypesLabel;
+  public JTextField commitCount;
+  public JLabel commitLabel;
+  public JCheckBox createTable;
+  public JPanel extOptionsPanel;
+  public JLabel jLabel1;
+  public JLabel jLabel2;
+  public JPanel jPanel2;
+  public JPanel jPanel4;
+  public JComboBox literalTypes;
+  public JLabel literalTypesLabel;
+  public JComboBox mergeTypes;
+  public JLabel mergeTypesLabel;
+  public JButton selectKeys;
+  public JComboBox syntaxType;
+  public ButtonGroup typeGroup;
+  private List<String> keyColumns;
+  private ColumnSelectorPanel columnSelectorPanel;
+  private ResultInfo tableColumns;
 
-	public SqlOptionsPanel(ResultInfo info)
-	{
-		super();
-		initComponents();
-		setResultInfo(info);
-		List<String> types = Settings.getInstance().getLiteralTypeList();
-		ComboBoxModel model = new DefaultComboBoxModel(types.toArray());
-		literalTypes.setModel(model);
+  public SqlOptionsPanel(ResultInfo info) {
+    super();
+    initComponents();
+    setResultInfo(info);
+    List<String> types = Settings.getInstance().getLiteralTypeList();
+    ComboBoxModel model = new DefaultComboBoxModel(types.toArray());
+    literalTypes.setModel(model);
 
-		List<String> mTypes = MergeGenerator.Factory.getSupportedTypes();
-		ComboBoxModel mergeModel = new DefaultComboBoxModel(mTypes.toArray());
-		mergeTypes.setModel(mergeModel);
+    List<String> mTypes = MergeGenerator.Factory.getSupportedTypes();
+    ComboBoxModel mergeModel = new DefaultComboBoxModel(mTypes.toArray());
+    mergeTypes.setModel(mergeModel);
 
-		List<String> bTypes = BlobMode.getTypes();
-		bTypes.remove(BlobMode.Base64.getTypeString());
-		ComboBoxModel blobModel = new DefaultComboBoxModel(bTypes.toArray());
-		blobTypes.setModel(blobModel);
-		blobTypes.setSelectedItem(BlobMode.SaveToFile.toString());
+    List<String> bTypes = BlobMode.getTypes();
+    bTypes.remove(BlobMode.Base64.getTypeString());
+    ComboBoxModel blobModel = new DefaultComboBoxModel(bTypes.toArray());
+    blobTypes.setModel(blobModel);
+    blobTypes.setSelectedItem(BlobMode.SaveToFile.toString());
 
-		WbSwingUtilities.setMinimumSizeFromCols(commitCount);
+    WbSwingUtilities.setMinimumSizeFromCols(commitCount);
 
-		GridBagLayout layout = (GridBagLayout)getLayout();
-		GridBagConstraints c = layout.getConstraints(extOptionsPanel);
-		remove(extOptionsPanel);
-		FoldingPanel p = new FoldingPanel(extOptionsPanel);
-		add(p, c);
-		invalidate();
+    GridBagLayout layout = (GridBagLayout) getLayout();
+    GridBagConstraints c = layout.getConstraints(extOptionsPanel);
+    remove(extOptionsPanel);
+    FoldingPanel p = new FoldingPanel(extOptionsPanel);
+    add(p, c);
+    invalidate();
 
-	}
+  }
 
-	public final void setResultInfo(ResultInfo info)
-	{
-		this.tableColumns = info;
+  public final void setResultInfo(ResultInfo info) {
+    this.tableColumns = info;
 
-		boolean hasColumns = tableColumns != null;
-		boolean keysPresent = (info == null ? false : info.hasPkColumns());
-		this.selectKeys.setEnabled(hasColumns);
+    boolean hasColumns = tableColumns != null;
+    boolean keysPresent = (info == null ? false : info.hasPkColumns());
+    this.selectKeys.setEnabled(hasColumns);
 
-		this.setIncludeDeleteInsert(keysPresent);
-		this.setIncludeUpdate(keysPresent);
+    this.setIncludeDeleteInsert(keysPresent);
+    this.setIncludeUpdate(keysPresent);
 
-		if (info != null)
-		{
-			TableIdentifier table = info.getUpdateTable();
-			if (table != null)
-			{
-				this.alternateTable.setText(table.getTableName());
-			}
-			else
-			{
-				this.alternateTable.setText("target_table");
-			}
-		}
-	}
+    if (info != null) {
+      TableIdentifier table = info.getUpdateTable();
+      if (table != null) {
+        this.alternateTable.setText(table.getTableName());
+      } else {
+        this.alternateTable.setText("target_table");
+      }
+    }
+  }
 
-	public void saveSettings()
-	{
-		Settings s = Settings.getInstance();
-		s.setProperty("workbench.export.sql.commitevery", this.getCommitEvery());
-		s.setProperty("workbench.export.sql.createtable", this.getCreateTable());
-		s.setProperty("workbench.export.sql.saveas.dateliterals", this.getDateLiteralType());
-		s.setProperty("workbench.export.sql.saveas.blobliterals", this.getBlobMode().getTypeString());
-	}
+  public void saveSettings() {
+    Settings s = Settings.getInstance();
+    s.setProperty("workbench.export.sql.commitevery", this.getCommitEvery());
+    s.setProperty("workbench.export.sql.createtable", this.getCreateTable());
+    s.setProperty("workbench.export.sql.saveas.dateliterals", this.getDateLiteralType());
+    s.setProperty("workbench.export.sql.saveas.blobliterals", this.getBlobMode().getTypeString());
+  }
 
-	public void restoreSettings()
-	{
-		Settings s = Settings.getInstance();
-		this.setCommitEvery(s.getIntProperty("workbench.export.sql.commitevery", 0));
-		this.setCreateTable(s.getBoolProperty("workbench.export.sql.createtable"));
-		String def = s.getProperty("workbench.export.sql.default.dateliterals", "dbms");
-		String type = s.getProperty("workbench.export.sql.saveas.dateliterals", def);
-		this.literalTypes.setSelectedItem(type);
+  public void restoreSettings() {
+    Settings s = Settings.getInstance();
+    this.setCommitEvery(s.getIntProperty("workbench.export.sql.commitevery", 0));
+    this.setCreateTable(s.getBoolProperty("workbench.export.sql.createtable"));
+    String def = s.getProperty("workbench.export.sql.default.dateliterals", "dbms");
+    String type = s.getProperty("workbench.export.sql.saveas.dateliterals", def);
+    this.literalTypes.setSelectedItem(type);
 
-		type = s.getProperty("workbench.export.sql.saveas.blobliterals", BlobMode.SaveToFile.getTypeString());
-		this.blobTypes.setSelectedItem(type);
-	}
+    type = s.getProperty("workbench.export.sql.saveas.blobliterals", BlobMode.SaveToFile.getTypeString());
+    this.blobTypes.setSelectedItem(type);
+  }
 
-	@Override
-	public String getMergeType()
-	{
-		return (String)mergeTypes.getSelectedItem();
-	}
+  @Override
+  public String getMergeType() {
+    return (String) mergeTypes.getSelectedItem();
+  }
 
-	@Override
-	public BlobMode getBlobMode()
-	{
-		String type = (String)blobTypes.getSelectedItem();
-		BlobMode mode = BlobMode.getMode(type);
-		return mode;
-	}
+  @Override
+  public BlobMode getBlobMode() {
+    String type = (String) blobTypes.getSelectedItem();
+    BlobMode mode = BlobMode.getMode(type);
+    return mode;
+  }
 
-	@Override
-	public String getDateLiteralType()
-	{
-		return (String)literalTypes.getSelectedItem();
-	}
+  @Override
+  public String getDateLiteralType() {
+    return (String) literalTypes.getSelectedItem();
+  }
 
-	@Override
-	public String getAlternateUpdateTable()
-	{
-		String s = alternateTable.getText();
-		if (StringUtil.isNonBlank(s)) return s.trim();
-		return null;
-	}
+  @Override
+  public String getAlternateUpdateTable() {
+    String s = alternateTable.getText();
+    if (StringUtil.isNonBlank(s)) return s.trim();
+    return null;
+  }
 
-	@Override
-	public void setAlternateUpdateTable(String table)
-	{
-		this.alternateTable.setText((table == null ? "" : table.trim()));
-	}
+  // Code for dispatching events from components to event handlers.
 
-	@Override
-	public int getCommitEvery()
-	{
-		int result = -1;
-		try
-		{
-			String value = this.commitCount.getText();
-			if (value != null && value.length() > 0)
-			{
-				result = Integer.parseInt(value);
-			}
-			else
-			{
-				result = 0;
-			}
-		}
-		catch (Exception e)
-		{
-			LogMgr.logDebug("SqlOptionsPanel.getCommitEvery", "Could not retrieve commit frequency", e);
-		}
-		return result;
-	}
+  @Override
+  public void setAlternateUpdateTable(String table) {
+    this.alternateTable.setText((table == null ? "" : table.trim()));
+  }
 
-	public void setDbId(String dbid)
-	{
-		String currentType = MergeGenerator.Factory.getTypeForDBID(dbid);
-		mergeTypes.setSelectedItem(currentType);
-	}
+  @Override
+  public int getCommitEvery() {
+    int result = -1;
+    try {
+      String value = this.commitCount.getText();
+      if (value != null && value.length() > 0) {
+        result = Integer.parseInt(value);
+      } else {
+        result = 0;
+      }
+    } catch (Exception e) {
+      LogMgr.logDebug("SqlOptionsPanel.getCommitEvery", "Could not retrieve commit frequency", e);
+    }
+    return result;
+  }
 
-	private void removeSyntaxType(String type)
-	{
-		syntaxType.removeItem(type);
-	}
+  @Override
+  public void setCommitEvery(int value) {
+    if (value > 0) {
+      this.commitCount.setText(Integer.toString(value));
+    } else {
+      this.commitCount.setText("");
+    }
+  }
 
-	private int getSyntaxTypeIndex(String type)
-	{
-		int count = syntaxType.getItemCount();
-		for (int i=0; i < count; i++)
-		{
-			String item = (String)syntaxType.getItemAt(i);
-			if (item.equals(type)) return i;
-		}
-		return -1;
-	}
+  public void setDbId(String dbid) {
+    String currentType = MergeGenerator.Factory.getTypeForDBID(dbid);
+    mergeTypes.setSelectedItem(currentType);
+  }
 
-	private void addSyntaxType(String type)
-	{
-		DefaultComboBoxModel model = (DefaultComboBoxModel)syntaxType.getModel();
-		int index = getSyntaxTypeIndex(type);
+  private void removeSyntaxType(String type) {
+    syntaxType.removeItem(type);
+  }
 
-		if (type.equals("MERGE") &&  index == -1)
-		{
-			// merge always goes to the end
-			model.addElement(type);
-		}
+  private int getSyntaxTypeIndex(String type) {
+    int count = syntaxType.getItemCount();
+    for (int i = 0; i < count; i++) {
+      String item = (String) syntaxType.getItemAt(i);
+      if (item.equals(type)) return i;
+    }
+    return -1;
+  }
 
-		if (type.equals("UPDATE") && index == -1)
-		{
-			int insertIndex = getSyntaxTypeIndex("INSERT");
-			model.insertElementAt(type, insertIndex + 1);
-		}
+  private void addSyntaxType(String type) {
+    DefaultComboBoxModel model = (DefaultComboBoxModel) syntaxType.getModel();
+    int index = getSyntaxTypeIndex(type);
 
-		if (type.equals("DELETE/INSERT") && index == -1)
-		{
-			int updateIndex = getSyntaxTypeIndex("UPDATE");
-			model.insertElementAt(type, updateIndex + 1);
-		}
-	}
+    if (type.equals("MERGE") && index == -1) {
+      // merge always goes to the end
+      model.addElement(type);
+    }
 
-	public void setIncludeMerge(boolean flag)
-	{
-		if (flag)
-		{
-			addSyntaxType("MERGE");
-			mergeTypes.setEnabled(true);
-			mergeTypesLabel.setEnabled(true);
-		}
-		else
-		{
-			removeSyntaxType("MERGE");
-			mergeTypes.setEnabled(false);
-			mergeTypesLabel.setEnabled(false);
-		}
-	}
+    if (type.equals("UPDATE") && index == -1) {
+      int insertIndex = getSyntaxTypeIndex("INSERT");
+      model.insertElementAt(type, insertIndex + 1);
+    }
 
-	public void setIncludeUpdate(boolean flag)
-	{
-		if (flag)
-		{
-			addSyntaxType("UPDATE");
-		}
-		else
-		{
-			removeSyntaxType("UPDATE");
-		}
-	}
+    if (type.equals("DELETE/INSERT") && index == -1) {
+      int updateIndex = getSyntaxTypeIndex("UPDATE");
+      model.insertElementAt(type, updateIndex + 1);
+    }
+  }
 
-	public void setIncludeDeleteInsert(boolean flag)
-	{
-		if (flag)
-		{
-			addSyntaxType("DELETE/INSERT");
-			addSyntaxType("DELETE");
-		}
-		else
-		{
-			removeSyntaxType("DELETE/INSERT");
-			removeSyntaxType("DELETE");
-		}
-	}
+  public void setIncludeMerge(boolean flag) {
+    if (flag) {
+      addSyntaxType("MERGE");
+      mergeTypes.setEnabled(true);
+      mergeTypesLabel.setEnabled(true);
+    } else {
+      removeSyntaxType("MERGE");
+      mergeTypes.setEnabled(false);
+      mergeTypesLabel.setEnabled(false);
+    }
+  }
 
-	private String getSelectedSyntaxType()
-	{
-		return (String)syntaxType.getSelectedItem();
-	}
+  public void setIncludeUpdate(boolean flag) {
+    if (flag) {
+      addSyntaxType("UPDATE");
+    } else {
+      removeSyntaxType("UPDATE");
+    }
+  }
 
-	@Override
-	public ExportType getExportType()
-	{
-		String type = getSelectedSyntaxType();
-		if (type.equals("UPDATE"))
-		{
-			return ExportType.SQL_UPDATE;
-		}
-		if (type.equals("DELETE"))
-		{
-			return ExportType.SQL_DELETE;
-		}
-		if (type.equals("DELETE/INSERT"))
-		{
-			return ExportType.SQL_DELETE_INSERT;
-		}
-		if (type.equals("MERGE"))
-		{
-			return ExportType.SQL_MERGE;
-		}
-		return ExportType.SQL_INSERT;
-	}
+  public void setIncludeDeleteInsert(boolean flag) {
+    if (flag) {
+      addSyntaxType("DELETE/INSERT");
+      addSyntaxType("DELETE");
+    } else {
+      removeSyntaxType("DELETE/INSERT");
+      removeSyntaxType("DELETE");
+    }
+  }
 
-	@Override
-	public boolean getCreateTable()
-	{
-		return createTable.isSelected();
-	}
+  private String getSelectedSyntaxType() {
+    return (String) syntaxType.getSelectedItem();
+  }
 
-	@Override
-	public void setCommitEvery(int value)
-	{
-		if (value > 0)
-		{
-			this.commitCount.setText(Integer.toString(value));
-		}
-		else
-		{
-			this.commitCount.setText("");
-		}
-	}
+  @Override
+  public ExportType getExportType() {
+    String type = getSelectedSyntaxType();
+    if (type.equals("UPDATE")) {
+      return ExportType.SQL_UPDATE;
+    }
+    if (type.equals("DELETE")) {
+      return ExportType.SQL_DELETE;
+    }
+    if (type.equals("DELETE/INSERT")) {
+      return ExportType.SQL_DELETE_INSERT;
+    }
+    if (type.equals("MERGE")) {
+      return ExportType.SQL_MERGE;
+    }
+    return ExportType.SQL_INSERT;
+  }
 
-	@Override
-	public void setExportType(ExportType type)
-	{
-		switch (type)
-		{
-			case SQL_DELETE:
-				syntaxType.setSelectedItem("DELETE");
-				break;
-			case SQL_DELETE_INSERT:
-				syntaxType.setSelectedItem("DELETE/INSERT");
-				break;
-			case SQL_UPDATE:
-				syntaxType.setSelectedItem("UPDATE");
-				break;
-			case SQL_MERGE:
-				syntaxType.setSelectedItem("MERGE");
-				break;
-			default:
-				syntaxType.setSelectedItem("INSERT");
-		}
-	}
+  @Override
+  public void setExportType(ExportType type) {
+    switch (type) {
+      case SQL_DELETE:
+        syntaxType.setSelectedItem("DELETE");
+        break;
+      case SQL_DELETE_INSERT:
+        syntaxType.setSelectedItem("DELETE/INSERT");
+        break;
+      case SQL_UPDATE:
+        syntaxType.setSelectedItem("UPDATE");
+        break;
+      case SQL_MERGE:
+        syntaxType.setSelectedItem("MERGE");
+        break;
+      default:
+        syntaxType.setSelectedItem("INSERT");
+    }
+  }
 
-	@Override
-	public void setCreateTable(boolean flag)
-	{
-		this.createTable.setSelected(flag);
-	}
+  @Override
+  public boolean getCreateTable() {
+    return createTable.isSelected();
+  }
 
-	@Override
-	public List<String> getKeyColumns()
-	{
-		return keyColumns;
-	}
+  @Override
+  public void setCreateTable(boolean flag) {
+    this.createTable.setSelected(flag);
+  }
 
-	private void selectColumns()
-	{
-		if (this.tableColumns == null) return;
+  @Override
+  public List<String> getKeyColumns() {
+    return keyColumns;
+  }
 
-		if (this.columnSelectorPanel == null)
-		{
-			this.columnSelectorPanel = new KeyColumnSelectorPanel(tableColumns);
-		}
-		else
-		{
-			this.columnSelectorPanel.selectColumns(this.keyColumns);
-		}
+  private void selectColumns() {
+    if (this.tableColumns == null) return;
 
-		int choice = JOptionPane.showConfirmDialog(SwingUtilities.getWindowAncestor(this), this.columnSelectorPanel, ResourceMgr.getString("MsgSelectKeyColumnsWindowTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+    if (this.columnSelectorPanel == null) {
+      this.columnSelectorPanel = new KeyColumnSelectorPanel(tableColumns);
+    } else {
+      this.columnSelectorPanel.selectColumns(this.keyColumns);
+    }
 
-		if (choice == JOptionPane.OK_OPTION)
-		{
-			this.keyColumns = null;
+    int choice = JOptionPane.showConfirmDialog(SwingUtilities.getWindowAncestor(this), this.columnSelectorPanel, ResourceMgr.getString("MsgSelectKeyColumnsWindowTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-			List selected = this.columnSelectorPanel.getSelectedColumns();
-			int size = selected.size();
-			this.keyColumns = new ArrayList<String>(size);
-			for (int i=0; i < size; i++)
-			{
-				ColumnIdentifier col = (ColumnIdentifier)selected.get(i);
-				this.keyColumns.add(col.getColumnName());
-			}
+    if (choice == JOptionPane.OK_OPTION) {
+      this.keyColumns = null;
 
-			boolean keysPresent = (size > 0);
-			this.setIncludeUpdate(keysPresent);
-			this.setIncludeDeleteInsert(keysPresent);
-			this.setIncludeMerge(keysPresent);
-		}
-	}
+      List selected = this.columnSelectorPanel.getSelectedColumns();
+      int size = selected.size();
+      this.keyColumns = new ArrayList<String>(size);
+      for (int i = 0; i < size; i++) {
+        ColumnIdentifier col = (ColumnIdentifier) selected.get(i);
+        this.keyColumns.add(col.getColumnName());
+      }
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+      boolean keysPresent = (size > 0);
+      this.setIncludeUpdate(keysPresent);
+      this.setIncludeDeleteInsert(keysPresent);
+      this.setIncludeMerge(keysPresent);
+    }
+  }
+
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     GridBagConstraints gridBagConstraints;
 
     typeGroup = new ButtonGroup();
@@ -508,7 +447,7 @@ public class SqlOptionsPanel
     gridBagConstraints.anchor = GridBagConstraints.LINE_START;
     jPanel4.add(jLabel2, gridBagConstraints);
 
-    syntaxType.setModel(new DefaultComboBoxModel(new String[] { "INSERT", "UPDATE", "DELETE/INSERT", "MERGE", "DELETE" }));
+    syntaxType.setModel(new DefaultComboBoxModel(new String[]{"INSERT", "UPDATE", "DELETE/INSERT", "MERGE", "DELETE"}));
     gridBagConstraints = new GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 1;
@@ -603,39 +542,15 @@ public class SqlOptionsPanel
     add(extOptionsPanel, gridBagConstraints);
   }
 
-  // Code for dispatching events from components to event handlers.
-
-  public void actionPerformed(ActionEvent evt)
-  {
-    if (evt.getSource() == selectKeys)
-    {
+  public void actionPerformed(ActionEvent evt) {
+    if (evt.getSource() == selectKeys) {
       SqlOptionsPanel.this.selectKeysActionPerformed(evt);
     }
   }// </editor-fold>//GEN-END:initComponents
 
-private void selectKeysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectKeysActionPerformed
-	selectColumns();
-}//GEN-LAST:event_selectKeysActionPerformed
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  public JTextField alternateTable;
-  public JComboBox blobTypes;
-  public JLabel blobTypesLabel;
-  public JTextField commitCount;
-  public JLabel commitLabel;
-  public JCheckBox createTable;
-  public JPanel extOptionsPanel;
-  public JLabel jLabel1;
-  public JLabel jLabel2;
-  public JPanel jPanel2;
-  public JPanel jPanel4;
-  public JComboBox literalTypes;
-  public JLabel literalTypesLabel;
-  public JComboBox mergeTypes;
-  public JLabel mergeTypesLabel;
-  public JButton selectKeys;
-  public JComboBox syntaxType;
-  public ButtonGroup typeGroup;
+  private void selectKeysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectKeysActionPerformed
+    selectColumns();
+  }//GEN-LAST:event_selectKeysActionPerformed
   // End of variables declaration//GEN-END:variables
 
 }

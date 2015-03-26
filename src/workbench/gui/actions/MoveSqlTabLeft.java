@@ -22,29 +22,27 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
 import workbench.gui.MainWindow;
 
-/**
- *	@author  Thomas Kellerer
- */
-public class MoveSqlTabLeft 
-	extends WbAction
-{
-	private MainWindow client;
-	
-	public MoveSqlTabLeft(MainWindow aClient)
-	{
-		super();
-		client = aClient;
-		isConfigurable = false;
-		initMenuDefinition("MnuTxtMoveTabLeft");
-		setIcon(null);
-	}
+import java.awt.event.ActionEvent;
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.moveTabLeft();
-	}
+/**
+ * @author Thomas Kellerer
+ */
+public class MoveSqlTabLeft
+    extends WbAction {
+  private MainWindow client;
+
+  public MoveSqlTabLeft(MainWindow aClient) {
+    super();
+    client = aClient;
+    isConfigurable = false;
+    initMenuDefinition("MnuTxtMoveTabLeft");
+    setIcon(null);
+  }
+
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.moveTabLeft();
+  }
 }

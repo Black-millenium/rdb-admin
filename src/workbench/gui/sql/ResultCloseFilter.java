@@ -22,17 +22,15 @@
 package workbench.gui.sql;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ResultCloseFilter
-{
-	/**
-	 * Returns true if the panel at the given index should be closed.
-	 *
-	 * @param panel      the panel
-	 * @param panelIndex the panel's index
-	 * @return true if the index can be closed.
-	 */
-	boolean shouldClose(DwPanel panel, int panelIndex);
+public interface ResultCloseFilter {
+  /**
+   * Returns true if the panel at the given index should be closed.
+   *
+   * @param panel      the panel
+   * @param panelIndex the panel's index
+   * @return true if the index can be closed.
+   */
+  boolean shouldClose(DwPanel panel, int panelIndex);
 }

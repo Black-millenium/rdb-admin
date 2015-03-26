@@ -28,99 +28,80 @@ import workbench.util.ValueConverter;
  * @author Thomas Kellerer
  */
 public class DateEqualsComparator
-	implements ColumnComparator
-{
-	private int sqlType;
+    implements ColumnComparator {
+  private int sqlType;
 
-	public DateEqualsComparator()
-	{
-		this.sqlType = java.sql.Types.TIMESTAMP;
-	}
+  public DateEqualsComparator() {
+    this.sqlType = java.sql.Types.TIMESTAMP;
+  }
 
-	public DateEqualsComparator(int type)
-	{
-		this.sqlType = type;
-	}
+  public DateEqualsComparator(int type) {
+    this.sqlType = type;
+  }
 
-	@Override
-	public boolean supportsIgnoreCase()
-	{
-		return false;
-	}
+  @Override
+  public boolean supportsIgnoreCase() {
+    return false;
+  }
 
-	@Override
-	public String getValueExpression(Object value)
-	{
-		return (value == null ? "" : value.toString());
-	}
+  @Override
+  public String getValueExpression(Object value) {
+    return (value == null ? "" : value.toString());
+  }
 
-	@Override
-	public String getOperator()
-	{
-		return "=";
-	}
+  @Override
+  public String getOperator() {
+    return "=";
+  }
 
-	@Override
-	public String getDescription()
-	{
-		return "equals";
-	}
+  @Override
+  public String getDescription() {
+    return "equals";
+  }
 
-	@Override
-	public boolean needsValue()
-	{
-		return true;
-	}
+  @Override
+  public boolean needsValue() {
+    return true;
+  }
 
-	@Override
-	public boolean comparesEquality()
-	{
-		return true;
-	}
+  @Override
+  public boolean comparesEquality() {
+    return true;
+  }
 
-	@Override
-	public boolean evaluate(Object reference, Object value, boolean ignoreCase)
-	{
-		if (reference == null || value == null) return false;
-		try
-		{
-			return reference.equals(value);
-		}
-		catch (Exception e)
-		{
-			return false;
-		}
-	}
+  @Override
+  public boolean evaluate(Object reference, Object value, boolean ignoreCase) {
+    if (reference == null || value == null) return false;
+    try {
+      return reference.equals(value);
+    } catch (Exception e) {
+      return false;
+    }
+  }
 
-	@Override
-	public boolean supportsType(Class valueClass)
-	{
-		return java.util.Date.class.isAssignableFrom(valueClass);
-	}
+  @Override
+  public boolean supportsType(Class valueClass) {
+    return java.util.Date.class.isAssignableFrom(valueClass);
+  }
 
-	@Override
-	public boolean equals(Object other)
-	{
-		return (other.getClass().equals(this.getClass()));
-	}
+  @Override
+  public boolean equals(Object other) {
+    return (other.getClass().equals(this.getClass()));
+  }
 
-	@Override
-	public boolean validateInput(Object value)
-	{
-		if (value == null) return false;
+  @Override
+  public boolean validateInput(Object value) {
+    if (value == null) return false;
 
-		if (value instanceof java.util.Date) return true;
+    if (value instanceof java.util.Date) return true;
 
-		ValueConverter converter = new ValueConverter();
-		try
-		{
-			converter.convertValue(value, this.sqlType);
-			return true;
-		}
-		catch (Exception e)
-		{
-			return false;
-		}
-	}
+    ValueConverter converter = new ValueConverter();
+    try {
+      converter.convertValue(value, this.sqlType);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
 
 }

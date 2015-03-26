@@ -25,16 +25,20 @@ package workbench.interfaces;
 import java.beans.PropertyChangeListener;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface SimplePropertyEditor
-{
-	void setSourceObject(Object source, String property);
-	void applyChanges();
-	boolean isChanged();
-	void addPropertyChangeListener(PropertyChangeListener listener);
-	void removePropertyChangeListener(PropertyChangeListener listener);
-	void setImmediateUpdate(boolean flag);
-	boolean getImmediateUpdate();
+public interface SimplePropertyEditor {
+  void setSourceObject(Object source, String property);
+
+  void applyChanges();
+
+  boolean isChanged();
+
+  void addPropertyChangeListener(PropertyChangeListener listener);
+
+  void removePropertyChangeListener(PropertyChangeListener listener);
+
+  boolean getImmediateUpdate();
+
+  void setImmediateUpdate(boolean flag);
 }

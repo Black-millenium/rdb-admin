@@ -26,68 +26,48 @@ import workbench.db.DbObjectChanger;
 import workbench.db.ProcedureDefinition;
 import workbench.db.ProcedureReader;
 import workbench.db.WbConnection;
-
 import workbench.gui.components.DataStoreTableModel;
-
 import workbench.storage.InputValidator;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class ProcedureChangeValidator
-	implements InputValidator
-{
-	private DbObjectChanger changer;
+    implements InputValidator {
+  private DbObjectChanger changer;
 
-	public ProcedureChangeValidator()
-	{
-	}
+  public ProcedureChangeValidator() {
+  }
 
-	@Override
-	public boolean isValid(Object newValue, int row, int col, DataStoreTableModel source)
-	{
-		if (changer == null) return false;
+  @Override
+  public boolean isValid(Object newValue, int row, int col, DataStoreTableModel source) {
+    if (changer == null) return false;
 
-		String type = null;
-		Object userObject = source.getDataStore().getRow(row).getUserObject();
-		if (userObject instanceof ProcedureDefinition)
-		{
-			type = ((ProcedureDefinition)userObject).getObjectType();
-		}
-		else
-		{
-			return false;
-		}
+    String type = null;
+    Object userObject = source.getDataStore().getRow(row).getUserObject();
+    if (userObject instanceof ProcedureDefinition) {
+      type = ((ProcedureDefinition) userObject).getObjectType();
+    } else {
+      return false;
+    }
 
-		if (col == ProcedureReader.COLUMN_IDX_PROC_LIST_REMARKS)
-		{
-			return changer.getCommentSql(type, null) != null;
-		}
-		else if (col == ProcedureReader.COLUMN_IDX_PROC_LIST_SCHEMA)
-		{
-			return changer.getChangeSchemaSql(type) != null;
-		}
-		else if (col == ProcedureReader.COLUMN_IDX_PROC_LIST_CATALOG)
-		{
-			return changer.getChangeCatalogSql(type) != null;
-		}
-		else if (col == ProcedureReader.COLUMN_IDX_PROC_LIST_NAME)
-		{
-			return changer.getRenameObjectSql(type) != null;
-		}
-		return false;
-	}
+    if (col == ProcedureReader.COLUMN_IDX_PROC_LIST_REMARKS) {
+      return changer.getCommentSql(type, null) != null;
+    } else if (col == ProcedureReader.COLUMN_IDX_PROC_LIST_SCHEMA) {
+      return changer.getChangeSchemaSql(type) != null;
+    } else if (col == ProcedureReader.COLUMN_IDX_PROC_LIST_CATALOG) {
+      return changer.getChangeCatalogSql(type) != null;
+    } else if (col == ProcedureReader.COLUMN_IDX_PROC_LIST_NAME) {
+      return changer.getRenameObjectSql(type) != null;
+    }
+    return false;
+  }
 
-	public void setConnection(WbConnection con)
-	{
-		if (con != null)
-		{
-			changer = new DbObjectChanger(con);
-		}
-		else
-		{
-			changer = null;
-		}
-	}
+  public void setConnection(WbConnection con) {
+    if (con != null) {
+      changer = new DbObjectChanger(con);
+    } else {
+      changer = null;
+    }
+  }
 }

@@ -27,67 +27,55 @@ import javax.swing.table.TableModel;
 
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class EmptyTableModel
-	implements TableModel
-{
-	public static final TableModel EMPTY_MODEL = new EmptyTableModel();
+    implements TableModel {
+  public static final TableModel EMPTY_MODEL = new EmptyTableModel();
 
-	private EmptyTableModel()
-	{
-	}
+  private EmptyTableModel() {
+  }
 
-	@Override
-	public Object getValueAt(int row, int col)
-	{
-		return "";
-	}
+  @Override
+  public Object getValueAt(int row, int col) {
+    return "";
+  }
 
-	@Override
-	public void setValueAt(Object aValue, int row, int column)
-	{
-	}
+  @Override
+  public void setValueAt(Object aValue, int row, int column) {
+  }
 
-	@Override
-	public int getColumnCount()
-	{
-		return 0;
-	}
+  @Override
+  public int getColumnCount() {
+    return 0;
+  }
 
-	@Override
-	public int getRowCount()
-	{
-		return 0;
-	}
+  @Override
+  public int getRowCount() {
+    return 0;
+  }
 
-	@Override
-	public boolean isCellEditable(int row, int column)
-	{
-		return false;
-	}
+  @Override
+  public boolean isCellEditable(int row, int column) {
+    return false;
+  }
 
-	@Override
-	public void addTableModelListener(TableModelListener l)
-	{
-	}
+  @Override
+  public void addTableModelListener(TableModelListener l) {
+  }
 
-	@Override
-	public Class getColumnClass(int columnIndex)
-	{
-		return String.class;
-	}
+  @Override
+  public Class getColumnClass(int columnIndex) {
+    return String.class;
+  }
 
-	@Override
-	public String getColumnName(int columnIndex)
-	{
-		return "";
-	}
+  @Override
+  public String getColumnName(int columnIndex) {
+    return "";
+  }
 
-	@Override
-	public void removeTableModelListener(TableModelListener l)
-	{
-	}
+  @Override
+  public void removeTableModelListener(TableModelListener l) {
+  }
 
 }

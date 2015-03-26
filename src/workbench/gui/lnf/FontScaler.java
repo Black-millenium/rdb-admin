@@ -22,11 +22,10 @@
  */
 package workbench.gui.lnf;
 
-import java.awt.Font;
-import java.awt.Toolkit;
-
 import workbench.log.LogMgr;
 import workbench.resource.Settings;
+
+import java.awt.*;
 
 /**
  * A class to scale fonts according to the DPI settings of the Desktop.
@@ -34,48 +33,40 @@ import workbench.resource.Settings;
  *
  * @author Thomas Kellerer
  */
-public class FontScaler
-{
-	private boolean scaleFont;
-	private final int dpi;
-	private final int defaultDPI;
-	private final float scaleFactor;
+public class FontScaler {
+  private final int dpi;
+  private final int defaultDPI;
+  private final float scaleFactor;
+  private boolean scaleFont;
 
-	public FontScaler()
-	{
-		dpi = Toolkit.getDefaultToolkit().getScreenResolution();
-		defaultDPI = Settings.getInstance().getIntProperty("workbench.gui.desktop.defaultdpi", 96);
-		if (dpi == defaultDPI)
-		{
-			scaleFont = false;
-			scaleFactor = 1.0f;
-		}
-		else
-		{
-			scaleFont = true;
-			scaleFactor = ((float)dpi / (float)defaultDPI);
-		}
-	}
+  public FontScaler() {
+    dpi = Toolkit.getDefaultToolkit().getScreenResolution();
+    defaultDPI = Settings.getInstance().getIntProperty("workbench.gui.desktop.defaultdpi", 96);
+    if (dpi == defaultDPI) {
+      scaleFont = false;
+      scaleFactor = 1.0f;
+    } else {
+      scaleFont = true;
+      scaleFactor = ((float) dpi / (float) defaultDPI);
+    }
+  }
 
-	public void logSettings()
-	{
-		LogMgr.logInfo("FontScaler.logSettings()", "Current DPI: "  + dpi + ", Default DPI: " + defaultDPI + ", scale factor: " + scaleFactor);
-	}
+  public void logSettings() {
+    LogMgr.logInfo("FontScaler.logSettings()", "Current DPI: " + dpi + ", Default DPI: " + defaultDPI + ", scale factor: " + scaleFactor);
+  }
 
-	public float getScaleFactor()
-	{
-		return scaleFactor;
-	}
+  public float getScaleFactor() {
+    return scaleFactor;
+  }
 
-	public Font scaleFont(Font baseFont)
-	{
-		if (!scaleFont) return baseFont;
-		if (baseFont == null) return null;
+  public Font scaleFont(Font baseFont) {
+    if (!scaleFont) return baseFont;
+    if (baseFont == null) return null;
 
-		float oldSize2D = baseFont.getSize2D();
-		float newSize2D = oldSize2D * scaleFactor;
-		Font scaled = baseFont.deriveFont(newSize2D);
-		return scaled;
-	}
+    float oldSize2D = baseFont.getSize2D();
+    float newSize2D = oldSize2D * scaleFactor;
+    Font scaled = baseFont.deriveFont(newSize2D);
+    return scaled;
+  }
 
 }

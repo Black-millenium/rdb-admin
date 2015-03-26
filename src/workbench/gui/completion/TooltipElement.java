@@ -23,10 +23,8 @@
 package workbench.gui.completion;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface TooltipElement
-{
-	String getTooltip();
+public interface TooltipElement {
+  String getTooltip();
 }

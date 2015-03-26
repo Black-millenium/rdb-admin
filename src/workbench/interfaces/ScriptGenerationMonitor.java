@@ -23,10 +23,8 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ScriptGenerationMonitor
-{
-	void setCurrentObject(String anObject, int current, int total);
+public interface ScriptGenerationMonitor {
+  void setCurrentObject(String anObject, int current, int total);
 }

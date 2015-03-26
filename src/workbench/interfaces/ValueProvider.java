@@ -23,15 +23,15 @@
 package workbench.interfaces;
 
 
-import java.util.Collection;
 import workbench.storage.ResultInfo;
 
+import java.util.Collection;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ValueProvider
-{
-	ResultInfo getResultInfo();
-	Collection<String> getColumnValues(String columnName);
+public interface ValueProvider {
+  ResultInfo getResultInfo();
+
+  Collection<String> getColumnValues(String columnName);
 }

@@ -23,41 +23,33 @@
 package workbench.db.importer;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class ValueDisplay
-{
-	private String display;
+public class ValueDisplay {
+  private String display;
 
-	public ValueDisplay(Object[] row)
-	{
-		int count = row.length;
-		StringBuilder values = new StringBuilder(count * 20);
-		values.append('{');
+  public ValueDisplay(Object[] row) {
+    int count = row.length;
+    StringBuilder values = new StringBuilder(count * 20);
+    values.append('{');
 
-		for (int i=0; i < count; i++)
-		{
-			if (i > 0) values.append(',');
-			values.append('[');
-			if (row[i] == null)
-			{
-				values.append("NULL");
-			}
-			else
-			{
-				values.append(row[i].toString());
-			}
-			values.append(']');
-		}
-		values.append('}');
-		display = values.toString();
-	}
+    for (int i = 0; i < count; i++) {
+      if (i > 0) values.append(',');
+      values.append('[');
+      if (row[i] == null) {
+        values.append("NULL");
+      } else {
+        values.append(row[i].toString());
+      }
+      values.append(']');
+    }
+    values.append('}');
+    display = values.toString();
+  }
 
-	@Override
-	public String toString()
-	{
-		return display;
-	}
+  @Override
+  public String toString() {
+    return display;
+  }
 
 }

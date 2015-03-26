@@ -25,19 +25,26 @@ package workbench.console;
 import java.util.List;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface WbConsole
-{
-	String readPassword(String prompt);
-	String readLine(String prompt);
+public interface WbConsole {
+  String readPassword(String prompt);
+
+  String readLine(String prompt);
+
   char readCharacter();
-	void shutdown();
-	int getColumns();
-	String readLineWithoutHistory(String prompt);
-	void clearHistory();
-	void addToHistory(List<String> lines);
+
+  void shutdown();
+
+  int getColumns();
+
+  String readLineWithoutHistory(String prompt);
+
+  void clearHistory();
+
+  void addToHistory(List<String> lines);
+
   void reset();
+
   void clearScreen();
 }

@@ -23,76 +23,65 @@ package workbench.gui.components;
 import java.awt.event.KeyEvent;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class SelectionHandler
-{
-	private WbTable dataList;
+public class SelectionHandler {
+  private WbTable dataList;
 
-	public SelectionHandler(WbTable list)
-	{
-		this.dataList = list;
-	}
+  public SelectionHandler(WbTable list) {
+    this.dataList = list;
+  }
 
-	public void handleKeyPressed(KeyEvent e)
-	{
-		switch (e.getKeyCode())
-		{
-			case KeyEvent.VK_UP:
-				selectPreviousRow();
-				e.consume();
-				break;
-			case KeyEvent.VK_DOWN:
-				selectNextRow();
-				e.consume();
-				break;
-			case KeyEvent.VK_PAGE_UP:
-				pageUp();
-				e.consume();
-				break;
-			case KeyEvent.VK_PAGE_DOWN:
-				pageDown();
-				e.consume();
-				break;
-		}
-	}
+  public void handleKeyPressed(KeyEvent e) {
+    switch (e.getKeyCode()) {
+      case KeyEvent.VK_UP:
+        selectPreviousRow();
+        e.consume();
+        break;
+      case KeyEvent.VK_DOWN:
+        selectNextRow();
+        e.consume();
+        break;
+      case KeyEvent.VK_PAGE_UP:
+        pageUp();
+        e.consume();
+        break;
+      case KeyEvent.VK_PAGE_DOWN:
+        pageDown();
+        e.consume();
+        break;
+    }
+  }
 
-	private int visibleRows()
-	{
-		return dataList.getLastVisibleRow() - dataList.getFirstVisibleRow();
-	}
+  private int visibleRows() {
+    return dataList.getLastVisibleRow() - dataList.getFirstVisibleRow();
+  }
 
-	private void pageDown()
-	{
-		int row = dataList.getSelectedRow();
-		selectRow(row + visibleRows());
-	}
+  private void pageDown() {
+    int row = dataList.getSelectedRow();
+    selectRow(row + visibleRows());
+  }
 
-	private void pageUp()
-	{
-		int row = dataList.getSelectedRow();
-		selectRow(row - visibleRows());
-	}
+  private void pageUp() {
+    int row = dataList.getSelectedRow();
+    selectRow(row - visibleRows());
+  }
 
-	private void selectNextRow()
-	{
-		int row = dataList.getSelectedRow();
-		selectRow(row + 1);
-	}
+  private void selectNextRow() {
+    int row = dataList.getSelectedRow();
+    selectRow(row + 1);
+  }
 
-	private void selectPreviousRow()
-	{
-		int row = dataList.getSelectedRow();
-		selectRow(row - 1);
-	}
+  private void selectPreviousRow() {
+    int row = dataList.getSelectedRow();
+    selectRow(row - 1);
+  }
 
-	public void selectRow(int row)
-	{
-		if (row < 0) row = 0;
-		if (row >= dataList.getRowCount()) row = dataList.getRowCount() - 1;
-		dataList.getSelectionModel().setSelectionInterval(row, row);
-		dataList.scrollToRow(row);
-	}
+  public void selectRow(int row) {
+    if (row < 0) row = 0;
+    if (row >= dataList.getRowCount()) row = dataList.getRowCount() - 1;
+    dataList.getSelectionModel().setSelectionInterval(row, row);
+    dataList.scrollToRow(row);
+  }
 
 }

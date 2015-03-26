@@ -22,115 +22,96 @@
  */
 package workbench.db.oracle;
 
+import workbench.db.ConstraintDefinition;
+import workbench.db.IndexDefinition;
+import workbench.db.UniqueConstraintReader;
+import workbench.db.WbConnection;
+import workbench.log.LogMgr;
+import workbench.resource.Settings;
+import workbench.util.CollectionUtil;
+import workbench.util.SqlUtil;
+import workbench.util.StringUtil;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import workbench.log.LogMgr;
-import workbench.resource.Settings;
-
-import workbench.db.ConstraintDefinition;
-import workbench.db.IndexDefinition;
-import workbench.db.UniqueConstraintReader;
-import workbench.db.WbConnection;
-
-import workbench.util.CollectionUtil;
-import workbench.util.SqlUtil;
-import workbench.util.StringUtil;
-
 /**
- *
  * @author Thomas Kellerer
  */
 public class OracleUniqueConstraintReader
-	implements UniqueConstraintReader
-{
+    implements UniqueConstraintReader {
 
-	@Override
-	public void processIndexList(List<IndexDefinition> indexList, WbConnection con)
-	{
-		if (CollectionUtil.isEmpty(indexList))  return;
-		if (con == null) return;
+  @Override
+  public void processIndexList(List<IndexDefinition> indexList, WbConnection con) {
+    if (CollectionUtil.isEmpty(indexList)) return;
+    if (con == null) return;
 
-		StringBuilder sql = new StringBuilder(500);
-		sql.append(
-			"select /* SQL Workbench */ index_name, constraint_name, deferrable, deferred, status, validated \n" +
-			"from all_constraints \n" +
-			"where constraint_type = 'U' \n" +
-			" AND (");
+    StringBuilder sql = new StringBuilder(500);
+    sql.append(
+        "select /* SQL Workbench */ index_name, constraint_name, deferrable, deferred, status, validated \n" +
+            "from all_constraints \n" +
+            "where constraint_type = 'U' \n" +
+            " AND (");
 
-		boolean first = true;
+    boolean first = true;
 
-		for (IndexDefinition idx : indexList)
-		{
-			if (first)
-			{
-				first = false;
-			}
-			else
-			{
-				sql.append(" OR ");
-			}
-			String schema = con.getMetadata().removeQuotes(idx.getSchema());
-			String idxName = con.getMetadata().removeQuotes(idx.getObjectName());
-			sql.append(" (nvl(index_owner, '");
-			sql.append(schema);
-			sql.append("') = '");
-			sql.append(schema);
-			sql.append("' AND index_name = '");
-			sql.append(idxName);
-			sql.append("') ");
-		}
-		sql.append(')');
+    for (IndexDefinition idx : indexList) {
+      if (first) {
+        first = false;
+      } else {
+        sql.append(" OR ");
+      }
+      String schema = con.getMetadata().removeQuotes(idx.getSchema());
+      String idxName = con.getMetadata().removeQuotes(idx.getObjectName());
+      sql.append(" (nvl(index_owner, '");
+      sql.append(schema);
+      sql.append("') = '");
+      sql.append(schema);
+      sql.append("' AND index_name = '");
+      sql.append(idxName);
+      sql.append("') ");
+    }
+    sql.append(')');
 
-		if (Settings.getInstance().getDebugMetadataSql())
-		{
-			LogMgr.logDebug("OracleUniqueConstraintReader.processIndexList()", "Using:\n" + sql);
-		}
+    if (Settings.getInstance().getDebugMetadataSql()) {
+      LogMgr.logDebug("OracleUniqueConstraintReader.processIndexList()", "Using:\n" + sql);
+    }
 
-		Statement stmt = null;
-		ResultSet rs = null;
-		try
-		{
-			stmt = con.createStatement();
-			rs = stmt.executeQuery(sql.toString());
-			while (rs.next())
-			{
-				String idxName = rs.getString(1);
-				String consName = rs.getString(2);
-				String deferrable = rs.getString("deferrable");
-				String deferred = rs.getString("deferred");
-				String status = rs.getString("status");
-				String validated = rs.getString("validated");
+    Statement stmt = null;
+    ResultSet rs = null;
+    try {
+      stmt = con.createStatement();
+      rs = stmt.executeQuery(sql.toString());
+      while (rs.next()) {
+        String idxName = rs.getString(1);
+        String consName = rs.getString(2);
+        String deferrable = rs.getString("deferrable");
+        String deferred = rs.getString("deferred");
+        String status = rs.getString("status");
+        String validated = rs.getString("validated");
 
-				IndexDefinition def = IndexDefinition.findIndex(indexList, idxName, null);
-				if (def == null) continue;
+        IndexDefinition def = IndexDefinition.findIndex(indexList, idxName, null);
+        if (def == null) continue;
 
-				if (def.isPrimaryKeyIndex())
-				{
-					def.setEnabled(StringUtil.equalStringIgnoreCase(status, "ENABLED"));
-					def.setValid(StringUtil.equalStringIgnoreCase(validated, "VALIDATED"));
-				}
-				else
-				{
-					ConstraintDefinition cons = ConstraintDefinition.createUniqueConstraint(consName);
-					cons.setDeferrable(StringUtil.equalStringIgnoreCase("DEFERRABLE", deferrable));
-					cons.setInitiallyDeferred(StringUtil.equalStringIgnoreCase("DEFERRED", deferred));
-					cons.setEnabled(StringUtil.equalStringIgnoreCase(status, "ENABLED"));
-					cons.setValid(StringUtil.equalStringIgnoreCase(validated, "VALIDATED"));
-					def.setUniqueConstraint(cons);
-				}
+        if (def.isPrimaryKeyIndex()) {
+          def.setEnabled(StringUtil.equalStringIgnoreCase(status, "ENABLED"));
+          def.setValid(StringUtil.equalStringIgnoreCase(validated, "VALIDATED"));
+        } else {
+          ConstraintDefinition cons = ConstraintDefinition.createUniqueConstraint(consName);
+          cons.setDeferrable(StringUtil.equalStringIgnoreCase("DEFERRABLE", deferrable));
+          cons.setInitiallyDeferred(StringUtil.equalStringIgnoreCase("DEFERRED", deferred));
+          cons.setEnabled(StringUtil.equalStringIgnoreCase(status, "ENABLED"));
+          cons.setValid(StringUtil.equalStringIgnoreCase(validated, "VALIDATED"));
+          def.setUniqueConstraint(cons);
+        }
 
-			}
-		}
-		catch (SQLException se)
-		{
-			LogMgr.logError("OracleUniqueConstraintReader.processIndexList()", "Could not retrieve definition", se);
-		}
-		finally
-		{
-			SqlUtil.closeAll(rs, stmt);
-		}
-	}
+      }
+    } catch (SQLException se) {
+      LogMgr.logError("OracleUniqueConstraintReader.processIndexList()", "Could not retrieve definition", se);
+    } finally {
+      SqlUtil.closeAll(rs, stmt);
+    }
+  }
 }

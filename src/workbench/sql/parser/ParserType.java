@@ -24,63 +24,55 @@ import workbench.db.WbConnection;
 import workbench.resource.Settings;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum ParserType
-{
-	Standard,
-	Postgres,
-	SqlServer,
-	Oracle,
-	MySQL;
+public enum ParserType {
+  Standard,
+  Postgres,
+  SqlServer,
+  Oracle,
+  MySQL;
 
-	public static ParserType getTypeFromConnection(WbConnection conn)
-	{
-		if (conn == null) return Standard;
-		return getTypeFromDBID(conn.getDbId());
-	}
+  public static ParserType getTypeFromConnection(WbConnection conn) {
+    if (conn == null) return Standard;
+    return getTypeFromDBID(conn.getDbId());
+  }
 
-	public static ParserType getTypeFromDBID(String dbid)
-	{
-		if (dbid == null) return Standard;
+  public static ParserType getTypeFromDBID(String dbid) {
+    if (dbid == null) return Standard;
 
-		// This will properly handle Postgres' dollar quoting
-		if (DbMetadata.DBID_PG.equals(dbid)) return Postgres;
-		if ("vertica_database".equals(dbid)) return Postgres;
+    // This will properly handle Postgres' dollar quoting
+    if (DbMetadata.DBID_PG.equals(dbid)) return Postgres;
+    if ("vertica_database".equals(dbid)) return Postgres;
 
-		// This will allow mixing the standard delimiter with the alternate delimiter
-		if (DbMetadata.DBID_ORA.equals(dbid)) return Oracle;
+    // This will allow mixing the standard delimiter with the alternate delimiter
+    if (DbMetadata.DBID_ORA.equals(dbid)) return Oracle;
 
-		// This will properly deal with the stupid [..] "quotes" in T-SQL
-		if (DbMetadata.DBID_MS.equals(dbid)) return SqlServer;
-		if ("adaptive_server_enterprise".equals(dbid)) return SqlServer;
-		if ("excel".equals(dbid)) return SqlServer;
+    // This will properly deal with the stupid [..] "quotes" in T-SQL
+    if (DbMetadata.DBID_MS.equals(dbid)) return SqlServer;
+    if ("adaptive_server_enterprise".equals(dbid)) return SqlServer;
+    if ("excel".equals(dbid)) return SqlServer;
 
-		// This will use a different lexer that supports MySQL's stupid backticks
-		// and non-standard line comments
-		if (DbMetadata.DBID_MYSQL.equals(dbid)) return MySQL;
+    // This will use a different lexer that supports MySQL's stupid backticks
+    // and non-standard line comments
+    if (DbMetadata.DBID_MYSQL.equals(dbid)) return MySQL;
 
-		// SQLite also allows these stupid [...] quoting style
-		// As currently this is the only thing that makes the Lexer for SQL server
-		// different from the standard Lexer I'm using it for SQLite as well.
-		if ("sqlite".equals(dbid)) return SqlServer;
+    // SQLite also allows these stupid [...] quoting style
+    // As currently this is the only thing that makes the Lexer for SQL server
+    // different from the standard Lexer I'm using it for SQLite as well.
+    if ("sqlite".equals(dbid)) return SqlServer;
 
-		String name = Settings.getInstance().getProperty("workbench.db." + dbid + ".parsertype", null);
+    String name = Settings.getInstance().getProperty("workbench.db." + dbid + ".parsertype", null);
 
-		if (name != null)
-		{
-			try
-			{
-				return ParserType.valueOf(name);
-			}
-			catch (Throwable th)
-			{
-				// ignore
-			}
-		}
+    if (name != null) {
+      try {
+        return ParserType.valueOf(name);
+      } catch (Throwable th) {
+        // ignore
+      }
+    }
 
-		return Standard;
-	}
+    return Standard;
+  }
 
 }

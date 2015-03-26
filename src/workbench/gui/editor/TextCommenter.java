@@ -22,131 +22,108 @@
  */
 package workbench.gui.editor;
 
-import javax.swing.text.BadLocationException;
-
 import workbench.log.LogMgr;
-
 import workbench.util.StringUtil;
 
+import javax.swing.text.BadLocationException;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public class TextCommenter
-{
-	private JEditTextArea editor;
+public class TextCommenter {
+  private JEditTextArea editor;
 
-	public TextCommenter(JEditTextArea client)
-	{
-		this.editor = client;
-	}
+  public TextCommenter(JEditTextArea client) {
+    this.editor = client;
+  }
 
-	public void commentSelection()
-	{
-		String commentChar = editor.getCommentChar();
-		boolean isCommented = this.isSelectionCommented(commentChar);
-		// Comment Selection acts as a toggle.
-		// if the complete selection is already commented
-		// the comments will be removed.
-		doComment(commentChar, !isCommented);
-	}
+  public void commentSelection() {
+    String commentChar = editor.getCommentChar();
+    boolean isCommented = this.isSelectionCommented(commentChar);
+    // Comment Selection acts as a toggle.
+    // if the complete selection is already commented
+    // the comments will be removed.
+    doComment(commentChar, !isCommented);
+  }
 
-	public void unCommentSelection()
-	{
-		doComment(editor.getCommentChar(), false);
-	}
+  public void unCommentSelection() {
+    doComment(editor.getCommentChar(), false);
+  }
 
-	private void doComment(String commentChar, boolean addComment)
-	{
-		int startline = editor.getSelectionStartLine();
-		int endline = getLastRelevantSelectionLine();
+  private void doComment(String commentChar, boolean addComment) {
+    int startline = editor.getSelectionStartLine();
+    int endline = getLastRelevantSelectionLine();
 
-		if (commentChar == null) commentChar = "--";
+    if (commentChar == null) commentChar = "--";
 
-		int cLength = commentChar.length();
+    int cLength = commentChar.length();
 
-		int pos = editor.getSelectionEnd(endline) - editor.getLineStartOffset(endline);
-		SyntaxDocument document = editor.getDocument();
+    int pos = editor.getSelectionEnd(endline) - editor.getLineStartOffset(endline);
+    SyntaxDocument document = editor.getDocument();
 
-		if (addComment && commentChar.equals("--"))
-		{
-			// workaround for an Oracle bug, where a comment like
-			//
-			// --commit;
-			//
-			// would not be treated correctly when sent to the database.
-			// Apparently Oracle requires a blank after the two dashes.
-			//
-			// Adding the blank shouldn't do any harm for other databases
-			commentChar = "-- ";
-		}
+    if (addComment && commentChar.equals("--")) {
+      // workaround for an Oracle bug, where a comment like
+      //
+      // --commit;
+      //
+      // would not be treated correctly when sent to the database.
+      // Apparently Oracle requires a blank after the two dashes.
+      //
+      // Adding the blank shouldn't do any harm for other databases
+      commentChar = "-- ";
+    }
 
-		boolean ansiComment = "--".equals(commentChar);
+    boolean ansiComment = "--".equals(commentChar);
 
-		try
-		{
-			document.beginCompoundEdit();
-			for (int line = startline; line <= endline; line ++)
-			{
-				String text = editor.getLineText(line);
-				if (StringUtil.isBlank(text)) continue;
-				int lineStart = editor.getLineStartOffset(line);
-				if (addComment)
-				{
-					document.insertString(lineStart, commentChar, null);
-				}
-				else
-				{
-					pos = text.indexOf(commentChar);
-					if (pos > -1)
-					{
-						int commentLength = cLength;
-						// remove the blank following the comment character to cater
-						// for the blank that was inserted by commenting the lines (see above)
-						if (ansiComment && text.length() > pos + cLength && Character.isWhitespace(text.charAt(pos + cLength)))
-						{
-							commentLength ++;
-						}
-						document.remove(lineStart, pos + commentLength);
-					}
-				}
-			}
-		}
-		catch (BadLocationException e)
-		{
-			LogMgr.logError("TextManipulator.doComment()", "Error when processing comment", e);
-		}
-		finally
-		{
-			document.endCompoundEdit();
-		}
-	}
+    try {
+      document.beginCompoundEdit();
+      for (int line = startline; line <= endline; line++) {
+        String text = editor.getLineText(line);
+        if (StringUtil.isBlank(text)) continue;
+        int lineStart = editor.getLineStartOffset(line);
+        if (addComment) {
+          document.insertString(lineStart, commentChar, null);
+        } else {
+          pos = text.indexOf(commentChar);
+          if (pos > -1) {
+            int commentLength = cLength;
+            // remove the blank following the comment character to cater
+            // for the blank that was inserted by commenting the lines (see above)
+            if (ansiComment && text.length() > pos + cLength && Character.isWhitespace(text.charAt(pos + cLength))) {
+              commentLength++;
+            }
+            document.remove(lineStart, pos + commentLength);
+          }
+        }
+      }
+    } catch (BadLocationException e) {
+      LogMgr.logError("TextManipulator.doComment()", "Error when processing comment", e);
+    } finally {
+      document.endCompoundEdit();
+    }
+  }
 
-	protected boolean isSelectionCommented(String commentChar)
-	{
-		int startline = editor.getSelectionStartLine();
-		int endline = getLastRelevantSelectionLine();
-		if (commentChar == null) commentChar = "--";
+  protected boolean isSelectionCommented(String commentChar) {
+    int startline = editor.getSelectionStartLine();
+    int endline = getLastRelevantSelectionLine();
+    if (commentChar == null) commentChar = "--";
 
-		for (int line = startline; line <= endline; line ++)
-		{
-			String text = editor.getLineText(line);
-			if (StringUtil.isBlank(text)) continue;
-			if (!text.startsWith(commentChar)) return false;
-		}
-		return true;
-	}
+    for (int line = startline; line <= endline; line++) {
+      String text = editor.getLineText(line);
+      if (StringUtil.isBlank(text)) continue;
+      if (!text.startsWith(commentChar)) return false;
+    }
+    return true;
+  }
 
-	private int getLastRelevantSelectionLine()
-	{
-		int startline = editor.getSelectionStartLine();
-		int endline = editor.getSelectionEndLine();
-		int lastLineStart = editor.getLineStartOffset(endline);
-		if (lastLineStart == editor.getSelectionEnd() && endline > startline)
-		{
-			// ignore the last selection line (of a multiline selection) if there isn't something selected
-			endline--;
-		}
-		return endline;
-	}
+  private int getLastRelevantSelectionLine() {
+    int startline = editor.getSelectionStartLine();
+    int endline = editor.getSelectionEndLine();
+    int lastLineStart = editor.getLineStartOffset(endline);
+    if (lastLineStart == editor.getSelectionEnd() && endline > startline) {
+      // ignore the last selection line (of a multiline selection) if there isn't something selected
+      endline--;
+    }
+    return endline;
+  }
 }

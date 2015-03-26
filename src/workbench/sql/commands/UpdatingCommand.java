@@ -22,20 +22,18 @@
  */
 package workbench.sql.commands;
 
-import java.io.FileNotFoundException;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 import workbench.log.LogMgr;
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
-
 import workbench.util.LobFileStatement;
 import workbench.util.SqlUtil;
 import workbench.util.StringUtil;
+
+import java.io.FileNotFoundException;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * Handles DML statements (UPDATE, DELETE, INSERT, TRUNCATE)
@@ -43,188 +41,140 @@ import workbench.util.StringUtil;
  * @author Thomas Kellerer
  */
 public class UpdatingCommand
-	extends SqlCommand
-{
-	public static SqlCommand getUpdateCommand()
-	{
-		return new UpdatingCommand("UPDATE");
-	}
+    extends SqlCommand {
+  private final String verb;
+  private final boolean checkLobParameter;
 
-	public static SqlCommand getDeleteCommand()
-	{
-		return new UpdatingCommand("DELETE");
-	}
+  private UpdatingCommand(String sqlVerb) {
+    super();
+    this.verb = sqlVerb;
+    this.isUpdatingCommand = true;
+    checkLobParameter = sqlVerb.equals("UPDATE") || sqlVerb.equals("INSERT");
+  }
 
-	public static SqlCommand getInsertCommand()
-	{
-		return new UpdatingCommand("INSERT");
-	}
+  public static SqlCommand getUpdateCommand() {
+    return new UpdatingCommand("UPDATE");
+  }
 
-	public static SqlCommand getTruncateCommand()
-	{
-		return new UpdatingCommand("TRUNCATE");
-	}
+  public static SqlCommand getDeleteCommand() {
+    return new UpdatingCommand("DELETE");
+  }
 
-	private final String verb;
-	private final boolean checkLobParameter;
+  public static SqlCommand getInsertCommand() {
+    return new UpdatingCommand("INSERT");
+  }
 
-	private UpdatingCommand(String sqlVerb)
-	{
-		super();
-		this.verb = sqlVerb;
-		this.isUpdatingCommand = true;
-		checkLobParameter = sqlVerb.equals("UPDATE") || sqlVerb.equals("INSERT");
-	}
+  public static SqlCommand getTruncateCommand() {
+    return new UpdatingCommand("TRUNCATE");
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult(sql);
-		LobFileStatement lob = null;
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult(sql);
+    LobFileStatement lob = null;
 
-		try
-		{
-			boolean isPrepared = false;
+    try {
+      boolean isPrepared = false;
 
-			if (checkLobParameter)
-			{
-				try
-				{
-					lob = new LobFileStatement(sql, getBaseDir());
-				}
-				catch (FileNotFoundException e)
-				{
-					result.addMessage(e.getMessage());
-					result.setFailure();
-					return result;
-				}
-			}
+      if (checkLobParameter) {
+        try {
+          lob = new LobFileStatement(sql, getBaseDir());
+        } catch (FileNotFoundException e) {
+          result.addMessage(e.getMessage());
+          result.setFailure();
+          return result;
+        }
+      }
 
-			runner.setSavepoint();
-			sql = getSqlToExecute(sql);
+      runner.setSavepoint();
+      sql = getSqlToExecute(sql);
 
-			if (lob != null && lob.containsParameter())
-			{
-				isPrepared = true;
-				this.currentStatement = lob.prepareStatement(currentConnection);
-			}
-			else if (Settings.getInstance().getCheckPreparedStatements() &&	currentConnection.getPreparedStatementPool().isRegistered(sql))
-			{
-				this.currentStatement = currentConnection.getPreparedStatementPool().prepareStatement(sql);
-				isPrepared = true;
-			}
-			else
-			{
-				this.currentStatement = currentConnection.createStatement();
-			}
+      if (lob != null && lob.containsParameter()) {
+        isPrepared = true;
+        this.currentStatement = lob.prepareStatement(currentConnection);
+      } else if (Settings.getInstance().getCheckPreparedStatements() && currentConnection.getPreparedStatementPool().isRegistered(sql)) {
+        this.currentStatement = currentConnection.getPreparedStatementPool().prepareStatement(sql);
+        isPrepared = true;
+      } else {
+        this.currentStatement = currentConnection.createStatement();
+      }
 
-			boolean hasResult = false;
-			boolean supportsResultSets = currentConnection.getDbSettings().supportsResultSetsWithDML();
-			int updateCount = -1;
+      boolean hasResult = false;
+      boolean supportsResultSets = currentConnection.getDbSettings().supportsResultSetsWithDML();
+      int updateCount = -1;
 
-			if (isPrepared)
-			{
-				hasResult = ((PreparedStatement)this.currentStatement).execute();
-			}
-			else if (supportsResultSets)
-			{
-				hasResult = this.currentStatement.execute(sql);
-			}
-			else
-			{
-				updateCount = currentStatement.executeUpdate(sql);
-			}
+      if (isPrepared) {
+        hasResult = ((PreparedStatement) this.currentStatement).execute();
+      } else if (supportsResultSets) {
+        hasResult = this.currentStatement.execute(sql);
+      } else {
+        updateCount = currentStatement.executeUpdate(sql);
+      }
 
-			String table = getAffectedTable(sql);
-			if (StringUtil.isEmptyString(table))
-			{
-				appendSuccessMessage(result);
-			}
-			else if (Settings.getInstance().showSuccessMessageForVerb(verb))
-			{
-				String msg = ResourceMgr.getFormattedString("MsgDMLSuccess", getMessageVerb(), table);
-				result.addMessage(msg);
-			}
-			result.setSuccess();
+      String table = getAffectedTable(sql);
+      if (StringUtil.isEmptyString(table)) {
+        appendSuccessMessage(result);
+      } else if (Settings.getInstance().showSuccessMessageForVerb(verb)) {
+        String msg = ResourceMgr.getFormattedString("MsgDMLSuccess", getMessageVerb(), table);
+        result.addMessage(msg);
+      }
+      result.setSuccess();
 
-			// adding the result/update count should be done after adding the success message
-			// to the StatementRunnerResult object
-			if (supportsResultSets || isPrepared)
-			{
-				processResults(result, hasResult);
-			}
-			else if (updateCount > -1)
-			{
-				result.addUpdateCountMsg(updateCount);
-			}
+      // adding the result/update count should be done after adding the success message
+      // to the StatementRunnerResult object
+      if (supportsResultSets || isPrepared) {
+        processResults(result, hasResult);
+      } else if (updateCount > -1) {
+        result.addUpdateCountMsg(updateCount);
+      }
 
-			runner.releaseSavepoint();
-		}
-		catch (Exception e)
-		{
-			runner.rollbackSavepoint();
-			String table = getAffectedTable(sql);
-			if (StringUtil.isNonEmpty(table))
-			{
-				String msg = ResourceMgr.getFormattedString("MsgDMLNoSuccess", getMessageVerb(), table);
-				result.addMessage(msg);
-			}
-			addErrorInfo(result, sql, e);
-			LogMgr.logUserSqlError("UpdatingCommnad.execute()", sql, e);
-		}
-		finally
-		{
-			if (lob != null) lob.done();
-			this.done();
-		}
-		return result;
-	}
+      runner.releaseSavepoint();
+    } catch (Exception e) {
+      runner.rollbackSavepoint();
+      String table = getAffectedTable(sql);
+      if (StringUtil.isNonEmpty(table)) {
+        String msg = ResourceMgr.getFormattedString("MsgDMLNoSuccess", getMessageVerb(), table);
+        result.addMessage(msg);
+      }
+      addErrorInfo(result, sql, e);
+      LogMgr.logUserSqlError("UpdatingCommnad.execute()", sql, e);
+    } finally {
+      if (lob != null) lob.done();
+      this.done();
+    }
+    return result;
+  }
 
-	private String getMessageVerb()
-	{
-		String result = null;
-		if (this.verb.equals("DELETE"))
-		{
-			result = "DELETE FROM";
-		}
-		else if (this.verb.equals("INSERT"))
-		{
-			result = "INSERT INTO";
-		}
-		else
-		{
-			result = verb;
-		}
-		return result;
-	}
+  private String getMessageVerb() {
+    String result = null;
+    if (this.verb.equals("DELETE")) {
+      result = "DELETE FROM";
+    } else if (this.verb.equals("INSERT")) {
+      result = "INSERT INTO";
+    } else {
+      result = verb;
+    }
+    return result;
+  }
 
-	private String getAffectedTable(String sql)
-	{
-		String tablename = null;
-		if (this.verb.equals("UPDATE"))
-		{
-			tablename = SqlUtil.getUpdateTable(sql, SqlUtil.getCatalogSeparator(currentConnection), currentConnection);
-		}
-		else if (this.verb.equals("DELETE"))
-		{
-			tablename = SqlUtil.getDeleteTable(sql, SqlUtil.getCatalogSeparator(currentConnection), currentConnection);
-		}
-		else if (this.verb.equals("INSERT"))
-		{
-			tablename = SqlUtil.getInsertTable(sql, SqlUtil.getCatalogSeparator(currentConnection), currentConnection);
-		}
-		else if (this.verb.equals("TRUNCATE"))
-		{
-			tablename = SqlUtil.getTruncateTable(sql, SqlUtil.getCatalogSeparator(currentConnection), currentConnection);
-		}
-		return tablename;
-	}
+  private String getAffectedTable(String sql) {
+    String tablename = null;
+    if (this.verb.equals("UPDATE")) {
+      tablename = SqlUtil.getUpdateTable(sql, SqlUtil.getCatalogSeparator(currentConnection), currentConnection);
+    } else if (this.verb.equals("DELETE")) {
+      tablename = SqlUtil.getDeleteTable(sql, SqlUtil.getCatalogSeparator(currentConnection), currentConnection);
+    } else if (this.verb.equals("INSERT")) {
+      tablename = SqlUtil.getInsertTable(sql, SqlUtil.getCatalogSeparator(currentConnection), currentConnection);
+    } else if (this.verb.equals("TRUNCATE")) {
+      tablename = SqlUtil.getTruncateTable(sql, SqlUtil.getCatalogSeparator(currentConnection), currentConnection);
+    }
+    return tablename;
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return verb;
-	}
+  @Override
+  public String getVerb() {
+    return verb;
+  }
 
 }

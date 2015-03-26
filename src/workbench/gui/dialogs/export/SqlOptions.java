@@ -22,27 +22,36 @@
  */
 package workbench.gui.dialogs.export;
 
-import java.util.List;
-
 import workbench.db.exporter.BlobMode;
 import workbench.db.exporter.ExportType;
 
+import java.util.List;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public interface SqlOptions
-{
-	boolean getCreateTable();
-	void setCreateTable(boolean flag);
-	void setCommitEvery(int value);
-	int getCommitEvery();
-	ExportType getExportType();
-	void setExportType(ExportType type);
-	String getAlternateUpdateTable();
-	void setAlternateUpdateTable(String table);
-	List<String> getKeyColumns();
-	String getDateLiteralType();
-	BlobMode getBlobMode();
-	String getMergeType();
+public interface SqlOptions {
+  boolean getCreateTable();
+
+  void setCreateTable(boolean flag);
+
+  int getCommitEvery();
+
+  void setCommitEvery(int value);
+
+  ExportType getExportType();
+
+  void setExportType(ExportType type);
+
+  String getAlternateUpdateTable();
+
+  void setAlternateUpdateTable(String table);
+
+  List<String> getKeyColumns();
+
+  String getDateLiteralType();
+
+  BlobMode getBlobMode();
+
+  String getMergeType();
 }

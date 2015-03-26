@@ -25,92 +25,76 @@ package workbench.liquibase;
 import workbench.util.StringUtil;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class ChangeSetIdentifier
-{
-	private final String author;
-	private final String id;
-	private String comment;
+public class ChangeSetIdentifier {
+  private final String author;
+  private final String id;
+  private String comment;
 
-	/**
-	 * Initialize the identifier using a combined string in the format <tt>author::id</tt>.
-	 *
-	 * If no double colon is present, the string is assumed to be the ID and the author to be null.
-	 * @param combined
-	 */
-	public ChangeSetIdentifier(String combined)
-	{
-		if (combined == null) throw new NullPointerException("Parameter must not be null");
-		int pos = combined.indexOf("::");
-		if (pos == -1)
-		{
-			id = combined.trim();
-			author = "*";
-		}
-		else
-		{
-			String[] elements = combined.split("::");
-			if (elements.length == 1)
-			{
-				id = combined.trim();
-				author = "*";
-			}
-			else
-			{
-				author = elements[0].trim();
-				id = elements[1].trim();
-			}
-		}
-	}
+  /**
+   * Initialize the identifier using a combined string in the format <tt>author::id</tt>.
+   * <p/>
+   * If no double colon is present, the string is assumed to be the ID and the author to be null.
+   *
+   * @param combined
+   */
+  public ChangeSetIdentifier(String combined) {
+    if (combined == null) throw new NullPointerException("Parameter must not be null");
+    int pos = combined.indexOf("::");
+    if (pos == -1) {
+      id = combined.trim();
+      author = "*";
+    } else {
+      String[] elements = combined.split("::");
+      if (elements.length == 1) {
+        id = combined.trim();
+        author = "*";
+      } else {
+        author = elements[0].trim();
+        id = elements[1].trim();
+      }
+    }
+  }
 
-	public ChangeSetIdentifier(String author, String id)
-	{
-		this.author = author == null ? "*" : author.trim();
-		this.id = id == null ? "*" : id.trim();
-	}
+  public ChangeSetIdentifier(String author, String id) {
+    this.author = author == null ? "*" : author.trim();
+    this.id = id == null ? "*" : id.trim();
+  }
 
-	public String getComment()
-	{
-		return comment;
-	}
-	
-	public void setComment(String comment)
-	{
-		this.comment = comment;
-	}
+  public String getComment() {
+    return comment;
+  }
 
-	public String getAuthor()
-	{
-		return author;
-	}
+  public void setComment(String comment) {
+    this.comment = comment;
+  }
 
-	public String getId()
-	{
-		return id;
-	}
+  public String getAuthor() {
+    return author;
+  }
 
-	private boolean isWildcard(String value)
-	{
-		return value == null || "*".equals(value);
-	}
+  public String getId() {
+    return id;
+  }
 
-	public boolean isEqualTo(ChangeSetIdentifier other)
-	{
-		if (other == null) return false;
-		boolean authorsEqual = isWildcard(this.author) || isWildcard(other.author) || StringUtil.equalString(this.author, other.author);
-		boolean idsEqual = isWildcard(this.id) || isWildcard(other.id) || StringUtil.equalString(this.id, other.id);
-		return authorsEqual && idsEqual;
-	}
+  private boolean isWildcard(String value) {
+    return value == null || "*".equals(value);
+  }
 
-	@Override
-	public String toString()
-	{
-		StringBuilder result = new StringBuilder(20);
-		result.append(author == null ? "*" : author);
-		result.append("::");
-		result.append(id == null ? "*" : id);
-		return result.toString();
-	}
+  public boolean isEqualTo(ChangeSetIdentifier other) {
+    if (other == null) return false;
+    boolean authorsEqual = isWildcard(this.author) || isWildcard(other.author) || StringUtil.equalString(this.author, other.author);
+    boolean idsEqual = isWildcard(this.id) || isWildcard(other.id) || StringUtil.equalString(this.id, other.id);
+    return authorsEqual && idsEqual;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder result = new StringBuilder(20);
+    result.append(author == null ? "*" : author);
+    result.append("::");
+    result.append(id == null ? "*" : id);
+    return result.toString();
+  }
 }

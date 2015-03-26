@@ -22,66 +22,55 @@
  */
 package workbench.gui.components;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class ColumnHider 
-{
+public class ColumnHider {
 
-	private List<TableColumn> hiddenColumns;
-	private TableColumnModel columnModel;
-	
-	public ColumnHider(TableColumnModel model)
-	{
-		columnModel = model;
-		hiddenColumns = new ArrayList<TableColumn>(model.getColumnCount());
-	}
+  private List<TableColumn> hiddenColumns;
+  private TableColumnModel columnModel;
 
-	public void hideColumn(Object identifier)
-	{
-		if (isHidden(identifier)) return;
-		
-		int index = columnModel.getColumnIndex(identifier);
-		if (index > -1)
-		{
-			TableColumn col = columnModel.getColumn(index);
-			this.hiddenColumns.add(col);
-			this.columnModel.removeColumn(col);
-		}
-	}
+  public ColumnHider(TableColumnModel model) {
+    columnModel = model;
+    hiddenColumns = new ArrayList<TableColumn>(model.getColumnCount());
+  }
 
-	public void showColumn(Object identifier)
-	{
-		TableColumn col = getHiddenColumn(identifier);
-		if (col != null)
-		{
-			columnModel.addColumn(col);
-		}
-	}
-	
-	private boolean isHidden(Object identifier)
-	{
-		return getHiddenColumn(identifier) != null;
-	}
-	
-	private TableColumn getHiddenColumn(Object identifier)
-	{
-		if (identifier == null) return null;
-		for (TableColumn col : hiddenColumns)
-		{
-			Object id = col.getIdentifier();
-			if (id != null)
-			{
-				if (col.getIdentifier().equals(identifier)) return col;
-			}
-		}
-		return null;
-	}
-	
+  public void hideColumn(Object identifier) {
+    if (isHidden(identifier)) return;
+
+    int index = columnModel.getColumnIndex(identifier);
+    if (index > -1) {
+      TableColumn col = columnModel.getColumn(index);
+      this.hiddenColumns.add(col);
+      this.columnModel.removeColumn(col);
+    }
+  }
+
+  public void showColumn(Object identifier) {
+    TableColumn col = getHiddenColumn(identifier);
+    if (col != null) {
+      columnModel.addColumn(col);
+    }
+  }
+
+  private boolean isHidden(Object identifier) {
+    return getHiddenColumn(identifier) != null;
+  }
+
+  private TableColumn getHiddenColumn(Object identifier) {
+    if (identifier == null) return null;
+    for (TableColumn col : hiddenColumns) {
+      Object id = col.getIdentifier();
+      if (id != null) {
+        if (col.getIdentifier().equals(identifier)) return col;
+      }
+    }
+    return null;
+  }
+
 }

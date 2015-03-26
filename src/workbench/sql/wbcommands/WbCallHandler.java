@@ -22,20 +22,22 @@
  */
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-import java.util.List;
 import workbench.sql.StatementRunnerResult;
 import workbench.sql.preparedstatement.ParameterDefinition;
 
+import java.sql.SQLException;
+import java.util.List;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public interface WbCallHandler
-{
-	String getExecutedSQL();
-	List<ParameterDefinition> prepareStatement(String command);
-	StatementRunnerResult execute()
-		throws SQLException;
-	void done();
+public interface WbCallHandler {
+  String getExecutedSQL();
+
+  List<ParameterDefinition> prepareStatement(String command);
+
+  StatementRunnerResult execute()
+      throws SQLException;
+
+  void done();
 }

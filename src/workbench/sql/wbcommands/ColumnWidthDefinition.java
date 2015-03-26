@@ -22,52 +22,47 @@
  */
 package workbench.sql.wbcommands;
 
+import workbench.db.ColumnIdentifier;
+import workbench.util.StringUtil;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import workbench.db.ColumnIdentifier;
-import workbench.util.StringUtil;
 
 /**
  * Parse the argument for defining column widths for a fixed-width
  * import file.
- * @see WbImport#ARG_COL_WIDTHS
+ *
  * @author Thomas Kellerer
+ * @see WbImport#ARG_COL_WIDTHS
  */
-public class ColumnWidthDefinition
-{
-	private Map<ColumnIdentifier, Integer> columnWidths;
+public class ColumnWidthDefinition {
+  private Map<ColumnIdentifier, Integer> columnWidths;
 
-	public ColumnWidthDefinition(String paramValue)
-		throws MissingWidthDefinition
-	{
-		List<String> entries = StringUtil.stringToList(paramValue, ",", true, true);
-		if (entries == null || entries.isEmpty())
-		{
-			return;
-		}
-		this.columnWidths = new HashMap<>();
+  public ColumnWidthDefinition(String paramValue)
+      throws MissingWidthDefinition {
+    List<String> entries = StringUtil.stringToList(paramValue, ",", true, true);
+    if (entries == null || entries.isEmpty()) {
+      return;
+    }
+    this.columnWidths = new HashMap<>();
 
-		for (String def : entries)
-		{
-			String[] parms = def.split("=");
+    for (String def : entries) {
+      String[] parms = def.split("=");
 
-			if (parms == null || parms.length != 2)
-			{
-				throw new MissingWidthDefinition(def);
-			}
-			ColumnIdentifier col = new ColumnIdentifier(parms[0]);
-			int width = StringUtil.getIntValue(parms[1], -1);
-			if (width <= 0)
-			{
-				throw new MissingWidthDefinition(def);
-			}
-			this.columnWidths.put(col, Integer.valueOf(width));
-		}
-	}
+      if (parms == null || parms.length != 2) {
+        throw new MissingWidthDefinition(def);
+      }
+      ColumnIdentifier col = new ColumnIdentifier(parms[0]);
+      int width = StringUtil.getIntValue(parms[1], -1);
+      if (width <= 0) {
+        throw new MissingWidthDefinition(def);
+      }
+      this.columnWidths.put(col, Integer.valueOf(width));
+    }
+  }
 
-	public Map<ColumnIdentifier, Integer> getColumnWidths()
-	{
-		return columnWidths;
-	}
+  public Map<ColumnIdentifier, Integer> getColumnWidths() {
+    return columnWidths;
+  }
 }

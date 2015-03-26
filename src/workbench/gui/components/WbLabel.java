@@ -22,59 +22,46 @@
  */
 package workbench.gui.components;
 
-import javax.swing.JLabel;
-
 import workbench.resource.ResourceMgr;
 
+import javax.swing.*;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class WbLabel
-	extends JLabel
-{
+    extends JLabel {
 
-	public void setTextByKey(String resourceKey)
-	{
-		setTextByKey(resourceKey, true);
-	}
+  public void setTextByKey(String resourceKey) {
+    setTextByKey(resourceKey, true);
+  }
 
-	public void setTextByKey(String resourceKey, boolean includeTooltip)
-	{
-		setText(ResourceMgr.getString(resourceKey));
-		setToolTipText(ResourceMgr.getDescription(resourceKey, false));
-	}
+  public void setTextByKey(String resourceKey, boolean includeTooltip) {
+    setText(ResourceMgr.getString(resourceKey));
+    setToolTipText(ResourceMgr.getDescription(resourceKey, false));
+  }
 
-	@Override
-	public void setText(String text)
-	{
+  @Override
+  public void setText(String text) {
     if (text == null) return;
 
     int pos = text.indexOf('&');
-    if (pos > -1)
-    {
+    if (pos > -1) {
       char mnemonic = text.charAt(pos + 1);
-      if (mnemonic != ' ')
-      {
+      if (mnemonic != ' ') {
         text = text.substring(0, pos) + text.substring(pos + 1);
       }
 
       super.setText(text);
 
-      if (mnemonic != ' ' && mnemonic != '&')
-      {
+      if (mnemonic != ' ' && mnemonic != '&') {
         setDisplayedMnemonic(mnemonic);
-        try
-        {
+        try {
           this.setDisplayedMnemonicIndex(pos);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
         }
       }
-    }
-    else
-    {
+    } else {
       super.setText(text);
     }
   }

@@ -20,36 +20,30 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.gui.MainWindow;
 import workbench.gui.dbobjects.objecttree.DbTreePanel;
 
+import java.awt.event.ActionEvent;
+
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class ShowDbTreeAction
-	extends WbAction
-{
-	private MainWindow mainWin;
+    extends WbAction {
+  private MainWindow mainWin;
 
-	public ShowDbTreeAction(MainWindow aWindow)
-	{
-		super();
-		mainWin = aWindow;
-		this.initMenuDefinition("MnuTxtNewDbTreeWindow");
-	}
+  public ShowDbTreeAction(MainWindow aWindow) {
+    super();
+    mainWin = aWindow;
+    this.initMenuDefinition("MnuTxtNewDbTreeWindow");
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-    if (mainWin.isDbTreeVisible())
-    {
+  @Override
+  public void executeAction(ActionEvent e) {
+    if (mainWin.isDbTreeVisible()) {
       DbTreePanel dbTree = mainWin.getDbTree();
       dbTree.requestFocusInWindow();
-    }
-    else
-    {
+    } else {
       mainWin.showDbTree();
     }
   }

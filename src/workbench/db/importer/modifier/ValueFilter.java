@@ -22,49 +22,43 @@
  */
 package workbench.db.importer.modifier;
 
-import java.util.LinkedList;
-import java.util.List;
 import workbench.db.ColumnIdentifier;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class ValueFilter
-	implements ImportValueModifier
-{
-	private List<ImportValueModifier> modifiers = new LinkedList<ImportValueModifier>();
+    implements ImportValueModifier {
+  private List<ImportValueModifier> modifiers = new LinkedList<ImportValueModifier>();
 
-	@Override
-	public int getSize()
-	{
-		int size = 0;
-		for (ImportValueModifier modifier : modifiers)
-		{
-			size += modifier.getSize();
-		}
-		return size;
-	}
+  @Override
+  public int getSize() {
+    int size = 0;
+    for (ImportValueModifier modifier : modifiers) {
+      size += modifier.getSize();
+    }
+    return size;
+  }
 
-	@Override
-	public String modifyValue(ColumnIdentifier column, String value)
-	{
-		for (ImportValueModifier modifier : modifiers)
-		{
-			value = modifier.modifyValue(column, value);
-		}
-		return value;
-	}
+  @Override
+  public String modifyValue(ColumnIdentifier column, String value) {
+    for (ImportValueModifier modifier : modifiers) {
+      value = modifier.modifyValue(column, value);
+    }
+    return value;
+  }
 
-	/**
-	 * Adds a column modifier.
-	 * The modifiers are called in the order how they are added.
-	 *
-	 * @param modifier
-	 */
-	public void addColumnModifier(ImportValueModifier modifier)
-	{
-		this.modifiers.add(modifier);
-	}
+  /**
+   * Adds a column modifier.
+   * The modifiers are called in the order how they are added.
+   *
+   * @param modifier
+   */
+  public void addColumnModifier(ImportValueModifier modifier) {
+    this.modifiers.add(modifier);
+  }
 
 }

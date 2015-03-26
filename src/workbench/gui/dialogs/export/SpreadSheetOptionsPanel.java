@@ -22,150 +22,135 @@
  */
 package workbench.gui.dialogs.export;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class SpreadSheetOptionsPanel
-	extends JPanel
-	implements SpreadSheetOptions
-{
-	private String exportType;
+    extends JPanel
+    implements SpreadSheetOptions {
+  private String exportType;
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private JCheckBox cbxOptimizeCols;
+  private JCheckBox createAutoFilter;
+  private JCheckBox createInfosheet;
+  private JCheckBox exportHeaders;
+  private JCheckBox freezeHeaders;
+  private JTextField pageTitle;
+  private JLabel pageTitleLabel;
 
-	public SpreadSheetOptionsPanel(String type)
-	{
-		super();
-		exportType = type;
-		initComponents();
-	}
+  public SpreadSheetOptionsPanel(String type) {
+    super();
+    exportType = type;
+    initComponents();
+  }
 
-	public void saveSettings()
-	{
-		Settings s = Settings.getInstance();
-		s.setProperty("workbench.export." + exportType + ".pagetitle", this.getPageTitle());
-		s.setProperty("workbench.export." + exportType + ".header", getExportHeaders());
-		s.setProperty("workbench.export." + exportType + ".fixedheader", getCreateFixedHeaders());
-		s.setProperty("workbench.export." + exportType + ".autofilter", getCreateAutoFilter());
-		s.setProperty("workbench.export." + exportType + ".infosheet", getCreateInfoSheet());
-		s.setProperty("workbench.export." + exportType + ".optimizecols", getOptimizeColumns());
-	}
+  public void saveSettings() {
+    Settings s = Settings.getInstance();
+    s.setProperty("workbench.export." + exportType + ".pagetitle", this.getPageTitle());
+    s.setProperty("workbench.export." + exportType + ".header", getExportHeaders());
+    s.setProperty("workbench.export." + exportType + ".fixedheader", getCreateFixedHeaders());
+    s.setProperty("workbench.export." + exportType + ".autofilter", getCreateAutoFilter());
+    s.setProperty("workbench.export." + exportType + ".infosheet", getCreateInfoSheet());
+    s.setProperty("workbench.export." + exportType + ".optimizecols", getOptimizeColumns());
+  }
 
-	public void restoreSettings()
-	{
-		Settings s = Settings.getInstance();
-		this.setPageTitle(s.getProperty("workbench.export." + exportType + ".pagetitle", ""));
-		boolean headerDefault = s.getBoolProperty("workbench.export." + exportType + ".default.header", false);
-		boolean header = s.getBoolProperty("workbench.export." + exportType + ".header", headerDefault);
-		this.setExportHeaders(header);
-		if (createAutoFilter.isEnabled())
-		{
-			setCreateAutoFilter(s.getBoolProperty("workbench.export." + exportType + ".autofilter", true));
-		}
-		setCreateInfoSheet(s.getBoolProperty("workbench.export." + exportType + ".infosheet", false));
-		setCreateFixedHeaders(s.getBoolProperty("workbench.export." + exportType + ".fixedheader", true));
-		setOptimizeColumns(s.getBoolProperty("workbench.export." + exportType + ".optimizecols", true));
-		checkHeaderSettings();
-	}
+  public void restoreSettings() {
+    Settings s = Settings.getInstance();
+    this.setPageTitle(s.getProperty("workbench.export." + exportType + ".pagetitle", ""));
+    boolean headerDefault = s.getBoolProperty("workbench.export." + exportType + ".default.header", false);
+    boolean header = s.getBoolProperty("workbench.export." + exportType + ".header", headerDefault);
+    this.setExportHeaders(header);
+    if (createAutoFilter.isEnabled()) {
+      setCreateAutoFilter(s.getBoolProperty("workbench.export." + exportType + ".autofilter", true));
+    }
+    setCreateInfoSheet(s.getBoolProperty("workbench.export." + exportType + ".infosheet", false));
+    setCreateFixedHeaders(s.getBoolProperty("workbench.export." + exportType + ".fixedheader", true));
+    setOptimizeColumns(s.getBoolProperty("workbench.export." + exportType + ".optimizecols", true));
+    checkHeaderSettings();
+  }
 
-	@Override
-	public boolean getOptimizeColumns()
-	{
-		return cbxOptimizeCols.isSelected();
-	}
+  @Override
+  public boolean getOptimizeColumns() {
+    return cbxOptimizeCols.isSelected();
+  }
 
-	@Override
-	public void setOptimizeColumns(boolean flag)
-	{
-		cbxOptimizeCols.setSelected(flag);
-	}
+  @Override
+  public void setOptimizeColumns(boolean flag) {
+    cbxOptimizeCols.setSelected(flag);
+  }
 
-	@Override
-	public boolean getCreateInfoSheet()
-	{
-		return createInfosheet.isSelected();
-	}
+  @Override
+  public boolean getCreateInfoSheet() {
+    return createInfosheet.isSelected();
+  }
 
-	@Override
-	public void setCreateInfoSheet(boolean flag)
-	{
-		createInfosheet.setSelected(flag);
-	}
+  @Override
+  public void setCreateInfoSheet(boolean flag) {
+    createInfosheet.setSelected(flag);
+  }
 
-	@Override
-	public boolean getCreateFixedHeaders()
-	{
-		return freezeHeaders.isSelected();
-	}
+  @Override
+  public boolean getCreateFixedHeaders() {
+    return freezeHeaders.isSelected();
+  }
 
-	@Override
-	public void setCreateFixedHeaders(boolean flag)
-	{
-		freezeHeaders.setSelected(flag);
-	}
+  @Override
+  public void setCreateFixedHeaders(boolean flag) {
+    freezeHeaders.setSelected(flag);
+  }
 
-	@Override
-	public boolean getCreateAutoFilter()
-	{
-		return createAutoFilter.isSelected();
-	}
+  @Override
+  public boolean getCreateAutoFilter() {
+    return createAutoFilter.isSelected();
+  }
 
-	@Override
-	public void setCreateAutoFilter(boolean flag)
-	{
-		createAutoFilter.setSelected(flag);
-	}
+  // Code for dispatching events from components to event handlers.
 
-	@Override
-	public boolean getExportHeaders()
-	{
-		return exportHeaders.isSelected();
-	}
+  @Override
+  public void setCreateAutoFilter(boolean flag) {
+    createAutoFilter.setSelected(flag);
+  }
 
-	@Override
-	public void setExportHeaders(boolean flag)
-	{
-		exportHeaders.setSelected(flag);
-	}
+  @Override
+  public boolean getExportHeaders() {
+    return exportHeaders.isSelected();
+  }
 
-	@Override
-	public String getPageTitle()
-	{
-		return pageTitle.getText();
-	}
+  @Override
+  public void setExportHeaders(boolean flag) {
+    exportHeaders.setSelected(flag);
+  }
 
-	@Override
-	public void setPageTitle(String title)
-	{
-		pageTitle.setText(title);
-	}
+  @Override
+  public String getPageTitle() {
+    return pageTitle.getText();
+  }
 
-	private void checkHeaderSettings()
-	{
-		freezeHeaders.setEnabled(exportHeaders.isSelected());
-	}
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  @Override
+  public void setPageTitle(String title) {
+    pageTitle.setText(title);
+  }
+
+  private void checkHeaderSettings() {
+    freezeHeaders.setEnabled(exportHeaders.isSelected());
+  }
+
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     GridBagConstraints gridBagConstraints;
 
     pageTitleLabel = new JLabel();
@@ -246,34 +231,21 @@ public class SpreadSheetOptionsPanel
     add(cbxOptimizeCols, gridBagConstraints);
   }
 
-  // Code for dispatching events from components to event handlers.
+  private void exportHeadersActionPerformed(ActionEvent evt)//GEN-FIRST:event_exportHeadersActionPerformed
+  {//GEN-HEADEREND:event_exportHeadersActionPerformed
+    checkHeaderSettings();
+  }//GEN-LAST:event_exportHeadersActionPerformed
 
-  private class FormListener implements ActionListener
-  {
-    FormListener() {}
-    public void actionPerformed(ActionEvent evt)
-    {
-      if (evt.getSource() == exportHeaders)
-      {
+  private class FormListener implements ActionListener {
+    FormListener() {
+    }
+
+    public void actionPerformed(ActionEvent evt) {
+      if (evt.getSource() == exportHeaders) {
         SpreadSheetOptionsPanel.this.exportHeadersActionPerformed(evt);
       }
     }
   }// </editor-fold>//GEN-END:initComponents
-
-	private void exportHeadersActionPerformed(ActionEvent evt)//GEN-FIRST:event_exportHeadersActionPerformed
-	{//GEN-HEADEREND:event_exportHeadersActionPerformed
-		checkHeaderSettings();
-	}//GEN-LAST:event_exportHeadersActionPerformed
-
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private JCheckBox cbxOptimizeCols;
-  private JCheckBox createAutoFilter;
-  private JCheckBox createInfosheet;
-  private JCheckBox exportHeaders;
-  private JCheckBox freezeHeaders;
-  private JTextField pageTitle;
-  private JLabel pageTitleLabel;
   // End of variables declaration//GEN-END:variables
 
 }

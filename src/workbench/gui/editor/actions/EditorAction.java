@@ -22,44 +22,37 @@
  */
 package workbench.gui.editor.actions;
 
-import javax.swing.KeyStroke;
-
+import workbench.gui.actions.WbAction;
 import workbench.resource.ResourceMgr;
 
-import workbench.gui.actions.WbAction;
+import javax.swing.*;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class EditorAction
-	extends WbAction
-{
+    extends WbAction {
 
-	protected EditorAction()
-	{
-		super();
-	}
+  protected EditorAction() {
+    super();
+  }
 
-	protected EditorAction(String resourceKey, int key, int modifier)
-	{
-		super();
-		init(resourceKey, KeyStroke.getKeyStroke(key, modifier));
-	}
+  protected EditorAction(String resourceKey, int key, int modifier) {
+    super();
+    init(resourceKey, KeyStroke.getKeyStroke(key, modifier));
+  }
 
-	protected EditorAction(String resourceKey, KeyStroke keyStroke)
-	{
-		super();
-		init(resourceKey, keyStroke);
-	}
+  protected EditorAction(String resourceKey, KeyStroke keyStroke) {
+    super();
+    init(resourceKey, keyStroke);
+  }
 
-	protected void init(String resourceKey, KeyStroke key)
-	{
-		// initMenuDefinition cannot be used because the editor actions don't have a description/tooltip
-		// therefor a "resource not found exception" would be thrown
-		setMenuText(ResourceMgr.getString(resourceKey));
-		setDefaultAccelerator(key);
-		initializeShortcut();
-	}
+  protected void init(String resourceKey, KeyStroke key) {
+    // initMenuDefinition cannot be used because the editor actions don't have a description/tooltip
+    // therefor a "resource not found exception" would be thrown
+    setMenuText(ResourceMgr.getString(resourceKey));
+    setDefaultAccelerator(key);
+    initializeShortcut();
+  }
 
 }

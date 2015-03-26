@@ -21,21 +21,20 @@
  *
  */
 package workbench.db;
+
+import workbench.log.LogMgr;
+import workbench.resource.Settings;
+import workbench.sql.formatter.SqlFormatter;
+import workbench.util.CollectionUtil;
+import workbench.util.ExceptionUtil;
+import workbench.util.SqlUtil;
+import workbench.util.StringUtil;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.util.List;
-
-import workbench.log.LogMgr;
-import workbench.resource.Settings;
-
-import workbench.sql.formatter.SqlFormatter;
-
-import workbench.util.CollectionUtil;
-import workbench.util.ExceptionUtil;
-import workbench.util.SqlUtil;
-import workbench.util.StringUtil;
 
 /**
  * A class to read the source of a database view.
@@ -48,283 +47,243 @@ import workbench.util.StringUtil;
  * @see MetaDataSqlManager#getViewSourceSql()
  */
 public class DefaultViewReader
-	implements ViewReader
-{
-	protected WbConnection connection;
+    implements ViewReader {
+  protected WbConnection connection;
 
-	public DefaultViewReader(WbConnection con)
-	{
-		this.connection = con;
-	}
-
-	@Override
-	public CharSequence getExtendedViewSource(TableIdentifier tbl)
-		throws SQLException
-	{
-		return getExtendedViewSource(new TableDefinition(tbl), false, false);
-	}
-
-	@Override
-	public CharSequence getExtendedViewSource(TableIdentifier tbl, boolean includeDrop)
-		throws SQLException
-	{
-		return getExtendedViewSource(new TableDefinition(tbl), includeDrop, false);
-	}
+  public DefaultViewReader(WbConnection con) {
+    this.connection = con;
+  }
 
   @Override
-	public CharSequence getFullViewSource(TableDefinition view)
-		throws SQLException, NoConfigException
-  {
+  public CharSequence getExtendedViewSource(TableIdentifier tbl)
+      throws SQLException {
+    return getExtendedViewSource(new TableDefinition(tbl), false, false);
+  }
+
+  @Override
+  public CharSequence getExtendedViewSource(TableIdentifier tbl, boolean includeDrop)
+      throws SQLException {
+    return getExtendedViewSource(new TableDefinition(tbl), includeDrop, false);
+  }
+
+  @Override
+  public CharSequence getFullViewSource(TableDefinition view)
+      throws SQLException, NoConfigException {
     return createFullViewSource(view, false, false);
   }
 
-	protected CharSequence createFullViewSource(TableDefinition view, boolean includeDrop, boolean includeCommit)
-		throws SQLException, NoConfigException
-  {
-		TableIdentifier viewTable = view.getTable();
-		CharSequence source = this.getViewSource(viewTable);
+  protected CharSequence createFullViewSource(TableDefinition view, boolean includeDrop, boolean includeCommit)
+      throws SQLException, NoConfigException {
+    TableIdentifier viewTable = view.getTable();
+    CharSequence source = this.getViewSource(viewTable);
 
-		List<ColumnIdentifier> columns = view.getColumns();
+    List<ColumnIdentifier> columns = view.getColumns();
 
-		if (CollectionUtil.isEmpty(columns))
-		{
-			view = this.connection.getMetadata().getTableDefinition(view.getTable());
-			columns = view.getColumns();
-		}
+    if (CollectionUtil.isEmpty(columns)) {
+      view = this.connection.getMetadata().getTableDefinition(view.getTable());
+      columns = view.getColumns();
+    }
 
-		if (StringUtil.isEmptyString(source)) return StringUtil.EMPTY_STRING;
+    if (StringUtil.isEmptyString(source)) return StringUtil.EMPTY_STRING;
 
-		StringBuilder result = new StringBuilder(source.length() + 100);
+    StringBuilder result = new StringBuilder(source.length() + 100);
 
-		String lineEnding = Settings.getInstance().getInternalEditorLineEnding();
-		String verb = connection.getParsingUtil().getSqlVerb(source.toString());
+    String lineEnding = Settings.getInstance().getInternalEditorLineEnding();
+    String verb = connection.getParsingUtil().getSqlVerb(source.toString());
 
-		TableSourceBuilder builder = TableSourceBuilderFactory.getBuilder(connection);
+    TableSourceBuilder builder = TableSourceBuilderFactory.getBuilder(connection);
 
-		// SQL Server and DB2 return the full CREATE VIEW statement
-		// DB2 even returns the CREATE OR REPLACE if the view was created that way.
-		// Teradata returns a complete REPLACE VIEW ... statement
-		// therefor the verb is compared with startsWith() rather than equals()
-		if (verb.startsWith("CREATE") || verb.equals("REPLACE"))
-		{
-			if (includeDrop && !verb.equals("CREATE OR REPLACE") && !verb.equalsIgnoreCase("REPLACE"))
-			{
-				result.append(builder.generateDrop(viewTable, false));
-				result.append(lineEnding);
-				result.append(lineEnding);
-			}
-			result.append(source);
-			if (this.connection.getDbSettings().ddlNeedsCommit() && includeCommit)
-			{
-				result.append(lineEnding);
-				result.append("COMMIT;");
-				result.append(lineEnding);
-			}
-		}
-		else
-		{
-			result.append(builder.generateCreateObject(false, viewTable, null));
+    // SQL Server and DB2 return the full CREATE VIEW statement
+    // DB2 even returns the CREATE OR REPLACE if the view was created that way.
+    // Teradata returns a complete REPLACE VIEW ... statement
+    // therefor the verb is compared with startsWith() rather than equals()
+    if (verb.startsWith("CREATE") || verb.equals("REPLACE")) {
+      if (includeDrop && !verb.equals("CREATE OR REPLACE") && !verb.equalsIgnoreCase("REPLACE")) {
+        result.append(builder.generateDrop(viewTable, false));
+        result.append(lineEnding);
+        result.append(lineEnding);
+      }
+      result.append(source);
+      if (this.connection.getDbSettings().ddlNeedsCommit() && includeCommit) {
+        result.append(lineEnding);
+        result.append("COMMIT;");
+        result.append(lineEnding);
+      }
+    } else {
+      result.append(builder.generateCreateObject(false, viewTable, null));
 
-			if (connection.getDbSettings().generateColumnListInViews())
-			{
-				result.append(lineEnding);
-				result.append('(');
-				result.append(lineEnding);
+      if (connection.getDbSettings().generateColumnListInViews()) {
+        result.append(lineEnding);
+        result.append('(');
+        result.append(lineEnding);
 
-				int colCount = columns.size();
-				for (int i=0; i < colCount; i++)
-				{
+        int colCount = columns.size();
+        for (int i = 0; i < colCount; i++) {
 
-					String colName = columns.get(i).getColumnName();
-					result.append("  ");
-					result.append(connection.getMetadata().quoteObjectname(colName));
-					if (i < colCount - 1)
-					{
-						result.append(',');
-						result.append(lineEnding);
-					}
-				}
-				result.append(lineEnding);
-				result.append(')');
-			}
-			result.append(lineEnding);
-			result.append("AS ");
-			result.append(lineEnding);
-			result.append(source);
-			result.append(lineEnding);
-		}
+          String colName = columns.get(i).getColumnName();
+          result.append("  ");
+          result.append(connection.getMetadata().quoteObjectname(colName));
+          if (i < colCount - 1) {
+            result.append(',');
+            result.append(lineEnding);
+          }
+        }
+        result.append(lineEnding);
+        result.append(')');
+      }
+      result.append(lineEnding);
+      result.append("AS ");
+      result.append(lineEnding);
+      result.append(source);
+      result.append(lineEnding);
+    }
     return result;
   }
 
-	/**
-	 * Returns a complete SQL statement to (re)create the given view.
-	 *
-	 * This method will extend the stored source to a valid CREATE VIEW.
-	 *
-	 * @param view The view for which thee source should be created
-	 * @param includeCommit if true, terminate the whole statement with a COMMIT
-	 * @param includeDrop if true, add a DROP statement before the CREATE statement
-	 *
-	 * @see #getViewSource(workbench.db.TableIdentifier)
-	 */
-	@Override
-	public CharSequence getExtendedViewSource(TableDefinition view, boolean includeDrop, boolean includeCommit)
-		throws SQLException
-	{
-		TableIdentifier viewTable = view.getTable();
+  /**
+   * Returns a complete SQL statement to (re)create the given view.
+   * <p/>
+   * This method will extend the stored source to a valid CREATE VIEW.
+   *
+   * @param view          The view for which thee source should be created
+   * @param includeCommit if true, terminate the whole statement with a COMMIT
+   * @param includeDrop   if true, add a DROP statement before the CREATE statement
+   * @see #getViewSource(workbench.db.TableIdentifier)
+   */
+  @Override
+  public CharSequence getExtendedViewSource(TableDefinition view, boolean includeDrop, boolean includeCommit)
+      throws SQLException {
+    TableIdentifier viewTable = view.getTable();
 
-		CharSequence source = null;
-		try
-		{
-			source = createFullViewSource(view, includeDrop, includeCommit);
-		}
-		catch (NoConfigException no)
-		{
-			SourceStatementsHelp help = new SourceStatementsHelp(this.connection.getMetadata().getMetaDataSQLMgr());
-			return help.explainMissingViewSourceSql();
-		}
+    CharSequence source = null;
+    try {
+      source = createFullViewSource(view, includeDrop, includeCommit);
+    } catch (NoConfigException no) {
+      SourceStatementsHelp help = new SourceStatementsHelp(this.connection.getMetadata().getMetaDataSQLMgr());
+      return help.explainMissingViewSourceSql();
+    }
 
-		if (StringUtil.isEmptyString(source)) return StringUtil.EMPTY_STRING;
+    if (StringUtil.isEmptyString(source)) return StringUtil.EMPTY_STRING;
 
-		StringBuilder result = new StringBuilder(source.length() + 100);
+    StringBuilder result = new StringBuilder(source.length() + 100);
     result.append(source);
 
-		String lineEnding = Settings.getInstance().getInternalEditorLineEnding();
+    String lineEnding = Settings.getInstance().getInternalEditorLineEnding();
 
-		ViewGrantReader grantReader = ViewGrantReader.createViewGrantReader(connection);
-		if (grantReader != null)
-		{
-			CharSequence grants = grantReader.getViewGrantSource(connection, view.getTable());
-			if (grants != null && grants.length() > 0)
-			{
-				result.append(Settings.getInstance().getInternalEditorLineEnding());
-				result.append(Settings.getInstance().getInternalEditorLineEnding());
-				result.append(grants);
-				result.append(Settings.getInstance().getInternalEditorLineEnding());
-			}
-		}
+    ViewGrantReader grantReader = ViewGrantReader.createViewGrantReader(connection);
+    if (grantReader != null) {
+      CharSequence grants = grantReader.getViewGrantSource(connection, view.getTable());
+      if (grants != null && grants.length() > 0) {
+        result.append(Settings.getInstance().getInternalEditorLineEnding());
+        result.append(Settings.getInstance().getInternalEditorLineEnding());
+        result.append(grants);
+        result.append(Settings.getInstance().getInternalEditorLineEnding());
+      }
+    }
 
-		TableCommentReader commentReader = new TableCommentReader();
-		String viewComment = commentReader.getTableCommentSql(this.connection, view.getTable());
-		if (StringUtil.isNonBlank(viewComment))
-		{
-			result.append(viewComment);
-			if (!viewComment.endsWith(";")) result.append(';');
-		}
+    TableCommentReader commentReader = new TableCommentReader();
+    String viewComment = commentReader.getTableCommentSql(this.connection, view.getTable());
+    if (StringUtil.isNonBlank(viewComment)) {
+      result.append(viewComment);
+      if (!viewComment.endsWith(";")) result.append(';');
+    }
 
-		StringBuilder colComments = commentReader.getTableColumnCommentsSql(this.connection, view.getTable(), view.getColumns());
-		if (StringUtil.isNonBlank(colComments))
-		{
-			result.append(lineEnding);
-			result.append(colComments);
-			result.append(lineEnding);
-		}
+    StringBuilder colComments = commentReader.getTableColumnCommentsSql(this.connection, view.getTable(), view.getColumns());
+    if (StringUtil.isNonBlank(colComments)) {
+      result.append(lineEnding);
+      result.append(colComments);
+      result.append(lineEnding);
+    }
 
-		// Oracle and MS SQL Server support materialized views. For those
-		// the index definitions are of interest as well.
-		List<IndexDefinition> indexInfo = connection.getMetadata().getIndexReader().getTableIndexList(viewTable);
-		if (indexInfo.size() > 0)
-		{
-			StringBuilder idx = this.connection.getMetadata().getIndexReader().getIndexSource(viewTable, indexInfo);
-			if (idx != null && idx.length() > 0)
-			{
-				result.append(lineEnding);
-				result.append(lineEnding);
-				result.append(idx);
-				result.append(lineEnding);
-			}
-		}
+    // Oracle and MS SQL Server support materialized views. For those
+    // the index definitions are of interest as well.
+    List<IndexDefinition> indexInfo = connection.getMetadata().getIndexReader().getTableIndexList(viewTable);
+    if (indexInfo.size() > 0) {
+      StringBuilder idx = this.connection.getMetadata().getIndexReader().getIndexSource(viewTable, indexInfo);
+      if (idx != null && idx.length() > 0) {
+        result.append(lineEnding);
+        result.append(lineEnding);
+        result.append(idx);
+        result.append(lineEnding);
+      }
+    }
 
-		if (this.connection.getDbSettings().ddlNeedsCommit() && includeCommit)
-		{
-			result.append("COMMIT;");
-		}
-		return result;
-	}
+    if (this.connection.getDbSettings().ddlNeedsCommit() && includeCommit) {
+      result.append("COMMIT;");
+    }
+    return result;
+  }
 
-	/**
-	 *	Return the source of a view definition as it is stored in the database.
-	 *  <br/>
-	 *	Usually (depending on how the meta data is stored in the database) the DBMS
-	 *	only stores the underlying SELECT statement (but not a full CREATE VIEW),
-	 *  and that will be returned by this method.
-	 *  <br/>
-	 *	To create a complete SQL to re-create a view, use {@link #getExtendedViewSource(workbench.db.TableIdentifier) }
-	 *
-	 *	@return the view source as stored in the database.
-	 *  @throws NoConfigException if no SQL was configured in ViewSourceStatements.xml
-	 */
-	@Override
-	public CharSequence getViewSource(TableIdentifier viewId)
-		throws NoConfigException
-	{
-		if (viewId == null) return null;
+  /**
+   * Return the source of a view definition as it is stored in the database.
+   * <br/>
+   * Usually (depending on how the meta data is stored in the database) the DBMS
+   * only stores the underlying SELECT statement (but not a full CREATE VIEW),
+   * and that will be returned by this method.
+   * <br/>
+   * To create a complete SQL to re-create a view, use {@link #getExtendedViewSource(workbench.db.TableIdentifier) }
+   *
+   * @return the view source as stored in the database.
+   * @throws NoConfigException if no SQL was configured in ViewSourceStatements.xml
+   */
+  @Override
+  public CharSequence getViewSource(TableIdentifier viewId)
+      throws NoConfigException {
+    if (viewId == null) return null;
 
-		GetMetaDataSql sql = connection.getMetadata().getMetaDataSQLMgr().getViewSourceSql();
-		if (sql == null) throw new NoConfigException("No SQL to retrieve the VIEW source");
+    GetMetaDataSql sql = connection.getMetadata().getMetaDataSQLMgr().getViewSourceSql();
+    if (sql == null) throw new NoConfigException("No SQL to retrieve the VIEW source");
 
-		StringBuilder source = new StringBuilder(500);
-		Statement stmt = null;
-		ResultSet rs = null;
-		Savepoint sp = null;
-		String query = null;
+    StringBuilder source = new StringBuilder(500);
+    Statement stmt = null;
+    ResultSet rs = null;
+    Savepoint sp = null;
+    String query = null;
 
-		try
-		{
-			if (connection.getDbSettings().useSavePointForDML())
-			{
-				sp = connection.setSavepoint();
-			}
-			TableIdentifier tbl = viewId.createCopy();
-			tbl.adjustCase(connection);
-			sql.setSchema(tbl.getRawSchema());
-			sql.setObjectName(tbl.getRawTableName());
-			sql.setCatalog(tbl.getRawCatalog());
-			stmt = connection.createStatementForQuery();
-			query = sql.getSql();
-			if (Settings.getInstance().getDebugMetadataSql())
-			{
-				LogMgr.logInfo("DbMetadata.getViewSource()", "Retrieving view source using query=\n" + query);
-			}
-			rs = stmt.executeQuery(query);
-			while (rs.next())
-			{
-				String line = rs.getString(1);
-				if (line != null)
-				{
-					source.append(line);
-				}
-			}
+    try {
+      if (connection.getDbSettings().useSavePointForDML()) {
+        sp = connection.setSavepoint();
+      }
+      TableIdentifier tbl = viewId.createCopy();
+      tbl.adjustCase(connection);
+      sql.setSchema(tbl.getRawSchema());
+      sql.setObjectName(tbl.getRawTableName());
+      sql.setCatalog(tbl.getRawCatalog());
+      stmt = connection.createStatementForQuery();
+      query = sql.getSql();
+      if (Settings.getInstance().getDebugMetadataSql()) {
+        LogMgr.logInfo("DbMetadata.getViewSource()", "Retrieving view source using query=\n" + query);
+      }
+      rs = stmt.executeQuery(query);
+      while (rs.next()) {
+        String line = rs.getString(1);
+        if (line != null) {
+          source.append(line);
+        }
+      }
 
-			if (source.length() > 0)
-			{
-				StringUtil.trimTrailingWhitespace(source);
-				if (this.connection.getDbSettings().getFormatViewSource())
-				{
-					SqlFormatter f = new SqlFormatter(source, connection.getDbId());
-					source = new StringBuilder(f.getFormattedSql());
-				}
+      if (source.length() > 0) {
+        StringUtil.trimTrailingWhitespace(source);
+        if (this.connection.getDbSettings().getFormatViewSource()) {
+          SqlFormatter f = new SqlFormatter(source, connection.getDbId());
+          source = new StringBuilder(f.getFormattedSql());
+        }
 
-				if (!StringUtil.endsWith(source, ';'))
-				{
-					source.append(';');
-					source.append(Settings.getInstance().getInternalEditorLineEnding());
-				}
-			}
-			connection.releaseSavepoint(sp);
-		}
-		catch (Exception e)
-		{
-			LogMgr.logError("DefaultViewReader.getViewSource()", "Could not retrieve view definition for " + viewId.getTableExpression() + " using SQL:\n" + query, e);
-			source = new StringBuilder(ExceptionUtil.getDisplay(e));
-			connection.rollback(sp);
-		}
-		finally
-		{
-			SqlUtil.closeAll(rs, stmt);
-		}
+        if (!StringUtil.endsWith(source, ';')) {
+          source.append(';');
+          source.append(Settings.getInstance().getInternalEditorLineEnding());
+        }
+      }
+      connection.releaseSavepoint(sp);
+    } catch (Exception e) {
+      LogMgr.logError("DefaultViewReader.getViewSource()", "Could not retrieve view definition for " + viewId.getTableExpression() + " using SQL:\n" + query, e);
+      source = new StringBuilder(ExceptionUtil.getDisplay(e));
+      connection.rollback(sp);
+    } finally {
+      SqlUtil.closeAll(rs, stmt);
+    }
 
-		return source;
-	}
+    return source;
+  }
 
 }

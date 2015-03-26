@@ -23,12 +23,10 @@
 package workbench.gui.sql;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum YesNoCancelResult
-{
-	yes,
-	no,
-	cancel;
+public enum YesNoCancelResult {
+  yes,
+  no,
+  cancel;
 }

@@ -21,26 +21,28 @@
  *
  */
 package workbench.interfaces;
-import javax.swing.JFrame;
+
 import workbench.db.WbConnection;
+
+import javax.swing.*;
+
 /**
  * @author Thomas Kellerer
  */
-public interface ToolWindow
-{
-	/**
-	 * Disconnect and close the tool window
-	 */
-	void closeWindow();
+public interface ToolWindow {
+  /**
+   * Disconnect and close the tool window
+   */
+  void closeWindow();
 
-	/**
-	 * Disconnect the tool window
-	 */
-	void disconnect();
+  /**
+   * Disconnect the tool window
+   */
+  void disconnect();
 
-	void activate();
-	
-	WbConnection getConnection();
+  void activate();
 
-	JFrame getWindow();
+  WbConnection getConnection();
+
+  JFrame getWindow();
 }

@@ -23,12 +23,10 @@
 package workbench.sql.wbcommands;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum EmptyImportFileHandling
-{
-	ignore,
-	fail,
-	warning;
+public enum EmptyImportFileHandling {
+  ignore,
+  fail,
+  warning;
 }

@@ -31,16 +31,14 @@ import java.util.Comparator;
  * @see Sortable
  */
 public class Sorter
-	implements Comparator<Sortable>
-{
+    implements Comparator<Sortable> {
 
-	@Override
-	public int compare(Sortable o1, Sortable o2)
-	{
-		if (o1 == null && o2 == null) return 0;
-		if (o1 == null) return -1;
-		if (o2 == null) return 1;
-		return o1.getSortOrder() - o2.getSortOrder();
-	}
+  @Override
+  public int compare(Sortable o1, Sortable o2) {
+    if (o1 == null && o2 == null) return 0;
+    if (o1 == null) return -1;
+    if (o2 == null) return 1;
+    return o1.getSortOrder() - o2.getSortOrder();
+  }
 
 }

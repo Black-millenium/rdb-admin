@@ -22,8 +22,9 @@
  */
 package workbench.console;
 
-import java.io.PrintStream;
 import workbench.interfaces.StatusBar;
+
+import java.io.PrintStream;
 
 /**
  * An implementation of the {@link workbench.interfaces.StatusBar} interface
@@ -32,70 +33,57 @@ import workbench.interfaces.StatusBar;
  * @author Thomas Kellerer
  */
 public class ConsoleStatusBar
-	implements StatusBar
-{
-	private PrintStream output;
-	private String lastMessage;
+    implements StatusBar {
+  private PrintStream output;
+  private String lastMessage;
 
-	public ConsoleStatusBar()
-	{
-		output = System.out;
-	}
+  public ConsoleStatusBar() {
+    output = System.out;
+  }
 
-	private String createDeleteString(String original)
-	{
-		if (original == null) return "\r";
-		StringBuilder result = new StringBuilder(original.length()+2);
-		result.append('\r');
-		for (int i = 0; i < original.length(); i++)
-		{
-			result.append(' ');
-		}
-		result.append('\r');
-		return result.toString();
-	}
+  private String createDeleteString(String original) {
+    if (original == null) return "\r";
+    StringBuilder result = new StringBuilder(original.length() + 2);
+    result.append('\r');
+    for (int i = 0; i < original.length(); i++) {
+      result.append(' ');
+    }
+    result.append('\r');
+    return result.toString();
+  }
 
-	@Override
-	public void setStatusMessage(String message, int duration)
-	{
-		setStatusMessage(message);
-	}
+  @Override
+  public void setStatusMessage(String message, int duration) {
+    setStatusMessage(message);
+  }
 
-	@Override
-	public void setStatusMessage(String message)
-	{
-		if (lastMessage != null)
-		{
-			output.print(createDeleteString(lastMessage));
-		}
-		output.print('\r');
-		output.print(message);
-		this.lastMessage = message;
-	}
+  @Override
+  public void setStatusMessage(String message) {
+    if (lastMessage != null) {
+      output.print(createDeleteString(lastMessage));
+    }
+    output.print('\r');
+    output.print(message);
+    this.lastMessage = message;
+  }
 
-	@Override
-	public void clearStatusMessage()
-	{
-		if (lastMessage != null)
-		{
-			output.print(createDeleteString(lastMessage));
-			lastMessage = null;
-		}
-		else
-		{
-			output.print('\r');
-		}
-	}
+  @Override
+  public void clearStatusMessage() {
+    if (lastMessage != null) {
+      output.print(createDeleteString(lastMessage));
+      lastMessage = null;
+    } else {
+      output.print('\r');
+    }
+  }
 
-	@Override
-	public void doRepaint()
-	{
-	}
+  @Override
+  public void doRepaint() {
+  }
 
-	@Override
-	public String getText()
-	{
-		return lastMessage;
-	}
+  @Override
+  public String getText() {
+    return lastMessage;
+  }
 
 }

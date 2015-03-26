@@ -21,125 +21,109 @@
  */
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import workbench.resource.ResourceMgr;
-
 import workbench.db.DbMetadata;
 import workbench.db.IndexDefinition;
 import workbench.db.IndexReader;
 import workbench.db.TableIdentifier;
-
-import workbench.storage.DataStore;
-
+import workbench.resource.ResourceMgr;
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
-
+import workbench.storage.DataStore;
 import workbench.util.ArgumentParser;
 import workbench.util.ArgumentType;
 import workbench.util.StringUtil;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * List all indexes available to the current user.
  * <br>
  *
- * @see workbench.db.DbMetadata#getObjects(String, String, String, String[])
  * @author Thomas Kellerer
+ * @see workbench.db.DbMetadata#getObjects(String, String, String, String[])
  */
 public class WbListIndexes
-	extends SqlCommand
-{
-	public static final String VERB = "WbListIndexes";
-	public static final String ARG_TABLE_NAME = "tableName";
-	public static final String ARG_INDEX_NAME = "indexName";
+    extends SqlCommand {
+  public static final String VERB = "WbListIndexes";
+  public static final String ARG_TABLE_NAME = "tableName";
+  public static final String ARG_INDEX_NAME = "indexName";
 
-	public WbListIndexes()
-	{
-		cmdLine = new ArgumentParser();
-		cmdLine.addArgument(CommonArgs.ARG_SCHEMA, ArgumentType.SchemaArgument);
-		cmdLine.addArgument(CommonArgs.ARG_CATALOG, ArgumentType.CatalogArgument);
-		cmdLine.addArgument(ARG_TABLE_NAME, ArgumentType.TableArgument);
-		cmdLine.addArgument(ARG_INDEX_NAME);
-	}
+  public WbListIndexes() {
+    cmdLine = new ArgumentParser();
+    cmdLine.addArgument(CommonArgs.ARG_SCHEMA, ArgumentType.SchemaArgument);
+    cmdLine.addArgument(CommonArgs.ARG_CATALOG, ArgumentType.CatalogArgument);
+    cmdLine.addArgument(ARG_TABLE_NAME, ArgumentType.TableArgument);
+    cmdLine.addArgument(ARG_INDEX_NAME);
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String aSql)
-		throws SQLException
-	{
-		String options = getCommandLine(aSql);
+  @Override
+  public StatementRunnerResult execute(String aSql)
+      throws SQLException {
+    String options = getCommandLine(aSql);
 
-		DbMetadata meta = currentConnection.getMetadata();
+    DbMetadata meta = currentConnection.getMetadata();
 
-		IndexReader reader = meta.getIndexReader();
+    IndexReader reader = meta.getIndexReader();
 
-		StatementRunnerResult result = new StatementRunnerResult();
+    StatementRunnerResult result = new StatementRunnerResult();
 
-		cmdLine.parse(options);
+    cmdLine.parse(options);
 
-		String schema = null;
-		String catalog = null;
+    String schema = null;
+    String catalog = null;
 
-		if (cmdLine.hasUnknownArguments())
-		{
-			result.addMessage(ResourceMgr.getString("ErrListIdxWrongArgs"));
-			result.setFailure();
-			return result;
-		}
+    if (cmdLine.hasUnknownArguments()) {
+      result.addMessage(ResourceMgr.getString("ErrListIdxWrongArgs"));
+      result.setFailure();
+      return result;
+    }
 
-		if (cmdLine.hasArguments())
-		{
-			schema = cmdLine.getValue(CommonArgs.ARG_SCHEMA);
-			catalog = cmdLine.getValue(CommonArgs.ARG_CATALOG);
-		}
+    if (cmdLine.hasArguments()) {
+      schema = cmdLine.getValue(CommonArgs.ARG_SCHEMA);
+      catalog = cmdLine.getValue(CommonArgs.ARG_CATALOG);
+    }
 
-		String currentSchema = currentConnection.getMetadata().getCurrentSchema();
-		String currentCatalog = currentConnection.getMetadata().getCurrentCatalog();
+    String currentSchema = currentConnection.getMetadata().getCurrentSchema();
+    String currentCatalog = currentConnection.getMetadata().getCurrentCatalog();
 
-		String indexPattern = cmdLine.getValue(ARG_INDEX_NAME);
+    String indexPattern = cmdLine.getValue(ARG_INDEX_NAME);
 
-		List<IndexDefinition> indexes = null;
+    List<IndexDefinition> indexes = null;
 
-		if (cmdLine.isArgPresent(ARG_TABLE_NAME))
-		{
-			SourceTableArgument tableArg = new SourceTableArgument(cmdLine.getValue(ARG_TABLE_NAME), null, StringUtil.coalesce(schema, currentSchema), currentConnection);
+    if (cmdLine.isArgPresent(ARG_TABLE_NAME)) {
+      SourceTableArgument tableArg = new SourceTableArgument(cmdLine.getValue(ARG_TABLE_NAME), null, StringUtil.coalesce(schema, currentSchema), currentConnection);
 
-			List<TableIdentifier> tables = tableArg.getTables();
-			indexes = new ArrayList<>();
-			for (TableIdentifier tbl : tables)
-			{
+      List<TableIdentifier> tables = tableArg.getTables();
+      indexes = new ArrayList<>();
+      for (TableIdentifier tbl : tables) {
         List<IndexDefinition> indexList = reader.getTableIndexList(tbl);
-				indexes.addAll(indexList);
-			}
-		}
-		else
-		{
-      if (!reader.supportsIndexList())
-      {
+        indexes.addAll(indexList);
+      }
+    } else {
+      if (!reader.supportsIndexList()) {
         result.addMessage(ResourceMgr.getFormattedString("ErrIdxListNotSupported", meta.getProductName()));
         result.setFailure();
         return result;
       }
-			indexes = reader.getIndexes(StringUtil.coalesce(catalog, currentCatalog), StringUtil.coalesce(schema, currentSchema), null, indexPattern);
-		}
+      indexes = reader.getIndexes(StringUtil.coalesce(catalog, currentCatalog), StringUtil.coalesce(schema, currentSchema), null, indexPattern);
+    }
 
-		DataStore ds = reader.fillDataStore(indexes, true);
-		ds.setResultName(ResourceMgr.getString("TxtDbExplorerIndexes"));
-		result.addDataStore(ds);
+    DataStore ds = reader.fillDataStore(indexes, true);
+    ds.setResultName(ResourceMgr.getString("TxtDbExplorerIndexes"));
+    result.addDataStore(ds);
 
-		return result;
-	}
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 }

@@ -28,29 +28,22 @@ import workbench.db.oracle.OracleViewReader;
 import workbench.db.postgres.PostgresViewReader;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class ViewReaderFactory
-{
-	public static ViewReader createViewReader(WbConnection con)
-	{
-		if (con.getMetadata().isPostgres())
-		{
-			return new PostgresViewReader(con);
-		}
-		if (con.getMetadata().isMySql())
-		{
-			return new MySQLViewReader(con);
-		}
-		if (con.getMetadata().isOracle())
-		{
-			return new OracleViewReader(con);
-		}
-		if (con.getMetadata().isSqlServer())
-		{
-			return new SqlServerViewReader(con);
-		}
-		return new DefaultViewReader(con);
-	}
+public class ViewReaderFactory {
+  public static ViewReader createViewReader(WbConnection con) {
+    if (con.getMetadata().isPostgres()) {
+      return new PostgresViewReader(con);
+    }
+    if (con.getMetadata().isMySql()) {
+      return new MySQLViewReader(con);
+    }
+    if (con.getMetadata().isOracle()) {
+      return new OracleViewReader(con);
+    }
+    if (con.getMetadata().isSqlServer()) {
+      return new SqlServerViewReader(con);
+    }
+    return new DefaultViewReader(con);
+  }
 }

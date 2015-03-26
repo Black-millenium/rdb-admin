@@ -22,158 +22,132 @@
  */
 package workbench.gui.editor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoableEdit;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class WbCompoundEdit
-	implements UndoableEdit
-{
-	private final List<UndoableEdit> edits = new ArrayList<>();
-	private boolean acceptNew = true;
-	private long lastEditTime;
+    implements UndoableEdit {
+  private final List<UndoableEdit> edits = new ArrayList<>();
+  private boolean acceptNew = true;
+  private long lastEditTime;
 
-	public WbCompoundEdit()
-	{
-	}
+  public WbCompoundEdit() {
+  }
 
-	public int getSize()
-	{
-		return edits.size();
-	}
+  public int getSize() {
+    return edits.size();
+  }
 
-	public void reset()
-	{
-		edits.clear();
-		acceptNew = true;
-		lastEditTime = 0;
-	}
+  public void reset() {
+    edits.clear();
+    acceptNew = true;
+    lastEditTime = 0;
+  }
 
-	public void finished()
-	{
-		acceptNew = false;
-	}
+  public void finished() {
+    acceptNew = false;
+  }
 
-	public UndoableEdit getLast()
-	{
-		if (edits.isEmpty()) return null;
-		return edits.get(edits.size() - 1);
-	}
+  public UndoableEdit getLast() {
+    if (edits.isEmpty()) return null;
+    return edits.get(edits.size() - 1);
+  }
 
-	@Override
-	public void undo()
-		throws CannotUndoException
-	{
-		if (edits.isEmpty()) return;
-		for (int i=edits.size() - 1; i > -1; i--)
-		{
-			UndoableEdit edit = edits.get(i);
-			if (edit.canUndo() && edit.isSignificant()) edit.undo();
-		}
-	}
+  @Override
+  public void undo()
+      throws CannotUndoException {
+    if (edits.isEmpty()) return;
+    for (int i = edits.size() - 1; i > -1; i--) {
+      UndoableEdit edit = edits.get(i);
+      if (edit.canUndo() && edit.isSignificant()) edit.undo();
+    }
+  }
 
-	@Override
-	public boolean canUndo()
-	{
-		if (edits.isEmpty()) return false;
-		for (UndoableEdit edit : edits)
-		{
-			if (!edit.canUndo()) return false;
-		}
-		return true;
-	}
+  @Override
+  public boolean canUndo() {
+    if (edits.isEmpty()) return false;
+    for (UndoableEdit edit : edits) {
+      if (!edit.canUndo()) return false;
+    }
+    return true;
+  }
 
-	@Override
-	public void redo()
-		throws CannotRedoException
-	{
-		if (edits.isEmpty()) return;
+  @Override
+  public void redo()
+      throws CannotRedoException {
+    if (edits.isEmpty()) return;
 
-		for (UndoableEdit edit : edits)
-		{
-			edit.redo();
-		}
-	}
+    for (UndoableEdit edit : edits) {
+      edit.redo();
+    }
+  }
 
-	@Override
-	public boolean canRedo()
-	{
-		if (edits.isEmpty()) return false;
-		for (UndoableEdit edit : edits)
-		{
-			if (!edit.canRedo()) return false;
-		}
-		return true;
-	}
+  @Override
+  public boolean canRedo() {
+    if (edits.isEmpty()) return false;
+    for (UndoableEdit edit : edits) {
+      if (!edit.canRedo()) return false;
+    }
+    return true;
+  }
 
-	@Override
-	public void die()
-	{
-		for (UndoableEdit edit : edits)
-		{
-			edit.die();
-		}
-	}
+  @Override
+  public void die() {
+    for (UndoableEdit edit : edits) {
+      edit.die();
+    }
+  }
 
-	public long getDurationSinceLastEdit()
-	{
-		if (getSize() == 0) return 0;
-		return System.currentTimeMillis() - lastEditTime;
-	}
+  public long getDurationSinceLastEdit() {
+    if (getSize() == 0) return 0;
+    return System.currentTimeMillis() - lastEditTime;
+  }
 
-	@Override
-	public boolean addEdit(UndoableEdit anEdit)
-	{
-		if (!acceptNew) return false;
-		lastEditTime = System.currentTimeMillis();
-		return edits.add(anEdit);
-	}
+  @Override
+  public boolean addEdit(UndoableEdit anEdit) {
+    if (!acceptNew) return false;
+    lastEditTime = System.currentTimeMillis();
+    return edits.add(anEdit);
+  }
 
-	@Override
-	public boolean replaceEdit(UndoableEdit anEdit)
-	{
-		return false;
-	}
+  @Override
+  public boolean replaceEdit(UndoableEdit anEdit) {
+    return false;
+  }
 
-	@Override
-	public boolean isSignificant()
-	{
-		for (UndoableEdit edit : edits)
-		{
-			if (edit.isSignificant()) return true;
-		}
-		return false;
-	}
+  @Override
+  public boolean isSignificant() {
+    for (UndoableEdit edit : edits) {
+      if (edit.isSignificant()) return true;
+    }
+    return false;
+  }
 
-	@Override
-	public String getPresentationName()
-	{
-		UndoableEdit edit = getLast();
-		if (edit == null) return "";
-		return edit.getPresentationName();
-	}
+  @Override
+  public String getPresentationName() {
+    UndoableEdit edit = getLast();
+    if (edit == null) return "";
+    return edit.getPresentationName();
+  }
 
-	@Override
-	public String getUndoPresentationName()
-	{
-		UndoableEdit edit = getLast();
-		if (edit == null) return "";
-		return edit.getUndoPresentationName();
-	}
+  @Override
+  public String getUndoPresentationName() {
+    UndoableEdit edit = getLast();
+    if (edit == null) return "";
+    return edit.getUndoPresentationName();
+  }
 
-	@Override
-	public String getRedoPresentationName()
-	{
-		UndoableEdit edit = getLast();
-		if (edit == null) return "";
-		return edit.getRedoPresentationName();
-	}
+  @Override
+  public String getRedoPresentationName() {
+    UndoableEdit edit = getLast();
+    if (edit == null) return "";
+    return edit.getRedoPresentationName();
+  }
 
 }

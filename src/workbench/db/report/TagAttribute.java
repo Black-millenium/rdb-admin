@@ -25,28 +25,24 @@ package workbench.db.report;
 import workbench.util.HtmlUtil;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class TagAttribute
-{
-	private final CharSequence tagText;
+public class TagAttribute {
+  private final CharSequence tagText;
 
-	public TagAttribute(String name, String value)
-	{
-		int len = name == null ? 0 : name.length();
-		len += value == null ? 0 : value.length();
-		StringBuilder b = new StringBuilder(len);
-		b.append(name);
-		b.append("=\"");
-		b.append(value == null ? "" : HtmlUtil.escapeXML(value));
-		b.append('"');
-		tagText = b;
-	}
+  public TagAttribute(String name, String value) {
+    int len = name == null ? 0 : name.length();
+    len += value == null ? 0 : value.length();
+    StringBuilder b = new StringBuilder(len);
+    b.append(name);
+    b.append("=\"");
+    b.append(value == null ? "" : HtmlUtil.escapeXML(value));
+    b.append('"');
+    tagText = b;
+  }
 
-	public CharSequence getTagText()
-	{
-		return tagText;
-	}
+  public CharSequence getTagText() {
+    return tagText;
+  }
 
 }

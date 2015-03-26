@@ -22,27 +22,24 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.gui.help.HelpManager;
+
+import java.awt.event.ActionEvent;
 
 /**
  * @author Thomas Kellerer
  */
 public class ShowManualAction
-	extends WbAction
-{
-	public ShowManualAction()
-	{
-		super();
-		initMenuDefinition("MnuTxtHelpManual");
-		setIcon("pdf");
-	}
+    extends WbAction {
+  public ShowManualAction() {
+    super();
+    initMenuDefinition("MnuTxtHelpManual");
+    setIcon("pdf");
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		HelpManager.showPdfHelp();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    HelpManager.showPdfHelp();
+  }
 
 }

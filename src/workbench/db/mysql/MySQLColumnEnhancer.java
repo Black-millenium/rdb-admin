@@ -29,23 +29,21 @@ import workbench.db.WbConnection;
 /**
  * A class to retrieve enum and collation definitions for the columns of a MySQL table.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  * @see workbench.db.DbMetadata#getTableDefinition(workbench.db.TableIdentifier)
  * @see MySQLEnumReader
  * @see MySQLColumnCollationReader
  */
 public class MySQLColumnEnhancer
-	implements ColumnDefinitionEnhancer
-{
+    implements ColumnDefinitionEnhancer {
 
-	@Override
-	public void updateColumnDefinition(TableDefinition tbl, WbConnection connection)
-	{
-		MySQLColumnCollationReader collationReader = new MySQLColumnCollationReader();
-		collationReader.readCollations(tbl, connection);
+  @Override
+  public void updateColumnDefinition(TableDefinition tbl, WbConnection connection) {
+    MySQLColumnCollationReader collationReader = new MySQLColumnCollationReader();
+    collationReader.readCollations(tbl, connection);
 
-		MySQLEnumReader enumReader = new MySQLEnumReader();
-		enumReader.readEnums(tbl, connection);
-	}
+    MySQLEnumReader enumReader = new MySQLEnumReader();
+    enumReader.readEnums(tbl, connection);
+  }
 
 }

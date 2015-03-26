@@ -22,87 +22,72 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
-import workbench.resource.ResourceMgr;
-
 import workbench.gui.components.WbTable;
 import workbench.gui.filter.SelectionFilter;
+import workbench.resource.ResourceMgr;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.event.ActionEvent;
 
 /**
- *	Filters data from a WbTable based on the currently selected column value.
+ * Filters data from a WbTable based on the currently selected column value.
  *
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class SelectionFilterAction
-		extends WbAction
-		implements ListSelectionListener
-{
-	private WbTable client;
+    extends WbAction
+    implements ListSelectionListener {
+  private WbTable client;
 
-	public SelectionFilterAction()
-	{
-		super();
-		this.initMenuDefinition("MnuTxtColFilter");
-		this.setIcon("colfilter");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
-		this.setCreateToolbarSeparator(false);
-		this.setEnabled(false);
-	}
+  public SelectionFilterAction() {
+    super();
+    this.initMenuDefinition("MnuTxtColFilter");
+    this.setIcon("colfilter");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
+    this.setCreateToolbarSeparator(false);
+    this.setEnabled(false);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		SelectionFilter filter = new SelectionFilter(this.client);
-		filter.applyFilter();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    SelectionFilter filter = new SelectionFilter(this.client);
+    filter.applyFilter();
+  }
 
-	public void setClient(WbTable c)
-	{
-		if (this.client != null)
-		{
-			ListSelectionModel m = this.client.getSelectionModel();
-			if (m != null)
-			{
-				m.removeListSelectionListener(this);
-			}
-		}
-		this.client = c;
-		this.setEnabled(client != null);
-		if (this.client != null)
-		{
-			ListSelectionModel m = this.client.getSelectionModel();
-			if (m != null)
-			{
-				m.addListSelectionListener(this);
-			}
-		}
-		checkEnabled();
-	}
+  public void setClient(WbTable c) {
+    if (this.client != null) {
+      ListSelectionModel m = this.client.getSelectionModel();
+      if (m != null) {
+        m.removeListSelectionListener(this);
+      }
+    }
+    this.client = c;
+    this.setEnabled(client != null);
+    if (this.client != null) {
+      ListSelectionModel m = this.client.getSelectionModel();
+      if (m != null) {
+        m.addListSelectionListener(this);
+      }
+    }
+    checkEnabled();
+  }
 
-	private void checkEnabled()
-	{
-		if (client == null)
-		{
-			this.setEnabled(false);
-		}
-		else
-		{
-			int rows = client.getSelectedRowCount();
-			int cols = client.getSelectedColumnCount();
+  private void checkEnabled() {
+    if (client == null) {
+      this.setEnabled(false);
+    } else {
+      int rows = client.getSelectedRowCount();
+      int cols = client.getSelectedColumnCount();
 
-			this.setEnabled(rows == 1 || (rows > 1 && cols == 1));
-		}
-	}
+      this.setEnabled(rows == 1 || (rows > 1 && cols == 1));
+    }
+  }
 
-	@Override
-	public void valueChanged(ListSelectionEvent e)
-	{
-		checkEnabled();
-	}
+  @Override
+  public void valueChanged(ListSelectionEvent e) {
+    checkEnabled();
+  }
 
 }

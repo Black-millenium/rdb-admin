@@ -21,86 +21,74 @@
  *
  */
 package workbench.sql.wbcommands;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.ResourceBundle;
 
 import workbench.WbManager;
 import workbench.log.LogMgr;
 import workbench.resource.Settings;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
 
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.ResourceBundle;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class WbHelp
-	extends SqlCommand
-{
-	public static final String VERB = "WbHelp";
+    extends SqlCommand {
+  public static final String VERB = "WbHelp";
 
-	public WbHelp()
-	{
-		super();
-	}
+  public WbHelp() {
+    super();
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException, Exception
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
-		Collection<String> commands = this.runner.getAllWbCommands();
-		StringBuffer msg = new StringBuffer(commands.size() * 25);
-		ResourceBundle bundle = ResourceBundle.getBundle("language/cmdhelp", Settings.getInstance().getLanguage());
-		commands.remove("DESC");
-		commands.add("DESCRIBE"); // only the "long" Verb is needed
-		commands.remove("ENABLEOUT");
-		commands.remove("DISABLEOUT");
-		commands.remove("SHOW");
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException, Exception {
+    StatementRunnerResult result = new StatementRunnerResult();
+    Collection<String> commands = this.runner.getAllWbCommands();
+    StringBuffer msg = new StringBuffer(commands.size() * 25);
+    ResourceBundle bundle = ResourceBundle.getBundle("language/cmdhelp", Settings.getInstance().getLanguage());
+    commands.remove("DESC");
+    commands.add("DESCRIBE"); // only the "long" Verb is needed
+    commands.remove("ENABLEOUT");
+    commands.remove("DISABLEOUT");
+    commands.remove("SHOW");
 
-		if (!WbManager.getInstance().isConsoleMode())
-		{
-			commands.remove("WbRun");
-		}
+    if (!WbManager.getInstance().isConsoleMode()) {
+      commands.remove("WbRun");
+    }
 
-		for (String verb : commands)
-		{
-			msg.append(verb);
-			try
-			{
-				String text = bundle.getString(verb);
-				msg.append(" - ");
-				msg.append(text);
-			}
-			catch (Exception e)
-			{
-				LogMgr.logWarning("WbHelp.execute()", "Error getting command short help from ResourceBundle", e);
-			}
-			msg.append('\n');
-		}
-		result.addMessage(msg);
-		result.setSuccess();
-		return result;
-	}
+    for (String verb : commands) {
+      msg.append(verb);
+      try {
+        String text = bundle.getString(verb);
+        msg.append(" - ");
+        msg.append(text);
+      } catch (Exception e) {
+        LogMgr.logWarning("WbHelp.execute()", "Error getting command short help from ResourceBundle", e);
+      }
+      msg.append('\n');
+    }
+    result.addMessage(msg);
+    result.setSuccess();
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 
 }

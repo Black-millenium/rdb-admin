@@ -22,146 +22,120 @@
  */
 package workbench.db.oracle;
 
+import workbench.log.LogMgr;
+import workbench.storage.DataConverter;
+import workbench.util.NumberStringCache;
+
 import java.lang.reflect.Method;
 import java.sql.Types;
-
-import workbench.log.LogMgr;
-
-import workbench.storage.DataConverter;
-
-import workbench.util.NumberStringCache;
 
 /**
  * A class to convert Oracle's RAW datatype to something readable.
  * <br/>
  * This is only used if enabled.
  *
- * @see workbench.resource.Settings#getConvertOracleTypes()
- *
  * @author Thomas Kellerer
+ * @see workbench.resource.Settings#getConvertOracleTypes()
  */
 public class OracleDataConverter
-	implements DataConverter
-{
-	private Method stringValueMethod;
+    implements DataConverter {
+  private Method stringValueMethod;
 
-	protected static class LazyInstanceHolder
-	{
-		protected static final OracleDataConverter instance = new OracleDataConverter();
-	}
+  private OracleDataConverter() {
+  }
 
-	public static OracleDataConverter getInstance()
-	{
-		return LazyInstanceHolder.instance;
-	}
+  public static OracleDataConverter getInstance() {
+    return LazyInstanceHolder.instance;
+  }
 
-	private OracleDataConverter()
-	{
-	}
+  @Override
+  public Class getConvertedClass(int jdbcType, String dbmsType) {
+    return String.class;
+  }
 
-	@Override
-	public Class getConvertedClass(int jdbcType, String dbmsType)
-	{
-		return String.class;
-	}
+  /**
+   * Two Oracle datatypes are supported
+   * <ul>
+   * <li>RAW (jdbcType == Types.VARBINARY && dbmsType == "RAW")</li>
+   * <li>ROWID (jdbcType = Types.ROWID)</li>
+   * </ul>
+   *
+   * @param jdbcType the jdbcType as returned by the driver
+   * @param dbmsType the name of the datatype for this value
+   */
+  @Override
+  public boolean convertsType(int jdbcType, String dbmsType) {
+    return (jdbcType == Types.VARBINARY && dbmsType.startsWith("RAW") ||
+        jdbcType == Types.ROWID);
+  }
 
-	/**
-	 * Two Oracle datatypes are supported
-	 * <ul>
-	 * <li>RAW (jdbcType == Types.VARBINARY && dbmsType == "RAW")</li>
-	 * <li>ROWID (jdbcType = Types.ROWID)</li>
-	 * </ul>
-	 *
-	 * @param jdbcType the jdbcType as returned by the driver
-	 * @param dbmsType the name of the datatype for this value
-	 */
-	@Override
-	public boolean convertsType(int jdbcType, String dbmsType)
-	{
-		return (jdbcType == Types.VARBINARY && dbmsType.startsWith("RAW") ||
-			      jdbcType == Types.ROWID);
-	}
+  /**
+   * If the type of the originalValue is RAW, then
+   * the value is converted into a corresponding hex display, e.g. <br/>
+   * <tt>0x000000000001dc91</tt>
+   * <p/>
+   * If the type of the originalValue is ROWID, Oracles stringValue() method
+   * from the class oracle.sql.ROWID is used to convert the input value
+   *
+   * @param jdbcType   the jdbcType as returned by the driver
+   * @param dbmsType   the name of the datatype for this value
+   * @param inputValue the value to be converted (or not)
+   * @return the originalValue or a converted value if approriate
+   * @see #convertsType(int, java.lang.String)
+   */
+  @Override
+  public Object convertValue(int jdbcType, String dbmsType, Object inputValue) {
+    if (inputValue == null) return null;
+    if (!convertsType(jdbcType, dbmsType)) return inputValue;
 
-	/**
-	 * If the type of the originalValue is RAW, then
-	 * the value is converted into a corresponding hex display, e.g. <br/>
-	 * <tt>0x000000000001dc91</tt>
-	 *
-	 * If the type of the originalValue is ROWID, Oracles stringValue() method
-	 * from the class oracle.sql.ROWID is used to convert the input value
-	 *
-	 * @param jdbcType the jdbcType as returned by the driver
-	 * @param dbmsType the name of the datatype for this value
-	 * @param inputValue the value to be converted (or not)
-	 *
-	 * @return the originalValue or a converted value if approriate
-	 * @see #convertsType(int, java.lang.String)
-	 */
-	@Override
-	public Object convertValue(int jdbcType, String dbmsType, Object inputValue)
-	{
-		if (inputValue == null) return null;
-		if (!convertsType(jdbcType, dbmsType)) return inputValue;
+    if (jdbcType == Types.ROWID) {
+      return convertRowId(inputValue);
+    }
+    return convertRaw(inputValue);
+  }
 
-		if (jdbcType == Types.ROWID)
-		{
-			return convertRowId(inputValue);
-		}
-		return convertRaw(inputValue);
-	}
+  private Object convertRaw(Object originalValue) {
+    Object newValue;
+    try {
+      byte[] b = (byte[]) originalValue;
+      StringBuilder buffer = new StringBuilder(b.length * 2);
+      for (byte v : b) {
+        int c = (v < 0 ? 256 + v : v);
+        buffer.append(NumberStringCache.getHexString(c));
+      }
+      newValue = buffer.toString();
+    } catch (Throwable th) {
+      LogMgr.logWarning("OracleDataConverter.convertValue()", "Error converting value " + originalValue, th);
+      newValue = originalValue;
+    }
+    return newValue;
+  }
 
-	private Object convertRaw(Object originalValue)
-	{
-		Object newValue;
-		try
-		{
-			byte[] b = (byte[])originalValue;
-			StringBuilder buffer = new StringBuilder(b.length * 2);
-			for (byte v : b)
-			{
-				int c = (v < 0 ? 256 + v : v);
-				buffer.append(NumberStringCache.getHexString(c));
-			}
-			newValue = buffer.toString();
-		}
-		catch (Throwable th)
-		{
-			LogMgr.logWarning("OracleDataConverter.convertValue()", "Error converting value " + originalValue, th);
-			newValue = originalValue;
-		}
-		return newValue;
-	}
+  private Object convertRowId(Object value) {
+    Method valueMethod = stringValueMethod(value);
+    if (valueMethod == null) return value.toString();
 
-	private Object convertRowId(Object value)
-	{
-		Method valueMethod = stringValueMethod(value);
-		if (valueMethod == null) return value.toString();
+    try {
+      Object result = valueMethod.invoke(value);
+      return result;
+    } catch (Throwable th) {
+      return value.toString();
+    }
+  }
 
-		try
-		{
-			Object result = valueMethod.invoke(value);
-			return result;
-		}
-		catch (Throwable th)
-		{
-			return value.toString();
-		}
-	}
+  private synchronized Method stringValueMethod(Object value) {
+    if (stringValueMethod == null) {
+      try {
+        stringValueMethod = value.getClass().getMethod("stringValue");
+      } catch (Throwable th) {
+        // ignore
+      }
+    }
+    return stringValueMethod;
+  }
 
-	private synchronized Method stringValueMethod(Object value)
-	{
-		if (stringValueMethod == null)
-		{
-			try
-			{
-				stringValueMethod = value.getClass().getMethod("stringValue");
-			}
-			catch (Throwable th)
-			{
-				// ignore
-			}
-		}
-		return stringValueMethod;
-	}
+  protected static class LazyInstanceHolder {
+    protected static final OracleDataConverter instance = new OracleDataConverter();
+  }
 
 }

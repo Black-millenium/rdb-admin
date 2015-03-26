@@ -22,81 +22,69 @@
  */
 package workbench.gui.components;
 
-import java.awt.Component;
-import java.util.LinkedList;
-import javax.swing.JTabbedPane;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.util.LinkedList;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class TabbedPaneHistory
-	implements ChangeListener
-{
-	private JTabbedPane client;
-	private LinkedList<Component> history = new LinkedList<Component>();
+    implements ChangeListener {
+  private JTabbedPane client;
+  private LinkedList<Component> history = new LinkedList<Component>();
 
-	public TabbedPaneHistory(JTabbedPane pane)
-	{
-		client = pane;
-		client.addChangeListener(this);
-	}
+  public TabbedPaneHistory(JTabbedPane pane) {
+    client = pane;
+    client.addChangeListener(this);
+  }
 
-	public void clear()
-	{
-		history.clear();
-	}
-	
-	private void addComponent(Component comp)
-	{
-		if (history.contains(comp))
-		{
-			history.remove(comp);
-		}
-		history.addFirst(comp);
-	}
+  public void clear() {
+    history.clear();
+  }
 
-	/**
-	 * Remove the currently active tab (== the first) component from the history
-	 * and activate the tab that was used before.
-	 */
-	public void restoreLastTab()
-	{
-		Component lastTab = getLastUsedComponent();
+  private void addComponent(Component comp) {
+    if (history.contains(comp)) {
+      history.remove(comp);
+    }
+    history.addFirst(comp);
+  }
 
-		if (lastTab == null) return;
+  /**
+   * Remove the currently active tab (== the first) component from the history
+   * and activate the tab that was used before.
+   */
+  public void restoreLastTab() {
+    Component lastTab = getLastUsedComponent();
 
-		// remove the current tab from the history
-		history.removeFirst();
+    if (lastTab == null) return;
 
-		try
-		{
-			client.setSelectedComponent(lastTab);
-		}
-		catch (IllegalArgumentException e)
-		{
-			// the component is no longer valid
-			history.remove(lastTab);
-		}
-	}
-	
-	private Component getLastUsedComponent()
-	{
-		if (history.size() == 0) return null;
-		if (history.size() == 1) return history.get(0);
+    // remove the current tab from the history
+    history.removeFirst();
 
-		// the element at index zero is always the active index
-		// so the last used index is at index 1
-		return history.get(1);
-	}
-	
-	@Override
-	public void stateChanged(ChangeEvent e)
-	{
-		if (e.getSource() != client) return;
-		addComponent(client.getSelectedComponent());
-	}
+    try {
+      client.setSelectedComponent(lastTab);
+    } catch (IllegalArgumentException e) {
+      // the component is no longer valid
+      history.remove(lastTab);
+    }
+  }
+
+  private Component getLastUsedComponent() {
+    if (history.size() == 0) return null;
+    if (history.size() == 1) return history.get(0);
+
+    // the element at index zero is always the active index
+    // so the last used index is at index 1
+    return history.get(1);
+  }
+
+  @Override
+  public void stateChanged(ChangeEvent e) {
+    if (e.getSource() != client) return;
+    addComponent(client.getSelectedComponent());
+  }
 
 }

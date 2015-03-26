@@ -23,13 +23,14 @@
 package workbench.util;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface LineParser
-{
-	boolean hasNext();
-	String getNext();
-	void setLine(String line);
-	void setTrimValues(boolean trimValues);
+public interface LineParser {
+  boolean hasNext();
+
+  String getNext();
+
+  void setLine(String line);
+
+  void setTrimValues(boolean trimValues);
 }

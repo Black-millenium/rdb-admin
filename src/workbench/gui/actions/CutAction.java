@@ -22,42 +22,36 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
 import workbench.interfaces.ClipboardSupport;
 import workbench.resource.PlatformShortcuts;
 import workbench.resource.ResourceMgr;
-
 import workbench.util.MacOSHelper;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
- *	Action to cut  the contents of an entry field
+ * Action to cut  the contents of an entry field
  *
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class CutAction extends WbAction
-{
-	private ClipboardSupport client;
+public class CutAction extends WbAction {
+  private ClipboardSupport client;
 
-	public CutAction(ClipboardSupport aClient)
-	{
-		super();
-		this.client = aClient;
-		initMenuDefinition("MnuTxtCut", PlatformShortcuts.getDefaultCutShortcut());
-		if (!MacOSHelper.isMacOS())
-		{
-			setAlternateAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, KeyEvent.SHIFT_MASK));
-		}
-		this.setIcon("cut");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-	}
+  public CutAction(ClipboardSupport aClient) {
+    super();
+    this.client = aClient;
+    initMenuDefinition("MnuTxtCut", PlatformShortcuts.getDefaultCutShortcut());
+    if (!MacOSHelper.isMacOS()) {
+      setAlternateAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, KeyEvent.SHIFT_MASK));
+    }
+    this.setIcon("cut");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.cut();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.cut();
+  }
 }

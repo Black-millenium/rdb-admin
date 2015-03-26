@@ -22,102 +22,75 @@
  */
 package workbench.util;
 
-import java.beans.BeanInfo;
-import java.beans.ExceptionListener;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import workbench.log.LogMgr;
+
+import java.beans.*;
+import java.io.*;
 
 /**
  * @author Thomas Kellerer
  */
 public class WbPersistence
-	implements ExceptionListener
-{
-	private String filename;
+    implements ExceptionListener {
+  private String filename;
 
-	public WbPersistence()
-	{
-	}
+  public WbPersistence() {
+  }
 
-	public WbPersistence(String file)
-	{
-		filename = file;
-	}
+  public WbPersistence(String file) {
+    filename = file;
+  }
 
-	/**
-	 * Makes a property of the given class transient, so that it won't be written
-	 * into the XML file when saved using WbPersistence
-	 * @param clazz
-	 * @param property
-	 */
-	public static void makeTransient(Class clazz, String property)
-	{
-		try
-		{
-			BeanInfo info = Introspector.getBeanInfo( clazz );
-			PropertyDescriptor[] propertyDescriptors = info.getPropertyDescriptors();
-			for (PropertyDescriptor pd : propertyDescriptors)
-			{
-				if ( pd.getName().equals(property) )
-				{
-					pd.setValue( "transient", Boolean.TRUE );
-				}
-			}
-		}
-		catch ( IntrospectionException e )
-		{
-		}
-	}
+  /**
+   * Makes a property of the given class transient, so that it won't be written
+   * into the XML file when saved using WbPersistence
+   *
+   * @param clazz
+   * @param property
+   */
+  public static void makeTransient(Class clazz, String property) {
+    try {
+      BeanInfo info = Introspector.getBeanInfo(clazz);
+      PropertyDescriptor[] propertyDescriptors = info.getPropertyDescriptors();
+      for (PropertyDescriptor pd : propertyDescriptors) {
+        if (pd.getName().equals(property)) {
+          pd.setValue("transient", Boolean.TRUE);
+        }
+      }
+    } catch (IntrospectionException e) {
+    }
+  }
 
-	public Object readObject()
-		throws Exception
-	{
-		if (this.filename == null) throw new IllegalArgumentException("No filename specified!");
-		InputStream in = new BufferedInputStream(new FileInputStream(filename));
-		return readObject(in);
-	}
+  public Object readObject()
+      throws Exception {
+    if (this.filename == null) throw new IllegalArgumentException("No filename specified!");
+    InputStream in = new BufferedInputStream(new FileInputStream(filename));
+    return readObject(in);
+  }
 
-	public Object readObject(InputStream in)
-		throws Exception
-	{
-		try (XMLDecoder e = new XMLDecoder(in, null, this))
-		{
-			Object result = e.readObject();
-			return result;
-		}
-		finally
-		{
-			FileUtil.closeQuietely(in);
-		}
-	}
+  public Object readObject(InputStream in)
+      throws Exception {
+    try (XMLDecoder e = new XMLDecoder(in, null, this)) {
+      Object result = e.readObject();
+      return result;
+    } finally {
+      FileUtil.closeQuietely(in);
+    }
+  }
 
-	public void writeObject(Object aValue)
-		throws IOException
-	{
-		if (aValue == null) return;
+  public void writeObject(Object aValue)
+      throws IOException {
+    if (aValue == null) return;
 
-		try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(filename), 32*1024);
-				XMLEncoder e = new XMLEncoder(out))
-		{
-			e.writeObject(aValue);
-		}
-	}
+    try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(filename), 32 * 1024);
+         XMLEncoder e = new XMLEncoder(out)) {
+      e.writeObject(aValue);
+    }
+  }
 
-	@Override
-	public void exceptionThrown(Exception e)
-	{
-		LogMgr.logError("WbPersistence", "Error reading file " + filename, e);
-	}
+  @Override
+  public void exceptionThrown(Exception e) {
+    LogMgr.logError("WbPersistence", "Error reading file " + filename, e);
+  }
 
 }

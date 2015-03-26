@@ -22,205 +22,173 @@
  */
 package workbench.gui.dialogs.dataimport;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-
-import workbench.interfaces.EncodingSelector;
-import workbench.interfaces.ValidatingComponent;
-import workbench.resource.Settings;
-
 import workbench.db.importer.ImportOptions;
 import workbench.db.importer.ProducerFactory;
 import workbench.db.importer.TextImportOptions;
-
 import workbench.gui.components.DividerBorder;
-
+import workbench.interfaces.EncodingSelector;
+import workbench.interfaces.ValidatingComponent;
+import workbench.resource.Settings;
 import workbench.util.StringUtil;
 
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
- *
- * @author  Thomas Kellerer
- *
+ * @author Thomas Kellerer
  */
 public class ImportOptionsPanel
-	extends JPanel
-	implements EncodingSelector, ActionListener, ValidatingComponent
-{
-	private JPanel typePanel;
-	private CardLayout card;
-	private JComboBox typeSelector;
-	private GeneralImportOptionsPanel generalOptions;
-	private TextOptionsPanel textOptions;
-	private ProducerFactory.ImportType currentType = null;
+    extends JPanel
+    implements EncodingSelector, ActionListener, ValidatingComponent {
+  private JPanel typePanel;
+  private CardLayout card;
+  private JComboBox typeSelector;
+  private GeneralImportOptionsPanel generalOptions;
+  private TextOptionsPanel textOptions;
+  private ProducerFactory.ImportType currentType = null;
 
-	public ImportOptionsPanel()
-	{
-		super();
-		setLayout(new BorderLayout(0,2));
-		generalOptions = new GeneralImportOptionsPanel();
+  public ImportOptionsPanel() {
+    super();
+    setLayout(new BorderLayout(0, 2));
+    generalOptions = new GeneralImportOptionsPanel();
 
-		JPanel generalContainer = new JPanel();
-		generalContainer.setLayout(new BorderLayout(0,0));
-		generalContainer.add(this.generalOptions, BorderLayout.CENTER);
-		Border leftMargin = new EmptyBorder(0, 3, 0, 0);
-		generalContainer.setBorder(leftMargin);
+    JPanel generalContainer = new JPanel();
+    generalContainer.setLayout(new BorderLayout(0, 0));
+    generalContainer.add(this.generalOptions, BorderLayout.CENTER);
+    Border leftMargin = new EmptyBorder(0, 3, 0, 0);
+    generalContainer.setBorder(leftMargin);
 
-		JPanel selectorPanel = new JPanel(new BorderLayout(2, 2));
-		Border b = new CompoundBorder(DividerBorder.BOTTOM_DIVIDER, new EmptyBorder(0, 0, 5, 0));
-		selectorPanel.setBorder(b);
-		typeSelector = new JComboBox();
-		typeSelector.addItem("Text");
-		typeSelector.addItem("XML");
-		JLabel type = new JLabel("Type");
-		selectorPanel.add(type, BorderLayout.WEST);
-		selectorPanel.add(typeSelector, BorderLayout.CENTER);
-		generalContainer.add(selectorPanel, BorderLayout.SOUTH);
+    JPanel selectorPanel = new JPanel(new BorderLayout(2, 2));
+    Border b = new CompoundBorder(DividerBorder.BOTTOM_DIVIDER, new EmptyBorder(0, 0, 5, 0));
+    selectorPanel.setBorder(b);
+    typeSelector = new JComboBox();
+    typeSelector.addItem("Text");
+    typeSelector.addItem("XML");
+    JLabel type = new JLabel("Type");
+    selectorPanel.add(type, BorderLayout.WEST);
+    selectorPanel.add(typeSelector, BorderLayout.CENTER);
+    generalContainer.add(selectorPanel, BorderLayout.SOUTH);
 
-		this.add(generalContainer, BorderLayout.NORTH);
+    this.add(generalContainer, BorderLayout.NORTH);
 
-		this.textOptions = new TextOptionsPanel();
-		this.typePanel = new JPanel();
-		typePanel.setBorder(leftMargin);
-		this.card = new CardLayout();
-		this.typePanel.setLayout(card);
+    this.textOptions = new TextOptionsPanel();
+    this.typePanel = new JPanel();
+    typePanel.setBorder(leftMargin);
+    this.card = new CardLayout();
+    this.typePanel.setLayout(card);
 
-		this.typePanel.add(this.textOptions, "text");
-		this.typePanel.add(new JPanel(), "xml"); // no options for XML import
+    this.typePanel.add(this.textOptions, "text");
+    this.typePanel.add(new JPanel(), "xml"); // no options for XML import
 
-		this.add(typePanel, BorderLayout.CENTER);
-		typeSelector.addActionListener(this);
-	}
+    this.add(typePanel, BorderLayout.CENTER);
+    typeSelector.addActionListener(this);
+  }
 
-	public void allowImportTypeSelection(boolean flag)
-	{
+  public void allowImportTypeSelection(boolean flag) {
 
-	}
-	public void allowImportModeSelection(boolean flag)
-	{
-		this.generalOptions.setModeSelectorEnabled(flag);
-	}
+  }
 
-	public void saveSettings(String section)
-	{
-		this.generalOptions.saveSettings(section);
-		this.textOptions.saveSettings(section + ".text");
-		if (StringUtil.isBlank(section))
-		{
-			section = "import";
-		}
-		Settings.getInstance().setProperty("workbench." + section + ".type", this.currentType == null ? -1 : currentType.toInteger());
-	}
+  public void allowImportModeSelection(boolean flag) {
+    this.generalOptions.setModeSelectorEnabled(flag);
+  }
 
-	public void restoreSettings(String section)
-	{
-		if (StringUtil.isBlank(section))
-		{
-			section = "import";
-		}
-		this.generalOptions.restoreSettings(section);
-		this.textOptions.restoreSettings(section + ".text");
-		int type = Settings.getInstance().getIntProperty("workbench." + section + ".type", -1);
-		this.setImportType(ProducerFactory.ImportType.valueOf(type));
-	}
+  public void saveSettings(String section) {
+    this.generalOptions.saveSettings(section);
+    this.textOptions.saveSettings(section + ".text");
+    if (StringUtil.isBlank(section)) {
+      section = "import";
+    }
+    Settings.getInstance().setProperty("workbench." + section + ".type", this.currentType == null ? -1 : currentType.toInteger());
+  }
 
-	/**
-	 *	Sets the displayed options according to
-	 *  DataExporter.EXPORT_XXXX types
-	 */
-	public void setImportType(ProducerFactory.ImportType type)
-	{
-		if (type == ProducerFactory.ImportType.Text)
-		{
-			setTypeText();
-		}
-		else if (type == ProducerFactory.ImportType.XML)
-		{
-			setTypeXml();
-		}
-	}
+  public void restoreSettings(String section) {
+    if (StringUtil.isBlank(section)) {
+      section = "import";
+    }
+    this.generalOptions.restoreSettings(section);
+    this.textOptions.restoreSettings(section + ".text");
+    int type = Settings.getInstance().getIntProperty("workbench." + section + ".type", -1);
+    this.setImportType(ProducerFactory.ImportType.valueOf(type));
+  }
 
-	public ProducerFactory.ImportType getImportType()
-	{
-		return this.currentType;
-	}
+  public ProducerFactory.ImportType getImportType() {
+    return this.currentType;
+  }
 
-	public void setTypeText()
-	{
-		this.card.show(this.typePanel, "text");
-		this.currentType = ProducerFactory.ImportType.Text;
-		typeSelector.setSelectedIndex(0);
-	}
+  /**
+   * Sets the displayed options according to
+   * DataExporter.EXPORT_XXXX types
+   */
+  public void setImportType(ProducerFactory.ImportType type) {
+    if (type == ProducerFactory.ImportType.Text) {
+      setTypeText();
+    } else if (type == ProducerFactory.ImportType.XML) {
+      setTypeXml();
+    }
+  }
 
-	public void setTypeXml()
-	{
-		this.card.show(this.typePanel, "xml");
-		this.currentType = ProducerFactory.ImportType.XML;
-		typeSelector.setSelectedIndex(1);
-	}
+  public void setTypeText() {
+    this.card.show(this.typePanel, "text");
+    this.currentType = ProducerFactory.ImportType.Text;
+    typeSelector.setSelectedIndex(0);
+  }
 
-	public ImportOptions getGeneralOptions()
-	{
-		return this.generalOptions;
-	}
+  public void setTypeXml() {
+    this.card.show(this.typePanel, "xml");
+    this.currentType = ProducerFactory.ImportType.XML;
+    typeSelector.setSelectedIndex(1);
+  }
 
-	public TextImportOptions getTextOptions()
-	{
-		return textOptions;
-	}
+  public ImportOptions getGeneralOptions() {
+    return this.generalOptions;
+  }
 
-	@Override
-	public String getEncoding()
-	{
-		return generalOptions.getEncoding();
-	}
+  public TextImportOptions getTextOptions() {
+    return textOptions;
+  }
 
-	@Override
-	public void setEncoding(String enc)
-	{
-		generalOptions.setEncoding(enc);
-	}
+  @Override
+  public String getEncoding() {
+    return generalOptions.getEncoding();
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent event)
-	{
-		if (event.getSource() == this.typeSelector)
-		{
-			String item = typeSelector.getSelectedItem().toString().toLowerCase();
-			ProducerFactory.ImportType oldType = this.currentType;
+  @Override
+  public void setEncoding(String enc) {
+    generalOptions.setEncoding(enc);
+  }
 
-			this.card.show(this.typePanel, item);
+  @Override
+  public void actionPerformed(ActionEvent event) {
+    if (event.getSource() == this.typeSelector) {
+      String item = typeSelector.getSelectedItem().toString().toLowerCase();
+      ProducerFactory.ImportType oldType = this.currentType;
 
-			if ("text".equals(item))
-				this.currentType = ProducerFactory.ImportType.Text;
-			else if ("xml".equals(item))
-				this.currentType = ProducerFactory.ImportType.XML;
+      this.card.show(this.typePanel, item);
 
-			if (oldType != currentType) firePropertyChange("exportType", oldType, this.currentType);
-		}
-	}
+      if ("text".equals(item))
+        this.currentType = ProducerFactory.ImportType.Text;
+      else if ("xml".equals(item))
+        this.currentType = ProducerFactory.ImportType.XML;
 
-	@Override
-	public boolean validateInput()
-	{
-		if (this.textOptions != null)
-		{
-			return generalOptions.validateInput();
-		}
-		return true;
-	}
+      if (oldType != currentType) firePropertyChange("exportType", oldType, this.currentType);
+    }
+  }
 
-	@Override
-	public void componentDisplayed()
-	{
-	}
+  @Override
+  public boolean validateInput() {
+    if (this.textOptions != null) {
+      return generalOptions.validateInput();
+    }
+    return true;
+  }
+
+  @Override
+  public void componentDisplayed() {
+  }
 
 }

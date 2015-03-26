@@ -23,25 +23,21 @@ package workbench.db;
 import workbench.db.postgres.PostgresExpressionBuilder;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface DmlExpressionBuilder
-{
-	String getDmlExpression(ColumnIdentifier column);
-	boolean isDmlExpressionDefined(String baseType);
+public interface DmlExpressionBuilder {
+  String getDmlExpression(ColumnIdentifier column);
 
-	public static class Factory
-	{
-		public static DmlExpressionBuilder getBuilder(WbConnection conn)
-		{
-			if (conn != null && conn.getMetadata().isPostgres())
-			{
-				return new PostgresExpressionBuilder(conn);
-			}
-			return new DefaultExpressionBuilder(conn);
-		}
-	}
+  boolean isDmlExpressionDefined(String baseType);
+
+  public static class Factory {
+    public static DmlExpressionBuilder getBuilder(WbConnection conn) {
+      if (conn != null && conn.getMetadata().isPostgres()) {
+        return new PostgresExpressionBuilder(conn);
+      }
+      return new DefaultExpressionBuilder(conn);
+    }
+  }
 
 }
 

@@ -22,197 +22,166 @@
  */
 package workbench.sql.fksupport;
 
+import workbench.db.DependencyNode;
+import workbench.db.TableIdentifier;
+import workbench.db.WbConnection;
+import workbench.resource.GeneratedIdentifierCase;
+import workbench.resource.Settings;
+import workbench.util.TableAlias;
+
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import workbench.resource.GeneratedIdentifierCase;
-import workbench.resource.Settings;
-
-import workbench.db.DependencyNode;
-import workbench.db.TableIdentifier;
-import workbench.db.WbConnection;
-
-import workbench.util.TableAlias;
-
 /**
- *
  * @author Thomas Kellerer
  */
-public class JoinColumnsDetector
-{
-	private final TableAlias joinTable;
-	private final TableAlias joinedTable;
-	private final WbConnection connection;
-	private boolean preferUsingOperator;
-	private boolean matchingColumnsAvailable;
-	private GeneratedIdentifierCase keywordCase;
-	private GeneratedIdentifierCase identifierCase;
+public class JoinColumnsDetector {
+  private final TableAlias joinTable;
+  private final TableAlias joinedTable;
+  private final WbConnection connection;
+  private boolean preferUsingOperator;
+  private boolean matchingColumnsAvailable;
+  private GeneratedIdentifierCase keywordCase;
+  private GeneratedIdentifierCase identifierCase;
 
-	public JoinColumnsDetector(WbConnection dbConnection, TableAlias mainTable, TableAlias childTable)
-	{
-		this.joinTable = mainTable;
-		this.joinedTable = childTable;
-		this.connection = dbConnection;
-		this.preferUsingOperator = Settings.getInstance().getJoinCompletionPreferUSING();
-		this.identifierCase = Settings.getInstance().getFormatterIdentifierCase();
-		this.keywordCase =  Settings.getInstance().getFormatterKeywordsCase();
-	}
+  public JoinColumnsDetector(WbConnection dbConnection, TableAlias mainTable, TableAlias childTable) {
+    this.joinTable = mainTable;
+    this.joinedTable = childTable;
+    this.connection = dbConnection;
+    this.preferUsingOperator = Settings.getInstance().getJoinCompletionPreferUSING();
+    this.identifierCase = Settings.getInstance().getFormatterIdentifierCase();
+    this.keywordCase = Settings.getInstance().getFormatterKeywordsCase();
+  }
 
-	public void setPreferUsingOperator(boolean flag)
-	{
-		this.preferUsingOperator = flag;
-	}
+  public void setPreferUsingOperator(boolean flag) {
+    this.preferUsingOperator = flag;
+  }
 
-	public void setKeywordCase(GeneratedIdentifierCase kwCase)
-	{
-		this.keywordCase = kwCase;
-	}
+  public void setKeywordCase(GeneratedIdentifierCase kwCase) {
+    this.keywordCase = kwCase;
+  }
 
-	public void setIdentifierCase(GeneratedIdentifierCase idCase)
-	{
-		this.identifierCase = idCase;
-	}
+  public void setIdentifierCase(GeneratedIdentifierCase idCase) {
+    this.identifierCase = idCase;
+  }
 
-	/**
-	 * Return the condition to be used in a JOIN or WHERE clause to join the two tables.
-	 * <br/>
- *
-	 * @return the join condition to be used (null if any table was not found)
-	 * @throws SQLException
-	 */
-	public String getJoinCondition()
-		throws SQLException
-	{
-		matchingColumnsAvailable = false;
-		Map<String, String> columns = getJoinColumns();
-		if (columns.isEmpty()) return "";
+  /**
+   * Return the condition to be used in a JOIN or WHERE clause to join the two tables.
+   * <br/>
+   *
+   * @return the join condition to be used (null if any table was not found)
+   * @throws SQLException
+   */
+  public String getJoinCondition()
+      throws SQLException {
+    matchingColumnsAvailable = false;
+    Map<String, String> columns = getJoinColumns();
+    if (columns.isEmpty()) return "";
 
-		String delim = null;
-		boolean useUsingOperator = preferUsingOperator && matchingColumnsAvailable;
-		if (useUsingOperator)
-		{
-			delim = ",";
-		}
-		else
-		{
-			delim = keywordCase == GeneratedIdentifierCase.upper ? " AND " : " and ";
-		}
-		StringBuilder result = new StringBuilder(20);
-		boolean first = true;
-		if (useUsingOperator)
-		{
-			result.append('(');
-		}
-		for (Map.Entry<String, String> entry : columns.entrySet())
-		{
-			if (!first)
-			{
-				result.append(delim);
-			}
-			result.append(entry.getKey());
-			if (!useUsingOperator)
-			{
-				result.append(" = ");
-				result.append(entry.getValue());
-			}
-			first = false;
-		}
-		if (useUsingOperator)
-		{
-			result.append(')');
-		}
-		return result.toString();
-	}
+    String delim = null;
+    boolean useUsingOperator = preferUsingOperator && matchingColumnsAvailable;
+    if (useUsingOperator) {
+      delim = ",";
+    } else {
+      delim = keywordCase == GeneratedIdentifierCase.upper ? " AND " : " and ";
+    }
+    StringBuilder result = new StringBuilder(20);
+    boolean first = true;
+    if (useUsingOperator) {
+      result.append('(');
+    }
+    for (Map.Entry<String, String> entry : columns.entrySet()) {
+      if (!first) {
+        result.append(delim);
+      }
+      result.append(entry.getKey());
+      if (!useUsingOperator) {
+        result.append(" = ");
+        result.append(entry.getValue());
+      }
+      first = false;
+    }
+    if (useUsingOperator) {
+      result.append(')');
+    }
+    return result.toString();
+  }
 
-	/**
-	 * Return a map for columns to be joined.
-	 * <br/>
-	 * The key will be the PK column, the value the FK column. If either the joinTable or the joined table
-	 * (see constructor) is not found, an empty map is returned;
-	 *
-	 * @return the mapping for the PK/FK columns
-	 * @throws SQLException
-	 */
-	private Map<String, String> getJoinColumns()
-		throws SQLException
-	{
-		TableIdentifier realJoinTable = connection.getObjectCache().getOrRetrieveTable(joinTable.getTable());
-		TableIdentifier realJoinedTable = connection.getObjectCache().getOrRetrieveTable(joinedTable.getTable());
+  /**
+   * Return a map for columns to be joined.
+   * <br/>
+   * The key will be the PK column, the value the FK column. If either the joinTable or the joined table
+   * (see constructor) is not found, an empty map is returned;
+   *
+   * @return the mapping for the PK/FK columns
+   * @throws SQLException
+   */
+  private Map<String, String> getJoinColumns()
+      throws SQLException {
+    TableIdentifier realJoinTable = connection.getObjectCache().getOrRetrieveTable(joinTable.getTable());
+    TableIdentifier realJoinedTable = connection.getObjectCache().getOrRetrieveTable(joinedTable.getTable());
 
-		if (realJoinTable == null || realJoinedTable == null)
-		{
-			return Collections.emptyMap();
-		}
+    if (realJoinTable == null || realJoinedTable == null) {
+      return Collections.emptyMap();
+    }
 
-		Map<String, String> columns = getJoinColumns(realJoinTable, joinTable, realJoinedTable, joinedTable);
-		if (columns.isEmpty())
-		{
-			columns = getJoinColumns(realJoinedTable, joinedTable, realJoinTable, joinTable);
-		}
-		return columns;
-	}
+    Map<String, String> columns = getJoinColumns(realJoinTable, joinTable, realJoinedTable, joinedTable);
+    if (columns.isEmpty()) {
+      columns = getJoinColumns(realJoinedTable, joinedTable, realJoinTable, joinTable);
+    }
+    return columns;
+  }
 
-	private Map<String, String> getJoinColumns(TableIdentifier table1, TableAlias alias1, TableIdentifier table2, TableAlias alias2)
-		throws SQLException
-	{
-		Map<String, String> columns = new HashMap<>(2);
-		List<DependencyNode> refTables = connection.getObjectCache().getReferencedTables(table2);
+  private Map<String, String> getJoinColumns(TableIdentifier table1, TableAlias alias1, TableIdentifier table2, TableAlias alias2)
+      throws SQLException {
+    Map<String, String> columns = new HashMap<>(2);
+    List<DependencyNode> refTables = connection.getObjectCache().getReferencedTables(table2);
 
-		for (DependencyNode node : refTables)
-		{
-			if (node.getTable().equals(table1))
-			{
-				Map<String, String> colMap = node.getColumns();
-				int matchingCols = 0;
-				for (Map.Entry<String, String> entry : colMap.entrySet())
-				{
-					if (entry.getKey().equalsIgnoreCase(entry.getValue()))
-					{
-						matchingCols ++;
-					}
-				}
-				this.matchingColumnsAvailable = matchingCols == colMap.size();
-				for (Map.Entry<String, String> entry : colMap.entrySet())
-				{
-					if (matchingColumnsAvailable && preferUsingOperator)
-					{
-						String col = getColumnName(entry.getKey());
-						columns.put(col, col);
-					}
-					else
-					{
-						String pkColumnExpr = alias1.getNameToUse() + "." + getColumnName(entry.getKey());
-						String fkColExpr = alias2.getNameToUse() + "." + getColumnName(entry.getValue());
-						columns.put(pkColumnExpr, fkColExpr);
-					}
-				}
-			}
-		}
-		return columns;
-	}
+    for (DependencyNode node : refTables) {
+      if (node.getTable().equals(table1)) {
+        Map<String, String> colMap = node.getColumns();
+        int matchingCols = 0;
+        for (Map.Entry<String, String> entry : colMap.entrySet()) {
+          if (entry.getKey().equalsIgnoreCase(entry.getValue())) {
+            matchingCols++;
+          }
+        }
+        this.matchingColumnsAvailable = matchingCols == colMap.size();
+        for (Map.Entry<String, String> entry : colMap.entrySet()) {
+          if (matchingColumnsAvailable && preferUsingOperator) {
+            String col = getColumnName(entry.getKey());
+            columns.put(col, col);
+          } else {
+            String pkColumnExpr = alias1.getNameToUse() + "." + getColumnName(entry.getKey());
+            String fkColExpr = alias2.getNameToUse() + "." + getColumnName(entry.getValue());
+            columns.put(pkColumnExpr, fkColExpr);
+          }
+        }
+      }
+    }
+    return columns;
+  }
 
-	private String getColumnName(String colname)
-	{
-		if (colname == null) return colname;
+  private String getColumnName(String colname) {
+    if (colname == null) return colname;
 
-		String result= connection.getMetadata().quoteObjectname(colname);
+    String result = connection.getMetadata().quoteObjectname(colname);
 
-		if (connection.getMetadata().isQuoted(result)) return result;
+    if (connection.getMetadata().isQuoted(result)) return result;
 
-		switch (identifierCase)
-		{
-			case lower:
-				result = colname.toLowerCase();
-				break;
-			case upper:
-				result = colname.toUpperCase();
-				break;
-			default:
-				result = colname;
-		}
-		return result;
-	}
+    switch (identifierCase) {
+      case lower:
+        result = colname.toLowerCase();
+        break;
+      case upper:
+        result = colname.toUpperCase();
+        break;
+      default:
+        result = colname;
+    }
+    return result;
+  }
 }

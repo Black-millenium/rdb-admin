@@ -23,10 +23,8 @@
 package workbench.gui.settings;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface Disposable
-{
-	void dispose();
+public interface Disposable {
+  void dispose();
 }

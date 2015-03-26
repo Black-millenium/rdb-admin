@@ -22,12 +22,11 @@
  */
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-
 import workbench.resource.ResourceMgr;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
+
+import java.sql.SQLException;
 
 /**
  * A SQL Statement to change the default fetch size for the current connection.
@@ -39,52 +38,44 @@ import workbench.sql.StatementRunnerResult;
  * @see workbench.db.WbConnection#setFetchSize(int)
  */
 public class WbFetchSize
-	extends SqlCommand
-{
-	public static final String VERB = "WbFetchSize";
+    extends SqlCommand {
+  public static final String VERB = "WbFetchSize";
 
-	public WbFetchSize()
-	{
-		super();
-		isUpdatingCommand = false;
-	}
+  public WbFetchSize() {
+    super();
+    isUpdatingCommand = false;
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult();
 
-		String value = getCommandLine(sql);
-		int size = -1;
+    String value = getCommandLine(sql);
+    int size = -1;
 
-		try
-		{
-			size = Integer.parseInt(value);
-		}
-		catch (Exception e)
-		{
-			result.setFailure();
-			result.addMessage(ResourceMgr.getFormattedString("ErrInvalidNumber", value));
-			return result;
-		}
+    try {
+      size = Integer.parseInt(value);
+    } catch (Exception e) {
+      result.setFailure();
+      result.addMessage(ResourceMgr.getFormattedString("ErrInvalidNumber", value));
+      return result;
+    }
 
-		currentConnection.setFetchSize(size);
-		result.addMessage(ResourceMgr.getFormattedString("MsgFetchSizeChanged", Integer.toString(currentConnection.getFetchSize())));
-		result.setSuccess();
+    currentConnection.setFetchSize(size);
+    result.addMessage(ResourceMgr.getFormattedString("MsgFetchSizeChanged", Integer.toString(currentConnection.getFetchSize())));
+    result.setSuccess();
 
-		return result;
-	}
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 }

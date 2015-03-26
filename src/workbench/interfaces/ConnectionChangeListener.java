@@ -25,10 +25,8 @@ package workbench.interfaces;
 import workbench.db.WbConnection;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface ConnectionChangeListener
-{
-	void connectionChanged(WbConnection newConnection);
+public interface ConnectionChangeListener {
+  void connectionChanged(WbConnection newConnection);
 }

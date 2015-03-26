@@ -25,10 +25,8 @@ package workbench.db.importer;
 import workbench.util.WbFile;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface TablenameResolver 
-{
-	String getTableName(WbFile f);
+public interface TablenameResolver {
+  String getTableName(WbFile f);
 }

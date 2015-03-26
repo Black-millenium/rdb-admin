@@ -20,10 +20,8 @@
 package workbench.sql;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface OutputPrinter
-{
-	void printMessage(String message);
+public interface OutputPrinter {
+  void printMessage(String message);
 }

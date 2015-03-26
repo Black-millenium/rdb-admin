@@ -22,65 +22,54 @@
  */
 package workbench.gui.editor.actions;
 
-import java.awt.event.ActionEvent;
-import javax.swing.KeyStroke;
 import workbench.gui.editor.InputHandler;
 import workbench.gui.editor.JEditTextArea;
 import workbench.gui.editor.TextUtilities;
 import workbench.resource.PlatformShortcuts;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class PrevWord
-	extends EditorAction
-{
-	protected boolean select;
+    extends EditorAction {
+  protected boolean select;
 
-	public PrevWord()
-	{
-		super("TxtEdPrvWord", PlatformShortcuts.getDefaultPrevWord(false));
-		select = false;
-	}
+  public PrevWord() {
+    super("TxtEdPrvWord", PlatformShortcuts.getDefaultPrevWord(false));
+    select = false;
+  }
 
-	public PrevWord(String resourceKey, KeyStroke key)
-	{
-		super(resourceKey, key);
-	}
+  public PrevWord(String resourceKey, KeyStroke key) {
+    super(resourceKey, key);
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt)
-	{
-		JEditTextArea textArea = InputHandler.getTextArea(evt);
-		int caret = textArea.getCaretPosition();
-		int line = textArea.getCaretLine();
-		int lineStart = textArea.getLineStartOffset(line);
-		caret -= lineStart;
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    JEditTextArea textArea = InputHandler.getTextArea(evt);
+    int caret = textArea.getCaretPosition();
+    int line = textArea.getCaretLine();
+    int lineStart = textArea.getLineStartOffset(line);
+    caret -= lineStart;
 
-		String lineText = textArea.getLineText(textArea.getCaretLine());
+    String lineText = textArea.getLineText(textArea.getCaretLine());
 
-		if (caret == 0)
-		{
-			if (lineStart == 0)
-			{
-				textArea.getToolkit().beep();
-				return;
-			}
-			caret--;
-		}
-		else
-		{
-			caret = TextUtilities.findWordStart(lineText, caret);
-		}
+    if (caret == 0) {
+      if (lineStart == 0) {
+        textArea.getToolkit().beep();
+        return;
+      }
+      caret--;
+    } else {
+      caret = TextUtilities.findWordStart(lineText, caret);
+    }
 
-		if (select)
-		{
-			textArea.select(textArea.getMarkPosition(), lineStart + caret);
-		}
-		else
-		{
-			textArea.setCaretPosition(lineStart + caret);
-		}
-	}
+    if (select) {
+      textArea.select(textArea.getMarkPosition(), lineStart + caret);
+    } else {
+      textArea.setCaretPosition(lineStart + caret);
+    }
+  }
 }

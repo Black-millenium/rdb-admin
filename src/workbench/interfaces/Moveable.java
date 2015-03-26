@@ -23,13 +23,14 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface Moveable
-{
-	boolean startMove(int index);
-	void endMove(int finalIndex);
-	boolean moveTab(int oldIndex, int newIndex);
-	void moveCancelled();
+public interface Moveable {
+  boolean startMove(int index);
+
+  void endMove(int finalIndex);
+
+  boolean moveTab(int oldIndex, int newIndex);
+
+  void moveCancelled();
 }

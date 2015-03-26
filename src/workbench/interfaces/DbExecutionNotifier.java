@@ -25,8 +25,8 @@ package workbench.interfaces;
 /**
  * @author Thomas Kellerer
  */
-public interface DbExecutionNotifier
-{
-	void addDbExecutionListener(DbExecutionListener l);
-	void removeDbExecutionListener(DbExecutionListener l);
+public interface DbExecutionNotifier {
+  void addDbExecutionListener(DbExecutionListener l);
+
+  void removeDbExecutionListener(DbExecutionListener l);
 }

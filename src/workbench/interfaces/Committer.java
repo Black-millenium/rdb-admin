@@ -23,26 +23,25 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface Committer
-{
-	/**
-	 * The integer value that identifies the fact that no COMMIT statement
-	 * at all should be written to the output file
-	 */
-	int NO_COMMIT_FLAG = Integer.MIN_VALUE;
+public interface Committer {
+  /**
+   * The integer value that identifies the fact that no COMMIT statement
+   * at all should be written to the output file
+   */
+  int NO_COMMIT_FLAG = Integer.MIN_VALUE;
 
-	/**
-	 * Define the interval when commits should be send to the DBMS
-	 * @param interval the number of statement after which to commit. 0 means each statement
-	 */
-	void setCommitEvery(int interval);
+  /**
+   * Define the interval when commits should be send to the DBMS
+   *
+   * @param interval the number of statement after which to commit. 0 means each statement
+   */
+  void setCommitEvery(int interval);
 
-	/**
-	 * Never commit anything
-	 */
-	void commitNothing();
+  /**
+   * Never commit anything
+   */
+  void commitNothing();
 
 }

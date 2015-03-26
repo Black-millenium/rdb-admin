@@ -22,12 +22,12 @@
  */
 package workbench.db.mssql;
 
-import java.sql.Types;
-
 import workbench.log.LogMgr;
 import workbench.resource.Settings;
 import workbench.storage.DataConverter;
 import workbench.util.NumberStringCache;
+
+import java.sql.Types;
 
 /**
  * A class to convert Microsofts strange binary "timestamp" to a readable display.
@@ -35,91 +35,76 @@ import workbench.util.NumberStringCache;
  * @author Thomas Kellerer
  */
 public class SqlServerDataConverter
-	implements DataConverter
-{
-	private boolean convertVarbinary;
+    implements DataConverter {
+  private boolean convertVarbinary;
 
-	protected static class LazyInstanceHolder
-	{
-		protected static final SqlServerDataConverter instance = new SqlServerDataConverter();
-	}
+  private SqlServerDataConverter() {
+    convertVarbinary = Settings.getInstance().getBoolProperty("workbench.db.microsoft_sql_server.converter.varbinary", false);
+  }
 
-	public static SqlServerDataConverter getInstance()
-	{
-		return LazyInstanceHolder.instance;
-	}
+  public static SqlServerDataConverter getInstance() {
+    return LazyInstanceHolder.instance;
+  }
 
-	private SqlServerDataConverter()
-	{
-		convertVarbinary = Settings.getInstance().getBoolProperty("workbench.db.microsoft_sql_server.converter.varbinary", false);
-	}
+  @Override
+  public Class getConvertedClass(int jdbcType, String dbmsType) {
+    return String.class;
+  }
 
-	@Override
-	public Class getConvertedClass(int jdbcType, String dbmsType)
-	{
-		return String.class;
-	}
+  /**
+   * Checks if jdbcType == Types.BINARY and if dbmsType == "timestamp"
+   *
+   * @param jdbcType the jdbcType as returned by the driver
+   * @param dbmsType the name of the datatype for this value
+   * @return true if Microsoft's "timestamp" type
+   */
+  @Override
+  public boolean convertsType(int jdbcType, String dbmsType) {
+    if (jdbcType == Types.BINARY) {
+      return dbmsType.equals("timestamp");
+    }
+    if (jdbcType == Types.VARBINARY) {
+      // don't convert really large blobs
+      // only convert varbinary(x) - assuming that they are sufficiently small
+      return convertVarbinary && !dbmsType.equalsIgnoreCase("varbinary(max)");
+    }
+    return false;
+  }
 
-	/**
-	 * Checks if jdbcType == Types.BINARY and if dbmsType == "timestamp"
-	 *
-	 * @param jdbcType the jdbcType as returned by the driver
-	 * @param dbmsType the name of the datatype for this value
-	 *
-	 * @return true if Microsoft's "timestamp" type
-	 */
-	@Override
-	public boolean convertsType(int jdbcType, String dbmsType)
-	{
-		if (jdbcType == Types.BINARY)
-		{
-			return dbmsType.equals("timestamp");
-		}
-		if (jdbcType == Types.VARBINARY)
-		{
-			// don't convert really large blobs
-			// only convert varbinary(x) - assuming that they are sufficiently small
-			return convertVarbinary && !dbmsType.equalsIgnoreCase("varbinary(max)");
-		}
-		return false;
-	}
+  /**
+   * If the type of the originalValue is Microsoft's "timestamp", then
+   * the value is converted into a corresponding hex display, e.g. <br/>
+   * <tt>0x000000000001dc91</tt>
+   *
+   * @param jdbcType      the jdbcType as returned by the driver
+   * @param dbmsType      the name of the datatype for this value
+   * @param originalValue the value to be converted (or not)
+   * @return the originalValue or a converted value if approriate
+   * @see #convertsType(int, java.lang.String)
+   */
+  @Override
+  public Object convertValue(int jdbcType, String dbmsType, Object originalValue) {
+    if (originalValue == null) return null;
+    if (!convertsType(jdbcType, dbmsType)) return originalValue;
+    Object newValue;
+    try {
+      byte[] b = (byte[]) originalValue;
+      StringBuilder buffer = new StringBuilder(b.length * 2 + 2);
+      buffer.append("0x");
+      for (byte v : b) {
+        int c = (v < 0 ? 256 + v : v);
+        buffer.append(NumberStringCache.getHexString(c));
+      }
+      newValue = buffer.toString();
+    } catch (Throwable th) {
+      LogMgr.logWarning("SqlServerDataConverter.convertValue()", "Error converting value " + originalValue, th);
+      newValue = originalValue;
+    }
+    return newValue;
+  }
 
-	/**
-	 * If the type of the originalValue is Microsoft's "timestamp", then
-	 * the value is converted into a corresponding hex display, e.g. <br/>
-	 * <tt>0x000000000001dc91</tt>
-	 *
-	 * @param jdbcType the jdbcType as returned by the driver
-	 * @param dbmsType the name of the datatype for this value
-	 * @param originalValue the value to be converted (or not)
-	 *
-	 * @return the originalValue or a converted value if approriate
-	 * @see #convertsType(int, java.lang.String)
-	 */
-	@Override
-	public Object convertValue(int jdbcType, String dbmsType, Object originalValue)
-	{
-		if (originalValue == null) return null;
-		if (!convertsType(jdbcType, dbmsType)) return originalValue;
-		Object newValue;
-		try
-		{
-			byte[] b = (byte[])originalValue;
-			StringBuilder buffer = new StringBuilder(b.length * 2 + 2);
-			buffer.append("0x");
-			for (byte v : b)
-			{
-				int c = (v < 0 ? 256 + v : v);
-				buffer.append(NumberStringCache.getHexString(c));
-			}
-			newValue = buffer.toString();
-		}
-		catch (Throwable th)
-		{
-			LogMgr.logWarning("SqlServerDataConverter.convertValue()", "Error converting value " + originalValue, th);
-			newValue = originalValue;
-		}
-		return newValue;
-	}
+  protected static class LazyInstanceHolder {
+    protected static final SqlServerDataConverter instance = new SqlServerDataConverter();
+  }
 
 }

@@ -23,30 +23,29 @@
 package workbench.interfaces;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface ExecutionController
-{
+public interface ExecutionController {
 
-	/**
-	 * Confirm the execution of passed SQL command.
-	 *
-	 * @return true if the user chose to continue
-	 */
-	boolean confirmStatementExecution(String command);
+  /**
+   * Confirm the execution of passed SQL command.
+   *
+   * @return true if the user chose to continue
+   */
+  boolean confirmStatementExecution(String command);
 
-	/**
-	 * Confirm the execution of the statements with a user visible prompt.
-	 * This is similar to the "pause" command in a Windows batch file.
-	 *
-	 * @param prompt the prompt to be displayed to the user
-	 * @param yesText the text to display for the "Yes" option, may be null
-	 * @param noText the text to display for the "No" option, may be null
-	 * @return true if the user chose to continue
-	 */
-	boolean confirmExecution(String prompt, String yesText, String noText);
+  /**
+   * Confirm the execution of the statements with a user visible prompt.
+   * This is similar to the "pause" command in a Windows batch file.
+   *
+   * @param prompt  the prompt to be displayed to the user
+   * @param yesText the text to display for the "Yes" option, may be null
+   * @param noText  the text to display for the "No" option, may be null
+   * @return true if the user chose to continue
+   */
+  boolean confirmExecution(String prompt, String yesText, String noText);
 
-	String getPassword(String prompt);
-	String getInput(String prompt);
+  String getPassword(String prompt);
+
+  String getInput(String prompt);
 }

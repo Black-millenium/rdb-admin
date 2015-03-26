@@ -22,12 +22,12 @@
  */
 package workbench.gui.lnf;
 
+import workbench.util.CollectionUtil;
+import workbench.util.StringUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import workbench.util.CollectionUtil;
-import workbench.util.StringUtil;
 
 /**
  * The definition of a pluggable look and feel. It stores the classname
@@ -37,122 +37,100 @@ import workbench.util.StringUtil;
  * @author Thomas Kellerer
  */
 public class LnFDefinition
-	implements Comparable<LnFDefinition>
-{
-	private String name;
-	private String className;
-	private List<String> liblist;
-	private boolean isBuiltIn;
-	public static final String LNF_PATH_SEPARATOR = "$|$";
+    implements Comparable<LnFDefinition> {
+  public static final String LNF_PATH_SEPARATOR = "$|$";
+  private String name;
+  private String className;
+  private List<String> liblist;
+  private boolean isBuiltIn;
 
-	public LnFDefinition(String desc)
-	{
-		this(desc, null, null);
-		this.isBuiltIn = false;
-	}
+  public LnFDefinition(String desc) {
+    this(desc, null, null);
+    this.isBuiltIn = false;
+  }
 
-	public LnFDefinition(String desc, String clazz)
-	{
-		this(desc, clazz, null);
-		this.isBuiltIn = true;
- 	}
+  public LnFDefinition(String desc, String clazz) {
+    this(desc, clazz, null);
+    this.isBuiltIn = true;
+  }
 
-	public LnFDefinition(String desc, String clazz, List<String> libs)
-	{
-		this.name = desc;
-		this.className = (clazz == null ? clazz : clazz.trim());
-		this.isBuiltIn = (libs == null);
-		this.setLibraries(libs);
-	}
+  public LnFDefinition(String desc, String clazz, List<String> libs) {
+    this.name = desc;
+    this.className = (clazz == null ? clazz : clazz.trim());
+    this.isBuiltIn = (libs == null);
+    this.setLibraries(libs);
+  }
 
-	public boolean isBuiltInLnF()
-	{
-		return this.isBuiltIn;
-	}
+  public boolean isBuiltInLnF() {
+    return this.isBuiltIn;
+  }
 
-	public boolean isComplete()
-	{
-		if (this.isBuiltIn) return true;
-		return !StringUtil.isEmptyString(this.name) && !StringUtil.isEmptyString(this.className)
-			&& CollectionUtil.isNonEmpty(liblist);
-	}
+  public boolean isComplete() {
+    if (this.isBuiltIn) return true;
+    return !StringUtil.isEmptyString(this.name) && !StringUtil.isEmptyString(this.className)
+        && CollectionUtil.isNonEmpty(liblist);
+  }
 
-	@Override
-	public String toString()
-	{
-		return getName();
-	}
+  @Override
+  public String toString() {
+    return getName();
+  }
 
-	public String getName()
-	{
-		return name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public String getClassName()
-	{
-		return className;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public void setName(String name)
-	{
-		this.name = name;
-	}
+  public String getClassName() {
+    return className;
+  }
 
-	public void setClassName(String className)
-	{
-		this.className = className;
-	}
+  public void setClassName(String className) {
+    this.className = className;
+  }
 
-	public List<String> getLibraries()
-	{
-		if (this.isBuiltIn) return Collections.singletonList("rt.jar");
-		if (CollectionUtil.isEmpty(liblist)) return new ArrayList<String>(0);
-		return Collections.unmodifiableList(liblist);
-	}
+  public List<String> getLibraries() {
+    if (this.isBuiltIn) return Collections.singletonList("rt.jar");
+    if (CollectionUtil.isEmpty(liblist)) return new ArrayList<String>(0);
+    return Collections.unmodifiableList(liblist);
+  }
 
-	public void setLibraries(List<String> list)
-	{
-		if (list != null)
-		{
-			liblist = new ArrayList<String>(list);
-		}
-		else
-		{
-			liblist = null;
-		}
-	}
+  public void setLibraries(List<String> list) {
+    if (list != null) {
+      liblist = new ArrayList<String>(list);
+    } else {
+      liblist = null;
+    }
+  }
 
-	public LnFDefinition createCopy()
-	{
-		return new LnFDefinition(getName(), getClassName(), liblist);
-	}
+  public LnFDefinition createCopy() {
+    return new LnFDefinition(getName(), getClassName(), liblist);
+  }
 
-	@Override
-	public int compareTo(LnFDefinition o)
-	{
-		String cls = o.getClassName();
-		return this.className.compareTo(cls);
-	}
+  @Override
+  public int compareTo(LnFDefinition o) {
+    String cls = o.getClassName();
+    return this.className.compareTo(cls);
+  }
 
-	@Override
-	public boolean equals(Object o)
-	{
-		if (o instanceof LnFDefinition)
-		{
-			LnFDefinition other = (LnFDefinition)o;
-			return this.className.equals(other.className);
-		}
-		if (o instanceof String)
-		{
-			return this.className.equals((String)o);
-		}
-		return false;
-	}
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof LnFDefinition) {
+      LnFDefinition other = (LnFDefinition) o;
+      return this.className.equals(other.className);
+    }
+    if (o instanceof String) {
+      return this.className.equals((String) o);
+    }
+    return false;
+  }
 
-	@Override
-	public int hashCode()
-	{
-		return this.className.hashCode();
-	}
+  @Override
+  public int hashCode() {
+    return this.className.hashCode();
+  }
 
 }

@@ -22,14 +22,13 @@
  */
 package workbench.gui.dbobjects;
 
-import java.awt.EventQueue;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
-
 import workbench.WbManager;
+import workbench.db.ConnectionProfile;
+import workbench.db.WbConnection;
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.WindowTitleBuilder;
+import workbench.gui.components.ConnectionSelector;
+import workbench.gui.components.RunningJobIndicator;
 import workbench.interfaces.Connectable;
 import workbench.interfaces.DbExecutionListener;
 import workbench.interfaces.StatusBar;
@@ -37,252 +36,208 @@ import workbench.interfaces.ToolWindow;
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
 
-import workbench.db.ConnectionProfile;
-import workbench.db.WbConnection;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.WindowTitleBuilder;
-import workbench.gui.components.ConnectionSelector;
-import workbench.gui.components.RunningJobIndicator;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class DbExplorerWindow
-	extends JFrame
-	implements WindowListener, Connectable, ToolWindow, DbExecutionListener
-{
-	private DbExplorerPanel panel;
-	private boolean standalone;
-	protected ConnectionSelector connectionSelector;
-	protected RunningJobIndicator jobIndicator;
+    extends JFrame
+    implements WindowListener, Connectable, ToolWindow, DbExecutionListener {
+  protected ConnectionSelector connectionSelector;
+  protected RunningJobIndicator jobIndicator;
+  private DbExplorerPanel panel;
+  private boolean standalone;
 
-	public DbExplorerWindow(DbExplorerPanel aPanel)
-	{
-		this(aPanel, null);
-	}
+  public DbExplorerWindow(DbExplorerPanel aPanel) {
+    this(aPanel, null);
+  }
 
-	public DbExplorerWindow(DbExplorerPanel aPanel, ConnectionProfile profile)
-	{
-		super();
-		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		this.panel = aPanel;
-		this.addWindowListener(this);
-		this.getContentPane().add(this.panel);
-		ResourceMgr.setWindowIcons(this, "database");
+  public DbExplorerWindow(DbExplorerPanel aPanel, ConnectionProfile profile) {
+    super();
+    this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+    this.panel = aPanel;
+    this.addWindowListener(this);
+    this.getContentPane().add(this.panel);
+    ResourceMgr.setWindowIcons(this, "database");
 
-		this.setProfile(profile);
-		this.restorePosition();
-		this.jobIndicator = new RunningJobIndicator(this);
-		this.panel.setDbExecutionListener(this);
-	}
+    this.setProfile(profile);
+    this.restorePosition();
+    this.jobIndicator = new RunningJobIndicator(this);
+    this.panel.setDbExecutionListener(this);
+  }
 
-	@Override
-	public JFrame getWindow()
-	{
-		return this;
-	}
+  public static void showWindow() {
+    EventQueue.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        DbExplorerPanel dbPanel = new DbExplorerPanel();
+        DbExplorerWindow window = new DbExplorerWindow(dbPanel);
+        window.setStandalone(true);
 
-	@Override
-	public void activate()
-	{
-		setVisible(true);
-		toFront();
-	}
+        window.restorePosition();
+        dbPanel.restoreSettings();
 
-	@Override
-	public String getDefaultIconName()
-	{
-		return "database";
-	}
+        window.setVisible(true);
+        window.selectConnection();
+      }
+    });
+  }
 
-	public final void setProfile(ConnectionProfile profile)
-	{
-		WindowTitleBuilder builder = new WindowTitleBuilder();
-		builder.setShowWorkspace(false);
-		String windowTitle = builder.getWindowTitle(profile, null, null, ResourceMgr.getString("TxtDbExplorerTitel"));
-		setTitle(windowTitle);
-	}
+  @Override
+  public JFrame getWindow() {
+    return this;
+  }
 
-	public void setStandalone(boolean flag)
-	{
-		this.standalone = flag;
-		if (flag)
-		{
-			WbManager.getInstance().registerToolWindow(this);
-			this.connectionSelector = new ConnectionSelector(this, this);
-			this.connectionSelector.setPropertyKey("workbench.dbexplorer.connection.last");
-			this.panel.showConnectButton(this.connectionSelector);
-		}
-	}
+  @Override
+  public void activate() {
+    setVisible(true);
+    toFront();
+  }
 
-	public void selectConnection()
-	{
-		connectionSelector.selectConnection();
-	}
+  @Override
+  public String getDefaultIconName() {
+    return "database";
+  }
 
-	@Override
-	public void executionEnd(WbConnection conn, Object source)
-	{
-		jobIndicator.jobEnded();
-	}
+  public final void setProfile(ConnectionProfile profile) {
+    WindowTitleBuilder builder = new WindowTitleBuilder();
+    builder.setShowWorkspace(false);
+    String windowTitle = builder.getWindowTitle(profile, null, null, ResourceMgr.getString("TxtDbExplorerTitel"));
+    setTitle(windowTitle);
+  }
 
-	@Override
-	public void executionStart(WbConnection conn, Object source)
-	{
-		jobIndicator.jobStarted();
-	}
+  public void setStandalone(boolean flag) {
+    this.standalone = flag;
+    if (flag) {
+      WbManager.getInstance().registerToolWindow(this);
+      this.connectionSelector = new ConnectionSelector(this, this);
+      this.connectionSelector.setPropertyKey("workbench.dbexplorer.connection.last");
+      this.panel.showConnectButton(this.connectionSelector);
+    }
+  }
 
-	@Override
-	public WbConnection getConnection()
-	{
-		return panel.getConnection();
-	}
+  public void selectConnection() {
+    connectionSelector.selectConnection();
+  }
 
-	@Override
-	public void closeWindow()
-	{
-		this.saveSettings();
-		this.disconnect();
-		this.panel.explorerWindowClosed();
-		this.setVisible(false);
-		this.dispose();
-	}
+  @Override
+  public void executionEnd(WbConnection conn, Object source) {
+    jobIndicator.jobEnded();
+  }
 
-	@Override
-	public void disconnect()
-	{
-		this.panel.disconnect();
-	}
+  @Override
+  public void executionStart(WbConnection conn, Object source) {
+    jobIndicator.jobStarted();
+  }
 
-	public void saveSettings()
-	{
-		Settings.getInstance().storeWindowPosition(this);
-		Settings.getInstance().storeWindowSize(this);
-		this.panel.saveSettings();
-	}
+  @Override
+  public WbConnection getConnection() {
+    return panel.getConnection();
+  }
 
-	public final void restorePosition()
-	{
-		Settings s = Settings.getInstance();
+  @Override
+  public void closeWindow() {
+    this.saveSettings();
+    this.disconnect();
+    this.panel.explorerWindowClosed();
+    this.setVisible(false);
+    this.dispose();
+  }
 
-		if (!s.restoreWindowSize(this))
-		{
-			this.setSize(950,750);
-		}
+  @Override
+  public void disconnect() {
+    this.panel.disconnect();
+  }
 
-		if (!s.restoreWindowPosition(this))
-		{
-			WbSwingUtilities.center(this, null);
-		}
-	}
+  public void saveSettings() {
+    Settings.getInstance().storeWindowPosition(this);
+    Settings.getInstance().storeWindowSize(this);
+    this.panel.saveSettings();
+  }
 
-	@Override
-	public void windowActivated(WindowEvent e)
-	{
-	}
+  public final void restorePosition() {
+    Settings s = Settings.getInstance();
 
-	@Override
-	public void windowClosed(WindowEvent e)
-	{
-		if (standalone)
-		{
-			WbManager.getInstance().unregisterToolWindow(this);
-		}
-		else
-		{
-			if (this.panel != null)
-			{
-				panel.explorerWindowClosed();
-			}
-		}
-	}
+    if (!s.restoreWindowSize(this)) {
+      this.setSize(950, 750);
+    }
 
-	@Override
-	public void windowClosing(WindowEvent e)
-	{
-		if (panel.canClosePanel(true))
-		{
-			closeWindow();
-		}
-	}
+    if (!s.restoreWindowPosition(this)) {
+      WbSwingUtilities.center(this, null);
+    }
+  }
 
-	@Override
-	public void windowDeactivated(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowActivated(WindowEvent e) {
+  }
 
-	@Override
-	public void windowDeiconified(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowClosed(WindowEvent e) {
+    if (standalone) {
+      WbManager.getInstance().unregisterToolWindow(this);
+    } else {
+      if (this.panel != null) {
+        panel.explorerWindowClosed();
+      }
+    }
+  }
 
-	@Override
-	public void windowIconified(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowClosing(WindowEvent e) {
+    if (panel.canClosePanel(true)) {
+      closeWindow();
+    }
+  }
 
-	@Override
-	public void windowOpened(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowDeactivated(WindowEvent e) {
+  }
 
-	public static void showWindow()
-	{
-		EventQueue.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				DbExplorerPanel dbPanel = new DbExplorerPanel();
-				DbExplorerWindow window = new DbExplorerWindow(dbPanel);
-				window.setStandalone(true);
+  @Override
+  public void windowDeiconified(WindowEvent e) {
+  }
 
-				window.restorePosition();
-				dbPanel.restoreSettings();
+  @Override
+  public void windowIconified(WindowEvent e) {
+  }
 
-				window.setVisible(true);
-				window.selectConnection();
-			}
-		});
-	}
+  @Override
+  public void windowOpened(WindowEvent e) {
+  }
 
-	@Override
-	public boolean connectBegin(ConnectionProfile profile, StatusBar info, final boolean loadWorkspace)
-	{
-		return true;
-	}
+  @Override
+  public boolean connectBegin(ConnectionProfile profile, StatusBar info, final boolean loadWorkspace) {
+    return true;
+  }
 
-	@Override
-	public void connectCancelled()
-	{
-	}
+  @Override
+  public void connectCancelled() {
+  }
 
-	@Override
-	public void connectFailed(String error)
-	{
-		this.setProfile(null);
-		this.panel.setConnection(null);
-		WbSwingUtilities.showFriendlyErrorMessage(this, ResourceMgr.getString("ErrConnectFailed"), error.trim());
-	}
+  @Override
+  public void connectFailed(String error) {
+    this.setProfile(null);
+    this.panel.setConnection(null);
+    WbSwingUtilities.showFriendlyErrorMessage(this, ResourceMgr.getString("ErrConnectFailed"), error.trim());
+  }
 
-	@Override
-	public void connected(WbConnection conn)
-	{
-		this.setProfile(conn.getProfile());
-		this.panel.setConnection(conn);
-	}
+  @Override
+  public void connected(WbConnection conn) {
+    this.setProfile(conn.getProfile());
+    this.panel.setConnection(conn);
+  }
 
-	@Override
-	public String getConnectionId(ConnectionProfile profile)
-	{
-		if (this.panel == null) return "DbExplorerWindow";
-		return this.panel.getId();
-	}
+  @Override
+  public String getConnectionId(ConnectionProfile profile) {
+    if (this.panel == null) return "DbExplorerWindow";
+    return this.panel.getId();
+  }
 
-	@Override
-	public void connectEnded()
-	{
-	}
+  @Override
+  public void connectEnded() {
+  }
 }

@@ -23,26 +23,22 @@ package workbench.resource;
 /**
  * An Enum to indicate the identifiers should be handled in the auto completion and SQL formatter
  *
- * @see workbench.gui.completion.CompletionPopup
- *
  * @author Thomas Kellerer
+ * @see workbench.gui.completion.CompletionPopup
  */
-public enum GeneratedIdentifierCase
-{
-	lower("LblLowercase"),
-	upper("LblUppercase"),
-	asIs("LblAsIs");
+public enum GeneratedIdentifierCase {
+  lower("LblLowercase"),
+  upper("LblUppercase"),
+  asIs("LblAsIs");
 
-	private String label;
+  private String label;
 
-	private GeneratedIdentifierCase(String resourceKey)
-	{
-		this.label = ResourceMgr.getString(resourceKey);
-	}
+  private GeneratedIdentifierCase(String resourceKey) {
+    this.label = ResourceMgr.getString(resourceKey);
+  }
 
-	@Override
-	public String toString()
-	{
-		return label;
-	}
+  @Override
+  public String toString() {
+    return label;
+  }
 }

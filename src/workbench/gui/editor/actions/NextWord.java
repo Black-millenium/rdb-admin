@@ -22,84 +22,67 @@
  */
 package workbench.gui.editor.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.KeyStroke;
-
 import workbench.gui.editor.InputHandler;
 import workbench.gui.editor.JEditTextArea;
 import workbench.gui.editor.TextUtilities;
 import workbench.resource.PlatformShortcuts;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class NextWord
-	extends EditorAction
-{
-	protected boolean select;
+    extends EditorAction {
+  protected boolean select;
 
 
-	public NextWord()
-	{
-		super("TxtEdNxtWord", PlatformShortcuts.getDefaultNextWord(false));
-		select = false;
-	}
+  public NextWord() {
+    super("TxtEdNxtWord", PlatformShortcuts.getDefaultNextWord(false));
+    select = false;
+  }
 
-	public NextWord(String resourceKey, KeyStroke key)
-	{
-		super(resourceKey, key);
-	}
+  public NextWord(String resourceKey, KeyStroke key) {
+    super(resourceKey, key);
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt)
-	{
-		JEditTextArea textArea = InputHandler.getTextArea(evt);
-		jump(textArea, select);
-	}
+  public static void jump(JEditTextArea textArea, boolean select) {
+    int caret = textArea.getCaretPosition();
+    int line = textArea.getCaretLine();
+    int lineStart = textArea.getLineStartOffset(line);
+    int lineEnd = textArea.getLineEndOffset(line);
+    caret -= lineStart;
 
-	public static void jump(JEditTextArea textArea, boolean select)
-	{
-		int caret = textArea.getCaretPosition();
-		int line = textArea.getCaretLine();
-		int lineStart = textArea.getLineStartOffset(line);
-		int lineEnd = textArea.getLineEndOffset(line);
-		caret -= lineStart;
+    String lineText = textArea.getLineText(textArea.getCaretLine());
 
-		String lineText = textArea.getLineText(textArea.getCaretLine());
+    if (caret == lineText.length()) {
+      if (lineStart + caret == textArea.getDocumentLength()) {
+        textArea.getToolkit().beep();
+        return;
+      }
+      caret++;
+    } else {
+      caret = TextUtilities.findWordEnd(lineText, caret);
+    }
 
-		if (caret == lineText.length())
-		{
-			if (lineStart + caret == textArea.getDocumentLength())
-			{
-				textArea.getToolkit().beep();
-				return;
-			}
-			caret++;
-		}
-		else
-		{
-			caret = TextUtilities.findWordEnd(lineText, caret);
-		}
+    int newPos = 0;
+    if (caret == -1) {
+      newPos = lineEnd - 1;
+    } else {
+      newPos = lineStart + caret;
+    }
 
-		int newPos = 0;
-		if (caret == -1)
-		{
-			newPos = lineEnd - 1;
-		}
-		else
-		{
-			newPos = lineStart + caret;
-		}
+    if (select) {
+      textArea.select(textArea.getMarkPosition(), newPos);
+    } else {
+      textArea.setCaretPosition(newPos);
+    }
+  }
 
-		if (select)
-		{
-			textArea.select(textArea.getMarkPosition(), newPos);
-		}
-		else
-		{
-			textArea.setCaretPosition(newPos);
-		}
-	}
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    JEditTextArea textArea = InputHandler.getTextArea(evt);
+    jump(textArea, select);
+  }
 }

@@ -22,38 +22,30 @@
  */
 package workbench.gui.components;
 
-import java.awt.Component;
-import java.awt.event.KeyListener;
-import java.util.List;
-
-import javax.swing.ComboBoxEditor;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-
 import workbench.interfaces.PropertyStorage;
 import workbench.resource.Settings;
-
 import workbench.util.FixedSizeList;
 import workbench.util.StringUtil;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyListener;
+import java.util.List;
 
 /**
  * @author Thomas Kellerer
  */
 public class HistoryTextField
-	extends JComboBox
-{
-	private String propName;
-	private FixedSizeList<String> historyValues;
-	private TextComponentMouseListener contextMenu;
+    extends JComboBox {
+  private String propName;
+  private FixedSizeList<String> historyValues;
+  private TextComponentMouseListener contextMenu;
 
-	public HistoryTextField()
-	{
-		this(null);
-	}
+  public HistoryTextField() {
+    this(null);
+  }
 
-  public HistoryTextField(String prop)
-  {
+  public HistoryTextField(String prop) {
     super();
     setEditable(true);
     setSettingsProperty(prop);
@@ -70,108 +62,89 @@ public class HistoryTextField
     setFocusTraversalKeysEnabled(true);
   }
 
-	public void dispose()
-	{
-		historyValues.clear();
-		ComboBoxEditor ed = getEditor();
-		if (ed != null)
-		{
-			Component comp = ed.getEditorComponent();
-			if (comp != null)
-			{
-				comp.removeMouseListener(contextMenu);
-				KeyListener[] keyListeners = comp.getKeyListeners();
-				for (KeyListener l : keyListeners)
-				{
-					comp.removeKeyListener(l);
-				}
-			}
-		}
-		contextMenu.dispose();
-	}
+  public void dispose() {
+    historyValues.clear();
+    ComboBoxEditor ed = getEditor();
+    if (ed != null) {
+      Component comp = ed.getEditorComponent();
+      if (comp != null) {
+        comp.removeMouseListener(contextMenu);
+        KeyListener[] keyListeners = comp.getKeyListeners();
+        for (KeyListener l : keyListeners) {
+          comp.removeKeyListener(l);
+        }
+      }
+    }
+    contextMenu.dispose();
+  }
 
-	public void setSettingsProperty(String prop)
-	{
-		propName = prop;
-		int maxHistorySize = Settings.getInstance().getIntProperty("workbench.history." + propName + ".size", 25);
-		historyValues = new FixedSizeList<>(maxHistorySize);
-	}
+  public void setSettingsProperty(String prop) {
+    propName = prop;
+    int maxHistorySize = Settings.getInstance().getIntProperty("workbench.history." + propName + ".size", 25);
+    historyValues = new FixedSizeList<>(maxHistorySize);
+  }
 
-	public void selectAll()
-	{
+  public void selectAll() {
     Component comp = getEditor().getEditorComponent();
-    if (comp instanceof JTextField)
-    {
-      JTextField text = (JTextField)comp;
+    if (comp instanceof JTextField) {
+      JTextField text = (JTextField) comp;
       text.select(0, text.getText().length());
     }
-	}
+  }
 
-	public void setColumns(int cols)
-	{
-		StringBuilder b = new StringBuilder(cols);
-		for (int i=0; i < cols; i++) b.append('w');
-		this.setPrototypeDisplayValue(b);
-	}
+  public void setColumns(int cols) {
+    StringBuilder b = new StringBuilder(cols);
+    for (int i = 0; i < cols; i++) b.append('w');
+    this.setPrototypeDisplayValue(b);
+  }
 
-	public String getText()
-	{
-		Object item = getSelectedItem();
-		if (item == null) item = getEditor().getItem();
-		if (item == null) return null;
-		return (String)item;
-	}
+  public String getText() {
+    Object item = getSelectedItem();
+    if (item == null) item = getEditor().getItem();
+    if (item == null) return null;
+    return (String) item;
+  }
 
-	public void setText(String s)
-	{
-    if (!StringUtil.equalString(s, getText()))
-    {
+  public void setText(String s) {
+    if (!StringUtil.equalString(s, getText())) {
       setSelectedItem(s);
     }
-	}
+  }
 
-	public void saveSettings(PropertyStorage props, String prefix)
-	{
-		props.setProperty(prefix + propName + ".history", StringUtil.listToString(historyValues, ';', true));
-		props.setProperty(prefix + propName + ".lastvalue", this.getText());
-	}
+  public void saveSettings(PropertyStorage props, String prefix) {
+    props.setProperty(prefix + propName + ".history", StringUtil.listToString(historyValues, ';', true));
+    props.setProperty(prefix + propName + ".lastvalue", this.getText());
+  }
 
-  public void restoreSettings(PropertyStorage props, String prefix)
-  {
+  public void restoreSettings(PropertyStorage props, String prefix) {
     String s = props.getProperty(prefix + propName + ".history", "");
     List<String> l = StringUtil.stringToList(s, ";", true, true);
     this.setText("");
     this.historyValues.clear();
-    for (String value : l)
-    {
+    for (String value : l) {
       historyValues.append(value);
     }
     this.updateModel();
     String lastValue = props.getProperty(prefix + propName + ".lastvalue", null);
 
-    if (lastValue != null)
-    {
+    if (lastValue != null) {
       setText(lastValue);
     }
   }
 
-	public void restoreSettings()
-	{
-		restoreSettings(Settings.getInstance(), "workbench.quickfilter.");
-	}
+  public void restoreSettings() {
+    restoreSettings(Settings.getInstance(), "workbench.quickfilter.");
+  }
 
-	public void saveSettings()
-	{
-		saveSettings(Settings.getInstance(), "workbench.quickfilter." );
-	}
+  public void saveSettings() {
+    saveSettings(Settings.getInstance(), "workbench.quickfilter.");
+  }
 
-	public void storeCurrent()
-	{
-		addToHistory(getText());
-	}
+  public void storeCurrent() {
+    addToHistory(getText());
+  }
 
-  public void addToHistory(String s)
-  {
+  public void addToHistory(String s) {
     if (StringUtil.isEmptyString(s)) return;
     s = s.trim();
     Object item = getSelectedItem();
@@ -180,11 +153,9 @@ public class HistoryTextField
     setSelectedItem(item);
   }
 
-  private void updateModel()
-  {
+  private void updateModel() {
     DefaultComboBoxModel model = new DefaultComboBoxModel();
-    for (String entry : this.historyValues.getEntries())
-    {
+    for (String entry : this.historyValues.getEntries()) {
       model.addElement(entry);
     }
     setModel(model);

@@ -22,15 +22,16 @@
  */
 package workbench.gui.components;
 
-import java.awt.Color;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import javax.swing.JComponent;
+import workbench.resource.Settings;
+
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import workbench.resource.Settings;
+import java.awt.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 /**
  * A class that draws a border around the currently focused component
@@ -38,66 +39,55 @@ import workbench.resource.Settings;
  * @author Thomas Kellerer
  */
 public class FocusIndicator
-	implements FocusListener
-{
-	private Border focusBorder;
-	private Border noFocusBorder;
-	private Border originalBorder;
-	private JComponent focusClient;
-	private JComponent borderClient;
-	private Color borderColor;
+    implements FocusListener {
+  private Border focusBorder;
+  private Border noFocusBorder;
+  private Border originalBorder;
+  private JComponent focusClient;
+  private JComponent borderClient;
+  private Color borderColor;
 
-	public FocusIndicator(JComponent focusToCheck, JComponent client)
-	{
-		focusClient = focusToCheck;
-		focusClient.addFocusListener(this);
-		borderClient = client;
-		borderColor = Settings.getInstance().getColor("workbench.gui.focusindicator.bordercolor", Color.YELLOW.brighter());
-		initBorder();
-	}
+  public FocusIndicator(JComponent focusToCheck, JComponent client) {
+    focusClient = focusToCheck;
+    focusClient.addFocusListener(this);
+    borderClient = client;
+    borderColor = Settings.getInstance().getColor("workbench.gui.focusindicator.bordercolor", Color.YELLOW.brighter());
+    initBorder();
+  }
 
-	private void initBorder()
-	{
-		if (noFocusBorder == null && focusBorder == null && originalBorder == null)
-		{
-			originalBorder = borderClient.getBorder();
-			noFocusBorder = new CompoundBorder(new EmptyBorder(1,1,1,1), originalBorder);
-			borderClient.setBorder(noFocusBorder);
-			focusBorder = new CompoundBorder(new LineBorder(borderColor, 1), originalBorder);
-		}
-	}
+  private void initBorder() {
+    if (noFocusBorder == null && focusBorder == null && originalBorder == null) {
+      originalBorder = borderClient.getBorder();
+      noFocusBorder = new CompoundBorder(new EmptyBorder(1, 1, 1, 1), originalBorder);
+      borderClient.setBorder(noFocusBorder);
+      focusBorder = new CompoundBorder(new LineBorder(borderColor, 1), originalBorder);
+    }
+  }
 
-	public void dispose()
-	{
-		if (this.focusClient != null)
-		{
-			focusClient.removeFocusListener(this);
-		}
+  public void dispose() {
+    if (this.focusClient != null) {
+      focusClient.removeFocusListener(this);
+    }
 
-		if (this.borderClient != null && originalBorder != null)
-		{
-			this.borderClient.setBorder(originalBorder);
-		}
-	}
+    if (this.borderClient != null && originalBorder != null) {
+      this.borderClient.setBorder(originalBorder);
+    }
+  }
 
-	@Override
-	public void focusGained(FocusEvent e)
-	{
-		if (this.borderClient != null)
-		{
-			initBorder();
-			this.borderClient.setBorder(focusBorder);
-		}
-	}
+  @Override
+  public void focusGained(FocusEvent e) {
+    if (this.borderClient != null) {
+      initBorder();
+      this.borderClient.setBorder(focusBorder);
+    }
+  }
 
-	@Override
-	public void focusLost(FocusEvent e)
-	{
-		if (this.borderClient != null)
-		{
-			initBorder();
-			this.borderClient.setBorder(noFocusBorder);
-		}
-	}
+  @Override
+  public void focusLost(FocusEvent e) {
+    if (this.borderClient != null) {
+      initBorder();
+      this.borderClient.setBorder(noFocusBorder);
+    }
+  }
 
 }

@@ -25,27 +25,25 @@ package workbench.log;
 import java.io.File;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface WbLogger
-{
+public interface WbLogger {
 
-	void setRootLevel(LogLevel level);
+  LogLevel getRootLevel();
 
-	LogLevel getRootLevel();
+  void setRootLevel(LogLevel level);
 
-	void logMessage(LogLevel level, Object caller, CharSequence msg, Throwable th);
+  void logMessage(LogLevel level, Object caller, CharSequence msg, Throwable th);
 
-	void setMessageFormat(String newFormat);
+  void setMessageFormat(String newFormat);
 
-	void logToSystemError(boolean flag);
+  void logToSystemError(boolean flag);
 
-	void setOutputFile(File logfile, int maxFilesize);
+  void setOutputFile(File logfile, int maxFilesize);
 
-	File getCurrentFile();
+  File getCurrentFile();
 
-	void shutdownWbLog();
+  void shutdownWbLog();
 
-	boolean levelEnabled(LogLevel tolog);
+  boolean levelEnabled(LogLevel tolog);
 }

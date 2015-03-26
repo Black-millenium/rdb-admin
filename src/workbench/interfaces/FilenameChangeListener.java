@@ -23,10 +23,8 @@
 package workbench.interfaces;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface FilenameChangeListener
-{
-	void fileNameChanged(Object sender, String newFilename);
+public interface FilenameChangeListener {
+  void fileNameChanged(Object sender, String newFilename);
 }

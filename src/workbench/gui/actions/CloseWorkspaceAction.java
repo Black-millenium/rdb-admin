@@ -22,32 +22,30 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.gui.MainWindow;
 import workbench.resource.ResourceMgr;
 
+import java.awt.event.ActionEvent;
+
 /**
  * Action to close the current workspace
- * @see workbench.gui.MainWindow#closeWorkspace(boolean) 
- * @author  Thomas Kellerer
+ *
+ * @author Thomas Kellerer
+ * @see workbench.gui.MainWindow#closeWorkspace(boolean)
  */
-public class CloseWorkspaceAction extends WbAction
-{
-	private MainWindow client;
+public class CloseWorkspaceAction extends WbAction {
+  private MainWindow client;
 
-	public CloseWorkspaceAction(MainWindow aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtCloseWorkspace", null);
-		this.setMenuItemName(ResourceMgr.MNU_TXT_WORKSPACE);
-		this.setIcon(null);
-	}
+  public CloseWorkspaceAction(MainWindow aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtCloseWorkspace", null);
+    this.setMenuItemName(ResourceMgr.MNU_TXT_WORKSPACE);
+    this.setIcon(null);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.closeWorkspace(true);
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.closeWorkspace(true);
+  }
 }

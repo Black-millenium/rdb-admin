@@ -27,75 +27,62 @@ import javax.swing.table.TableModel;
 
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class OneLineTableModel
-	implements TableModel
-{
-	private String columnTitle;
-	private String message;
+    implements TableModel {
+  private String columnTitle;
+  private String message;
 
-	public OneLineTableModel(String colTitle, String msg)
-	{
-		this.columnTitle = colTitle;
-		this.message = msg;
-	}
+  public OneLineTableModel(String colTitle, String msg) {
+    this.columnTitle = colTitle;
+    this.message = msg;
+  }
 
-	public void setMessage(String aMessage)
-	{
-		this.message = aMessage;
-	}
+  public void setMessage(String aMessage) {
+    this.message = aMessage;
+  }
 
-	@Override
-	public Object getValueAt(int row, int col)
-	{
-		return message;
-	}
+  @Override
+  public Object getValueAt(int row, int col) {
+    return message;
+  }
 
-	@Override
-	public void setValueAt(Object aValue, int row, int column)
-	{
-	}
+  @Override
+  public void setValueAt(Object aValue, int row, int column) {
+  }
 
-	@Override
-	public int getColumnCount()
-	{
-		return 1;
-	}
+  @Override
+  public int getColumnCount() {
+    return 1;
+  }
 
-	@Override
-	public int getRowCount()
-	{
-		return 1;
-	}
+  @Override
+  public int getRowCount() {
+    return 1;
+  }
 
-	@Override
-	public boolean isCellEditable(int row, int column)
-	{
-		return false;
-	}
+  @Override
+  public boolean isCellEditable(int row, int column) {
+    return false;
+  }
 
-	@Override
-	public void addTableModelListener(TableModelListener l)
-	{
-	}
+  @Override
+  public void addTableModelListener(TableModelListener l) {
+  }
 
-	@Override
-	public Class getColumnClass(int columnIndex)
-	{
-		return String.class;
-	}
+  @Override
+  public Class getColumnClass(int columnIndex) {
+    return String.class;
+  }
 
-	@Override
-	public String getColumnName(int columnIndex)
-	{
-		return this.columnTitle;
-	}
+  @Override
+  public String getColumnName(int columnIndex) {
+    return this.columnTitle;
+  }
 
-	@Override
-	public void removeTableModelListener(TableModelListener l)
-	{
-	}
+  @Override
+  public void removeTableModelListener(TableModelListener l) {
+  }
 
 }

@@ -21,128 +21,100 @@
  */
 package workbench.gui.components;
 
+import org.dbunit.dataset.*;
+import org.dbunit.dataset.datatype.DataType;
+import workbench.db.ColumnIdentifier;
+import workbench.storage.DataStore;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import workbench.db.ColumnIdentifier;
-
-import workbench.storage.DataStore;
-
-import org.dbunit.dataset.Column;
-import org.dbunit.dataset.DataSetException;
-import org.dbunit.dataset.ITable;
-import org.dbunit.dataset.ITableMetaData;
-import org.dbunit.dataset.RowOutOfBoundsException;
-import org.dbunit.dataset.datatype.DataType;
-
 /**
- *
  * @author Brian Bonner
  */
 public class DBUnitTableAdapter
-	implements ITable
-{
+    implements ITable {
 
-	private DataStore dataStore;
+  private DataStore dataStore;
 
-	public DBUnitTableAdapter(DataStore dataStore)
-	{
-		this.dataStore = dataStore;
-	}
+  public DBUnitTableAdapter(DataStore dataStore) {
+    this.dataStore = dataStore;
+  }
 
-	@Override
-	public Object getValue(int row, String column)
-		throws DataSetException
-	{
-		if (row < 0 || row >= getRowCount())
-		{
-			throw new RowOutOfBoundsException();
-		}
-		return dataStore.getValue(row, column);
-	}
+  @Override
+  public Object getValue(int row, String column)
+      throws DataSetException {
+    if (row < 0 || row >= getRowCount()) {
+      throw new RowOutOfBoundsException();
+    }
+    return dataStore.getValue(row, column);
+  }
 
-	@Override
-	public ITableMetaData getTableMetaData()
-	{
-		return new ITableMetaData()
-		{
+  @Override
+  public ITableMetaData getTableMetaData() {
+    return new ITableMetaData() {
 
-			@Override
-			public String getTableName()
-			{
-				if (dataStore.getUpdateTable() != null)
-				{
-					return dataStore.getUpdateTable().getTableName();
-				}
-				else if (dataStore.getResultInfo() != null && dataStore.getResultInfo().getUpdateTable() != null)
-				{
-					return dataStore.getResultInfo().getUpdateTable().getTableName();
-				}
-				else if (dataStore.getInsertTable() != null)
-				{
-					return dataStore.getInsertTable();
-				}
-				else
-				{
-					return "UNKNOWN";
-				}
-			}
+      @Override
+      public String getTableName() {
+        if (dataStore.getUpdateTable() != null) {
+          return dataStore.getUpdateTable().getTableName();
+        } else if (dataStore.getResultInfo() != null && dataStore.getResultInfo().getUpdateTable() != null) {
+          return dataStore.getResultInfo().getUpdateTable().getTableName();
+        } else if (dataStore.getInsertTable() != null) {
+          return dataStore.getInsertTable();
+        } else {
+          return "UNKNOWN";
+        }
+      }
 
-			@Override
-			public Column[] getPrimaryKeys()
-				throws DataSetException
-			{
-				if (!dataStore.hasPkColumns()) return null;
+      @Override
+      public Column[] getPrimaryKeys()
+          throws DataSetException {
+        if (!dataStore.hasPkColumns()) return null;
 
-				ColumnIdentifier[] columns = dataStore.getColumns();
+        ColumnIdentifier[] columns = dataStore.getColumns();
 
-				if (columns == null) return null;
+        if (columns == null) return null;
 
-				List<Column> pkCols = new ArrayList<>(1);
-				for (ColumnIdentifier col : columns)
-				{
-					if (col.isPkColumn())
-					{
-						DataType type = DataType.forSqlType(col.getDataType());
-						Column pk = new Column(col.getColumnName(), type);
-						pkCols.add(pk);
-					}
-				}
-				if (pkCols.isEmpty()) return null;
+        List<Column> pkCols = new ArrayList<>(1);
+        for (ColumnIdentifier col : columns) {
+          if (col.isPkColumn()) {
+            DataType type = DataType.forSqlType(col.getDataType());
+            Column pk = new Column(col.getColumnName(), type);
+            pkCols.add(pk);
+          }
+        }
+        if (pkCols.isEmpty()) return null;
 
-				Column[] result = pkCols.toArray(new Column[]{});
-				return result;
-			}
+        Column[] result = pkCols.toArray(new Column[]{});
+        return result;
+      }
 
-			@Override
-			public Column[] getColumns()
-				throws DataSetException
-			{
-				List<Column> columns = new ArrayList<>();
-				for (int i = 0; i < dataStore.getColumns().length; i++)
-				{
-					String columnName = dataStore.getColumnName(i);
-					DataType columnType = DataType.forSqlType(dataStore.getColumnType(i));
-					Column column = new Column(columnName, columnType);
-					columns.add(column);
-				}
-				return columns.toArray(new Column[columns.size()]);
-			}
+      @Override
+      public Column[] getColumns()
+          throws DataSetException {
+        List<Column> columns = new ArrayList<>();
+        for (int i = 0; i < dataStore.getColumns().length; i++) {
+          String columnName = dataStore.getColumnName(i);
+          DataType columnType = DataType.forSqlType(dataStore.getColumnType(i));
+          Column column = new Column(columnName, columnType);
+          columns.add(column);
+        }
+        return columns.toArray(new Column[columns.size()]);
+      }
 
-			@Override
-			public int getColumnIndex(String columnName)
-				throws DataSetException
-			{
-				return dataStore.getColumnIndex(columnName);
-			}
+      @Override
+      public int getColumnIndex(String columnName)
+          throws DataSetException {
+        return dataStore.getColumnIndex(columnName);
+      }
 
-		};
-	}
+    };
+  }
 
-	@Override
-	public int getRowCount()
-	{
-		return dataStore.getRowCount();
-	}
+  @Override
+  public int getRowCount() {
+    return dataStore.getRowCount();
+  }
 
 }

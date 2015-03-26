@@ -22,36 +22,33 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
+import workbench.gui.sql.SqlPanel;
 import workbench.resource.ResourceMgr;
 
-import workbench.gui.sql.SqlPanel;
+import java.awt.event.ActionEvent;
 
 /**
  * Select the messages panel of the SqlPanel
+ *
  * @author Thomas Kellerer
  */
 public class ViewMessageLogAction
-	extends WbAction
-{
-	private SqlPanel panel;
+    extends WbAction {
+  private SqlPanel panel;
 
-	/**
-	 * Creates a new instance of ViewMessageLogAction
-	 */
-	public ViewMessageLogAction(SqlPanel p)
-	{
-		super();
-		this.panel = p;
-		this.initMenuDefinition("MnuTxtSelectMsgLog");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_VIEW);
-	}
+  /**
+   * Creates a new instance of ViewMessageLogAction
+   */
+  public ViewMessageLogAction(SqlPanel p) {
+    super();
+    this.panel = p;
+    this.initMenuDefinition("MnuTxtSelectMsgLog");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_VIEW);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		panel.showLogPanel();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    panel.showLogPanel();
+  }
 
 }

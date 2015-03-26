@@ -22,19 +22,21 @@
  */
 package workbench.interfaces;
 
-import java.io.File;
-
 import workbench.gui.MainWindow;
 
+import java.io.File;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface TextFileContainer
-{
-	boolean saveFile();
-	boolean saveCurrentFile();
-	boolean closeFile(boolean clearText);
-	MainWindow getMainWindow();
-	File getCurrentFile();
+public interface TextFileContainer {
+  boolean saveFile();
+
+  boolean saveCurrentFile();
+
+  boolean closeFile(boolean clearText);
+
+  MainWindow getMainWindow();
+
+  File getCurrentFile();
 }

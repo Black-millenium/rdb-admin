@@ -22,13 +22,11 @@
  */
 package workbench.interfaces;
 
-import java.awt.Font;
+import java.awt.*;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface FontChangedListener
-{
-	void fontChanged(String aFontId, Font newFont);
+public interface FontChangedListener {
+  void fontChanged(String aFontId, Font newFont);
 }

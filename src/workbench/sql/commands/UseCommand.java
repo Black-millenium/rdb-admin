@@ -22,81 +22,69 @@
  */
 package workbench.sql.commands;
 
-import java.sql.SQLException;
-
-import workbench.resource.ResourceMgr;
-
 import workbench.db.CatalogChanger;
-
+import workbench.resource.ResourceMgr;
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
-
 import workbench.util.ExceptionUtil;
 import workbench.util.StringUtil;
+
+import java.sql.SQLException;
 
 /**
  * MS SQL Server's and MySQL's USE command.
  * <br/>
  * This command will also be "activated if the JDBC driver reports
  * that catalogs are supported
- *
+ * <p/>
  * This class will notify the connection of this statement that the current database has changed
  * so that the connection display in the main window can be updated.
  *
+ * @author Thomas Kellerer
  * @see workbench.db.CatalogChanger#setCurrentCatalog(workbench.db.WbConnection, java.lang.String)
  * @see workbench.sql.CommandMapper#getCommandToUse(java.lang.String)
  * @see workbench.sql.CommandMapper#addCommand(workbench.sql.SqlCommand)
- *
- * @author  Thomas Kellerer
  */
 public class UseCommand
-	extends SqlCommand
-{
-	public static final String VERB = "USE";
+    extends SqlCommand {
+  public static final String VERB = "USE";
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult(sql);
-		try
-		{
-			// everything after the USE command is the catalog name
-			String catName = getCommandLine(sql);
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult(sql);
+    try {
+      // everything after the USE command is the catalog name
+      String catName = getCommandLine(sql);
 
-			// CatalogChanger.setCurrentCatalog() will fire the
-			// catalogChanged() event on the connection!
-			CatalogChanger changer = new CatalogChanger();
-			changer.setCurrentCatalog(currentConnection, catName);
+      // CatalogChanger.setCurrentCatalog() will fire the
+      // catalogChanged() event on the connection!
+      CatalogChanger changer = new CatalogChanger();
+      changer.setCurrentCatalog(currentConnection, catName);
 
-			String newCatalog = currentConnection.getMetadata().getCurrentCatalog();
+      String newCatalog = currentConnection.getMetadata().getCurrentCatalog();
 
-			String msg = ResourceMgr.getString("MsgCatalogChanged");
-			String term = currentConnection.getMetadata().getCatalogTerm();
+      String msg = ResourceMgr.getString("MsgCatalogChanged");
+      String term = currentConnection.getMetadata().getCatalogTerm();
 
-			msg = StringUtil.replace(msg, "%newcatalog%", newCatalog);
-			msg = StringUtil.replace(msg, "%catalogterm%", StringUtil.capitalize(term));
-			result.addMessage(msg);
-			result.setSuccess();
-		}
-		catch (Exception e)
-		{
-			result.addMessage(ResourceMgr.getString("MsgExecuteError"));
-			result.addMessage(ExceptionUtil.getAllExceptions(e));
-			result.setFailure();
-		}
-		finally
-		{
-			this.done();
-		}
+      msg = StringUtil.replace(msg, "%newcatalog%", newCatalog);
+      msg = StringUtil.replace(msg, "%catalogterm%", StringUtil.capitalize(term));
+      result.addMessage(msg);
+      result.setSuccess();
+    } catch (Exception e) {
+      result.addMessage(ResourceMgr.getString("MsgExecuteError"));
+      result.addMessage(ExceptionUtil.getAllExceptions(e));
+      result.setFailure();
+    } finally {
+      this.done();
+    }
 
-		return result;
-	}
+    return result;
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
 }

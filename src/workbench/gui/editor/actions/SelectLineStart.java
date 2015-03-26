@@ -25,15 +25,12 @@ package workbench.gui.editor.actions;
 import workbench.resource.PlatformShortcuts;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class SelectLineStart
-	extends LineStart
-{
-	public SelectLineStart()
-	{
-		super("TxtEdLineStartSel", PlatformShortcuts.getDefaultStartOfLine(true));
-		select = true;
-	}
+    extends LineStart {
+  public SelectLineStart() {
+    super("TxtEdLineStartSel", PlatformShortcuts.getDefaultStartOfLine(true));
+    select = true;
+  }
 }

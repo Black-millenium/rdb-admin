@@ -23,10 +23,8 @@
 package workbench.interfaces;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface FormattableSql
-{
-	void reformatSql();
+public interface FormattableSql {
+  void reformatSql();
 }

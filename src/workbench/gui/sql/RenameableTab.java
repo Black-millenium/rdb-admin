@@ -22,18 +22,20 @@
  */
 package workbench.gui.sql;
 
-import java.awt.Component;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface RenameableTab
-{
-	void setCurrentTabTitle(String newName);
-	String getCurrentTabTitle();
-	boolean canRenameTab();
-	void addTabChangeListener(ChangeListener listener);
-	Component getComponent();
+public interface RenameableTab {
+  String getCurrentTabTitle();
+
+  void setCurrentTabTitle(String newName);
+
+  boolean canRenameTab();
+
+  void addTabChangeListener(ChangeListener listener);
+
+  Component getComponent();
 }

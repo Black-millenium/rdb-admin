@@ -26,23 +26,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class SetColumnWidthAction extends WbAction
-{
-	private ActionListener client;
+public class SetColumnWidthAction extends WbAction {
+  private ActionListener client;
 
-	public SetColumnWidthAction(ActionListener aClient)
-	{
-		super();
-		this.client = aClient;
-		this.setMenuTextByKey("MnuTxtSetColWidth");
-	}
+  public SetColumnWidthAction(ActionListener aClient) {
+    super();
+    this.client = aClient;
+    this.setMenuTextByKey("MnuTxtSetColWidth");
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		e.setSource(this);
-		this.client.actionPerformed(e);
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    e.setSource(this);
+    this.client.actionPerformed(e);
+  }
 }

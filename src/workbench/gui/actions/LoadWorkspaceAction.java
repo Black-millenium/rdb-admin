@@ -22,38 +22,33 @@
  */
 package workbench.gui.actions;
 
+import workbench.gui.MainWindow;
+import workbench.resource.PlatformShortcuts;
+import workbench.resource.ResourceMgr;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.KeyStroke;
-
-import workbench.resource.PlatformShortcuts;
-import workbench.resource.ResourceMgr;
-
-import workbench.gui.MainWindow;
-
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class LoadWorkspaceAction
-	extends WbAction
-{
-	private MainWindow client;
+    extends WbAction {
+  private MainWindow client;
 
-	public LoadWorkspaceAction(MainWindow aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtLoadWorkspace", KeyStroke.getKeyStroke(KeyEvent.VK_O, PlatformShortcuts.getDefaultModifier() | InputEvent.SHIFT_MASK));
-		this.setMenuItemName(ResourceMgr.MNU_TXT_WORKSPACE);
-		this.setIcon(null);
-	}
+  public LoadWorkspaceAction(MainWindow aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtLoadWorkspace", KeyStroke.getKeyStroke(KeyEvent.VK_O, PlatformShortcuts.getDefaultModifier() | InputEvent.SHIFT_MASK));
+    this.setMenuItemName(ResourceMgr.MNU_TXT_WORKSPACE);
+    this.setIcon(null);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.loadWorkspace();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.loadWorkspace();
+  }
 
 }

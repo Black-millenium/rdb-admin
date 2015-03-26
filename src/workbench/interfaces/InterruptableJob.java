@@ -23,11 +23,9 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public interface InterruptableJob
-	extends Interruptable
-{
-	void cancelCurrent();
+    extends Interruptable {
+  void cancelCurrent();
 }

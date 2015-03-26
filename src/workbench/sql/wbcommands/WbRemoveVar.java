@@ -22,74 +22,62 @@
  */
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-
 import workbench.resource.ResourceMgr;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
 import workbench.sql.VariablePool;
+
+import java.sql.SQLException;
 
 /**
  * Delete a variable defined through {@link WbDefineVar}.
  *
  * @author Thomas Kellerer
  */
-public class WbRemoveVar extends SqlCommand
-{
-	public static final String VERB = "WbVarDelete";
+public class WbRemoveVar extends SqlCommand {
+  public static final String VERB = "WbVarDelete";
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sqlCommand)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
-		String var = getCommandLine(sqlCommand);
+  @Override
+  public StatementRunnerResult execute(String sqlCommand)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult();
+    String var = getCommandLine(sqlCommand);
 
-		String msg = null;
+    String msg = null;
 
-		if (var == null || var.length() == 0)
-		{
-			result.addMessage(ResourceMgr.getString("ErrVarRemoveWrongParameter"));
-			result.setFailure();
-			return result;
-		}
-		else
-		{
-			boolean removed = VariablePool.getInstance().removeValue(var);
-			if (removed)
-			{
-				msg = ResourceMgr.getString("MsgVarDefVariableRemoved");
-			}
-			else
-			{
-				msg = ResourceMgr.getString("MsgVarDefVariableNotRemoved");
-			}
-			msg = msg.replace("%var%", var);
-		}
+    if (var == null || var.length() == 0) {
+      result.addMessage(ResourceMgr.getString("ErrVarRemoveWrongParameter"));
+      result.setFailure();
+      return result;
+    } else {
+      boolean removed = VariablePool.getInstance().removeValue(var);
+      if (removed) {
+        msg = ResourceMgr.getString("MsgVarDefVariableRemoved");
+      } else {
+        msg = ResourceMgr.getString("MsgVarDefVariableNotRemoved");
+      }
+      msg = msg.replace("%var%", var);
+    }
 
-		result.addMessage(msg);
-		result.setSuccess();
+    result.addMessage(msg);
+    result.setSuccess();
 
-		return result;
-	}
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 
 }

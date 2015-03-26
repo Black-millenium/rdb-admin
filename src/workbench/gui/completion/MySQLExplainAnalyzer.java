@@ -22,94 +22,73 @@
  */
 package workbench.gui.completion;
 
+import workbench.db.WbConnection;
+import workbench.log.LogMgr;
+import workbench.sql.lexer.SQLLexer;
+import workbench.sql.lexer.SQLLexerFactory;
+import workbench.sql.lexer.SQLToken;
+import workbench.util.CollectionUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 
-import workbench.log.LogMgr;
-
-import workbench.db.WbConnection;
-
-import workbench.sql.lexer.SQLLexer;
-import workbench.sql.lexer.SQLLexerFactory;
-import workbench.sql.lexer.SQLToken;
-
-import workbench.util.CollectionUtil;
-
 /**
- *
  * @author Thomas Kellerer
  */
 public class MySQLExplainAnalyzer
-	extends ExplainAnalyzer
-{
+    extends ExplainAnalyzer {
 
-	public MySQLExplainAnalyzer(WbConnection conn, String statement, int cursorPos)
-	{
-		super(conn, statement, cursorPos);
-	}
+  public MySQLExplainAnalyzer(WbConnection conn, String statement, int cursorPos) {
+    super(conn, statement, cursorPos);
+  }
 
-	@Override
-	protected int getStatementStart(String sql)
-	{
-		try
-		{
-			SQLLexer lexer = SQLLexerFactory.createLexer(dbConnection, sql);
-			SQLToken t = lexer.getNextToken(false, false);
-			while (t != null)
-			{
-				// Only SELECT statements are supported
-				if (t.getText().equalsIgnoreCase("SELECT"))
-				{
-					return t.getCharBegin();
-				}
-				t = lexer.getNextToken(false, false);
-			}
-			return Integer.MAX_VALUE;
-		}
-		catch (Exception e)
-		{
-			return Integer.MAX_VALUE;
-		}
-	}
+  @Override
+  protected int getStatementStart(String sql) {
+    try {
+      SQLLexer lexer = SQLLexerFactory.createLexer(dbConnection, sql);
+      SQLToken t = lexer.getNextToken(false, false);
+      while (t != null) {
+        // Only SELECT statements are supported
+        if (t.getText().equalsIgnoreCase("SELECT")) {
+          return t.getCharBegin();
+        }
+        t = lexer.getNextToken(false, false);
+      }
+      return Integer.MAX_VALUE;
+    } catch (Exception e) {
+      return Integer.MAX_VALUE;
+    }
+  }
 
-	@Override
-	protected void checkContext()
-	{
-		Set<String> allOptions = CollectionUtil.caseInsensitiveSet("EXTENDED", "PARTITIONS");
-		Set<String> usedOptions = CollectionUtil.caseInsensitiveSet();
+  @Override
+  protected void checkContext() {
+    Set<String> allOptions = CollectionUtil.caseInsensitiveSet("EXTENDED", "PARTITIONS");
+    Set<String> usedOptions = CollectionUtil.caseInsensitiveSet();
 
-		String sqlToParse = getExplainSql();
-		try
-		{
-			SQLLexer lexer = SQLLexerFactory.createLexer(dbConnection, sqlToParse);
-			SQLToken t = lexer.getNextToken(false, false);
-			while (t != null)
-			{
-				String v = t.getText();
-				if (!v.equalsIgnoreCase("EXPLAIN"))
-				{
-					usedOptions.add(v);
-				}
-				t = lexer.getNextToken(false, false);
-			}
-			if (usedOptions.isEmpty())
-			{
-				this.elements = new ArrayList<>(allOptions);
-			}
-			else
-			{
-				// only one option allowed
-				this.elements = Collections.emptyList();
-			}
-			this.context = CONTEXT_SYNTAX_COMPLETION;
-		}
-		catch (Exception e)
-		{
-			LogMgr.logError("MySQLExplainAnalyzer.checkContext()", "Error getting optiosn", e);
-			this.elements = new ArrayList<>();
-			this.context = NO_CONTEXT;
-		}
-	}
+    String sqlToParse = getExplainSql();
+    try {
+      SQLLexer lexer = SQLLexerFactory.createLexer(dbConnection, sqlToParse);
+      SQLToken t = lexer.getNextToken(false, false);
+      while (t != null) {
+        String v = t.getText();
+        if (!v.equalsIgnoreCase("EXPLAIN")) {
+          usedOptions.add(v);
+        }
+        t = lexer.getNextToken(false, false);
+      }
+      if (usedOptions.isEmpty()) {
+        this.elements = new ArrayList<>(allOptions);
+      } else {
+        // only one option allowed
+        this.elements = Collections.emptyList();
+      }
+      this.context = CONTEXT_SYNTAX_COMPLETION;
+    } catch (Exception e) {
+      LogMgr.logError("MySQLExplainAnalyzer.checkContext()", "Error getting optiosn", e);
+      this.elements = new ArrayList<>();
+      this.context = NO_CONTEXT;
+    }
+  }
 
 }

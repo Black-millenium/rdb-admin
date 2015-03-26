@@ -26,14 +26,13 @@ import workbench.resource.Settings;
 
 /**
  * Toggle the display of line numbers in the editor
- * @author  Thomas Kellerer
+ *
+ * @author Thomas Kellerer
  */
-public class ViewLineNumbers 
-	extends CheckBoxAction
-{
-	public ViewLineNumbers()
-	{
-		super("MnuTxtShowLineNumbers", Settings.PROPERTY_SHOW_LINE_NUMBERS);
-	}
+public class ViewLineNumbers
+    extends CheckBoxAction {
+  public ViewLineNumbers() {
+    super("MnuTxtShowLineNumbers", Settings.PROPERTY_SHOW_LINE_NUMBERS);
+  }
 
 }

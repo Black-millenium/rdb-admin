@@ -22,40 +22,35 @@
  */
 package workbench.gui.profiles;
 
-import java.awt.event.ActionEvent;
+import workbench.gui.actions.WbAction;
 
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-
-import workbench.gui.actions.WbAction;
+import java.awt.event.ActionEvent;
 
 /**
  * @author Thomas Kellerer
  */
 public class RenameGroupAction
-	extends WbAction
-	implements TreeSelectionListener
-{
-	private ProfileTree client;
+    extends WbAction
+    implements TreeSelectionListener {
+  private ProfileTree client;
 
-	public RenameGroupAction(ProfileTree panel)
-	{
-		super();
-		this.client = panel;
-		this.client.addTreeSelectionListener(this);
-		this.initMenuDefinition("LblRenameProfileGroup");
-	}
+  public RenameGroupAction(ProfileTree panel) {
+    super();
+    this.client = panel;
+    this.client.addTreeSelectionListener(this);
+    this.initMenuDefinition("LblRenameProfileGroup");
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		client.renameGroup();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    client.renameGroup();
+  }
 
-	@Override
-	public void valueChanged(TreeSelectionEvent e)
-	{
-		this.setEnabled(client.onlyGroupSelected());
-	}
+  @Override
+  public void valueChanged(TreeSelectionEvent e) {
+    this.setEnabled(client.onlyGroupSelected());
+  }
 
 }

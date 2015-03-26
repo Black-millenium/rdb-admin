@@ -25,17 +25,14 @@ package workbench.gui.editor.actions;
 import workbench.resource.PlatformShortcuts;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class SelectPrevWord
-	extends PrevWord
-{
+    extends PrevWord {
 
-	public SelectPrevWord()
-	{
-		super("TxtEdPrvWordSel", PlatformShortcuts.getDefaultPrevWord(true));
-		select = true;
-	}
+  public SelectPrevWord() {
+    super("TxtEdPrvWordSel", PlatformShortcuts.getDefaultPrevWord(true));
+    select = true;
+  }
 
 }

@@ -23,135 +23,137 @@
 package workbench.gui.settings;
 
 
-import java.awt.*;
-
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.components.WbColorPicker;
 import workbench.interfaces.Restoreable;
 import workbench.interfaces.ValidatingComponent;
 import workbench.resource.GuiSettings;
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.components.WbColorPicker;
-
 import workbench.util.StringUtil;
 
+import javax.swing.*;
+import java.awt.*;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class DataColorOptions
-	extends JPanel
-	implements Restoreable, ValidatingComponent
-{
+    extends JPanel
+    implements Restoreable, ValidatingComponent {
 
-	public DataColorOptions()
-	{
-		super();
-		initComponents();
-		WbSwingUtilities.setMinimumSize(alternateBlend, 5);
-		WbSwingUtilities.setMinimumSize(selectionBlend, 5);
-	}
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JTextField alternateBlend;
+  private workbench.gui.components.WbColorPicker alternateColor;
+  private javax.swing.JLabel alternateColorLabel;
+  private javax.swing.JLabel jLabel10;
+  private javax.swing.JLabel jLabel2;
+  private javax.swing.JLabel jLabel7;
+  private javax.swing.JLabel jLabel8;
+  private javax.swing.JLabel jLabel9;
+  private javax.swing.JPanel jPanel7;
+  private workbench.gui.components.WbColorPicker modifiedColor;
+  private workbench.gui.components.WbColorPicker nullColor;
+  private workbench.gui.components.WbColorPicker searchHilite;
+  private workbench.gui.components.WbColorPicker selectedTextColor;
+  private javax.swing.JLabel selectedTextColorLabel;
+  private javax.swing.JTextField selectionBlend;
+  private workbench.gui.components.WbColorPicker selectionColor;
+  private javax.swing.JLabel selectionColorLabel;
+  private workbench.gui.components.WbColorPicker stdBackground;
+  private javax.swing.JLabel stdBackgroundLabel;
+  private workbench.gui.components.WbColorPicker textColor;
+  private javax.swing.JLabel textColorLabel;
+  public DataColorOptions() {
+    super();
+    initComponents();
+    WbSwingUtilities.setMinimumSize(alternateBlend, 5);
+    WbSwingUtilities.setMinimumSize(selectionBlend, 5);
+  }
 
-	@Override
-	public void restoreSettings()
-	{
-		alternateColor.setSelectedColor(GuiSettings.getAlternateRowColor());
-		nullColor.setSelectedColor(GuiSettings.getNullColor());
-		stdBackground.setDefaultLabelKey("LblDefaultIndicator");
-		textColor.setDefaultLabelKey("LblDefaultIndicator");
-		selectionColor.setDefaultLabelKey("LblDefaultIndicator");
-		selectedTextColor.setDefaultLabelKey("LblDefaultIndicator");
+  @Override
+  public void restoreSettings() {
+    alternateColor.setSelectedColor(GuiSettings.getAlternateRowColor());
+    nullColor.setSelectedColor(GuiSettings.getNullColor());
+    stdBackground.setDefaultLabelKey("LblDefaultIndicator");
+    textColor.setDefaultLabelKey("LblDefaultIndicator");
+    selectionColor.setDefaultLabelKey("LblDefaultIndicator");
+    selectedTextColor.setDefaultLabelKey("LblDefaultIndicator");
 
-		stdBackground.setSelectedColor(Settings.getInstance().getColor("workbench.gui.table.background", null));
-		textColor.setSelectedColor(Settings.getInstance().getColor("workbench.gui.table.foreground", null));
-		selectionColor.setSelectedColor(Settings.getInstance().getColor("workbench.gui.table.selection.background", null));
-		selectedTextColor.setSelectedColor(Settings.getInstance().getColor("workbench.gui.table.selection.foreground", null));
-		modifiedColor.setSelectedColor(GuiSettings.getColumnModifiedColor());
-		selectionBlend.setText(Settings.getInstance().getProperty("workbench.gui.renderer.blend.selection", ""));
-		alternateBlend.setText(Settings.getInstance().getProperty("workbench.gui.renderer.blend.alternate", ""));
-		searchHilite.setSelectedColor(GuiSettings.getExpressionHighlightColor());
-	}
+    stdBackground.setSelectedColor(Settings.getInstance().getColor("workbench.gui.table.background", null));
+    textColor.setSelectedColor(Settings.getInstance().getColor("workbench.gui.table.foreground", null));
+    selectionColor.setSelectedColor(Settings.getInstance().getColor("workbench.gui.table.selection.background", null));
+    selectedTextColor.setSelectedColor(Settings.getInstance().getColor("workbench.gui.table.selection.foreground", null));
+    modifiedColor.setSelectedColor(GuiSettings.getColumnModifiedColor());
+    selectionBlend.setText(Settings.getInstance().getProperty("workbench.gui.renderer.blend.selection", ""));
+    alternateBlend.setText(Settings.getInstance().getProperty("workbench.gui.renderer.blend.alternate", ""));
+    searchHilite.setSelectedColor(GuiSettings.getExpressionHighlightColor());
+  }
 
-	@Override
-	public void saveSettings()
-	{
-		Color c = alternateColor.getSelectedColor();
-		GuiSettings.setUseAlternateRowColor(c != null);
-		GuiSettings.setAlternateRowColor(alternateColor.getSelectedColor());
-		GuiSettings.setNullColor(nullColor.getSelectedColor());
-		GuiSettings.setColumnModifiedColor(modifiedColor.getSelectedColor());
-		GuiSettings.setExpressionHighlightColor(searchHilite.getSelectedColor());
+  @Override
+  public void saveSettings() {
+    Color c = alternateColor.getSelectedColor();
+    GuiSettings.setUseAlternateRowColor(c != null);
+    GuiSettings.setAlternateRowColor(alternateColor.getSelectedColor());
+    GuiSettings.setNullColor(nullColor.getSelectedColor());
+    GuiSettings.setColumnModifiedColor(modifiedColor.getSelectedColor());
+    GuiSettings.setExpressionHighlightColor(searchHilite.getSelectedColor());
 
-		Settings.getInstance().setColor("workbench.gui.table.background", stdBackground.getSelectedColor());
-		Settings.getInstance().setColor("workbench.gui.table.foreground", textColor.getSelectedColor());
-		Settings.getInstance().setColor("workbench.gui.table.selection.background", selectionColor.getSelectedColor());
-		Settings.getInstance().setColor("workbench.gui.table.selection.foreground", selectedTextColor.getSelectedColor());
-		Settings.getInstance().setProperty("workbench.gui.renderer.blend.selection",selectionBlend.getText().trim());
-		Settings.getInstance().setProperty("workbench.gui.renderer.blend.alternate",alternateBlend.getText().trim());
-	}
+    Settings.getInstance().setColor("workbench.gui.table.background", stdBackground.getSelectedColor());
+    Settings.getInstance().setColor("workbench.gui.table.foreground", textColor.getSelectedColor());
+    Settings.getInstance().setColor("workbench.gui.table.selection.background", selectionColor.getSelectedColor());
+    Settings.getInstance().setColor("workbench.gui.table.selection.foreground", selectedTextColor.getSelectedColor());
+    Settings.getInstance().setProperty("workbench.gui.renderer.blend.selection", selectionBlend.getText().trim());
+    Settings.getInstance().setProperty("workbench.gui.renderer.blend.alternate", alternateBlend.getText().trim());
+  }
 
-	@Override
-	public void componentDisplayed()
-	{
-	}
+  @Override
+  public void componentDisplayed() {
+  }
 
-	@Override
-	public boolean validateInput()
-	{
-		if (!validateTextField(selectionBlend))
-		{
-			return false;
-		}
-		if (!validateTextField(alternateBlend))
-		{
-			return false;
-		}
-		return true;
-	}
+  @Override
+  public boolean validateInput() {
+    if (!validateTextField(selectionBlend)) {
+      return false;
+    }
+    if (!validateTextField(alternateBlend)) {
+      return false;
+    }
+    return true;
+  }
 
-	private boolean validateTextField(final JTextField field)
-	{
-		if (StringUtil.isEmptyString(field.getText().trim())) return true;
-		String errMsg = ResourceMgr.getString("ErrInvalidBlend");
+  private boolean validateTextField(final JTextField field) {
+    if (StringUtil.isEmptyString(field.getText().trim())) return true;
+    String errMsg = ResourceMgr.getString("ErrInvalidBlend");
 
-		int blend = -1;
-		try
-		{
-			blend = Integer.parseInt(field.getText().trim());
-		}
-		catch (Exception ex)
-		{
-			blend = -1;
-		}
+    int blend = -1;
+    try {
+      blend = Integer.parseInt(field.getText().trim());
+    } catch (Exception ex) {
+      blend = -1;
+    }
 
-		if (blend < 0 || blend > 256)
-		{
-			WbSwingUtilities.showErrorMessage(this, ResourceMgr.getString("TxtError"), errMsg);
-			EventQueue.invokeLater(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					field.requestFocusInWindow();
-				}
-			});
-			return false;
-		}
-		return true;
-	}
+    if (blend < 0 || blend > 256) {
+      WbSwingUtilities.showErrorMessage(this, ResourceMgr.getString("TxtError"), errMsg);
+      EventQueue.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          field.requestFocusInWindow();
+        }
+      });
+      return false;
+    }
+    return true;
+  }
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
 
     alternateColorLabel = new javax.swing.JLabel();
@@ -386,30 +388,6 @@ public class DataColorOptions
     gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 0);
     add(searchHilite, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
-
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JTextField alternateBlend;
-  private workbench.gui.components.WbColorPicker alternateColor;
-  private javax.swing.JLabel alternateColorLabel;
-  private javax.swing.JLabel jLabel10;
-  private javax.swing.JLabel jLabel2;
-  private javax.swing.JLabel jLabel7;
-  private javax.swing.JLabel jLabel8;
-  private javax.swing.JLabel jLabel9;
-  private javax.swing.JPanel jPanel7;
-  private workbench.gui.components.WbColorPicker modifiedColor;
-  private workbench.gui.components.WbColorPicker nullColor;
-  private workbench.gui.components.WbColorPicker searchHilite;
-  private workbench.gui.components.WbColorPicker selectedTextColor;
-  private javax.swing.JLabel selectedTextColorLabel;
-  private javax.swing.JTextField selectionBlend;
-  private workbench.gui.components.WbColorPicker selectionColor;
-  private javax.swing.JLabel selectionColorLabel;
-  private workbench.gui.components.WbColorPicker stdBackground;
-  private javax.swing.JLabel stdBackgroundLabel;
-  private workbench.gui.components.WbColorPicker textColor;
-  private javax.swing.JLabel textColorLabel;
   // End of variables declaration//GEN-END:variables
 
 }

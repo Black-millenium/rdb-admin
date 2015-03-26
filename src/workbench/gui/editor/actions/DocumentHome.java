@@ -22,29 +22,24 @@
  */
 package workbench.gui.editor.actions;
 
-import java.awt.event.ActionEvent;
-
-import workbench.resource.PlatformShortcuts;
-
 import workbench.gui.editor.InputHandler;
 import workbench.gui.editor.JEditTextArea;
+import workbench.resource.PlatformShortcuts;
+
+import java.awt.event.ActionEvent;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class DocumentHome
-	extends EditorAction
-{
-	public DocumentHome()
-	{
-		super("TxtEdDocHome", PlatformShortcuts.getDefaultStartOfDoc(false));
-	}
+    extends EditorAction {
+  public DocumentHome() {
+    super("TxtEdDocHome", PlatformShortcuts.getDefaultStartOfDoc(false));
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt)
-	{
-		JEditTextArea textArea = InputHandler.getTextArea(evt);
-		textArea.setCaretPosition(0);
-	}
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    JEditTextArea textArea = InputHandler.getTextArea(evt);
+    textArea.setCaretPosition(0);
+  }
 }

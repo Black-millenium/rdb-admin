@@ -22,137 +22,122 @@
  */
 package workbench.gui.dialogs.export;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
 import workbench.gui.components.EncodingPanel;
 import workbench.gui.components.FlatButton;
-
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
 import workbench.util.StringUtil;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class GeneralExportOptionsPanel
-	extends JPanel
-	implements ExportOptions
-{
+    extends JPanel
+    implements ExportOptions {
 
-	public GeneralExportOptionsPanel()
-	{
-		super();
-		initComponents();
-	}
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private JTextField dateFormat;
+  private JLabel dateFormatLabel;
+  private EncodingPanel encodingPanel;
+  private JTextField nullString;
+  private JLabel nullStringLabel;
+  private JButton selectColumnsButton;
+  private JTextField timestampFormat;
+  private JLabel timestampFormatLabel;
 
-	public void saveSettings()
-	{
-		Settings s = Settings.getInstance();
-		s.setProperty("workbench.export.general.dateformat", this.getDateFormat());
-		s.setProperty("workbench.export.general.timestampformat", this.getTimestampFormat());
-		s.setProperty("workbench.export.general.encoding", this.getEncoding());
-		s.setExportNullString(this.getNullString());
-	}
+  public GeneralExportOptionsPanel() {
+    super();
+    initComponents();
+  }
 
-	public void restoreSettings()
-	{
-		Settings s = Settings.getInstance();
-		this.setDateFormat(s.getProperty("workbench.export.general.dateformat", ""));
-		this.setTimestampFormat(s.getProperty("workbench.export.general.timestampformat", ""));
-		this.setEncoding(s.getProperty("workbench.export.general.encoding", s.getDefaultDataEncoding()));
-		this.setNullString(s.getExportNullString());
-	}
+  public void saveSettings() {
+    Settings s = Settings.getInstance();
+    s.setProperty("workbench.export.general.dateformat", this.getDateFormat());
+    s.setProperty("workbench.export.general.timestampformat", this.getTimestampFormat());
+    s.setProperty("workbench.export.general.encoding", this.getEncoding());
+    s.setExportNullString(this.getNullString());
+  }
 
-	@Override
-	public void setNullString(String value)
-	{
-		nullString.setText(value);
-	}
+  public void restoreSettings() {
+    Settings s = Settings.getInstance();
+    this.setDateFormat(s.getProperty("workbench.export.general.dateformat", ""));
+    this.setTimestampFormat(s.getProperty("workbench.export.general.timestampformat", ""));
+    this.setEncoding(s.getProperty("workbench.export.general.encoding", s.getDefaultDataEncoding()));
+    this.setNullString(s.getExportNullString());
+  }
 
-	@Override
-	public String getNullString()
-	{
-		if (StringUtil.isBlank(nullString.getText()))
-		{
-			return null;
-		}
-		return nullString.getText().trim();
-	}
+  @Override
+  public String getNullString() {
+    if (StringUtil.isBlank(nullString.getText())) {
+      return null;
+    }
+    return nullString.getText().trim();
+  }
 
-	@Override
-	public String getDateFormat()
-	{
-		return this.dateFormat.getText();
-	}
+  @Override
+  public void setNullString(String value) {
+    nullString.setText(value);
+  }
 
-	@Override
-	public String getEncoding()
-	{
-		return encodingPanel.getEncoding();
-	}
+  @Override
+  public String getDateFormat() {
+    return this.dateFormat.getText();
+  }
 
-	@Override
-	public String getTimestampFormat()
-	{
-		return this.timestampFormat.getText();
-	}
+  @Override
+  public void setDateFormat(String format) {
+    dateFormat.setText(format);
+  }
 
-	@Override
-	public void setDateFormat(String format)
-	{
-		dateFormat.setText(format);
-	}
+  @Override
+  public String getEncoding() {
+    return encodingPanel.getEncoding();
+  }
 
-	@Override
-	public void setEncoding(String enc)
-	{
-		encodingPanel.setEncoding(enc);
-	}
+  @Override
+  public void setEncoding(String enc) {
+    encodingPanel.setEncoding(enc);
+  }
 
-	@Override
-	public void setTimestampFormat(String format)
-	{
-		timestampFormat.setText(format);
-	}
+  @Override
+  public String getTimestampFormat() {
+    return this.timestampFormat.getText();
+  }
 
-	public void showRetrieveColumnsLabel()
-	{
-		selectColumnsButton.setText(ResourceMgr.getString("LblRetrieveColumns"));
-	}
+  @Override
+  public void setTimestampFormat(String format) {
+    timestampFormat.setText(format);
+  }
 
-	public void showSelectColumnsLabel()
-	{
-		selectColumnsButton.setText(ResourceMgr.getString("LblSelectColumns"));
-	}
-	public void allowSelectColumns(boolean flag)
-	{
-		this.selectColumnsButton.setEnabled(flag);
-	}
+  public void showRetrieveColumnsLabel() {
+    selectColumnsButton.setText(ResourceMgr.getString("LblRetrieveColumns"));
+  }
 
-	public Object addColumnSelectListener(ActionListener l)
-	{
-		this.selectColumnsButton.addActionListener(l);
-		return this.selectColumnsButton;
-	}
+  public void showSelectColumnsLabel() {
+    selectColumnsButton.setText(ResourceMgr.getString("LblSelectColumns"));
+  }
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  public void allowSelectColumns(boolean flag) {
+    this.selectColumnsButton.setEnabled(flag);
+  }
+
+  public Object addColumnSelectListener(ActionListener l) {
+    this.selectColumnsButton.addActionListener(l);
+    return this.selectColumnsButton;
+  }
+
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     GridBagConstraints gridBagConstraints;
 
     encodingPanel = new EncodingPanel();
@@ -235,17 +220,6 @@ public class GeneralExportOptionsPanel
     gridBagConstraints.insets = new Insets(0, 4, 0, 4);
     add(nullString, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
-
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private JTextField dateFormat;
-  private JLabel dateFormatLabel;
-  private EncodingPanel encodingPanel;
-  private JTextField nullString;
-  private JLabel nullStringLabel;
-  private JButton selectColumnsButton;
-  private JTextField timestampFormat;
-  private JLabel timestampFormatLabel;
   // End of variables declaration//GEN-END:variables
 
 }

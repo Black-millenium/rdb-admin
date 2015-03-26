@@ -21,12 +21,10 @@
 package workbench.sql;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum EndReadOnlyTrans
-{
-	never,
-	commit,
-	rollback;
+public enum EndReadOnlyTrans {
+  never,
+  commit,
+  rollback;
 }

@@ -27,13 +27,18 @@ import java.util.Set;
 /**
  * @author Thomas Kellerer
  */
-public interface PropertyStorage
-{
-	Object setProperty(String property, String value);
-	void setProperty(String property, int value);
-	void setProperty(String property, boolean value);
-	boolean getBoolProperty(String property, boolean defaultValue);
-	int getIntProperty(String property, int defaultValue);
-	String getProperty(String property, String defaultValue);
-	Set<String> getKeys();
+public interface PropertyStorage {
+  Object setProperty(String property, String value);
+
+  void setProperty(String property, int value);
+
+  void setProperty(String property, boolean value);
+
+  boolean getBoolProperty(String property, boolean defaultValue);
+
+  int getIntProperty(String property, int defaultValue);
+
+  String getProperty(String property, String defaultValue);
+
+  Set<String> getKeys();
 }

@@ -22,69 +22,59 @@
  */
 package workbench.sql.wbcommands.console;
 
-import java.sql.SQLException;
-
 import workbench.RunMode;
 import workbench.console.ConsoleSettings;
 import workbench.console.RowDisplay;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
+
+import java.sql.SQLException;
 
 /**
  * A SQL command to control the output format in console mode.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class WbToggleDisplay extends SqlCommand
-{
-	public static final String VERB = "WbToggleDisplay";
+public class WbToggleDisplay extends SqlCommand {
+  public static final String VERB = "WbToggleDisplay";
 
-	@Override
-	public StatementRunnerResult execute(String aSql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
+  @Override
+  public StatementRunnerResult execute(String aSql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult();
 
-		RowDisplay current = ConsoleSettings.getInstance().getRowDisplay();
-		RowDisplay newDisplay = null;
-		if (current == RowDisplay.Form)
-		{
-			newDisplay = RowDisplay.SingleLine;
-			result.addMessageByKey("MsgDispChangeRow");
-		}
-		else
-		{
-			newDisplay = RowDisplay.Form;
-			result.addMessageByKey("MsgDispChangeForm");
-		}
-		ConsoleSettings.getInstance().setRowDisplay(newDisplay);
-		result.setSuccess();
-		return result;
-	}
+    RowDisplay current = ConsoleSettings.getInstance().getRowDisplay();
+    RowDisplay newDisplay = null;
+    if (current == RowDisplay.Form) {
+      newDisplay = RowDisplay.SingleLine;
+      result.addMessageByKey("MsgDispChangeRow");
+    } else {
+      newDisplay = RowDisplay.Form;
+      result.addMessageByKey("MsgDispChangeForm");
+    }
+    ConsoleSettings.getInstance().setRowDisplay(newDisplay);
+    result.setSuccess();
+    return result;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	public boolean isModeSupported(RunMode mode)
-	{
-		return mode != RunMode.GUI;
-	}
+  @Override
+  public boolean isModeSupported(RunMode mode) {
+    return mode != RunMode.GUI;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 
 }

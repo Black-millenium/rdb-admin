@@ -22,30 +22,27 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.interfaces.Undoable;
 import workbench.resource.ResourceMgr;
 
+import java.awt.event.ActionEvent;
+
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class RedoAction extends WbAction
-{
-	private Undoable client;
+public class RedoAction extends WbAction {
+  private Undoable client;
 
-	public RedoAction(Undoable aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtRedo");
-		this.setIcon("redo");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-	}
+  public RedoAction(Undoable aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtRedo");
+    this.setIcon("redo");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.redo();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.redo();
+  }
 }

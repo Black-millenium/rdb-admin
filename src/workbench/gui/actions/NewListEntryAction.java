@@ -22,48 +22,41 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.interfaces.FileActions;
 import workbench.log.LogMgr;
 import workbench.resource.ResourceMgr;
 
+import java.awt.event.ActionEvent;
+
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class NewListEntryAction
-	extends WbAction
-{
-	private FileActions client;
+    extends WbAction {
+  private FileActions client;
 
-	public NewListEntryAction(FileActions aClient, String aKey)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition(aKey);
-		this.setIcon("New");
-	}
+  public NewListEntryAction(FileActions aClient, String aKey) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition(aKey);
+    this.setIcon("New");
+  }
 
-	public NewListEntryAction(FileActions aClient)
-	{
-		super();
-		this.client = aClient;
-		this.setIcon("New");
-		String tip = ResourceMgr.getDescription("LblNewListEntry", true);
-		this.initMenuDefinition(ResourceMgr.getString("LblNewListEntry"), tip, null);
-	}
+  public NewListEntryAction(FileActions aClient) {
+    super();
+    this.client = aClient;
+    this.setIcon("New");
+    String tip = ResourceMgr.getDescription("LblNewListEntry", true);
+    this.initMenuDefinition(ResourceMgr.getString("LblNewListEntry"), tip, null);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		try
-		{
-			this.client.newItem(isShiftPressed(e));
-		}
-		catch (Exception ex)
-		{
-			LogMgr.logError("NewListEntryAction.executeAction()", "Error creating new list entry", ex);
-		}
+  @Override
+  public void executeAction(ActionEvent e) {
+    try {
+      this.client.newItem(isShiftPressed(e));
+    } catch (Exception ex) {
+      LogMgr.logError("NewListEntryAction.executeAction()", "Error creating new list entry", ex);
+    }
 
-	}
+  }
 }

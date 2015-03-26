@@ -22,29 +22,25 @@
  */
 package workbench.gui.components;
 
-import javax.swing.JToolTip;
+import javax.swing.*;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class MultiLineToolTip
-	extends JToolTip
-{
-	private static final MultiLineToolTipUI SHARED_UI = new MultiLineToolTipUI();
+    extends JToolTip {
+  private static final MultiLineToolTipUI SHARED_UI = new MultiLineToolTipUI();
 
-	public MultiLineToolTip()
-	{
-		super();
+  public MultiLineToolTip() {
+    super();
     setOpaque(true);
-		updateUI();
-	}
+    updateUI();
+  }
 
-	@Override
-	public final void updateUI()
-	{
-		setUI(SHARED_UI);
-	}
+  @Override
+  public final void updateUI() {
+    setUI(SHARED_UI);
+  }
 
 }
 

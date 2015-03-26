@@ -22,62 +22,51 @@
  */
 package workbench.gui.editor.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import javax.swing.text.BadLocationException;
 import workbench.gui.editor.InputHandler;
 import workbench.gui.editor.JEditTextArea;
 import workbench.gui.editor.TextUtilities;
 
+import javax.swing.text.BadLocationException;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class DeleteWord
-	extends EditorAction
-{
-	public DeleteWord()
-	{
-		super("TxtEdDelWord", KeyEvent.VK_DELETE, KeyEvent.CTRL_MASK);
-	}
+    extends EditorAction {
+  public DeleteWord() {
+    super("TxtEdDelWord", KeyEvent.VK_DELETE, KeyEvent.CTRL_MASK);
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt)
-	{
-		JEditTextArea textArea = InputHandler.getTextArea(evt);
-		int start = textArea.getSelectionStart();
-		if (start != textArea.getSelectionEnd())
-		{
-			textArea.setSelectedText("");
-		}
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    JEditTextArea textArea = InputHandler.getTextArea(evt);
+    int start = textArea.getSelectionStart();
+    if (start != textArea.getSelectionEnd()) {
+      textArea.setSelectedText("");
+    }
 
-		int line = textArea.getCaretLine();
-		int lineStart = textArea.getLineStartOffset(line);
-		int caret = start - lineStart;
+    int line = textArea.getCaretLine();
+    int lineStart = textArea.getLineStartOffset(line);
+    int caret = start - lineStart;
 
-		String lineText = textArea.getLineText(textArea.getCaretLine());
+    String lineText = textArea.getLineText(textArea.getCaretLine());
 
-		if (caret == lineText.length())
-		{
-			if (lineStart + caret == textArea.getDocumentLength())
-			{
-				textArea.getToolkit().beep();
-				return;
-			}
-			caret++;
-		}
-		else
-		{
-			caret = TextUtilities.findWordEnd(lineText, caret);
-		}
+    if (caret == lineText.length()) {
+      if (lineStart + caret == textArea.getDocumentLength()) {
+        textArea.getToolkit().beep();
+        return;
+      }
+      caret++;
+    } else {
+      caret = TextUtilities.findWordEnd(lineText, caret);
+    }
 
-		try
-		{
-			textArea.getDocument().remove(start, (caret + lineStart) - start);
-		}
-		catch (BadLocationException bl)
-		{
-			bl.printStackTrace();
-		}
-	}
+    try {
+      textArea.getDocument().remove(start, (caret + lineStart) - start);
+    } catch (BadLocationException bl) {
+      bl.printStackTrace();
+    }
+  }
 }

@@ -22,111 +22,92 @@
  */
 package workbench.gui.tools;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
-
-import workbench.resource.ResourceMgr;
-
 import workbench.gui.components.WbStatusLabel;
-
+import workbench.resource.ResourceMgr;
 import workbench.util.BrowserLauncher;
 import workbench.util.UpdateVersion;
 import workbench.util.VersionNumber;
 import workbench.util.WbVersionReader;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
 /**
  * A Dialog to display available versions from the SQL Workbench/J homepage.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class VersionCheckDialog
-	extends JDialog
-	implements ActionListener, MouseListener
-{
-	private WbVersionReader versionReader;
+    extends JDialog
+    implements ActionListener, MouseListener {
+  private WbVersionReader versionReader;
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private JButton closeButton;
+  private JLabel devVersion;
+  private JLabel devVersionLabel;
+  private JLabel headingLabel;
+  private JSeparator jSeparator2;
+  private JLabel stableVersion;
+  private JLabel stableVersionLabel;
+  private JLabel statusLabel;
+  private JLabel yourVersion;
+  private JLabel yourVersionLabel;
 
-	public VersionCheckDialog(Frame parent)
-	{
-		super(parent, true);
-		initComponents();
-		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		this.closeButton.addActionListener(this);
-		Font f = this.headingLabel.getFont().deriveFont(Font.BOLD);
-		this.headingLabel.setFont(f);
-		this.headingLabel.setText(ResourceMgr.getString("LblReadingVersion"));
-		this.headingLabel.addMouseListener(this);
-		this.headingLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		this.stableVersion.setText(" " + ResourceMgr.getString("LblNotAvailable"));
-		this.devVersion.setText(" " + ResourceMgr.getString("LblNotAvailable"));
+  public VersionCheckDialog(Frame parent) {
+    super(parent, true);
+    initComponents();
+    setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+    this.closeButton.addActionListener(this);
+    Font f = this.headingLabel.getFont().deriveFont(Font.BOLD);
+    this.headingLabel.setFont(f);
+    this.headingLabel.setText(ResourceMgr.getString("LblReadingVersion"));
+    this.headingLabel.addMouseListener(this);
+    this.headingLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    this.stableVersion.setText(" " + ResourceMgr.getString("LblNotAvailable"));
+    this.devVersion.setText(" " + ResourceMgr.getString("LblNotAvailable"));
     this.statusLabel.setText(" " + ResourceMgr.getString("LblReadingVersion"));
-	}
+  }
 
-	private void startRetrieveVersions()
-	{
-		readVersion();
-	}
+  private void startRetrieveVersions() {
+    readVersion();
+  }
 
-	@Override
-	public void setVisible(boolean flag)
-	{
-		if (flag) startRetrieveVersions();
-		super.setVisible(flag);
-	}
+  @Override
+  public void setVisible(boolean flag) {
+    if (flag) startRetrieveVersions();
+    super.setVisible(flag);
+  }
 
-	protected void readVersion()
-	{
-		this.versionReader = new WbVersionReader(this);
-		this.versionReader.startCheckThread();
-	}
+  protected void readVersion() {
+    this.versionReader = new WbVersionReader(this);
+    this.versionReader.startCheckThread();
+  }
 
-	private void checkDisplay()
-	{
-		UpdateVersion version = this.versionReader.getAvailableUpdate();
+  private void checkDisplay() {
+    UpdateVersion version = this.versionReader.getAvailableUpdate();
 
-		String msg = ResourceMgr.getString("LblVersionUpToDate");
-		if (!this.versionReader.success())
-		{
-			msg = ResourceMgr.getString("LblVersionReadError");
-		}
-		else if (version == UpdateVersion.stable)
-		{
-			this.stableVersion.setBackground(Color.YELLOW);
-			msg = ResourceMgr.getString("LblVersionNewStableAvailable");
-		}
-		else if (version == UpdateVersion.devBuild)
-		{
-			this.devVersion.setBackground(Color.YELLOW);
-			msg = ResourceMgr.getString("LblVersionNewDevAvailable");
-		}
-		this.statusLabel.setText(msg);
-	}
+    String msg = ResourceMgr.getString("LblVersionUpToDate");
+    if (!this.versionReader.success()) {
+      msg = ResourceMgr.getString("LblVersionReadError");
+    } else if (version == UpdateVersion.stable) {
+      this.stableVersion.setBackground(Color.YELLOW);
+      msg = ResourceMgr.getString("LblVersionNewStableAvailable");
+    } else if (version == UpdateVersion.devBuild) {
+      this.devVersion.setBackground(Color.YELLOW);
+      msg = ResourceMgr.getString("LblVersionNewDevAvailable");
+    }
+    this.statusLabel.setText(msg);
+  }
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     GridBagConstraints gridBagConstraints;
 
     yourVersionLabel = new JLabel();
@@ -141,10 +122,8 @@ public class VersionCheckDialog
     jSeparator2 = new JSeparator();
 
     setTitle(ResourceMgr.getString("TxtWindowTitleVersionCheck"));
-    addWindowListener(new WindowAdapter()
-    {
-      public void windowClosing(WindowEvent evt)
-      {
+    addWindowListener(new WindowAdapter() {
+      public void windowClosing(WindowEvent evt) {
         closeDialog(evt);
       }
     });
@@ -247,94 +226,67 @@ public class VersionCheckDialog
     setSize(new Dimension(386, 196));
   }// </editor-fold>//GEN-END:initComponents
 
-	/** Closes the dialog */
-	private void closeDialog(java.awt.event.WindowEvent evt)//GEN-FIRST:event_closeDialog
-	{
-		setVisible(false);
-		dispose();
-	}//GEN-LAST:event_closeDialog
+  /**
+   * Closes the dialog
+   */
+  private void closeDialog(java.awt.event.WindowEvent evt)//GEN-FIRST:event_closeDialog
+  {
+    setVisible(false);
+    dispose();
+  }//GEN-LAST:event_closeDialog
 
-	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		if (e.getSource() == this.versionReader)
-		{
-			if (this.versionReader.success())
-			{
-				this.stableVersion.setText(" " + ResourceMgr.getString("TxtBuild") + " " + this.versionReader.getStableBuildNumber() + " (" + this.versionReader.getStableBuildDate() + ")");
-				String date = this.versionReader.getDevBuildDate();
-				VersionNumber nr = this.versionReader.getDevBuildNumber();
-				if (date != null && nr.isValid())
-				{
-					this.devVersion.setText(" " + ResourceMgr.getString("TxtBuild") + " " + nr + " (" + date + ")");
-				}
-			}
-			else
-			{
-				this.stableVersion.setText(" " + ResourceMgr.getString("LblNotAvailable"));
-				this.devVersion.setText(" " + ResourceMgr.getString("LblNotAvailable"));
-			}
-			this.headingLabel.setText(ResourceMgr.getString("LblVersionsAvailable"));
-			this.headingLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == this.versionReader) {
+      if (this.versionReader.success()) {
+        this.stableVersion.setText(" " + ResourceMgr.getString("TxtBuild") + " " + this.versionReader.getStableBuildNumber() + " (" + this.versionReader.getStableBuildDate() + ")");
+        String date = this.versionReader.getDevBuildDate();
+        VersionNumber nr = this.versionReader.getDevBuildNumber();
+        if (date != null && nr.isValid()) {
+          this.devVersion.setText(" " + ResourceMgr.getString("TxtBuild") + " " + nr + " (" + date + ")");
+        }
+      } else {
+        this.stableVersion.setText(" " + ResourceMgr.getString("LblNotAvailable"));
+        this.devVersion.setText(" " + ResourceMgr.getString("LblNotAvailable"));
+      }
+      this.headingLabel.setText(ResourceMgr.getString("LblVersionsAvailable"));
+      this.headingLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-			checkDisplay();
-		}
-		else if (e.getSource() == this.closeButton)
-		{
-			setVisible(false);
-			dispose();
-		}
-	}
+      checkDisplay();
+    } else if (e.getSource() == this.closeButton) {
+      setVisible(false);
+      dispose();
+    }
+  }
 
-	@Override
-	public void mouseClicked(java.awt.event.MouseEvent e)
-	{
-		if (e.getSource() == this.headingLabel &&
-				e.getButton() == MouseEvent.BUTTON1 &&
-				e.getClickCount() == 1)
-		{
-			try
-			{
-				BrowserLauncher.openURL("http://www.sql-workbench.net");
-			}
-			catch (Exception ex)
-			{
-				ex.printStackTrace();
-			}
-		}
-	}
+  @Override
+  public void mouseClicked(java.awt.event.MouseEvent e) {
+    if (e.getSource() == this.headingLabel &&
+        e.getButton() == MouseEvent.BUTTON1 &&
+        e.getClickCount() == 1) {
+      try {
+        BrowserLauncher.openURL("http://www.sql-workbench.net");
+      } catch (Exception ex) {
+        ex.printStackTrace();
+      }
+    }
+  }
 
-	@Override
-	public void mouseEntered(java.awt.event.MouseEvent e)
-	{
-	}
+  @Override
+  public void mouseEntered(java.awt.event.MouseEvent e) {
+  }
 
-	@Override
-	public void mouseExited(java.awt.event.MouseEvent e)
-	{
-	}
+  @Override
+  public void mouseExited(java.awt.event.MouseEvent e) {
+  }
 
-	@Override
-	public void mousePressed(java.awt.event.MouseEvent e)
-	{
-	}
+  @Override
+  public void mousePressed(java.awt.event.MouseEvent e) {
+  }
 
-	@Override
-	public void mouseReleased(java.awt.event.MouseEvent e)
-	{
-	}
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private JButton closeButton;
-  private JLabel devVersion;
-  private JLabel devVersionLabel;
-  private JLabel headingLabel;
-  private JSeparator jSeparator2;
-  private JLabel stableVersion;
-  private JLabel stableVersionLabel;
-  private JLabel statusLabel;
-  private JLabel yourVersion;
-  private JLabel yourVersionLabel;
+  @Override
+  public void mouseReleased(java.awt.event.MouseEvent e) {
+  }
   // End of variables declaration//GEN-END:variables
 
 }

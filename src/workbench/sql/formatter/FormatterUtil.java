@@ -22,45 +22,37 @@ package workbench.sql.formatter;
 
 import workbench.resource.GeneratedIdentifierCase;
 import workbench.resource.Settings;
-
 import workbench.util.SqlUtil;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class FormatterUtil
-{
+public class FormatterUtil {
 
-	public static String getIdentifier(String input)
-	{
-		if (SqlUtil.isQuotedIdentifier(input)) return input;
-		return adjustCase(input, Settings.getInstance().getFormatterIdentifierCase());
-	}
+  public static String getIdentifier(String input) {
+    if (SqlUtil.isQuotedIdentifier(input)) return input;
+    return adjustCase(input, Settings.getInstance().getFormatterIdentifierCase());
+  }
 
-	public static String getFunction(String input)
-	{
-		return adjustCase(input, Settings.getInstance().getFormatterIdentifierCase());
-	}
+  public static String getFunction(String input) {
+    return adjustCase(input, Settings.getInstance().getFormatterIdentifierCase());
+  }
 
-	public static String getKeyword(String input)
-	{
-		return adjustCase(input, Settings.getInstance().getFormatterKeywordsCase());
-	}
+  public static String getKeyword(String input) {
+    return adjustCase(input, Settings.getInstance().getFormatterKeywordsCase());
+  }
 
-	private static String adjustCase(String input, GeneratedIdentifierCase keywordCase)
-	{
-		if (input == null) return null;
-		switch (keywordCase)
-		{
-			case asIs:
-				return input;
-			case lower:
-				return input.toLowerCase();
-			case upper:
-				return input.toUpperCase();
-		}
-		return input;
-	}
+  private static String adjustCase(String input, GeneratedIdentifierCase keywordCase) {
+    if (input == null) return null;
+    switch (keywordCase) {
+      case asIs:
+        return input;
+      case lower:
+        return input.toLowerCase();
+      case upper:
+        return input.toUpperCase();
+    }
+    return input;
+  }
 
 }

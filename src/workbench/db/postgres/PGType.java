@@ -23,40 +23,31 @@
 package workbench.db.postgres;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class PGType
-{
-	private final String typeName;
-	private final long oid;
+public class PGType {
+  private final String typeName;
+  private final long oid;
 
-	public PGType(String type, long id)
-	{
-		if (type.equals("character varying"))
-		{
-			typeName = "varchar";
-		}
-		else
-		{
-			typeName = type;
-		}
-		oid = id;
-	}
+  public PGType(String type, long id) {
+    if (type.equals("character varying")) {
+      typeName = "varchar";
+    } else {
+      typeName = type;
+    }
+    oid = id;
+  }
 
-	public long getOid()
-	{
-		return oid;
-	}
+  public long getOid() {
+    return oid;
+  }
 
-	public String getTypeName()
-	{
-		return typeName;
-	}
+  public String getTypeName() {
+    return typeName;
+  }
 
-	public boolean isVoid()
-	{
-		return typeName.equals("void");
-	}
+  public boolean isVoid() {
+    return typeName.equals("void");
+  }
 
 }

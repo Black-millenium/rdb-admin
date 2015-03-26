@@ -22,8 +22,6 @@
  */
 package workbench.gui.actions;
 
-import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
 import workbench.db.DbObjectChanger;
 import workbench.db.TableIdentifier;
 import workbench.gui.dbobjects.DbObjectList;
@@ -31,46 +29,42 @@ import workbench.gui.dbobjects.RunScriptPanel;
 import workbench.resource.ResourceMgr;
 import workbench.util.StringUtil;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class DropPKAction
-	extends WbAction
-{
-	private final DbObjectList columns;
+    extends WbAction {
+  private final DbObjectList columns;
 
-	public DropPKAction(DbObjectList cols)
-	{
-		super();
-		this.columns = cols;
-		this.initMenuDefinition("MnuTxtDropPK");
-	}
+  public DropPKAction(DbObjectList cols) {
+    super();
+    this.columns = cols;
+    this.initMenuDefinition("MnuTxtDropPK");
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		TableIdentifier table = columns.getObjectTable();
+  @Override
+  public void executeAction(ActionEvent e) {
+    TableIdentifier table = columns.getObjectTable();
 
-		DbObjectChanger changer = new DbObjectChanger(columns.getConnection());
-		String sql = changer.getDropPKScript(table);
-		if (StringUtil.isBlank(sql)) return;
+    DbObjectChanger changer = new DbObjectChanger(columns.getConnection());
+    String sql = changer.getDropPKScript(table);
+    if (StringUtil.isBlank(sql)) return;
 
-		RunScriptPanel panel = new RunScriptPanel(columns.getConnection(), sql);
+    RunScriptPanel panel = new RunScriptPanel(columns.getConnection(), sql);
 
-		panel.openWindow(columns.getComponent(), ResourceMgr.getString("TxtDropPK"));
+    panel.openWindow(columns.getComponent(), ResourceMgr.getString("TxtDropPK"));
 
-		if (panel.wasRun() && columns != null)
-		{
-			EventQueue.invokeLater(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					columns.reload();
-				}
-			});
-		}
-	}
+    if (panel.wasRun() && columns != null) {
+      EventQueue.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          columns.reload();
+        }
+      });
+    }
+  }
 
 }

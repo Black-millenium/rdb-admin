@@ -28,44 +28,38 @@ import workbench.interfaces.CharacterSequence;
  * An implementation of the CharacterSequence interface
  * based on a String as the source.
  *
- * @see FileMappedSequence
  * @author Thomas Kellerer
+ * @see FileMappedSequence
  */
 public class StringSequence
-	implements CharacterSequence
-{
-	private CharSequence source;
+    implements CharacterSequence {
+  private CharSequence source;
 
-	/**
-	 * Create a StringSequence based on the given String
-	 */
-	public StringSequence(CharSequence s)
-	{
-		this.source = s;
-	}
+  /**
+   * Create a StringSequence based on the given String
+   */
+  public StringSequence(CharSequence s) {
+    this.source = s;
+  }
 
-	@Override
-	public void done()
-	{
-		this.source = null;
-	}
+  @Override
+  public void done() {
+    this.source = null;
+  }
 
-	@Override
-	public int length()
-	{
-		return source.length();
-	}
+  @Override
+  public int length() {
+    return source.length();
+  }
 
-	@Override
-	public char charAt(int index)
-	{
-		return this.source.charAt(index);
-	}
+  @Override
+  public char charAt(int index) {
+    return this.source.charAt(index);
+  }
 
-	@Override
-	public CharSequence subSequence(int start, int end)
-	{
-		return this.source.subSequence(start, end);
-	}
+  @Override
+  public CharSequence subSequence(int start, int end) {
+    return this.source.subSequence(start, end);
+  }
 
 }

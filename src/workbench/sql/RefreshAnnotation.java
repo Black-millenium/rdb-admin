@@ -21,17 +21,14 @@
 package workbench.sql;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class RefreshAnnotation
-	extends WbAnnotation
-{
-	public static final String ANNOTATION = "WbRefresh";
+    extends WbAnnotation {
+  public static final String ANNOTATION = "WbRefresh";
 
-	public RefreshAnnotation()
-	{
-		super(ANNOTATION);
-	}
+  public RefreshAnnotation() {
+    super(ANNOTATION);
+  }
 
 }

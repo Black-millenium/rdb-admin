@@ -22,38 +22,32 @@
  */
 package workbench.gui.completion;
 
-import java.io.File;
-
 import workbench.util.WbFile;
 
+import java.io.File;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class TooltipFile
-	extends WbFile
-	implements TooltipElement
-{
+    extends WbFile
+    implements TooltipElement {
 
-	public TooltipFile(File f)
-	{
-		super(f);
-	}
+  public TooltipFile(File f) {
+    super(f);
+  }
 
-	@Override
-	public String getTooltip()
-	{
-		return getFullPath();
-	}
+  @Override
+  public String getTooltip() {
+    return getFullPath();
+  }
 
-	@Override
-	public String toString()
-	{
-		if (isDirectory())
-		{
-			return "[" + getFileName() + "]";
-		}
-		return getName();
-	}
+  @Override
+  public String toString() {
+    if (isDirectory()) {
+      return "[" + getFileName() + "]";
+    }
+    return getName();
+  }
 
 }

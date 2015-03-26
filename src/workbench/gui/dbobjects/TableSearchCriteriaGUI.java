@@ -22,27 +22,28 @@
  */
 package workbench.gui.dbobjects;
 
-import java.awt.event.KeyListener;
 import workbench.db.search.TableDataSearcher;
 import workbench.interfaces.PropertyStorage;
 
+import java.awt.event.KeyListener;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public interface TableSearchCriteriaGUI
-{
-	void disableControls();
-	void enableControls();
+public interface TableSearchCriteriaGUI {
+  void disableControls();
 
-	/**
-	 * Return a TableDataSearcher initialized
-	 * according to the selection of the user in the panel
-	 */
-	TableDataSearcher getSearcher();
-	
-	void saveSettings(String prefix, PropertyStorage props);
-	void restoreSettings(String prefix, PropertyStorage props);
+  void enableControls();
 
-	void addKeyListenerForCriteria(KeyListener listener);
+  /**
+   * Return a TableDataSearcher initialized
+   * according to the selection of the user in the panel
+   */
+  TableDataSearcher getSearcher();
+
+  void saveSettings(String prefix, PropertyStorage props);
+
+  void restoreSettings(String prefix, PropertyStorage props);
+
+  void addKeyListenerForCriteria(KeyListener listener);
 }

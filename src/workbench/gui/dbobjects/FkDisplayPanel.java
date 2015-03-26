@@ -22,348 +22,283 @@
  */
 package workbench.gui.dbobjects;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.JCheckBox;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
-
+import workbench.db.DependencyNode;
+import workbench.db.TableDependency;
+import workbench.db.TableIdentifier;
+import workbench.db.WbConnection;
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.actions.DropForeignKeyAction;
+import workbench.gui.actions.ReloadAction;
+import workbench.gui.actions.StopAction;
+import workbench.gui.components.*;
+import workbench.gui.renderer.RendererSetup;
 import workbench.interfaces.Interruptable;
 import workbench.interfaces.Reloadable;
 import workbench.interfaces.Resettable;
 import workbench.log.LogMgr;
 import workbench.resource.DbExplorerSettings;
 import workbench.resource.ResourceMgr;
-
-import workbench.db.DependencyNode;
-import workbench.db.TableDependency;
-import workbench.db.TableIdentifier;
-import workbench.db.WbConnection;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.actions.DropForeignKeyAction;
-import workbench.gui.actions.ReloadAction;
-import workbench.gui.actions.StopAction;
-import workbench.gui.components.DataStoreTableModel;
-import workbench.gui.components.WbScrollPane;
-import workbench.gui.components.WbSplitPane;
-import workbench.gui.components.WbTable;
-import workbench.gui.components.WbToolbar;
-import workbench.gui.renderer.RendererSetup;
-
 import workbench.storage.DataStore;
-
 import workbench.util.WbThread;
 
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class FkDisplayPanel
-	extends JPanel
-	implements Resettable, Reloadable, Interruptable, ActionListener
-{
-	protected WbTable keys;
-	private final TableDependencyTreeDisplay dependencyTree;
-	private final WbSplitPane splitPanel;
+    extends JPanel
+    implements Resettable, Reloadable, Interruptable, ActionListener {
+  private final TableDependencyTreeDisplay dependencyTree;
+  private final WbSplitPane splitPanel;
+  private final ReloadAction reloadTree;
+  private final StopAction cancelAction;
+  private final JCheckBox retrieveAll;
+  private final boolean showImportedKeys;
+  private final JMenuItem selectTableItem;
+  private final TableLister tables;
+  protected WbTable keys;
+  private WbConnection dbConnection;
+  private boolean isRetrieving;
+  private boolean isTreeRetrieving;
+  private TableIdentifier currentTable;
+  private DropForeignKeyAction dropFK;
 
-	private final ReloadAction reloadTree;
-	private final StopAction cancelAction;
-	private final JCheckBox retrieveAll;
+  public FkDisplayPanel(TableLister lister, boolean showImported) {
+    super(new BorderLayout());
+    this.keys = new WbTable();
+    this.keys.setAdjustToColumnLabel(false);
+    this.keys.setRendererSetup(RendererSetup.getBaseSetup());
+    WbScrollPane scroll = new WbScrollPane(this.keys);
+    this.splitPanel = new WbSplitPane(JSplitPane.VERTICAL_SPLIT);
+    this.splitPanel.setDividerLocation(100);
+    this.splitPanel.setDividerSize(8);
+    this.splitPanel.setTopComponent(scroll);
+    tables = lister;
+    this.dependencyTree = new TableDependencyTreeDisplay(lister);
+    this.dependencyTree.reset();
+    JPanel treePanel = new JPanel(new BorderLayout());
+    treePanel.add(this.dependencyTree, BorderLayout.CENTER);
 
-	private final boolean showImportedKeys;
-	private WbConnection dbConnection;
-	private boolean isRetrieving;
-	private boolean isTreeRetrieving;
+    WbToolbar toolbar = new WbToolbar();
+    toolbar.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+    reloadTree = new ReloadAction(this);
+    cancelAction = new StopAction(this);
+    cancelAction.setEnabled(false);
+    toolbar.add(reloadTree);
+    toolbar.add(cancelAction);
+    toolbar.addSeparator();
 
-	private TableIdentifier currentTable;
-	private final JMenuItem selectTableItem;
-	private DropForeignKeyAction dropFK;
-	private final TableLister tables;
+    treePanel.add(toolbar, BorderLayout.NORTH);
+    this.splitPanel.setBottomComponent(treePanel);
+    this.add(splitPanel, BorderLayout.CENTER);
+    showImportedKeys = showImported;
 
-	public FkDisplayPanel(TableLister lister, boolean showImported)
-	{
-		super(new BorderLayout());
-		this.keys = new WbTable();
-		this.keys.setAdjustToColumnLabel(false);
-		this.keys.setRendererSetup(RendererSetup.getBaseSetup());
-		WbScrollPane scroll = new WbScrollPane(this.keys);
-		this.splitPanel = new WbSplitPane(JSplitPane.VERTICAL_SPLIT);
-		this.splitPanel.setDividerLocation(100);
-		this.splitPanel.setDividerSize(8);
-		this.splitPanel.setTopComponent(scroll);
-		tables = lister;
-		this.dependencyTree = new TableDependencyTreeDisplay(lister);
-		this.dependencyTree.reset();
-		JPanel treePanel = new JPanel(new BorderLayout());
-		treePanel.add(this.dependencyTree, BorderLayout.CENTER);
+    retrieveAll = new JCheckBox(ResourceMgr.getString("LblRefAllLevel"));
+    retrieveAll.setToolTipText(ResourceMgr.getDescription("LblRefAllLevel"));
+    retrieveAll.setBorder(new EmptyBorder(0, 5, 0, 0));
+    retrieveAll.setSelected(true);
+    toolbar.add(retrieveAll);
 
-		WbToolbar toolbar = new WbToolbar();
-		toolbar.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-		reloadTree = new ReloadAction(this);
-		cancelAction = new StopAction(this);
-		cancelAction.setEnabled(false);
-		toolbar.add(reloadTree);
-		toolbar.add(cancelAction);
-		toolbar.addSeparator();
+    selectTableItem = new JMenuItem(ResourceMgr.getString("MnuTextSelectInList"));
+    selectTableItem.addActionListener(this);
 
-		treePanel.add(toolbar, BorderLayout.NORTH);
-		this.splitPanel.setBottomComponent(treePanel);
-		this.add(splitPanel, BorderLayout.CENTER);
-		showImportedKeys = showImported;
+    dropFK = new DropForeignKeyAction(this);
+    keys.addPopupAction(dropFK, true);
+    keys.addPopupMenu(selectTableItem, false);
+  }
 
-		retrieveAll = new JCheckBox(ResourceMgr.getString("LblRefAllLevel"));
-		retrieveAll.setToolTipText(ResourceMgr.getDescription("LblRefAllLevel"));
-		retrieveAll.setBorder(new EmptyBorder(0, 5, 0,0));
-		retrieveAll.setSelected(true);
-		toolbar.add(retrieveAll);
+  public boolean getRetrieveAll() {
+    return retrieveAll.isSelected();
+  }
 
-		selectTableItem = new JMenuItem(ResourceMgr.getString("MnuTextSelectInList"));
-		selectTableItem.addActionListener(this);
+  public void setRetrieveAll(boolean flag) {
+    retrieveAll.setSelected(flag);
+  }
 
-		dropFK = new DropForeignKeyAction(this);
-		keys.addPopupAction(dropFK, true);
-		keys.addPopupMenu(selectTableItem, false);
-	}
+  public int getDividerLocation() {
+    return splitPanel.getDividerLocation();
+  }
 
-	public boolean getRetrieveAll()
-	{
-		return retrieveAll.isSelected();
-	}
+  public void setDividerLocation(int location) {
+    splitPanel.setDividerLocation(location);
+  }
 
-	public void setRetrieveAll(boolean flag)
-	{
-		retrieveAll.setSelected(flag);
-	}
+  public TableDependencyTreeDisplay getTree() {
+    return dependencyTree;
+  }
 
-	public void setConnection(WbConnection conn)
-	{
-		dbConnection = conn;
-		dependencyTree.setConnection(conn);
-	}
+  public WbTable getKeyDisplay() {
+    return keys;
+  }
 
-	public int getDividerLocation()
-	{
-		return splitPanel.getDividerLocation();
-	}
+  public TableIdentifier getCurrentTable() {
+    return currentTable;
+  }
 
-	public void setDividerLocation(int location)
-	{
-		splitPanel.setDividerLocation(location);
-	}
+  public WbConnection getConnection() {
+    return this.dbConnection;
+  }
 
-	public TableDependencyTreeDisplay getTree()
-	{
-		return dependencyTree;
-	}
+  public void setConnection(WbConnection conn) {
+    dbConnection = conn;
+    dependencyTree.setConnection(conn);
+  }
 
-	public WbTable getKeyDisplay()
-	{
-		return keys;
-	}
+  public Map<TableIdentifier, String> getSelectedForeignKeys() {
+    int[] rows = keys.getSelectedRows();
 
-	public TableIdentifier getCurrentTable()
-	{
-		return currentTable;
-	}
+    DataStore ds = keys.getDataStore();
 
-	public WbConnection getConnection()
-	{
-		return this.dbConnection;
-	}
+    Map<TableIdentifier, String> result = new HashMap<>();
 
-	public Map<TableIdentifier, String> getSelectedForeignKeys()
-	{
-		int[] rows = keys.getSelectedRows();
+    for (int i = 0; i < rows.length; i++) {
+      int row = rows[i];
+      DependencyNode node = (DependencyNode) ds.getRow(row).getUserObject();
+      String fkName = node.getFkName();
+      TableIdentifier constraintTable = null;
+      if (showImportedKeys) {
+        constraintTable = currentTable;
+      } else {
+        constraintTable = node.getTable();
+      }
+      if (constraintTable != null) {
+        result.put(constraintTable, fkName);
+      }
+    }
+    return result;
+  }
 
-		DataStore ds = keys.getDataStore();
+  @Override
+  public void reset() {
+    keys.reset();
+    dependencyTree.reset();
+  }
 
-		Map<TableIdentifier, String> result = new HashMap<>();
+  public boolean isRetrieving() {
+    return isRetrieving || isTreeRetrieving;
+  }
 
-		for (int i=0; i < rows.length; i++)
-		{
-			int row = rows[i];
-			DependencyNode node = (DependencyNode)ds.getRow(row).getUserObject();
-			String fkName = node.getFkName();
-			TableIdentifier constraintTable = null;
-			if (showImportedKeys)
-			{
-				constraintTable = currentTable;
-			}
-			else
-			{
-				constraintTable = node.getTable();
-			}
-			if (constraintTable != null)
-			{
-				result.put(constraintTable, fkName);
-			}
-		}
-		return result;
-	}
+  public void cancel() {
+    dependencyTree.cancelRetrieve();
+  }
 
-	@Override
-	public void reset()
-	{
-		keys.reset();
-		dependencyTree.reset();
-	}
+  public void reloadTable() {
+    try {
+      reset();
+      retrieve(currentTable);
+    } catch (SQLException sql) {
+      LogMgr.logError("FkDisplayPanel.reloadTable()", "Could not reload constraints", sql);
+    }
+  }
 
-	public boolean isRetrieving()
-	{
-		return isRetrieving || isTreeRetrieving;
-	}
+  protected void retrieve(TableIdentifier table)
+      throws SQLException {
+    try {
+      currentTable = table;
+      isRetrieving = true;
 
-	public void cancel()
-	{
-		dependencyTree.cancelRetrieve();
-	}
+      final DataStoreTableModel model = new DataStoreTableModel(getFKDataStore(table));
 
-	public void reloadTable()
-	{
-		try
-		{
-			reset();
-			retrieve(currentTable);
-		}
-		catch (SQLException sql)
-		{
-			LogMgr.logError("FkDisplayPanel.reloadTable()", "Could not reload constraints", sql);
-		}
-	}
+      WbSwingUtilities.invoke(new Runnable() {
+        @Override
+        public void run() {
+          keys.setModel(model, true);
+          keys.adjustRowsAndColumns();
+          dependencyTree.reset();
+        }
+      });
 
-	protected void retrieve(TableIdentifier table)
-		throws SQLException
-	{
-		try
-		{
-			currentTable = table;
-			isRetrieving = true;
+      if (DbExplorerSettings.getAutoRetrieveFKTree()) {
+        reload();
+      }
+    } finally {
+      isRetrieving = false;
+    }
+  }
 
-			final DataStoreTableModel model = new DataStoreTableModel(getFKDataStore(table));
+  private DataStore getFKDataStore(TableIdentifier table) {
+    TableDependency deps = new TableDependency(dbConnection, table);
+    return deps.getDisplayDataStore(showImportedKeys);
+  }
 
-			WbSwingUtilities.invoke(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					keys.setModel(model, true);
-					keys.adjustRowsAndColumns();
-					dependencyTree.reset();
-				}
-			});
+  protected void retrieveTree(TableIdentifier table) {
+    dependencyTree.setRetrieveAll(retrieveAll.isSelected());
+    if (showImportedKeys) {
+      dependencyTree.readReferencedTables(table);
+    } else {
+      dependencyTree.readReferencingTables(table);
+    }
+  }
 
-			if (DbExplorerSettings.getAutoRetrieveFKTree())
-			{
-				reload();
-			}
-		}
-		finally
-		{
-			isRetrieving = false;
-		}
-	}
+  @Override
+  public void reload() {
+    WbThread t = new WbThread("DependencyTreeRetriever") {
+      @Override
+      public void run() {
+        try {
+          isTreeRetrieving = true;
+          retrieveTree(currentTable);
+        } finally {
+          isTreeRetrieving = false;
+          reloadTree.setEnabled(true);
+          cancelAction.setEnabled(false);
+          WbSwingUtilities.showDefaultCursor(FkDisplayPanel.this);
+        }
+      }
+    };
+    reloadTree.setEnabled(false);
+    cancelAction.setEnabled(true);
+    WbSwingUtilities.showWaitCursor(this);
+    t.start();
+  }
 
-	private DataStore getFKDataStore(TableIdentifier table)
-	{
-		TableDependency deps = new TableDependency(dbConnection, table);
-		return deps.getDisplayDataStore(showImportedKeys);
-	}
+  @Override
+  public void cancelExecution() {
+    if (isTreeRetrieving) {
+      dependencyTree.cancelRetrieve();
+      cancelAction.setEnabled(false);
+    }
+  }
 
-	protected void retrieveTree(TableIdentifier table)
-	{
-		dependencyTree.setRetrieveAll(retrieveAll.isSelected());
-		if (showImportedKeys)
-		{
-			dependencyTree.readReferencedTables(table);
-		}
-		else
-		{
-			dependencyTree.readReferencingTables(table);
-		}
-	}
+  @Override
+  public boolean confirmCancel() {
+    return true;
+  }
 
-	@Override
-	public void reload()
-	{
-		WbThread t = new WbThread("DependencyTreeRetriever")
-		{
-			@Override
-			public void run()
-			{
-				try
-				{
-					isTreeRetrieving = true;
-					retrieveTree(currentTable);
-				}
-				finally
-				{
-					isTreeRetrieving = false;
-					reloadTree.setEnabled(true);
-					cancelAction.setEnabled(false);
-					WbSwingUtilities.showDefaultCursor(FkDisplayPanel.this);
-				}
-			}
-		};
-		reloadTree.setEnabled(false);
-		cancelAction.setEnabled(true);
-		WbSwingUtilities.showWaitCursor(this);
-		t.start();
-	}
+  private TableIdentifier getReferencedTable(int row) {
+    if (row < 0) return null;
 
-	@Override
-	public void cancelExecution()
-	{
-		if (isTreeRetrieving)
-		{
-			dependencyTree.cancelRetrieve();
-			cancelAction.setEnabled(false);
-		}
-	}
+    DataStore ds = keys.getDataStore();
+    DependencyNode node = (DependencyNode) ds.getRow(row).getUserObject();
+    return node.getTable();
+  }
 
-	@Override
-	public boolean confirmCancel()
-	{
-		return true;
-	}
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    if (tables == null) return;
+    if (e.getSource() != selectTableItem) return;
 
-	private TableIdentifier getReferencedTable(int row)
-	{
-		if (row < 0) return null;
+    int selected = keys.getSelectedRow();
+    if (selected < 0) return;
 
-		DataStore ds = keys.getDataStore();
-		DependencyNode node = (DependencyNode)ds.getRow(row).getUserObject();
-		return node.getTable();
-	}
+    final TableIdentifier tbl = getReferencedTable(selected);
+    if (tbl == null) return;
 
-	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		if (tables == null) return;
-		if (e.getSource() != selectTableItem) return;
-
-		int selected = keys.getSelectedRow();
-		if (selected < 0) return;
-
-		final TableIdentifier tbl = getReferencedTable(selected);
-		if (tbl == null) return;
-
-		LogMgr.logDebug("FkDisplayPanel.actionPerformed()", "Trying to select table: " + tbl.getTableName());
-		WbSwingUtilities.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				tables.selectTable(tbl);
-			}
-		});
-	}
+    LogMgr.logDebug("FkDisplayPanel.actionPerformed()", "Trying to select table: " + tbl.getTableName());
+    WbSwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        tables.selectTable(tbl);
+      }
+    });
+  }
 }

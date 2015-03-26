@@ -22,29 +22,26 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
 import workbench.interfaces.MainPanel;
 
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public class LockPanelAction 
-	extends CheckBoxAction
-{
-	private MainPanel client;
-	
-	public LockPanelAction(MainPanel panel)
-	{
-		super("MnuTxtLockPanel");
-		client = panel;
-	}
+public class LockPanelAction
+    extends CheckBoxAction {
+  private MainPanel client;
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		super.executeAction(e);
-		client.setLocked(this.isSwitchedOn());
-	}
+  public LockPanelAction(MainPanel panel) {
+    super("MnuTxtLockPanel");
+    client = panel;
+  }
+
+  @Override
+  public void executeAction(ActionEvent e) {
+    super.executeAction(e);
+    client.setLocked(this.isSwitchedOn());
+  }
 
 }

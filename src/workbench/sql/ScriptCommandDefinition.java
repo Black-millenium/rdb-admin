@@ -25,102 +25,86 @@ package workbench.sql;
 import workbench.util.StringUtil;
 
 /**
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class ScriptCommandDefinition
-{
-	private final String command;
-	private final int textStartPosInScript;
-	private final int textEndPosInScript;
+public class ScriptCommandDefinition {
+  private final String command;
+  private final int textStartPosInScript;
+  private final int textEndPosInScript;
 
-	private int whiteSpaceStart = -1;
+  private int whiteSpaceStart = -1;
 
-	private int indexInScript;
-	private DelimiterDefinition delimiterUsed;
-	private boolean delimiterNeeded;
+  private int indexInScript;
+  private DelimiterDefinition delimiterUsed;
+  private boolean delimiterNeeded;
 
-	public ScriptCommandDefinition(String c, int start, int end)
-	{
-		this(c, start, end, -1);
-	}
+  public ScriptCommandDefinition(String c, int start, int end) {
+    this(c, start, end, -1);
+  }
 
-	public ScriptCommandDefinition(String c, int start, int end, int index)
-	{
-		this.command = StringUtil.rtrim(c);
-		this.textStartPosInScript = start;
-		this.textEndPosInScript = end;
-		this.indexInScript = index;
-	}
+  public ScriptCommandDefinition(String c, int start, int end, int index) {
+    this.command = StringUtil.rtrim(c);
+    this.textStartPosInScript = start;
+    this.textEndPosInScript = end;
+    this.indexInScript = index;
+  }
 
-	public void setWhitespaceStart(int start)
-	{
-		if (start != this.textStartPosInScript)
-		{
-			this.whiteSpaceStart = start;
-		}
-	}
+  public String getSQL() {
+    return this.command;
+  }
 
-	public String getSQL()
-	{
-		return this.command;
-	}
+  /**
+   * Returns the start of this command in the source script
+   * including potential whitespace characters before the
+   * real command. If setWhitespaceStart() has not been
+   * called, this is identical to getStartPositionInScript()
+   */
+  public int getWhitespaceStart() {
+    if (whiteSpaceStart != -1) return whiteSpaceStart;
+    return this.textStartPosInScript;
+  }
 
-	/**
-	 * Returns the start of this command in the source script
-	 * including potential whitespace characters before the
-	 * real command. If setWhitespaceStart() has not been
-	 * called, this is identical to getStartPositionInScript()
-	 */
-	public int getWhitespaceStart()
-	{
-		if (whiteSpaceStart != -1) return whiteSpaceStart;
-		return this.textStartPosInScript;
-	}
+  public void setWhitespaceStart(int start) {
+    if (start != this.textStartPosInScript) {
+      this.whiteSpaceStart = start;
+    }
+  }
 
-	public int getStartPositionInScript()
-	{
-		return this.textStartPosInScript;
-	}
+  public int getStartPositionInScript() {
+    return this.textStartPosInScript;
+  }
 
-	public int getEndPositionInScript()
-	{
-		return this.textEndPosInScript;
-	}
+  public int getEndPositionInScript() {
+    return this.textEndPosInScript;
+  }
 
-	public int getIndexInScript()
-	{
-		return this.indexInScript;
-	}
+  public int getIndexInScript() {
+    return this.indexInScript;
+  }
 
-	public void setIndexInScript(int index)
-	{
-		this.indexInScript = index;
-	}
+  public void setIndexInScript(int index) {
+    this.indexInScript = index;
+  }
 
-	public boolean getDelimiterNeeded()
-	{
-		return delimiterNeeded;
-	}
+  public boolean getDelimiterNeeded() {
+    return delimiterNeeded;
+  }
 
-	public void setDelimiterNeeded(boolean flag)
-	{
-		this.delimiterNeeded = flag;
-	}
+  public void setDelimiterNeeded(boolean flag) {
+    this.delimiterNeeded = flag;
+  }
 
-	public DelimiterDefinition getDelimiterUsed()
-	{
-		return delimiterUsed;
-	}
+  public DelimiterDefinition getDelimiterUsed() {
+    return delimiterUsed;
+  }
 
-	public void setDelimiterUsed(DelimiterDefinition delimiter)
-	{
-		this.delimiterUsed = delimiter;
-	}
+  public void setDelimiterUsed(DelimiterDefinition delimiter) {
+    this.delimiterUsed = delimiter;
+  }
 
-	@Override
-	public String toString()
-	{
-		if (command == null) return "[" + textStartPosInScript + "," + textEndPosInScript + "]";
-		return this.command;
-	}
+  @Override
+  public String toString() {
+    if (command == null) return "[" + textStartPosInScript + "," + textEndPosInScript + "]";
+    return this.command;
+  }
 }

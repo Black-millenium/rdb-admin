@@ -22,33 +22,29 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.WbManager;
-
 import workbench.gui.MainWindow;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Exit and close the application
- * @see workbench.WbManager#closeMainWindow(workbench.gui.MainWindow) 
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
+ * @see workbench.WbManager#closeMainWindow(workbench.gui.MainWindow)
  */
 public class FileCloseAction
-	extends WbAction
-{
-	private MainWindow window;
+    extends WbAction {
+  private MainWindow window;
 
-	public FileCloseAction(MainWindow toClose)
-	{
-		super();
-		window = toClose;
-		this.initMenuDefinition("MnuTxtFileCloseWin");
-	}
+  public FileCloseAction(MainWindow toClose) {
+    super();
+    window = toClose;
+    this.initMenuDefinition("MnuTxtFileCloseWin");
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		WbManager.getInstance().closeMainWindow(window);
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    WbManager.getInstance().closeMainWindow(window);
+  }
 }

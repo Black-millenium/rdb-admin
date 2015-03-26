@@ -23,11 +23,9 @@
 package workbench.gui.sql;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum PanelType
-{
-	sqlPanel,
-	dbExplorer
+public enum PanelType {
+  sqlPanel,
+  dbExplorer
 }

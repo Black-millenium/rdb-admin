@@ -25,7 +25,6 @@ package workbench.interfaces;
 /**
  * @author Thomas Kellerer
  */
-public interface MacroChangeListener
-{
-	void macroListChanged();
+public interface MacroChangeListener {
+  void macroListChanged();
 }

@@ -26,57 +26,44 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class MacroTreeNode
-	extends DefaultMutableTreeNode
-{
-	public MacroTreeNode(Object dataObject)
-	{
-		super(dataObject);
-	}
+    extends DefaultMutableTreeNode {
+  public MacroTreeNode(Object dataObject) {
+    super(dataObject);
+  }
 
-	public MacroTreeNode(Object dataObject, boolean allowsChildren)
-	{
-		super(dataObject, allowsChildren);
-	}
+  public MacroTreeNode(Object dataObject, boolean allowsChildren) {
+    super(dataObject, allowsChildren);
+  }
 
-	public Object getDataObject()
-	{
-		return getUserObject();
-	}
+  public Object getDataObject() {
+    return getUserObject();
+  }
 
-	public DragType getDropType(TreePath[] source)
-	{
-		if (source == null) return DragType.none;
+  public DragType getDropType(TreePath[] source) {
+    if (source == null) return DragType.none;
 
-		boolean sourceIsGroup = true;
-		boolean sourceBelongsToUs = false;
+    boolean sourceIsGroup = true;
+    boolean sourceBelongsToUs = false;
 
-		for (TreePath path : source)
-		{
-			MacroTreeNode node = (MacroTreeNode)path.getLastPathComponent();
-			sourceIsGroup = sourceIsGroup && node.getAllowsChildren();
-			if (!sourceBelongsToUs && getAllowsChildren() && isNodeChild(node))
-			{
-				sourceBelongsToUs = true;
-			}
-		}
-		if (sourceBelongsToUs) return DragType.none;
+    for (TreePath path : source) {
+      MacroTreeNode node = (MacroTreeNode) path.getLastPathComponent();
+      sourceIsGroup = sourceIsGroup && node.getAllowsChildren();
+      if (!sourceBelongsToUs && getAllowsChildren() && isNodeChild(node)) {
+        sourceBelongsToUs = true;
+      }
+    }
+    if (sourceBelongsToUs) return DragType.none;
 
-		if (getAllowsChildren())
-		{
-			if (sourceIsGroup) return DragType.reorderItems;
-			return DragType.moveItems;
-		}
-		else if (!sourceIsGroup)
-		{
-			return DragType.reorderItems;
-		}
-		else
-		{
-			return DragType.none;
-		}
-	}
+    if (getAllowsChildren()) {
+      if (sourceIsGroup) return DragType.reorderItems;
+      return DragType.moveItems;
+    } else if (!sourceIsGroup) {
+      return DragType.reorderItems;
+    } else {
+      return DragType.none;
+    }
+  }
 }

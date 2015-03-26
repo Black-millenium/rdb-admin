@@ -23,10 +23,8 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ListSelectionControl
-{
-	boolean canChangeSelection();
+public interface ListSelectionControl {
+  boolean canChangeSelection();
 }

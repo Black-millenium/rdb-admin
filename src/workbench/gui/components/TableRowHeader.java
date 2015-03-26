@@ -22,176 +22,151 @@
  */
 package workbench.gui.components;
 
-import java.beans.PropertyChangeEvent;
-import javax.swing.*;
-import java.awt.*;
-import java.beans.PropertyChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import workbench.gui.WbSwingUtilities;
 
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class TableRowHeader
-	extends JTable
-	implements ChangeListener, PropertyChangeListener
-{
-	private TableRowHeaderModel rowModel;
-	private RowHeaderRenderer renderer;
-	private JTable clientTable;
+    extends JTable
+    implements ChangeListener, PropertyChangeListener {
+  private TableRowHeaderModel rowModel;
+  private RowHeaderRenderer renderer;
+  private JTable clientTable;
 
-	public TableRowHeader(JTable client)
-	{
-		super();
-		rowModel = new TableRowHeaderModel(client);
-		setModel(rowModel);
-		clientTable = client;
-		renderer = new RowHeaderRenderer(this, client);
-		getColumnModel().getColumn(0).setCellRenderer(renderer);
-		setSelectionModel(client.getSelectionModel());
-		setBackground(client.getBackground());
-		setOpaque(false);
-		setBorder(WbSwingUtilities.EMPTY_BORDER);
-		setRowSelectionAllowed(false);
-		setAutoscrolls(false);
-		setFocusable(false);
-		clientTable.addPropertyChangeListener("font", this);
-	}
+  public TableRowHeader(JTable client) {
+    super();
+    rowModel = new TableRowHeaderModel(client);
+    setModel(rowModel);
+    clientTable = client;
+    renderer = new RowHeaderRenderer(this, client);
+    getColumnModel().getColumn(0).setCellRenderer(renderer);
+    setSelectionModel(client.getSelectionModel());
+    setBackground(client.getBackground());
+    setOpaque(false);
+    setBorder(WbSwingUtilities.EMPTY_BORDER);
+    setRowSelectionAllowed(false);
+    setAutoscrolls(false);
+    setFocusable(false);
+    clientTable.addPropertyChangeListener("font", this);
+  }
 
-	@Override
-	public void setFont(Font f)
-	{
-		super.setFont(f);
-		if (renderer != null)
-		{
-			renderer.setFont(f);
-		}
-	}
-	
-	@Override
-	public void addNotify()
-	{
-		super.addNotify();
+  public static void showRowHeader(JTable table) {
+    Container p = table.getParent();
+    if (p instanceof JViewport) {
+      Container gp = p.getParent();
+      if (gp instanceof JScrollPane) {
+        JScrollPane scrollPane = (JScrollPane) gp;
+        scrollPane.setRowHeaderView(new TableRowHeader(table));
+      }
+    }
+  }
 
-		Component c = getParent();
+  public static boolean isRowHeaderVisible(JTable table) {
+    return getRowHeader(table) != null;
+  }
 
-		//  Keep scrolling of the row table in sync with the main table.
-		if (c instanceof JViewport)
-		{
-			JViewport viewport = (JViewport)c;
-			viewport.addChangeListener(this);
-		}
-		setRowHeight(clientTable.getRowHeight());
-	}
+  public static TableRowHeader getRowHeader(JTable table) {
+    Container p = table.getParent();
+    if (p instanceof JViewport) {
+      Container gp = p.getParent();
+      if (gp instanceof JScrollPane) {
+        JScrollPane scrollPane = (JScrollPane) gp;
+        JViewport rowHeaderViewPort = scrollPane.getRowHeader();
+        if (rowHeaderViewPort != null) {
+          Component c = rowHeaderViewPort.getView();
+          if (c instanceof TableRowHeader) {
+            return (TableRowHeader) c;
+          }
+        }
+      }
+    }
+    return null;
+  }
 
-	/**
-	 * Adjust the height of the specified row according to the table's
-	 * height for that row
-	 */
-	public void rowHeightChanged(int row)
-	{
-		setRowHeight(row, clientTable.getRowHeight(row));
-	}
+  public static void removeRowHeader(JTable table) {
+    Container p = table.getParent();
+    if (p instanceof JViewport) {
+      Container gp = p.getParent();
+      if (gp instanceof JScrollPane) {
+        JScrollPane scrollPane = (JScrollPane) gp;
+        TableRowHeader header = getRowHeader(table);
+        if (header != null && header.clientTable != null) {
+          header.clientTable.getModel().removeTableModelListener(header);
+        }
+        scrollPane.setRowHeader(null);
+      }
+    }
+  }
 
-	/**
-	 * Adjust the height of all rows according to the clientTable.
-	 */
-	public void rowHeightChanged()
-	{
-		if (clientTable == null) return;
+  @Override
+  public void setFont(Font f) {
+    super.setFont(f);
+    if (renderer != null) {
+      renderer.setFont(f);
+    }
+  }
 
-		int count = clientTable.getRowCount();
+  @Override
+  public void addNotify() {
+    super.addNotify();
 
-		for (int row = 0; row < count; row++)
-		{
-			setRowHeight(row, clientTable.getRowHeight(row));
-		}
-	}
+    Component c = getParent();
 
-	public static void showRowHeader(JTable table)
-	{
-		Container p = table.getParent();
-		if (p instanceof JViewport)
-		{
-			Container gp = p.getParent();
-			if (gp instanceof JScrollPane)
-			{
-				JScrollPane scrollPane = (JScrollPane) gp;
-				scrollPane.setRowHeaderView(new TableRowHeader(table));
-			}
-		}
-	}
+    //  Keep scrolling of the row table in sync with the main table.
+    if (c instanceof JViewport) {
+      JViewport viewport = (JViewport) c;
+      viewport.addChangeListener(this);
+    }
+    setRowHeight(clientTable.getRowHeight());
+  }
 
-	public static boolean isRowHeaderVisible(JTable table)
-	{
-		return getRowHeader(table) != null;
-	}
+  /**
+   * Adjust the height of the specified row according to the table's
+   * height for that row
+   */
+  public void rowHeightChanged(int row) {
+    setRowHeight(row, clientTable.getRowHeight(row));
+  }
 
-	public static TableRowHeader getRowHeader(JTable table)
-	{
-		Container p = table.getParent();
-		if (p instanceof JViewport)
-		{
-			Container gp = p.getParent();
-			if (gp instanceof JScrollPane)
-			{
-				JScrollPane scrollPane = (JScrollPane) gp;
-				JViewport rowHeaderViewPort = scrollPane.getRowHeader();
-				if (rowHeaderViewPort != null)
-				{
-					Component c = rowHeaderViewPort.getView();
-					if (c instanceof TableRowHeader)
-					{
-						return (TableRowHeader)c;
-					}
-				}
-			}
-		}
-		return null;
-	}
+  /**
+   * Adjust the height of all rows according to the clientTable.
+   */
+  public void rowHeightChanged() {
+    if (clientTable == null) return;
 
-	public static void removeRowHeader(JTable table)
-	{
-		Container p = table.getParent();
-		if (p instanceof JViewport)
-		{
-			Container gp = p.getParent();
-			if (gp instanceof JScrollPane)
-			{
-				JScrollPane scrollPane = (JScrollPane) gp;
-				TableRowHeader header = getRowHeader(table);
-				if (header != null && header.clientTable != null)
-				{
-					header.clientTable.getModel().removeTableModelListener(header);
-				}
-				scrollPane.setRowHeader(null);
-			}
-		}
-	}
+    int count = clientTable.getRowCount();
 
-	@Override
-	public void stateChanged(ChangeEvent e)
-	{
-		JViewport viewport = (JViewport) e.getSource();
-		if (viewport == null) return;
+    for (int row = 0; row < count; row++) {
+      setRowHeight(row, clientTable.getRowHeight(row));
+    }
+  }
 
-		JScrollPane scrollPane = (JScrollPane)viewport.getParent();
-		if (scrollPane == null) return;
+  @Override
+  public void stateChanged(ChangeEvent e) {
+    JViewport viewport = (JViewport) e.getSource();
+    if (viewport == null) return;
 
-		JScrollBar bar = scrollPane.getVerticalScrollBar();
-		if (bar == null) return;
-		bar.setValue(viewport.getViewPosition().y);
-	}
+    JScrollPane scrollPane = (JScrollPane) viewport.getParent();
+    if (scrollPane == null) return;
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt)
-	{
-		if (evt.getSource() == clientTable && "font".equals(evt.getPropertyName()))
-		{
-			Font f = clientTable.getFont();
-			setFont(f);
-		}
-	}
+    JScrollBar bar = scrollPane.getVerticalScrollBar();
+    if (bar == null) return;
+    bar.setValue(viewport.getViewPosition().y);
+  }
+
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+    if (evt.getSource() == clientTable && "font".equals(evt.getPropertyName())) {
+      Font f = clientTable.getFont();
+      setFont(f);
+    }
+  }
 }

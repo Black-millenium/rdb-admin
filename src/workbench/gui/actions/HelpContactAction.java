@@ -22,11 +22,6 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.JFrame;
-
-import workbench.WbManager;
 import workbench.db.WbConnection;
 import workbench.gui.MainWindow;
 import workbench.gui.WbSwingUtilities;
@@ -34,54 +29,46 @@ import workbench.interfaces.MainPanel;
 import workbench.util.BrowserLauncher;
 import workbench.util.ExceptionUtil;
 
+import java.awt.event.ActionEvent;
+
 /**
  * @author Thomas Kellerer
  */
 public class HelpContactAction
-	extends WbAction
-{
-	private MainWindow mainWindow;
-	
-	public HelpContactAction(MainWindow parent)
-	{
-		super();
-		mainWindow = parent;
-		initMenuDefinition("MnuTxtHelpContact");
-		removeIcon();
-	}
+    extends WbAction {
+  private MainWindow mainWindow;
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		sendEmail();
-	}
+  public HelpContactAction(MainWindow parent) {
+    super();
+    mainWindow = parent;
+    initMenuDefinition("MnuTxtHelpContact");
+    removeIcon();
+  }
 
-	private void sendEmail()
-	{
-		sendEmail(mainWindow);
-	}
+  public static void sendEmail(MainWindow mainWin) {
+    WbConnection currentConnection = null;
 
-	public static void sendEmail(MainWindow mainWin)
-	{
-		WbConnection currentConnection = null;
+    if (mainWin != null) {
+      MainPanel panel = mainWin.getCurrentPanel();
+      if (panel != null) {
+        currentConnection = panel.getConnection();
+      }
+    }
 
-		if (mainWin != null)
-		{
-			MainPanel panel = mainWin.getCurrentPanel();
-			if (panel != null)
-			{
-				currentConnection = panel.getConnection();
-			}
-		}
+    try {
+      BrowserLauncher.openEmail("support@sql-workbench.net", currentConnection);
+    } catch (Exception ex) {
+      WbSwingUtilities.showErrorMessage(ExceptionUtil.getDisplay(ex));
+    }
+  }
 
-		try
-		{
-			BrowserLauncher.openEmail("support@sql-workbench.net", currentConnection);
-		}
-		catch (Exception ex)
-		{
-			WbSwingUtilities.showErrorMessage(ExceptionUtil.getDisplay(ex));
-		}
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    sendEmail();
+  }
+
+  private void sendEmail() {
+    sendEmail(mainWindow);
+  }
 
 }

@@ -25,10 +25,8 @@ package workbench.db.exporter;
 import workbench.storage.RowData;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ExportDataModifier
-{
-	void modifyData(RowDataConverter converter, RowData row, long currentRowNumber);
+public interface ExportDataModifier {
+  void modifyData(RowDataConverter converter, RowData row, long currentRowNumber);
 }

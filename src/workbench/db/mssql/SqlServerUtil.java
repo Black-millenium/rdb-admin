@@ -22,85 +22,72 @@
  */
 package workbench.db.mssql;
 
-import java.sql.SQLException;
-import java.sql.Statement;
 import workbench.db.JdbcUtils;
 import workbench.db.WbConnection;
 import workbench.log.LogMgr;
 import workbench.util.SqlUtil;
 
+import java.sql.SQLException;
+import java.sql.Statement;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public class SqlServerUtil
-{
-	/**
-	 * Returns true if the connection is to a SQL Server 2014 or later.
-	 */
-	public static boolean isSqlServer2014(WbConnection conn)
-	{
-		return JdbcUtils.hasMinimumServerVersion(conn, "12.0");
-	}
+public class SqlServerUtil {
+  /**
+   * Returns true if the connection is to a SQL Server 2014 or later.
+   */
+  public static boolean isSqlServer2014(WbConnection conn) {
+    return JdbcUtils.hasMinimumServerVersion(conn, "12.0");
+  }
 
-	/**
-	 * Returns true if the connection is to a SQL Server 2012 or later.
-	 */
-	public static boolean isSqlServer2012(WbConnection conn)
-	{
-		return JdbcUtils.hasMinimumServerVersion(conn, "11.0");
-	}
+  /**
+   * Returns true if the connection is to a SQL Server 2012 or later.
+   */
+  public static boolean isSqlServer2012(WbConnection conn) {
+    return JdbcUtils.hasMinimumServerVersion(conn, "11.0");
+  }
 
-	/**
-	 * Returns true if the connection is to a SQL Server 2008R2 or later.
-	 */
-	public static boolean isSqlServer2008R2(WbConnection conn)
-	{
-		return JdbcUtils.hasMinimumServerVersion(conn, "10.5");
-	}
+  /**
+   * Returns true if the connection is to a SQL Server 2008R2 or later.
+   */
+  public static boolean isSqlServer2008R2(WbConnection conn) {
+    return JdbcUtils.hasMinimumServerVersion(conn, "10.5");
+  }
 
-	/**
-	 * Returns true if the connection is to a SQL Server 2008 or later.
-	 */
-	public static boolean isSqlServer2008(WbConnection conn)
-	{
-		return JdbcUtils.hasMinimumServerVersion(conn, "10.0");
-	}
+  /**
+   * Returns true if the connection is to a SQL Server 2008 or later.
+   */
+  public static boolean isSqlServer2008(WbConnection conn) {
+    return JdbcUtils.hasMinimumServerVersion(conn, "10.0");
+  }
 
-	/**
-	 * Returns true if the connection is to a SQL Server 2005 or later.
-	 */
-	public static boolean isSqlServer2005(WbConnection conn)
-	{
-		return JdbcUtils.hasMinimumServerVersion(conn, "9.0");
-	}
+  /**
+   * Returns true if the connection is to a SQL Server 2005 or later.
+   */
+  public static boolean isSqlServer2005(WbConnection conn) {
+    return JdbcUtils.hasMinimumServerVersion(conn, "9.0");
+  }
 
-	/**
-	 * Returns true if the connection is to a SQL Server 2000 or later.
-	 */
-	public static boolean isSqlServer2000(WbConnection conn)
-	{
-		return JdbcUtils.hasMinimumServerVersion(conn, "8.0");
-	}
+  /**
+   * Returns true if the connection is to a SQL Server 2000 or later.
+   */
+  public static boolean isSqlServer2000(WbConnection conn) {
+    return JdbcUtils.hasMinimumServerVersion(conn, "8.0");
+  }
 
-	public static void setLockTimeout(WbConnection conn, int millis)
-	{
-		Statement stmt = null;
-		String sql = "SET LOCK_TIMEOUT " + Integer.toString(millis <= 0 ? -1 : millis );
-		try
-		{
-			stmt = conn.createStatement();
-			LogMgr.logInfo("SqlServerUtil.setLockTimeout()", "Setting lock timeout: " + millis + "ms");
-			stmt.execute(sql);
-		}
-		catch (SQLException ex)
-		{
-			LogMgr.logError("SqlServerUtil.setLockTimeout()", "Could not set lock timeout using: " + sql, ex);
-		}
-		finally
-		{
-			SqlUtil.closeStatement(stmt);
-		}
-	}
+  public static void setLockTimeout(WbConnection conn, int millis) {
+    Statement stmt = null;
+    String sql = "SET LOCK_TIMEOUT " + Integer.toString(millis <= 0 ? -1 : millis);
+    try {
+      stmt = conn.createStatement();
+      LogMgr.logInfo("SqlServerUtil.setLockTimeout()", "Setting lock timeout: " + millis + "ms");
+      stmt.execute(sql);
+    } catch (SQLException ex) {
+      LogMgr.logError("SqlServerUtil.setLockTimeout()", "Could not set lock timeout using: " + sql, ex);
+    } finally {
+      SqlUtil.closeStatement(stmt);
+    }
+  }
 
 }

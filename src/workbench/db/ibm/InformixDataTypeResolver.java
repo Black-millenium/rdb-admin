@@ -20,65 +20,53 @@
  */
 package workbench.db.ibm;
 
-import java.sql.Types;
-
 import workbench.db.DefaultDataTypeResolver;
 
+import java.sql.Types;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class InformixDataTypeResolver
-	extends DefaultDataTypeResolver
-{
+    extends DefaultDataTypeResolver {
 
-	@Override
-	public int fixColumnType(int type, String dbmsType)
-	{
-		if (type == Types.CHAR && "INTERVAL".equalsIgnoreCase(dbmsType))
-		{
-			// Don't treat intervals as CHAR.
-			// As JDBC does not have a Type "INTERVAL" this should at least be "OTHER"
-			return Types.OTHER;
-		}
-		return type;
-	}
+  @Override
+  public int fixColumnType(int type, String dbmsType) {
+    if (type == Types.CHAR && "INTERVAL".equalsIgnoreCase(dbmsType)) {
+      // Don't treat intervals as CHAR.
+      // As JDBC does not have a Type "INTERVAL" this should at least be "OTHER"
+      return Types.OTHER;
+    }
+    return type;
+  }
 
-	/**
-	 * Handles Informix varchar(m,r) correctly.
-	 *
-	 * @see workbench.util.SqlUtil#getSqlTypeDisplay(java.lang.String, int, int, int)
-	 */
-	@Override
-	public String getSqlTypeDisplay(String dbmsName, int sqlType, int size, int digits)
-	{
-		if (sqlType == Types.VARCHAR && size > 255)
-		{
-			String display = dbmsName;
+  /**
+   * Handles Informix varchar(m,r) correctly.
+   *
+   * @see workbench.util.SqlUtil#getSqlTypeDisplay(java.lang.String, int, int, int)
+   */
+  @Override
+  public String getSqlTypeDisplay(String dbmsName, int sqlType, int size, int digits) {
+    if (sqlType == Types.VARCHAR && size > 255) {
+      String display = dbmsName;
 
-			int charLength = size % 256;
-			display += "(" + Integer.toString(charLength);
+      int charLength = size % 256;
+      display += "(" + Integer.toString(charLength);
 
-			int reserved = (int)(2810 / 256);
-			if (reserved > 0)
-			{
-				display += "," + Integer.toString(reserved);
-			}
-			display += ")";
-			return display;
-		}
-		else if (sqlType == Types.LONGVARCHAR)
-		{
-			if ("longvarchar".equalsIgnoreCase(dbmsName))
-			{
-				return dbmsName + "(" + Integer.toString(size) + ")";
-			}
-			else
-			{
-				return dbmsName;
-			}
-		}
-		return super.getSqlTypeDisplay(dbmsName, sqlType, size, digits);
-	}
+      int reserved = (int) (2810 / 256);
+      if (reserved > 0) {
+        display += "," + Integer.toString(reserved);
+      }
+      display += ")";
+      return display;
+    } else if (sqlType == Types.LONGVARCHAR) {
+      if ("longvarchar".equalsIgnoreCase(dbmsName)) {
+        return dbmsName + "(" + Integer.toString(size) + ")";
+      } else {
+        return dbmsName;
+      }
+    }
+    return super.getSqlTypeDisplay(dbmsName, sqlType, size, digits);
+  }
 
 }

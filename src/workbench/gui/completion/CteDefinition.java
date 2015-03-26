@@ -22,86 +22,73 @@
  */
 package workbench.gui.completion;
 
-import java.util.List;
-
 import workbench.db.ColumnIdentifier;
 
+import java.util.List;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public class CteDefinition
-{
-	private String cteName;
-	private String innerSql;
-	private List<ColumnIdentifier> columns;
-	private int startAt;
-	private int endAt;
+public class CteDefinition {
+  private String cteName;
+  private String innerSql;
+  private List<ColumnIdentifier> columns;
+  private int startAt;
+  private int endAt;
 
-	public CteDefinition(String name, List<ColumnIdentifier> columnList)
-	{
-		this.cteName = name;
-		this.columns = columnList;
-	}
+  public CteDefinition(String name, List<ColumnIdentifier> columnList) {
+    this.cteName = name;
+    this.columns = columnList;
+  }
 
-	public String getInnerSql()
-	{
-		return innerSql;
-	}
+  public String getInnerSql() {
+    return innerSql;
+  }
 
-	public void setInnerSql(String sql)
-	{
-		this.innerSql = sql == null ? null : sql;
-	}
+  public void setInnerSql(String sql) {
+    this.innerSql = sql == null ? null : sql;
+  }
 
-	public String getName()
-	{
-		return cteName;
-	}
+  public String getName() {
+    return cteName;
+  }
 
-	public List<ColumnIdentifier> getColumns()
-	{
-		return columns;
-	}
+  public List<ColumnIdentifier> getColumns() {
+    return columns;
+  }
 
-	public void setStartInStatement(int startAt)
-	{
-		this.startAt = startAt;
-	}
+  public int getStartInStatement() {
+    return startAt;
+  }
 
-	public void setEndInStatement(int endAt)
-	{
-		this.endAt = endAt;
-	}
+  public void setStartInStatement(int startAt) {
+    this.startAt = startAt;
+  }
 
-	public int getStartInStatement()
-	{
-		return startAt;
-	}
+  public int getEndInStatement() {
+    return endAt;
+  }
 
-	public int getEndInStatement()
-	{
-		return endAt;
-	}
+  public void setEndInStatement(int endAt) {
+    this.endAt = endAt;
+  }
 
-	@Override
-	public String toString()
-	{
-		StringBuilder result = new StringBuilder(50);
-		result.append(cteName);
-		result.append('(');
-		boolean first = true;
-		for (ColumnIdentifier col : columns)
-		{
-			if (first) first = false;
-			else result.append(',');
-			result.append(col.getColumnName());
-		}
-		result.append(") [from ");
-		result.append(startAt);
-		result.append(" to ");
-		result.append(endAt);
-		result.append(']');
-		return result.toString();
-	}
+  @Override
+  public String toString() {
+    StringBuilder result = new StringBuilder(50);
+    result.append(cteName);
+    result.append('(');
+    boolean first = true;
+    for (ColumnIdentifier col : columns) {
+      if (first) first = false;
+      else result.append(',');
+      result.append(col.getColumnName());
+    }
+    result.append(") [from ");
+    result.append(startAt);
+    result.append(" to ");
+    result.append(endAt);
+    result.append(']');
+    return result.toString();
+  }
 }

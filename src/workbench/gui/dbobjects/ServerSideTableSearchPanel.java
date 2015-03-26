@@ -22,48 +22,41 @@
  */
 package workbench.gui.dbobjects;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.KeyListener;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 import workbench.db.search.ServerSideTableSearcher;
 import workbench.db.search.TableDataSearcher;
 import workbench.gui.components.TextComponentMouseListener;
 import workbench.interfaces.PropertyStorage;
 import workbench.resource.ResourceMgr;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyListener;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class ServerSideTableSearchPanel
-	extends JPanel
-	implements TableSearchCriteriaGUI
-{
-	private JTextField columnFunction;
-	private JTextField searchText;
-	private ServerSideTableSearcher searcher;
+    extends JPanel
+    implements TableSearchCriteriaGUI {
+  private JTextField columnFunction;
+  private JTextField searchText;
+  private ServerSideTableSearcher searcher;
 
-	public ServerSideTableSearchPanel()
-	{
-		super(new GridBagLayout());
-		searcher = new ServerSideTableSearcher();
-		initComponents();
-	}
+  public ServerSideTableSearchPanel() {
+    super(new GridBagLayout());
+    searcher = new ServerSideTableSearcher();
+    initComponents();
+  }
 
-	private void initComponents()
-	{
+  private void initComponents() {
     searchText = new JTextField();
     searchText.setMinimumSize(new java.awt.Dimension(100, 20));
-		searchText.addMouseListener(new TextComponentMouseListener());
-		String tip = ResourceMgr.getDescription("LblSearchTableSqlCriteria");
-		searchText.setToolTipText(tip);
+    searchText.addMouseListener(new TextComponentMouseListener());
+    String tip = ResourceMgr.getDescription("LblSearchTableSqlCriteria");
+    searchText.setToolTipText(tip);
 
-		columnFunction = new JTextField();
-		columnFunction.addMouseListener(new TextComponentMouseListener());
+    columnFunction = new JTextField();
+    columnFunction.addMouseListener(new TextComponentMouseListener());
     JLabel likeLabel = new JLabel();
 
     columnFunction.setColumns(8);
@@ -88,50 +81,44 @@ public class ServerSideTableSearchPanel
     gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
     gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.insets = new Insets(0, 2, 0, 5);
+    gridBagConstraints.insets = new Insets(0, 2, 0, 5);
     add(searchText, gridBagConstraints);
-	}
+  }
 
-	@Override
-	public void disableControls()
-	{
-		columnFunction.setEnabled(false);
-		searchText.setEnabled(false);
-	}
+  @Override
+  public void disableControls() {
+    columnFunction.setEnabled(false);
+    searchText.setEnabled(false);
+  }
 
-	@Override
-	public void enableControls()
-	{
-		columnFunction.setEnabled(true);
-		searchText.setEnabled(true);
-	}
+  @Override
+  public void enableControls() {
+    columnFunction.setEnabled(true);
+    searchText.setEnabled(true);
+  }
 
-	@Override
-	public TableDataSearcher getSearcher()
-	{
-		searcher.setCriteria(searchText.getText(), false);
-		searcher.setColumnFunction(columnFunction.getText());
-		return searcher;
-	}
+  @Override
+  public TableDataSearcher getSearcher() {
+    searcher.setCriteria(searchText.getText(), false);
+    searcher.setColumnFunction(columnFunction.getText());
+    return searcher;
+  }
 
-	@Override
-	public void saveSettings(String prefix, PropertyStorage props)
-	{
-		props.setProperty(prefix + ".criteria", this.searchText.getText());
-		props.setProperty(prefix + ".column-function", this.columnFunction.getText());
-	}
+  @Override
+  public void saveSettings(String prefix, PropertyStorage props) {
+    props.setProperty(prefix + ".criteria", this.searchText.getText());
+    props.setProperty(prefix + ".column-function", this.columnFunction.getText());
+  }
 
-	@Override
-	public void restoreSettings(String prefix, PropertyStorage props)
-	{
-		this.searchText.setText(props.getProperty(prefix + ".criteria", ""));
-		this.columnFunction.setText(props.getProperty(prefix + ".column-function", "$col$"));
-	}
+  @Override
+  public void restoreSettings(String prefix, PropertyStorage props) {
+    this.searchText.setText(props.getProperty(prefix + ".criteria", ""));
+    this.columnFunction.setText(props.getProperty(prefix + ".column-function", "$col$"));
+  }
 
-	@Override
-	public void addKeyListenerForCriteria(KeyListener listener)
-	{
-		searchText.addKeyListener(listener);
-	}
+  @Override
+  public void addKeyListenerForCriteria(KeyListener listener) {
+    searchText.addKeyListener(listener);
+  }
 
 }

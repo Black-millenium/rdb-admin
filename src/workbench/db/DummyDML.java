@@ -21,186 +21,152 @@
  *
  */
 package workbench.db;
+
+import workbench.resource.Settings;
+import workbench.storage.*;
+import workbench.util.SqlUtil;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import workbench.resource.Settings;
-
-import workbench.storage.DmlStatement;
-import workbench.storage.ResultInfo;
-import workbench.storage.RowData;
-import workbench.storage.SqlLiteralFormatter;
-import workbench.storage.StatementFactory;
-
-import workbench.util.SqlUtil;
 
 /**
  * @author Thomas Kellerer
  */
 public class DummyDML
-	implements DbObject
-{
-	private final TableIdentifier table;
-	private List<ColumnIdentifier> columns;
+    implements DbObject {
+  private final TableIdentifier table;
+  // if false, an INSERT will be created, otherwise an UPDATE
+  private final boolean createUpdateStatement;
+  private List<ColumnIdentifier> columns;
+  private boolean formatSql = true;
 
-	// if false, an INSERT will be created, otherwise an UPDATE
-	private final boolean createUpdateStatement;
-	private boolean formatSql = true;
+  protected DummyDML(TableIdentifier tbl, boolean buildUpdate) {
+    this.table = tbl;
+    this.createUpdateStatement = buildUpdate;
+  }
 
-	protected DummyDML(TableIdentifier tbl, boolean buildUpdate)
-	{
-		this.table = tbl;
-		this.createUpdateStatement = buildUpdate;
-	}
+  public DummyDML(TableIdentifier tbl, List<ColumnIdentifier> cols, boolean buildUpdate) {
+    this.table = tbl;
+    this.columns = new ArrayList<>(cols);
+    this.createUpdateStatement = buildUpdate;
+  }
 
-	public DummyDML(TableIdentifier tbl, List<ColumnIdentifier> cols, boolean buildUpdate)
-	{
-		this.table = tbl;
-		this.columns = new ArrayList<>(cols);
-		this.createUpdateStatement = buildUpdate;
-	}
+  public void setFormatSql(boolean formatSql) {
+    this.formatSql = formatSql;
+  }
 
-	public void setFormatSql(boolean formatSql)
-	{
-		this.formatSql = formatSql;
-	}
+  @Override
+  public String getComment() {
+    return null;
+  }
 
-	@Override
-	public String getComment()
-	{
-		return null;
-	}
+  @Override
+  public void setComment(String c) {
+  }
 
-	@Override
-	public void setComment(String c)
-	{
-	}
+  @Override
+  public String getCatalog() {
+    return null;
+  }
 
-	@Override
-	public String getCatalog()
-	{
-		return null;
-	}
+  @Override
+  public String getFullyQualifiedName(WbConnection conn) {
+    return getObjectExpression(conn);
+  }
 
-	@Override
-	public String getFullyQualifiedName(WbConnection conn)
-	{
-		return getObjectExpression(conn);
-	}
+  @Override
+  public String getObjectExpression(WbConnection conn) {
+    return null;
+  }
 
-	@Override
-	public String getObjectExpression(WbConnection conn)
-	{
-		return null;
-	}
+  @Override
+  public String getObjectName() {
+    return null;
+  }
 
-	@Override
-	public String getObjectName()
-	{
-		return null;
-	}
+  @Override
+  public String getObjectName(WbConnection conn) {
+    return null;
+  }
 
-	@Override
-	public String getObjectName(WbConnection conn)
-	{
-		return null;
-	}
+  @Override
+  public String getDropStatement(WbConnection con, boolean cascade) {
+    return null;
+  }
 
-	@Override
-	public String getDropStatement(WbConnection con, boolean cascade)
-	{
-		return null;
-	}
+  @Override
+  public String getObjectNameForDrop(WbConnection con) {
+    return null;
+  }
 
-	@Override
-	public String getObjectNameForDrop(WbConnection con)
-	{
-		return null;
-	}
+  @Override
+  public String getObjectType() {
+    throw new UnsupportedOperationException("Must be implemented in a descendant");
+  }
 
-	@Override
-	public String getObjectType()
-	{
-		throw new UnsupportedOperationException("Must be implemented in a descendant");
-	}
+  @Override
+  public String getSchema() {
+    return null;
+  }
 
-	@Override
-	public String getSchema()
-	{
-		return null;
-	}
-
-	@Override
-	public CharSequence getSource(WbConnection con)
-		throws SQLException
-	{
+  @Override
+  public CharSequence getSource(WbConnection con)
+      throws SQLException {
     boolean makePrepared = Settings.getInstance().getBoolProperty("workbench.sql.generate.dummydml.prepared", false);
-		ResultInfo info = null;
-		if (this.columns == null)
-		{
-			info = new ResultInfo(table, con);
-		}
-		else
-		{
-			ColumnIdentifier[] cols = new ColumnIdentifier[columns.size()];
-			columns.toArray(cols);
-			info = new ResultInfo(cols);
-		}
-		info.setUpdateTable(table);
-		StatementFactory factory = new StatementFactory(info, con);
+    ResultInfo info = null;
+    if (this.columns == null) {
+      info = new ResultInfo(table, con);
+    } else {
+      ColumnIdentifier[] cols = new ColumnIdentifier[columns.size()];
+      columns.toArray(cols);
+      info = new ResultInfo(cols);
+    }
+    info.setUpdateTable(table);
+    StatementFactory factory = new StatementFactory(info, con);
 
-		SqlLiteralFormatter f = new SqlLiteralFormatter(con);
+    SqlLiteralFormatter f = new SqlLiteralFormatter(con);
 
-		RowData dummyData = new RowData(info.getColumnCount());
-		if (createUpdateStatement)
-		{
-			// clear the "isNew" status
-			dummyData.resetStatus();
-		}
+    RowData dummyData = new RowData(info.getColumnCount());
+    if (createUpdateStatement) {
+      // clear the "isNew" status
+      dummyData.resetStatus();
+    }
 
 
-		// This is a "trick" to fool the StatementFactory which will
-		// check the type of the Data. In case it does not "know" the
-		// class, it calls toString() to get the value of the column
-		// this way we get a question mark for each value
-		StringBuilder marker = new StringBuilder("?");
+    // This is a "trick" to fool the StatementFactory which will
+    // check the type of the Data. In case it does not "know" the
+    // class, it calls toString() to get the value of the column
+    // this way we get a question mark for each value
+    StringBuilder marker = new StringBuilder("?");
 
-		for (int i=0; i < info.getColumnCount(); i++)
-		{
-			if (makePrepared)
-			{
-				dummyData.setValue(i, marker);
-			}
-			else
-			{
-				int type = info.getColumnType(i);
-				StringBuilder dummy = new StringBuilder();
-				if (SqlUtil.isCharacterType(type)) dummy.append('\'');
-				dummy.append(info.getColumnName(i));
-				dummy.append("_value");
-				if (SqlUtil.isCharacterType(type)) dummy.append('\'');
-				dummyData.setValue(i, dummy);
-				if (createUpdateStatement && info.getColumn(i).isPkColumn())
-				{
-					dummyData.resetStatusForColumn(i);
-				}
-			}
-		}
-		String le = Settings.getInstance().getInternalEditorLineEnding();
-		DmlStatement stmt = null;
-		if (createUpdateStatement)
-		{
-			stmt = factory.createUpdateStatement(dummyData, true, le);
-		}
-		else
-		{
-			stmt = factory.createInsertStatement(dummyData, true, le);
-		}
-		String nl = Settings.getInstance().getInternalEditorLineEnding();
-		stmt.setFormatSql(formatSql);
-		String sql = stmt.getExecutableStatement(f, con) + ";" + nl;
-		return sql;
-	}
+    for (int i = 0; i < info.getColumnCount(); i++) {
+      if (makePrepared) {
+        dummyData.setValue(i, marker);
+      } else {
+        int type = info.getColumnType(i);
+        StringBuilder dummy = new StringBuilder();
+        if (SqlUtil.isCharacterType(type)) dummy.append('\'');
+        dummy.append(info.getColumnName(i));
+        dummy.append("_value");
+        if (SqlUtil.isCharacterType(type)) dummy.append('\'');
+        dummyData.setValue(i, dummy);
+        if (createUpdateStatement && info.getColumn(i).isPkColumn()) {
+          dummyData.resetStatusForColumn(i);
+        }
+      }
+    }
+    String le = Settings.getInstance().getInternalEditorLineEnding();
+    DmlStatement stmt = null;
+    if (createUpdateStatement) {
+      stmt = factory.createUpdateStatement(dummyData, true, le);
+    } else {
+      stmt = factory.createInsertStatement(dummyData, true, le);
+    }
+    String nl = Settings.getInstance().getInternalEditorLineEnding();
+    stmt.setFormatSql(formatSql);
+    String sql = stmt.getExecutableStatement(f, con) + ";" + nl;
+    return sql;
+  }
 
 }

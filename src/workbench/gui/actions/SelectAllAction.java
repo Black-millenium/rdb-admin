@@ -22,34 +22,30 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
 import workbench.interfaces.ClipboardSupport;
 import workbench.resource.PlatformShortcuts;
 import workbench.resource.ResourceMgr;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class SelectAllAction extends WbAction
-{
-	private ClipboardSupport client;
+public class SelectAllAction extends WbAction {
+  private ClipboardSupport client;
 
-	public SelectAllAction(ClipboardSupport aClient)
-	{
-		super();
-		this.client = aClient;
-		this.setMenuTextByKey("MnuTxtSelectAll");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-		this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, PlatformShortcuts.getDefaultModifier()));
-	}
+  public SelectAllAction(ClipboardSupport aClient) {
+    super();
+    this.client = aClient;
+    this.setMenuTextByKey("MnuTxtSelectAll");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+    this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, PlatformShortcuts.getDefaultModifier()));
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.selectAll();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.selectAll();
+  }
 }

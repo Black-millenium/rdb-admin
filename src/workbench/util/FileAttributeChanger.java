@@ -22,40 +22,32 @@
  */
 package workbench.util;
 
+import workbench.log.LogMgr;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 
-import workbench.log.LogMgr;
-
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class FileAttributeChanger
-{
+public class FileAttributeChanger {
 
-	public void removeHidden(File dir)
-	{
-		if (PlatformHelper.isWindows())
-		{
-			removeAttribute(dir);
-		}
-	}
+  public void removeHidden(File dir) {
+    if (PlatformHelper.isWindows()) {
+      removeAttribute(dir);
+    }
+  }
 
-	private void removeAttribute(File dir)
-	{
-		try
-		{
-			Path file = dir.toPath();
-			Files.setAttribute(file, "dos:hidden", false, LinkOption.NOFOLLOW_LINKS);
-		}
-		catch (Throwable th)
-		{
-			LogMgr.logWarning("FileAttributeChanger.removeAttribute()", "Could not remove hidden attribute of config dir: " + dir.getAbsolutePath(), th);
-		}
-	}
+  private void removeAttribute(File dir) {
+    try {
+      Path file = dir.toPath();
+      Files.setAttribute(file, "dos:hidden", false, LinkOption.NOFOLLOW_LINKS);
+    } catch (Throwable th) {
+      LogMgr.logWarning("FileAttributeChanger.removeAttribute()", "Could not remove hidden attribute of config dir: " + dir.getAbsolutePath(), th);
+    }
+  }
 
 }

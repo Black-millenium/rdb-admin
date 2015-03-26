@@ -22,63 +22,63 @@
  */
 package workbench.sql.parser;
 
-import java.io.File;
-import java.io.IOException;
-
 import workbench.sql.DelimiterDefinition;
 import workbench.sql.ScriptCommandDefinition;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ScriptIterator
-{
-	int getScriptLength();
+public interface ScriptIterator {
+  int getScriptLength();
 
-	void setCheckEscapedQuotes(boolean flag);
+  void setCheckEscapedQuotes(boolean flag);
 
-	void setEmptyLineIsDelimiter(boolean flag);
+  void setEmptyLineIsDelimiter(boolean flag);
 
-	/**
-	 * Controls if the actual SQL for each command returned by
-	 * #getNextCommand() is stored in the ScriptCommandDefinition
-	 * or if only start and end in the script should be stored.
-	 *
-	 * @param flag if true, the actual SQL is returned otherwise only the start and end
-	 */
-	void setStoreStatementText(boolean flag);
+  /**
+   * Controls if the actual SQL for each command returned by
+   * #getNextCommand() is stored in the ScriptCommandDefinition
+   * or if only start and end in the script should be stored.
+   *
+   * @param flag if true, the actual SQL is returned otherwise only the start and end
+   */
+  void setStoreStatementText(boolean flag);
 
-	boolean supportsSingleLineCommands();
+  boolean supportsSingleLineCommands();
 
-	/**
-	 * Return the next command from the script.
-	 * There are no more commands if this returns null
-	 */
-	ScriptCommandDefinition getNextCommand();
+  /**
+   * Return the next command from the script.
+   * There are no more commands if this returns null
+   */
+  ScriptCommandDefinition getNextCommand();
 
-	void setDelimiter(DelimiterDefinition delim);
-	void setAlternateDelimiter(DelimiterDefinition delim);
+  void setDelimiter(DelimiterDefinition delim);
 
-	boolean supportsMixedDelimiter();
+  void setAlternateDelimiter(DelimiterDefinition delim);
 
-	/**
-	 * Define the source file to be used and the encoding of the file.
-	 * If the encoding is null, the default encoding will be used.
-	 * @see #setFile(File, String)
-	 * @see workbench.resource.Settings#getDefaultEncoding()
-	 */
-	void setFile(File f, String enc)
-		throws IOException;
+  boolean supportsMixedDelimiter();
 
-	void setReturnStartingWhitespace(boolean flag);
+  /**
+   * Define the source file to be used and the encoding of the file.
+   * If the encoding is null, the default encoding will be used.
+   *
+   * @see #setFile(File, String)
+   * @see workbench.resource.Settings#getDefaultEncoding()
+   */
+  void setFile(File f, String enc)
+      throws IOException;
 
-	/**
-	 * Define the script to be parsed
-	 */
-	void setScript(String aScript);
+  void setReturnStartingWhitespace(boolean flag);
 
-	void reset();
+  /**
+   * Define the script to be parsed
+   */
+  void setScript(String aScript);
 
-	void done();
+  void reset();
+
+  void done();
 }

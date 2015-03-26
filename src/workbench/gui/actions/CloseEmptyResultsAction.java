@@ -22,40 +22,34 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.gui.sql.DwPanel;
 import workbench.gui.sql.ResultCloseFilter;
 import workbench.gui.sql.SqlPanel;
 
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class CloseEmptyResultsAction
-	extends WbAction
-{
-	private SqlPanel client;
+    extends WbAction {
+  private SqlPanel client;
 
-	public CloseEmptyResultsAction(SqlPanel panel)
-	{
-		client = panel;
-		initMenuDefinition("MnuTxtCloseEmptyResults");
-		this.setEnabled(client.getResultTabCount() > 0);
-	}
+  public CloseEmptyResultsAction(SqlPanel panel) {
+    client = panel;
+    initMenuDefinition("MnuTxtCloseEmptyResults");
+    this.setEnabled(client.getResultTabCount() > 0);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		ResultCloseFilter filter = new ResultCloseFilter()
-		{
-			@Override
-			public boolean shouldClose(DwPanel panel, int panelIndex)
-			{
-				return panel.getDataStore().getRowCount() == 0;
-			}
-		};
-		client.closeSelectedResults(filter);
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    ResultCloseFilter filter = new ResultCloseFilter() {
+      @Override
+      public boolean shouldClose(DwPanel panel, int panelIndex) {
+        return panel.getDataStore().getRowCount() == 0;
+      }
+    };
+    client.closeSelectedResults(filter);
+  }
 
 }

@@ -31,57 +31,44 @@ import java.sql.Struct;
  *
  * @author Thomas Kellerer
  */
-public class ArrayConverter
-{
-	public static String getArrayDisplay(Object value, String dbmsType, boolean showType)
-		throws SQLException
-	{
-		if (value == null) return null;
+public class ArrayConverter {
+  public static String getArrayDisplay(Object value, String dbmsType, boolean showType)
+      throws SQLException {
+    if (value == null) return null;
 
-		Object[] elements = null;
-		String prefix = "";
-		if (value instanceof Array)
-		{
-			Array ar = (Array)value;
-			elements = (Object[])ar.getArray();
-			prefix = dbmsType;
-		}
-		else if (value instanceof Object[])
-		{
-			// this is for H2
-			elements = (Object[])value;
-		}
+    Object[] elements = null;
+    String prefix = "";
+    if (value instanceof Array) {
+      Array ar = (Array) value;
+      elements = (Object[]) ar.getArray();
+      prefix = dbmsType;
+    } else if (value instanceof Object[]) {
+      // this is for H2
+      elements = (Object[]) value;
+    }
 
-		if (elements != null)
-		{
-			int len = elements.length;
-			StringBuilder sb = new StringBuilder(len * 10);
-			if (showType)
-			{
-				sb.append(prefix);
-			}
-			sb.append('[');
-			StructConverter conv = StructConverter.getInstance();
+    if (elements != null) {
+      int len = elements.length;
+      StringBuilder sb = new StringBuilder(len * 10);
+      if (showType) {
+        sb.append(prefix);
+      }
+      sb.append('[');
+      StructConverter conv = StructConverter.getInstance();
 
-			for (int x=0; x < len; x++)
-			{
-				if (x > 0) sb.append(',');
-				if (elements[x] == null)
-				{
-					sb.append("NULL");
-				}
-				else if (elements[x] instanceof Struct)
-				{
-					sb.append(conv.getStructDisplay((Struct)elements[x]));
-				}
-				else
-				{
-					conv.appendValue(sb, elements[x]);
-				}
-			}
-			sb.append(']');
-			return sb.toString();
-		}
-		return value.toString();
-	}
+      for (int x = 0; x < len; x++) {
+        if (x > 0) sb.append(',');
+        if (elements[x] == null) {
+          sb.append("NULL");
+        } else if (elements[x] instanceof Struct) {
+          sb.append(conv.getStructDisplay((Struct) elements[x]));
+        } else {
+          conv.appendValue(sb, elements[x]);
+        }
+      }
+      sb.append(']');
+      return sb.toString();
+    }
+    return value.toString();
+  }
 }

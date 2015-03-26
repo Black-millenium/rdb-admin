@@ -19,36 +19,29 @@
  */
 package workbench.gui.dbobjects.objecttree;
 
-import java.awt.Component;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.swing.JTree;
-import javax.swing.tree.DefaultTreeCellRenderer;
-
-import workbench.resource.IconMgr;
-
 import workbench.db.ColumnIdentifier;
 import workbench.db.DbMetadata;
 import workbench.db.DbObject;
-
+import workbench.resource.IconMgr;
 import workbench.util.CaseInsensitiveComparator;
 
+import javax.swing.*;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import java.awt.*;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class DbObjectNodeRenderer
-	extends DefaultTreeCellRenderer
-{
+    extends DefaultTreeCellRenderer {
   private Map<String, String> iconMap = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
   private Map<String, String> iconMapOpen = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
 
-	public DbObjectNodeRenderer()
-	{
-		super();
+  public DbObjectNodeRenderer() {
+    super();
     iconMap.put(TreeLoader.TYPE_TABLE, "table");
     iconMap.put(TreeLoader.TYPE_VIEW, "table");
     iconMap.put(DbMetadata.MVIEW_NAME, "table");
@@ -59,44 +52,36 @@ public class DbObjectNodeRenderer
 
     iconMapOpen.put(TreeLoader.TYPE_SCHEMA, "folder-open");
     iconMapOpen.put(TreeLoader.TYPE_CATALOG, "folder-open");
-	}
+  }
 
-	@Override
-	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean isLeaf, int row, boolean hasFocus)
-	{
-		Component result = super.getTreeCellRendererComponent(tree, value, isSelected, expanded, isLeaf, row, hasFocus);
+  @Override
+  public Component getTreeCellRendererComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean isLeaf, int row, boolean hasFocus) {
+    Component result = super.getTreeCellRendererComponent(tree, value, isSelected, expanded, isLeaf, row, hasFocus);
 
-		if (value instanceof ObjectTreeNode)
-		{
-			ObjectTreeNode node = (ObjectTreeNode)value;
+    if (value instanceof ObjectTreeNode) {
+      ObjectTreeNode node = (ObjectTreeNode) value;
       String type = node.getType();
       DbObject dbo = node.getDbObject();
-      if (dbo instanceof ColumnIdentifier)
-      {
-        ColumnIdentifier col = (ColumnIdentifier)dbo;
-        if (col.isPkColumn())
-        {
+      if (dbo instanceof ColumnIdentifier) {
+        ColumnIdentifier col = (ColumnIdentifier) dbo;
+        if (col.isPkColumn()) {
           setIcon(IconMgr.getInstance().getLabelIcon("key"));
         }
-      }
-      else
-      {
+      } else {
         String key = null;
 
-        if (expanded)
-        {
+        if (expanded) {
           key = iconMapOpen.get(type);
         }
         if (key == null) key = iconMap.get(type);
 
-        if (key != null)
-        {
+        if (key != null) {
           setIcon(IconMgr.getInstance().getLabelIcon(key));
         }
       }
       setToolTipText(node.getTooltip());
-		}
+    }
 
-		return result;
-	}
+    return result;
+  }
 }

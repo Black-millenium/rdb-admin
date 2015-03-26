@@ -25,47 +25,33 @@ package workbench.util;
 import java.io.FileWriter;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class SilentFileWriter
-{
-	private FileWriter writer;
+public class SilentFileWriter {
+  private FileWriter writer;
 
-	public SilentFileWriter(String filename)
-	{
-		try
-		{
-			writer = new FileWriter(filename);
-		}
-		catch (Throwable th)
-		{
-			th.printStackTrace();
-		}
-	}
+  public SilentFileWriter(String filename) {
+    try {
+      writer = new FileWriter(filename);
+    } catch (Throwable th) {
+      th.printStackTrace();
+    }
+  }
 
-	public void append(String text)
-	{
-		try
-		{
-			writer.append(text);
-		}
-		catch (Throwable th)
-		{
-			th.printStackTrace();
-		}
-	}
+  public void append(String text) {
+    try {
+      writer.append(text);
+    } catch (Throwable th) {
+      th.printStackTrace();
+    }
+  }
 
-	public void close()
-	{
-		try
-		{
-			writer.close();
-		}
-		catch (Throwable th)
-		{
-			th.printStackTrace();
-		}
-	}
+  public void close() {
+    try {
+      writer.close();
+    } catch (Throwable th) {
+      th.printStackTrace();
+    }
+  }
 
 }

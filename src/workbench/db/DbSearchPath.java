@@ -22,76 +22,60 @@
  */
 package workbench.db;
 
-import java.util.Collections;
-import java.util.List;
-
 import workbench.db.ibm.Db2SearchPath;
 import workbench.db.postgres.PostgresUtil;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public interface DbSearchPath
-{
-	boolean isRealSearchPath();
-	List<String> getSearchPath(WbConnection dbConn, String defaultSchema);
+public interface DbSearchPath {
+  DbSearchPath DEFAULT_HANDLER = new DbSearchPath() {
+    @Override
+    public List<String> getSearchPath(WbConnection dbConn, String defaultSchema) {
+      if (defaultSchema == null) {
+        defaultSchema = dbConn.getCurrentSchema();
+      }
+      if (defaultSchema == null) {
+        return Collections.emptyList();
+      }
+      return Collections.singletonList(dbConn.getMetadata().adjustSchemaNameCase(defaultSchema));
+    }
 
-	DbSearchPath DEFAULT_HANDLER = new DbSearchPath()
-	{
-		@Override
-		public List<String> getSearchPath(WbConnection dbConn, String defaultSchema)
-		{
-			if (defaultSchema == null)
-			{
-				defaultSchema = dbConn.getCurrentSchema();
-			}
-			if (defaultSchema == null)
-			{
-				return Collections.emptyList();
-			}
-			return Collections.singletonList(dbConn.getMetadata().adjustSchemaNameCase(defaultSchema));
-		}
+    @Override
+    public boolean isRealSearchPath() {
+      return false;
+    }
+  };
+  DbSearchPath PG_HANDLER = new DbSearchPath() {
+    @Override
+    public List<String> getSearchPath(WbConnection dbConn, String defaultSchema) {
+      if (defaultSchema != null && dbConn != null) {
+        return Collections.singletonList(dbConn.getMetadata().adjustSchemaNameCase(defaultSchema));
+      }
+      return PostgresUtil.getSearchPath(dbConn);
+    }
 
-		@Override
-		public boolean isRealSearchPath()
-		{
-			return false;
-		}
-	};
+    @Override
+    public boolean isRealSearchPath() {
+      return true;
+    }
+  };
 
-	DbSearchPath PG_HANDLER = new DbSearchPath()
-	{
-		@Override
-		public List<String> getSearchPath(WbConnection dbConn, String defaultSchema)
-		{
-			if (defaultSchema != null && dbConn != null)
-			{
-				return Collections.singletonList(dbConn.getMetadata().adjustSchemaNameCase(defaultSchema));
-			}
-			return PostgresUtil.getSearchPath(dbConn);
-		}
-		
-		@Override
-		public boolean isRealSearchPath()
-		{
-			return true;
-		}
-	};
+  boolean isRealSearchPath();
 
-	class Factory
-	{
-		public static DbSearchPath getSearchPathHandler(WbConnection con)
-		{
-			if (con != null && con.getMetadata().isPostgres())
-			{
-				return PG_HANDLER;
-			}
-			else if (con.getDbId().equals("db2i"))
-			{
-				return new Db2SearchPath();
-			}
-			return DEFAULT_HANDLER;
-		}
-	}
+  List<String> getSearchPath(WbConnection dbConn, String defaultSchema);
+
+  class Factory {
+    public static DbSearchPath getSearchPathHandler(WbConnection con) {
+      if (con != null && con.getMetadata().isPostgres()) {
+        return PG_HANDLER;
+      } else if (con.getDbId().equals("db2i")) {
+        return new Db2SearchPath();
+      }
+      return DEFAULT_HANDLER;
+    }
+  }
 }

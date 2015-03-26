@@ -22,110 +22,95 @@
  */
 package workbench.sql.wbcommands;
 
+import workbench.console.ConsoleSettings;
+import workbench.console.RowDisplay;
+import workbench.resource.ResourceMgr;
+import workbench.sql.SqlCommand;
+import workbench.sql.StatementRunnerResult;
+import workbench.storage.DataStore;
+import workbench.util.SqlUtil;
+import workbench.util.StringUtil;
+
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 
-import workbench.console.ConsoleSettings;
-import workbench.console.RowDisplay;
-import workbench.resource.ResourceMgr;
-
-import workbench.storage.DataStore;
-
-import workbench.sql.SqlCommand;
-import workbench.sql.StatementRunnerResult;
-
-import workbench.util.SqlUtil;
-import workbench.util.StringUtil;
-
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class WbListCatalogs
-	extends SqlCommand
-{
+    extends SqlCommand {
 
-	public static final String VERB = "WbListDB";
-	public static final String VERB_ALTERNATE = "WbListCat";
+  public static final String VERB = "WbListDB";
+  public static final String VERB_ALTERNATE = "WbListCat";
 
-	public WbListCatalogs()
-	{
-		super();
-	}
+  public WbListCatalogs() {
+    super();
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	public String getAlternateVerb()
-	{
-		return VERB_ALTERNATE;
-	}
+  @Override
+  public String getAlternateVerb() {
+    return VERB_ALTERNATE;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult();
 
-		DataStore ds = null;
-		String catName = StringUtil.capitalize(currentConnection.getMetadata().getCatalogTerm());
+    DataStore ds = null;
+    String catName = StringUtil.capitalize(currentConnection.getMetadata().getCatalogTerm());
 
-		if (currentConnection.getMetadata().isPostgres())
-		{
-			ds = listPgDatabases();
-		}
-		else
-		{
-			ConsoleSettings.getInstance().setNextRowDisplay(RowDisplay.SingleLine);
+    if (currentConnection.getMetadata().isPostgres()) {
+      ds = listPgDatabases();
+    } else {
+      ConsoleSettings.getInstance().setNextRowDisplay(RowDisplay.SingleLine);
 
-			List<String> cats = currentConnection.getMetadata().getCatalogs();
-			String[] cols = {catName};
-			int[] types = {Types.VARCHAR};
-			int[] sizes = {10};
+      List<String> cats = currentConnection.getMetadata().getCatalogs();
+      String[] cols = {catName};
+      int[] types = {Types.VARCHAR};
+      int[] sizes = {10};
 
-			ds = new DataStore(cols, types, sizes);
-			for (String cat : cats)
-			{
-				int row = ds.addRow();
-				ds.setValue(row, 0, cat);
-			}
-			ds.setResultName(catName);
-			ds.setGeneratingSql(sql);
-		}
+      ds = new DataStore(cols, types, sizes);
+      for (String cat : cats) {
+        int row = ds.addRow();
+        ds.setValue(row, 0, cat);
+      }
+      ds.setResultName(catName);
+      ds.setGeneratingSql(sql);
+    }
 
-		ds.resetStatus();
-		result.addDataStore(ds);
-		result.setSuccess();
-		return result;
-	}
+    ds.resetStatus();
+    result.addDataStore(ds);
+    result.setSuccess();
+    return result;
+  }
 
-	private DataStore listPgDatabases()
-	{
-		String name = StringUtil.capitalize(currentConnection.getMetadata().getCatalogTerm());
-		String sql =
-			"SELECT d.datname as \"" + name + "\",\n" +
-			"       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n" +
-			"       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n" +
-			"       d.datcollate as \"Collate\",\n" +
-			"       d.datctype as \"Ctype\",\n" +
-			"       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\", \n" +
-			"       pg_catalog.shobj_description(d.oid, 'pg_database') as \"Description\" \n" +
-			"FROM pg_catalog.pg_database d\n" +
-			"ORDER BY 1";
-		DataStore ds = SqlUtil.getResult(currentConnection, sql, true);
-		ds.setGeneratingSql(sql);
-		ds.setResultName(ResourceMgr.getString("TxtDbList"));
-		return ds;
-	}
+  private DataStore listPgDatabases() {
+    String name = StringUtil.capitalize(currentConnection.getMetadata().getCatalogTerm());
+    String sql =
+        "SELECT d.datname as \"" + name + "\",\n" +
+            "       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n" +
+            "       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n" +
+            "       d.datcollate as \"Collate\",\n" +
+            "       d.datctype as \"Ctype\",\n" +
+            "       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\", \n" +
+            "       pg_catalog.shobj_description(d.oid, 'pg_database') as \"Description\" \n" +
+            "FROM pg_catalog.pg_database d\n" +
+            "ORDER BY 1";
+    DataStore ds = SqlUtil.getResult(currentConnection, sql, true);
+    ds.setGeneratingSql(sql);
+    ds.setResultName(ResourceMgr.getString("TxtDbList"));
+    return ds;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 }

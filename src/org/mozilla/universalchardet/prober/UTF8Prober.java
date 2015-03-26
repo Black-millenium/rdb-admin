@@ -37,104 +37,94 @@
 
 package org.mozilla.universalchardet.prober;
 
+import org.mozilla.universalchardet.Constants;
 import org.mozilla.universalchardet.prober.statemachine.CodingStateMachine;
 import org.mozilla.universalchardet.prober.statemachine.SMModel;
 import org.mozilla.universalchardet.prober.statemachine.UTF8SMModel;
-import org.mozilla.universalchardet.Constants;
 
 
-public class UTF8Prober extends CharsetProber
-{
-    ////////////////////////////////////////////////////////////////
-    // constants
-    ////////////////////////////////////////////////////////////////
-    public static final float ONE_CHAR_PROB = 0.50f;
-    
+public class UTF8Prober extends CharsetProber {
+  ////////////////////////////////////////////////////////////////
+  // constants
+  ////////////////////////////////////////////////////////////////
+  public static final float ONE_CHAR_PROB = 0.50f;
+  private static final SMModel smModel = new UTF8SMModel();
+  ////////////////////////////////////////////////////////////////
+  // fields
+  ////////////////////////////////////////////////////////////////
+  private CodingStateMachine codingSM;
+  private ProbingState state;
+  private int numOfMBChar;
 
-    ////////////////////////////////////////////////////////////////
-    // fields
-    ////////////////////////////////////////////////////////////////
-    private CodingStateMachine  codingSM;
-    private ProbingState        state;
-    private int                 numOfMBChar;
-    
-    private static final SMModel smModel = new UTF8SMModel();
-    
 
-    ////////////////////////////////////////////////////////////////
-    // methods
-    ////////////////////////////////////////////////////////////////
-    public UTF8Prober()
-    {
-        super();
-        this.numOfMBChar = 0;
-        this.codingSM = new CodingStateMachine(smModel);
+  ////////////////////////////////////////////////////////////////
+  // methods
+  ////////////////////////////////////////////////////////////////
+  public UTF8Prober() {
+    super();
+    this.numOfMBChar = 0;
+    this.codingSM = new CodingStateMachine(smModel);
 
-        reset();
-    }
+    reset();
+  }
 
-    public String getCharSetName()
-    {
-        return Constants.CHARSET_UTF_8;
-    }
+  public String getCharSetName() {
+    return Constants.CHARSET_UTF_8;
+  }
 
-    public ProbingState handleData(final byte[] buf, int offset, int length)
-    {
-        int codingState;
+  public ProbingState handleData(final byte[] buf, int offset, int length) {
+    int codingState;
 
-        int maxPos = offset + length;
-        for (int i=offset; i<maxPos; ++i) {
-            codingState = this.codingSM.nextState(buf[i]);
-            if (codingState == SMModel.ERROR) {
-                this.state = ProbingState.NOT_ME;
-                break;
-            }
-            if (codingState == SMModel.ITSME) {
-                this.state = ProbingState.FOUND_IT;
-                break;
-            }
-            if (codingState == SMModel.START) {
-                if (this.codingSM.getCurrentCharLen() >= 2) {
-                    ++this.numOfMBChar;
-                }
-            }
+    int maxPos = offset + length;
+    for (int i = offset; i < maxPos; ++i) {
+      codingState = this.codingSM.nextState(buf[i]);
+      if (codingState == SMModel.ERROR) {
+        this.state = ProbingState.NOT_ME;
+        break;
+      }
+      if (codingState == SMModel.ITSME) {
+        this.state = ProbingState.FOUND_IT;
+        break;
+      }
+      if (codingState == SMModel.START) {
+        if (this.codingSM.getCurrentCharLen() >= 2) {
+          ++this.numOfMBChar;
         }
-        
-        if (this.state == ProbingState.DETECTING) {
-            if (getConfidence() > SHORTCUT_THRESHOLD) {
-                this.state = ProbingState.FOUND_IT;
-            }
-        }
-        
-        return this.state;
+      }
     }
 
-    public ProbingState getState()
-    {
-        return this.state;
+    if (this.state == ProbingState.DETECTING) {
+      if (getConfidence() > SHORTCUT_THRESHOLD) {
+        this.state = ProbingState.FOUND_IT;
+      }
     }
 
-    public void reset()
-    {
-        this.codingSM.reset();
-        this.numOfMBChar = 0;
-        this.state = ProbingState.DETECTING;
-    }
+    return this.state;
+  }
 
-    public float getConfidence()
-    {
-        float unlike = 0.99f;
-        
-        if (this.numOfMBChar < 6) {
-            for (int i=0; i<this.numOfMBChar; ++i) {
-                unlike *= ONE_CHAR_PROB;
-            }
-            return (1.0f - unlike);
-        } else {
-            return 0.99f;
-        }
-    }
+  public ProbingState getState() {
+    return this.state;
+  }
 
-    public void setOption()
-    {}
+  public void reset() {
+    this.codingSM.reset();
+    this.numOfMBChar = 0;
+    this.state = ProbingState.DETECTING;
+  }
+
+  public float getConfidence() {
+    float unlike = 0.99f;
+
+    if (this.numOfMBChar < 6) {
+      for (int i = 0; i < this.numOfMBChar; ++i) {
+        unlike *= ONE_CHAR_PROB;
+      }
+      return (1.0f - unlike);
+    } else {
+      return 0.99f;
+    }
+  }
+
+  public void setOption() {
+  }
 }

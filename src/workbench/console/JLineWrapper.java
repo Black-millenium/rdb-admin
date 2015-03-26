@@ -22,166 +22,124 @@
  */
 package workbench.console;
 
+import jline.*;
+import workbench.util.CollectionUtil;
+import workbench.util.FileUtil;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import workbench.util.CollectionUtil;
-import workbench.util.FileUtil;
-
-import jline.ArgumentCompletor;
-import jline.Completor;
-import jline.ConsoleReader;
-import jline.History;
-import jline.NullCompletor;
-import jline.Terminal;
-
 /**
- *
  * @author Thomas Kellerer
  */
 public class JLineWrapper
-	implements WbConsole
-{
-	private ConsoleReader reader;
+    implements WbConsole {
+  private ConsoleReader reader;
 
-	public JLineWrapper()
-		throws IOException
-	{
-		reader = new ConsoleReader();
-		reader.setUseHistory(true);
-		reader.setUsePagination(false);
-		reader.setBellEnabled(false);
-		List<Completor> completors = new ArrayList<>(2);
+  public JLineWrapper()
+      throws IOException {
+    reader = new ConsoleReader();
+    reader.setUseHistory(true);
+    reader.setUsePagination(false);
+    reader.setBellEnabled(false);
+    List<Completor> completors = new ArrayList<>(2);
 //		completors.add(new WbFilenameCompletor());
-		completors.add(new ClipCompletor());
-		completors.add(new NullCompletor());
-		reader.addCompletor(new ArgumentCompletor(completors));
-	}
+    completors.add(new ClipCompletor());
+    completors.add(new NullCompletor());
+    reader.addCompletor(new ArgumentCompletor(completors));
+  }
 
   @Override
-  public void clearScreen()
-  {
-    try
-    {
+  public void clearScreen() {
+    try {
       reader.clearScreen();
-    }
-    catch (IOException ex)
-    {
+    } catch (IOException ex) {
     }
   }
 
   @Override
-  public void reset()
-  {
-    try
-    {
+  public void reset() {
+    try {
       reader.getInput().reset();
-    }
-    catch (IOException ex)
-    {
+    } catch (IOException ex) {
     }
   }
 
   @Override
-  public char readCharacter()
-  {
-    try
-    {
-      return (char)reader.readVirtualKey();
-    }
-    catch (IOException ex)
-    {
+  public char readCharacter() {
+    try {
+      return (char) reader.readVirtualKey();
+    } catch (IOException ex) {
     }
     return 0;
   }
 
-	@Override
-	public String readLineWithoutHistory(String prompt)
-	{
-		boolean old = reader.getUseHistory();
-		try
-		{
-			reader.setUseHistory(false);
-			return readLine(prompt);
-		}
-		finally
-		{
-			reader.setUseHistory(old);
-		}
-	}
+  @Override
+  public String readLineWithoutHistory(String prompt) {
+    boolean old = reader.getUseHistory();
+    try {
+      reader.setUseHistory(false);
+      return readLine(prompt);
+    } finally {
+      reader.setUseHistory(old);
+    }
+  }
 
-	@Override
-	public int getColumns()
-	{
-		Terminal t = Terminal.getTerminal();
-		if (t != null)
-		{
-			return t.getTerminalWidth();
-		}
-		return -1;
-	}
+  @Override
+  public int getColumns() {
+    Terminal t = Terminal.getTerminal();
+    if (t != null) {
+      return t.getTerminalWidth();
+    }
+    return -1;
+  }
 
-	@Override
-	public String readPassword(String prompt)
-	{
-		try
-		{
-			return reader.readLine(prompt, Character.valueOf('*'));
-		}
-		catch (IOException e)
-		{
-			return null;
-		}
-	}
+  @Override
+  public String readPassword(String prompt) {
+    try {
+      return reader.readLine(prompt, Character.valueOf('*'));
+    } catch (IOException e) {
+      return null;
+    }
+  }
 
-	@Override
-	public String readLine(String prompt)
-	{
-		try
-		{
-			return reader.readLine(prompt);
-		}
-		catch (IOException e)
-		{
-			return null;
-		}
-	}
+  @Override
+  public String readLine(String prompt) {
+    try {
+      return reader.readLine(prompt);
+    } catch (IOException e) {
+      return null;
+    }
+  }
 
-	@Override
-	public void shutdown()
-	{
-		History h = reader.getHistory();
-		if (h != null)
-		{
-			FileUtil.closeQuietely(h.getOutput());
-		}
-	}
+  @Override
+  public void shutdown() {
+    History h = reader.getHistory();
+    if (h != null) {
+      FileUtil.closeQuietely(h.getOutput());
+    }
+  }
 
-	@Override
-	public void clearHistory()
-	{
-		History h = reader.getHistory();
-		if (h != null)
-		{
-			h.clear();
-		}
-	}
+  @Override
+  public void clearHistory() {
+    History h = reader.getHistory();
+    if (h != null) {
+      h.clear();
+    }
+  }
 
-	@Override
-	public void addToHistory(List<String> lines)
-	{
-		if (CollectionUtil.isEmpty(lines)) return;
+  @Override
+  public void addToHistory(List<String> lines) {
+    if (CollectionUtil.isEmpty(lines)) return;
 
-		History h = reader.getHistory();
-		if (h != null)
-		{
-			for (String line : lines)
-			{
-				h.addToHistory(line);
-			}
-		}
-	}
+    History h = reader.getHistory();
+    if (h != null) {
+      for (String line : lines) {
+        h.addToHistory(line);
+      }
+    }
+  }
 
 
 }

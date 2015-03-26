@@ -22,38 +22,34 @@
  */
 package workbench.gui.actions;
 
+import workbench.gui.sql.SqlPanel;
+import workbench.resource.PlatformShortcuts;
+import workbench.resource.ResourceMgr;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.KeyStroke;
-
-import workbench.resource.PlatformShortcuts;
-import workbench.resource.ResourceMgr;
-
-import workbench.gui.sql.SqlPanel;
-
 /**
  * Run all statements in the current SQL Panel
+ *
+ * @author Thomas Kellerer
  * @see workbench.gui.sql.SqlPanel#runAll()
- * @author  Thomas Kellerer
  */
-public class ExecuteAllAction extends WbAction
-{
-	private SqlPanel client;
+public class ExecuteAllAction extends WbAction {
+  private SqlPanel client;
 
-	public ExecuteAllAction(SqlPanel aPanel)
-	{
-		super();
-		this.client = aPanel;
-		this.initMenuDefinition("MnuTxtExecuteAll", KeyStroke.getKeyStroke(KeyEvent.VK_E, PlatformShortcuts.getDefaultModifier() | InputEvent.SHIFT_MASK));
-		this.setIcon("execute_all");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
-	}
+  public ExecuteAllAction(SqlPanel aPanel) {
+    super();
+    this.client = aPanel;
+    this.initMenuDefinition("MnuTxtExecuteAll", KeyStroke.getKeyStroke(KeyEvent.VK_E, PlatformShortcuts.getDefaultModifier() | InputEvent.SHIFT_MASK));
+    this.setIcon("execute_all");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.runAll();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.runAll();
+  }
 }

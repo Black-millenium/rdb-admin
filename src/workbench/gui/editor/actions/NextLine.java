@@ -22,66 +22,56 @@
  */
 package workbench.gui.editor.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import workbench.gui.editor.InputHandler;
 import workbench.gui.editor.JEditTextArea;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class NextLine
-	extends EditorAction
-{
-	protected boolean select;
+    extends EditorAction {
+  protected boolean select;
 
-	public NextLine()
-	{
-		super("TxtEdNxtLine", KeyEvent.VK_DOWN, 0);
-		select = false;
-	}
+  public NextLine() {
+    super("TxtEdNxtLine", KeyEvent.VK_DOWN, 0);
+    select = false;
+  }
 
-	public NextLine(String resourceKey, int key, int modifier)
-	{
-		super(resourceKey, key, modifier);
-	}
+  public NextLine(String resourceKey, int key, int modifier) {
+    super(resourceKey, key, modifier);
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt)
-	{
-		JEditTextArea textArea = InputHandler.getTextArea(evt);
-		int caret = textArea.getCaretPosition();
-		int line = textArea.getCaretLine();
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    JEditTextArea textArea = InputHandler.getTextArea(evt);
+    int caret = textArea.getCaretPosition();
+    int line = textArea.getCaretLine();
 
-		if (line == textArea.getLineCount() - 1)
-		{
-			textArea.getToolkit().beep();
-			if (!select)
-			{
-				textArea.selectNone();
-			}
-			return;
-		}
+    if (line == textArea.getLineCount() - 1) {
+      textArea.getToolkit().beep();
+      if (!select) {
+        textArea.selectNone();
+      }
+      return;
+    }
 
-		int magic = textArea.getMagicCaretPosition();
-		if (magic == -1)
-		{
-			magic = textArea.offsetToX(line,
-				caret - textArea.getLineStartOffset(line));
-		}
+    int magic = textArea.getMagicCaretPosition();
+    if (magic == -1) {
+      magic = textArea.offsetToX(line,
+          caret - textArea.getLineStartOffset(line));
+    }
 
-		caret = textArea.getLineStartOffset(line + 1) + textArea.xToOffset(line + 1, magic);
+    caret = textArea.getLineStartOffset(line + 1) + textArea.xToOffset(line + 1, magic);
 
-		if (select)
-		{
-			textArea.select(textArea.getMarkPosition(), caret);
-		}
-		else
-		{
-			textArea.setCaretPosition(caret);
-		}
+    if (select) {
+      textArea.select(textArea.getMarkPosition(), caret);
+    } else {
+      textArea.setCaretPosition(caret);
+    }
 
-		textArea.setMagicCaretPosition(magic);
-	}
+    textArea.setMagicCaretPosition(magic);
+  }
 }

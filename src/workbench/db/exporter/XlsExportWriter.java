@@ -28,36 +28,31 @@ package workbench.db.exporter;
  * @author Alessandro Palumbo
  */
 public class XlsExportWriter
-	extends ExportWriter
-{
+    extends ExportWriter {
 
-	public XlsExportWriter(DataExporter exp)
-	{
-		super(exp);
-		canAppendStart = true;
-	}
+  public XlsExportWriter(DataExporter exp) {
+    super(exp);
+    canAppendStart = true;
+  }
 
-	@Override
-	public RowDataConverter createConverter()
-	{
-		return new XlsRowDataConverter();
-	}
+  @Override
+  public RowDataConverter createConverter() {
+    return new XlsRowDataConverter();
+  }
 
-	@Override
-	public void configureConverter()
-	{
-		super.configureConverter();
-		converter.setNullString(exporter.getNullString());
-		XlsRowDataConverter xls = (XlsRowDataConverter) converter;
-		xls.setOptimizeColumns(exporter.getOptimizeSpreadsheetColumns());
-		xls.setAppend(exporter.getAppendToFile());
-		xls.setTargetSheetIndex(exporter.getTargetSheetIndex());
-		xls.setTargetSheetName(exporter.getTargetSheetName());
-	}
+  @Override
+  public void configureConverter() {
+    super.configureConverter();
+    converter.setNullString(exporter.getNullString());
+    XlsRowDataConverter xls = (XlsRowDataConverter) converter;
+    xls.setOptimizeColumns(exporter.getOptimizeSpreadsheetColumns());
+    xls.setAppend(exporter.getAppendToFile());
+    xls.setTargetSheetIndex(exporter.getTargetSheetIndex());
+    xls.setTargetSheetName(exporter.getTargetSheetName());
+  }
 
-	@Override
-	public boolean managesOutput()
-	{
-		return true;
-	}
+  @Override
+  public boolean managesOutput() {
+    return true;
+  }
 }

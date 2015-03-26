@@ -22,203 +22,169 @@
  */
 package workbench.gui.sql;
 
-import java.awt.BorderLayout;
-import java.awt.Window;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
 import workbench.WbManager;
+import workbench.db.WbConnection;
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.dbobjects.TableDataPanel;
 import workbench.interfaces.ToolWindow;
 import workbench.interfaces.ToolWindowManager;
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
-
-import workbench.db.WbConnection;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.dbobjects.TableDataPanel;
-
 import workbench.util.NumberStringCache;
 import workbench.util.StringUtil;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class DetachedResultWindow
-	extends JPanel
-	implements WindowListener, ToolWindow
-{
-	private static int instanceCount;
-	private final TableDataPanel data;
-	private final int id;
-	private JFrame window;
+    extends JPanel
+    implements WindowListener, ToolWindow {
+  private static int instanceCount;
+  private final TableDataPanel data;
+  private final int id;
+  private JFrame window;
 
-	public DetachedResultWindow(DwPanel result, Window parent, ToolWindowManager registry)
-	{
-		super(new BorderLayout(0,0));
-		id = ++instanceCount;
+  public DetachedResultWindow(DwPanel result, Window parent, ToolWindowManager registry) {
+    super(new BorderLayout(0, 0));
+    id = ++instanceCount;
 
-		data = new TableDataPanel();
+    data = new TableDataPanel();
     data.showRefreshButton(true);
 
-		add(data, BorderLayout.CENTER);
-		data.displayData(result.getDataStore(), result.getLastExecutionTime());
+    add(data, BorderLayout.CENTER);
+    data.displayData(result.getDataStore(), result.getLastExecutionTime());
 
-		String title = result.getDataStore().getResultName();
-		if (StringUtil.isBlank(title))
-		{
-			title = ResourceMgr.getString("LblTabResult") + " " + NumberStringCache.getNumberString(id);
-		}
+    String title = result.getDataStore().getResultName();
+    if (StringUtil.isBlank(title)) {
+      title = ResourceMgr.getString("LblTabResult") + " " + NumberStringCache.getNumberString(id);
+    }
 
-		WbConnection conn = result.getDataStore().getOriginalConnection();
-		if (conn != null)
-		{
-			title += " (" + conn.getCurrentUser() + "@" + conn.getUrl() + ")";
-		}
+    WbConnection conn = result.getDataStore().getOriginalConnection();
+    if (conn != null) {
+      title += " (" + conn.getCurrentUser() + "@" + conn.getUrl() + ")";
+    }
 
-		this.window = new JFrame(title);
-		this.window.getContentPane().setLayout(new BorderLayout());
-		this.window.getContentPane().add(this, BorderLayout.CENTER);
+    this.window = new JFrame(title);
+    this.window.getContentPane().setLayout(new BorderLayout());
+    this.window.getContentPane().add(this, BorderLayout.CENTER);
 
-		ResourceMgr.setWindowIcons(window, "data");
+    ResourceMgr.setWindowIcons(window, "data");
 
-		int width = (int)(parent.getWidth() * 0.7);
-		int height = (int)(parent.getHeight() * 0.7);
+    int width = (int) (parent.getWidth() * 0.7);
+    int height = (int) (parent.getHeight() * 0.7);
 
-		if (!Settings.getInstance().restoreWindowSize(window, getClass().getName()))
-		{
-			this.window.setSize(width, height);
-		}
+    if (!Settings.getInstance().restoreWindowSize(window, getClass().getName())) {
+      this.window.setSize(width, height);
+    }
 
-		WbSwingUtilities.center(this.window, parent);
+    WbSwingUtilities.center(this.window, parent);
 
-		window.addWindowListener(this);
-		registry.registerToolWindow(this);
-	}
+    window.addWindowListener(this);
+    registry.registerToolWindow(this);
+  }
 
-  public void refreshAutomatically(int interval)
-  {
+  public void refreshAutomatically(int interval) {
     data.refreshAutomatically(interval);
   }
 
-	public void showWindow()
-	{
-		if (this.window != null)
-		{
-			this.window.setVisible(true);
-		}
-	}
+  public void showWindow() {
+    if (this.window != null) {
+      this.window.setVisible(true);
+    }
+  }
 
-	protected void saveSettings()
-	{
-		Settings.getInstance().storeWindowSize(this.window, getClass().getName());
-	}
+  protected void saveSettings() {
+    Settings.getInstance().storeWindowSize(this.window, getClass().getName());
+  }
 
-	private void doClose()
-	{
-		saveSettings();
-		window.setVisible(false);
-		window.dispose();
-		window = null;
-	}
+  private void doClose() {
+    saveSettings();
+    window.setVisible(false);
+    window.dispose();
+    window = null;
+  }
 
-	@Override
-	public void windowOpened(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowOpened(WindowEvent e) {
+  }
 
-	@Override
-	public void windowClosing(WindowEvent e)
-	{
-		WbManager.getInstance().unregisterToolWindow(this);
-		doClose();
-	}
+  @Override
+  public void windowClosing(WindowEvent e) {
+    WbManager.getInstance().unregisterToolWindow(this);
+    doClose();
+  }
 
 
-	@Override
-	public void windowClosed(WindowEvent e)
-	{
-		if (data != null)
-		{
-			data.dispose();
-		}
-	}
+  @Override
+  public void windowClosed(WindowEvent e) {
+    if (data != null) {
+      data.dispose();
+    }
+  }
 
-	@Override
-	public void windowIconified(WindowEvent e)
-	{
+  @Override
+  public void windowIconified(WindowEvent e) {
 
-	}
+  }
 
-	@Override
-	public void windowDeiconified(WindowEvent e)
-	{
+  @Override
+  public void windowDeiconified(WindowEvent e) {
 
-	}
+  }
 
-	@Override
-	public void windowActivated(WindowEvent e)
-	{
+  @Override
+  public void windowActivated(WindowEvent e) {
 
-	}
+  }
 
-	@Override
-	public void windowDeactivated(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowDeactivated(WindowEvent e) {
+  }
 
-	@Override
-	public void closeWindow()
-	{
-		doClose();
-	}
+  @Override
+  public void closeWindow() {
+    doClose();
+  }
 
-	@Override
-	public void activate()
-	{
-		if (window != null)
-		{
-			window.requestFocus();
-		}
-	}
+  @Override
+  public void activate() {
+    if (window != null) {
+      window.requestFocus();
+    }
+  }
 
-	@Override
-	public JFrame getWindow()
-	{
-		return window;
-	}
+  @Override
+  public JFrame getWindow() {
+    return window;
+  }
 
-	@Override
-	public void disconnect()
-	{
-		if (this.data != null)
-		{
-			this.data.detachConnection();
-		}
-		if (window != null)
-		{
-			String title = window.getTitle();
-			int pos = title.indexOf(" (");
-			if (pos > -1)
-			{
-				title = title.substring(0, pos);
-				window.setTitle(title);
-			}
-		}
-	}
+  @Override
+  public void disconnect() {
+    if (this.data != null) {
+      this.data.detachConnection();
+    }
+    if (window != null) {
+      String title = window.getTitle();
+      int pos = title.indexOf(" (");
+      if (pos > -1) {
+        title = title.substring(0, pos);
+        window.setTitle(title);
+      }
+    }
+  }
 
-	@Override
-	public WbConnection getConnection()
-	{
-		// as the connection original comes from the SqlPanel
-		// we do not need to return it here
-		// (this is only used by WbManager to properly close all connections during shutdown)
-		return null;
-	}
+  @Override
+  public WbConnection getConnection() {
+    // as the connection original comes from the SqlPanel
+    // we do not need to return it here
+    // (this is only used by WbManager to properly close all connections during shutdown)
+    return null;
+  }
 
 }

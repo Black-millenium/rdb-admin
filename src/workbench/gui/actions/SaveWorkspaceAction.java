@@ -22,36 +22,32 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
 import workbench.gui.MainWindow;
 import workbench.resource.PlatformShortcuts;
 import workbench.resource.ResourceMgr;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class SaveWorkspaceAction extends WbAction
-{
-	private MainWindow client;
+public class SaveWorkspaceAction extends WbAction {
+  private MainWindow client;
 
-	public SaveWorkspaceAction(MainWindow aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtSaveWorkspace",KeyStroke.getKeyStroke(KeyEvent.VK_S, PlatformShortcuts.getDefaultModifier() | InputEvent.SHIFT_MASK));
-		this.setMenuItemName(ResourceMgr.MNU_TXT_FILE);
-		this.setIcon(null);
-	}
+  public SaveWorkspaceAction(MainWindow aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtSaveWorkspace", KeyStroke.getKeyStroke(KeyEvent.VK_S, PlatformShortcuts.getDefaultModifier() | InputEvent.SHIFT_MASK));
+    this.setMenuItemName(ResourceMgr.MNU_TXT_FILE);
+    this.setIcon(null);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.saveWorkspace(this.client.getCurrentWorkspaceFile(), false);
-	}
-	
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.saveWorkspace(this.client.getCurrentWorkspaceFile(), false);
+  }
+
 }

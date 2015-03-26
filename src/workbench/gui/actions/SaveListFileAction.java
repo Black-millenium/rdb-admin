@@ -22,43 +22,36 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.interfaces.FileActions;
 import workbench.log.LogMgr;
 import workbench.resource.IconMgr;
 
+import java.awt.event.ActionEvent;
+
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class SaveListFileAction
-	extends WbAction
-{
-	private FileActions client;
+    extends WbAction {
+  private FileActions client;
 
-	public SaveListFileAction(FileActions aClient)
-	{
-		this(aClient, "LblSaveProfiles");
-	}
+  public SaveListFileAction(FileActions aClient) {
+    this(aClient, "LblSaveProfiles");
+  }
 
-	public SaveListFileAction(FileActions aClient, String labelKey)
-	{
-		super();
-		this.client = aClient;
-		this.setMenuTextByKey(labelKey);
-		this.setIcon(IconMgr.IMG_SAVE);
-	}
+  public SaveListFileAction(FileActions aClient, String labelKey) {
+    super();
+    this.client = aClient;
+    this.setMenuTextByKey(labelKey);
+    this.setIcon(IconMgr.IMG_SAVE);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		try
-		{
-			this.client.saveItem();
-		}
-		catch (Exception ex)
-		{
-			LogMgr.logError(this, "Error saving profiles", ex);
-		}
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    try {
+      this.client.saveItem();
+    } catch (Exception ex) {
+      LogMgr.logError(this, "Error saving profiles", ex);
+    }
+  }
 }

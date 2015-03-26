@@ -23,13 +23,11 @@
 package workbench.db;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum IdentifierCase
-{
-	lower,
-	upper,
-	mixed,
-	unknown;
+public enum IdentifierCase {
+  lower,
+  upper,
+  mixed,
+  unknown;
 }

@@ -22,9 +22,6 @@
  */
 package workbench.gui.actions;
 
-import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import javax.swing.JFrame;
 import workbench.WbManager;
 import workbench.gui.WbSwingUtilities;
 import workbench.gui.components.LogFileViewer;
@@ -32,62 +29,54 @@ import workbench.log.LogMgr;
 import workbench.util.ExceptionUtil;
 import workbench.util.WbFile;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+
 /**
  * @author Thomas Kellerer
  */
 public class ViewLogfileAction
-	extends WbAction
-{
-	private static ViewLogfileAction instance = new ViewLogfileAction();
-	private JFrame viewer = null;
+    extends WbAction {
+  private static ViewLogfileAction instance = new ViewLogfileAction();
+  private JFrame viewer = null;
 
-	public static ViewLogfileAction getInstance()
-	{
-		return instance;
-	}
+  private ViewLogfileAction() {
+    super();
+    this.initMenuDefinition("MnuTxtViewLogfile");
+    this.removeIcon();
+    WbFile logFile = LogMgr.getLogfile();
+    this.setEnabled(logFile != null);
+  }
 
-	private ViewLogfileAction()
-	{
-		super();
-		this.initMenuDefinition("MnuTxtViewLogfile");
-		this.removeIcon();
-		WbFile logFile = LogMgr.getLogfile();
-		this.setEnabled(logFile != null);
-	}
+  public static ViewLogfileAction getInstance() {
+    return instance;
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		final WbFile logFile = LogMgr.getLogfile();
-		if (logFile == null) return;
+  @Override
+  public void executeAction(ActionEvent e) {
+    final WbFile logFile = LogMgr.getLogfile();
+    if (logFile == null) return;
 
-		EventQueue.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				if (viewer == null)
-				{
-					try
-					{
-						LogFileViewer lview = new LogFileViewer(WbManager.getInstance().getCurrentWindow());
-						viewer = lview;
-						viewer.setVisible(true);
-						lview.setText("Loading...");
-						lview.showFile(logFile);
-					}
-					catch (Exception e)
-					{
-						LogMgr.logError("ViewLogFileAction.executeAction()", "Error displaying the log file", e);
-						WbSwingUtilities.showErrorMessage(ExceptionUtil.getDisplay(e));
-					}
-				}
-				else
-				{
-					viewer.setVisible(true);
-					viewer.toFront();
-				}
-			}
-		});
-	}
+    EventQueue.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        if (viewer == null) {
+          try {
+            LogFileViewer lview = new LogFileViewer(WbManager.getInstance().getCurrentWindow());
+            viewer = lview;
+            viewer.setVisible(true);
+            lview.setText("Loading...");
+            lview.showFile(logFile);
+          } catch (Exception e) {
+            LogMgr.logError("ViewLogFileAction.executeAction()", "Error displaying the log file", e);
+            WbSwingUtilities.showErrorMessage(ExceptionUtil.getDisplay(e));
+          }
+        } else {
+          viewer.setVisible(true);
+          viewer.toFront();
+        }
+      }
+    });
+  }
 }

@@ -20,75 +20,64 @@
 
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
-
 import workbench.util.ArgumentParser;
 import workbench.util.ArgumentType;
 import workbench.util.EncodingUtil;
 
+import java.sql.SQLException;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class WbShowEncoding
-	extends SqlCommand
-{
-	public static final String ARG_LIST = "list";
-	public static final String VERB = "WbShowEncoding";
+    extends SqlCommand {
+  public static final String ARG_LIST = "list";
+  public static final String VERB = "WbShowEncoding";
 
-	public WbShowEncoding()
-	{
-		cmdLine = new ArgumentParser();
-		cmdLine.addArgument(ARG_LIST, ArgumentType.BoolSwitch);
-	}
+  public WbShowEncoding() {
+    cmdLine = new ArgumentParser();
+    cmdLine.addArgument(ARG_LIST, ArgumentType.BoolSwitch);
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult();
 
-		cmdLine.parse(getCommandLine(sql));
+    cmdLine.parse(getCommandLine(sql));
 
-		if (cmdLine.getBoolean(ARG_LIST))
-		{
-			result.addMessage(ResourceMgr.getString("MsgAvailableEncodings"));
-			result.addMessage("");
-			String[] encodings = EncodingUtil.getEncodings();
-			for (String encoding : encodings)
-			{
-				result.addMessage(encoding);
-			}
-			result.addMessage("");
-		}
+    if (cmdLine.getBoolean(ARG_LIST)) {
+      result.addMessage(ResourceMgr.getString("MsgAvailableEncodings"));
+      result.addMessage("");
+      String[] encodings = EncodingUtil.getEncodings();
+      for (String encoding : encodings) {
+        result.addMessage(encoding);
+      }
+      result.addMessage("");
+    }
 
-		String msg = ResourceMgr.getFormattedString("MsgDefaultEncoding", Settings.getInstance().getDefaultEncoding());
-		result.addMessage(msg);
-		result.setSuccess();
-		return result;
-	}
+    String msg = ResourceMgr.getFormattedString("MsgDefaultEncoding", Settings.getInstance().getDefaultEncoding());
+    result.addMessage(msg);
+    result.setSuccess();
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 }

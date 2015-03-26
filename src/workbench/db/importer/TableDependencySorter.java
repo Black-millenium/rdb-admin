@@ -22,27 +22,16 @@
  */
 package workbench.db.importer;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import workbench.interfaces.ScriptGenerationMonitor;
-import workbench.log.LogMgr;
-import workbench.resource.ResourceMgr;
-
 import workbench.db.DependencyNode;
 import workbench.db.TableDependency;
 import workbench.db.TableIdentifier;
 import workbench.db.WbConnection;
-
+import workbench.interfaces.ScriptGenerationMonitor;
+import workbench.log.LogMgr;
+import workbench.resource.ResourceMgr;
 import workbench.util.AggregatingMap;
+
+import java.util.*;
 
 
 /**
@@ -51,371 +40,307 @@ import workbench.util.AggregatingMap;
  *
  * @author Thomas Kellerer
  */
-public class TableDependencySorter
-{
-	private final WbConnection dbConn;
-	private final List<TableIdentifier> cycleErrors = new LinkedList<TableIdentifier>();
-	private ScriptGenerationMonitor monitor;
-	private TableDependency dependencyReader;
-	private boolean cancel;
-	private boolean validateInputTables = true;
+public class TableDependencySorter {
+  private final WbConnection dbConn;
+  private final List<TableIdentifier> cycleErrors = new LinkedList<TableIdentifier>();
+  private ScriptGenerationMonitor monitor;
+  private TableDependency dependencyReader;
+  private boolean cancel;
+  private boolean validateInputTables = true;
 
-	public TableDependencySorter(WbConnection con)
-	{
-		this.dbConn = con;
-	}
+  public TableDependencySorter(WbConnection con) {
+    this.dbConn = con;
+  }
 
-	public void setValidateTables(boolean flag)
-	{
-		this.validateInputTables = flag;
-	}
+  public static List<TableIdentifier> sortTables(final Collection<DependencyNode> allNodes, final Collection<TableIdentifier> tables, final boolean bottomUp) {
+    long start = System.currentTimeMillis();
 
-	public void setProgressMonitor(ScriptGenerationMonitor monitor)
-	{
-		this.monitor = monitor;
-	}
+    List<TableIdentifier> sorted = new ArrayList<TableIdentifier>(tables);
 
-	public List<TableIdentifier> sortForInsert(List<TableIdentifier> tables)
-	{
-		return getSortedTableList(tables, false, false);
-	}
+    final AggregatingMap<TableIdentifier, DependencyNode> tableNodes = new AggregatingMap<TableIdentifier, DependencyNode>(false);
+    final Map<TableIdentifier, Integer> totalLevels = new HashMap<TableIdentifier, Integer>();
+    final Map<TableIdentifier, Integer> refCounters = new HashMap<TableIdentifier, Integer>();
 
-	public List<TableIdentifier> sortForDelete(List<TableIdentifier> tables, boolean addMissing)
-	{
-		return getSortedTableList(tables, addMissing, true);
-	}
+    for (DependencyNode node : allNodes) {
+      tableNodes.addValue(node.getTable(), node);
 
-	public boolean hasErrors()
-	{
-		return cycleErrors.size() > 0;
-	}
+      int level = 0;
+      Integer lvl = totalLevels.get(node.getTable());
+      if (lvl != null) {
+        level = lvl.intValue();
+      }
+      level += node.getLevel();
+      totalLevels.put(node.getTable(), Integer.valueOf(level));
+    }
 
-	public List<TableIdentifier> getErrorTables()
-	{
-		if (cycleErrors == null) return Collections.emptyList();
-		return Collections.unmodifiableList(cycleErrors);
-	}
+    final Comparator<TableIdentifier> depComp = new Comparator<TableIdentifier>() {
+      final int factor = bottomUp ? -1 : 1;
 
-	/**
-	 * Determines the FK dependencies for each table in the passed List,
-	 * and sorts them so that data can be imported without violating
-	 * foreign key constraints
-	 *
-	 * @param tables the list of tables to be sorted
-	 * @returns the tables sorted according to their FK dependencies
-	 */
-	private List<TableIdentifier> getSortedTableList(List<TableIdentifier> tables, boolean addMissing, boolean bottomUp)
-	{
-		cancel = false;
+      @Override
+      public int compare(TableIdentifier o1, TableIdentifier o2) {
+        if (o1.equals(o2)) {
+          return 0;
+        }
 
-		if (validateInputTables)
-		{
-			// make sure only existing tables are kept in the list of tables that need processing
-			tables = validateTables(tables);
-		}
+        int levelOne = getLevelTotal(o1);
+        int levelTwo = getLevelTotal(o2);
 
-		Collection<DependencyNode> allNodes = collectRoots(tables);
+        int result = 0;
 
-		if (cancel)
-		{
-			return Collections.emptyList();
-		}
+        if (levelOne == levelTwo) {
+          int refCountOne = getReferenceCounter(o1);
+          int refCountTwo = getReferenceCounter(o2);
+          result = factor * (refCountOne - refCountTwo);
+        } else {
+          result = factor * (levelOne - levelTwo);
+        }
 
-		if (this.monitor != null)
-		{
-			this.monitor.setCurrentObject(ResourceMgr.getFormattedString("MsgCalcDelDeps"), -1, -1);
-		}
+        int sign = (int) Math.signum(result);
+        if (result == 0 || sign == factor) {
+          Set<DependencyNode> o2nodes = tableNodes.get(o2);
+          for (DependencyNode n2 : o2nodes) {
+            if (n2.containsParentTable(o1)) {
+              return -factor;
+            }
+            if (result == 0 && n2.containsChildTable(o1)) {
+              return factor;
+            }
+          }
+        }
 
-		if (addMissing)
-		{
-			Set<TableIdentifier> missing = new HashSet<TableIdentifier>();
-			for (DependencyNode node : allNodes)
-			{
-				if (!tables.contains(node.getTable()))
-				{
-					missing.add(node.getTable());
-				}
-			}
-			tables.addAll(missing);
-		}
+        if (result == 0 || sign == -factor) {
+          Set<DependencyNode> o1nodes = tableNodes.get(o1);
+          for (DependencyNode n1 : o1nodes) {
+            if (n1.containsParentTable(o2)) {
+              return factor;
+            }
+            if (result == 0 && n1.containsChildTable(o2)) {
+              return -factor;
+            }
+          }
+        }
+        if (result == 0) {
+          // if all parameters are equal, sort them alphabetically
+          result = o1.getTableExpression().compareTo(o2.getTableExpression());
+        }
+        return result;
+      }
 
-		List<TableIdentifier> result = sortTables(allNodes, tables, bottomUp);
+      private int getReferenceCounter(TableIdentifier tbl) {
+        Integer ref = refCounters.get(tbl);
+        if (ref != null) {
+          return ref.intValue();
+        }
 
-		return result;
-	}
+        int refCount = 0;
+        for (DependencyNode node : allNodes) {
+          if (node.getTable().equals(tbl) || node.containsParentTable(tbl)) {
+            refCount++;
+          }
+        }
+        refCounters.put(tbl, Integer.valueOf(refCount));
+        return refCount;
+      }
 
-	private List<TableIdentifier> validateTables(List<TableIdentifier> toCheck)
-	{
-		List<TableIdentifier> result = new ArrayList<TableIdentifier>(toCheck.size());
-		for (TableIdentifier tbl : toCheck)
-		{
-			TableIdentifier realTable = dbConn.getMetadata().findTable(tbl);
-			if (realTable != null)
-			{
-				result.add(realTable);
-			}
-		}
-		return result;
-	}
+      private int getLevelTotal(TableIdentifier tbl) {
+        Integer lvl = totalLevels.get(tbl);
+        if (lvl == null) {
+          return 0;
+        }
+        return lvl.intValue();
+      }
+    };
 
-	private DependencyNode findChildTree(Collection<DependencyNode> nodes, TableIdentifier tbl)
-	{
-		int maxLevel = Integer.MIN_VALUE;
-		DependencyNode lastNode = null;
+    Collections.sort(sorted, depComp);
 
-		for (DependencyNode node : nodes)
-		{
-			DependencyNode child = node.findChildTree(tbl);
-			if (child != null)
-			{
-				int childLevel = child.getLevel();
-				if (child.getLevel() > maxLevel)
-				{
-					maxLevel = childLevel;
-					lastNode = child;
-				}
-			}
-		}
-		return lastNode;
-	}
+    long duration = System.currentTimeMillis() - start;
 
-	public boolean isCancelled()
-	{
-		return cancel;
-	}
-	
-	public void cancel()
-	{
-		cancel = true;
-		if (this.dependencyReader != null)
-		{
-			dependencyReader.cancel();
-		}
-	}
+    LogMgr.logDebug("TableDependencySorter.sortTables()", "Sorting " + sorted.size() + " tables took " + duration + "ms");
+    return sorted;
+  }
 
-	private List<DependencyNode> collectRoots(List<TableIdentifier> tables)
-	{
-		List<DependencyNode> allNodes = new ArrayList<DependencyNode>(tables.size() * 2);
-		Set<DependencyNode> rootNodes = new HashSet<DependencyNode>(tables.size());
-		dependencyReader = new TableDependency(dbConn);
+  public void setValidateTables(boolean flag) {
+    this.validateInputTables = flag;
+  }
 
-		int num = 1;
-		for (TableIdentifier tbl : tables)
-		{
-			if (cancel) break;
+  public void setProgressMonitor(ScriptGenerationMonitor monitor) {
+    this.monitor = monitor;
+  }
 
-			if (this.monitor != null)
-			{
-				this.monitor.setCurrentObject(tbl.getTableExpression(), num, tables.size());
-			}
-			num ++;
-			DependencyNode root = findChildTree(allNodes, tbl);
-			if (root == null)
-			{
-				dependencyReader.setMainTable(tbl);
-				dependencyReader.readTreeForChildren();
-				if (dependencyReader.wasAborted())
-				{
-					cycleErrors.add(tbl);
-				}
-				root = dependencyReader.getRootNode();
-				rootNodes.add(root);
-			}
-			else
-			{
-				LogMgr.logDebug("TableDependencySorter.createLevelMapping()", "Re-using child tree for " + tbl + " with level: " + root.getLevel());
-			}
-			List<DependencyNode> allChildren = getAllNodes(root);
-			allNodes.addAll(allChildren);
-		}
+  public List<TableIdentifier> sortForInsert(List<TableIdentifier> tables) {
+    return getSortedTableList(tables, false, false);
+  }
 
-		if (cancel) return Collections.emptyList();
+  public List<TableIdentifier> sortForDelete(List<TableIdentifier> tables, boolean addMissing) {
+    return getSortedTableList(tables, addMissing, true);
+  }
 
-		// The "starting" tables have not been added yet.
-		// They only need to be added if they did not appear as a child
-		// in one of the sub-trees
-		for (DependencyNode node : rootNodes)
-		{
-			DependencyNode check = findNodeForTable(allNodes, node.getTable());
-			if (check == null)
-			{
-				allNodes.add(node);
-			}
-		}
-		return allNodes;
-	}
+  public boolean hasErrors() {
+    return cycleErrors.size() > 0;
+  }
 
-	public static List<TableIdentifier> sortTables(final Collection<DependencyNode> allNodes, final Collection<TableIdentifier> tables, final boolean bottomUp)
-	{
-		long start = System.currentTimeMillis();
+  public List<TableIdentifier> getErrorTables() {
+    if (cycleErrors == null) return Collections.emptyList();
+    return Collections.unmodifiableList(cycleErrors);
+  }
 
-		List<TableIdentifier> sorted = new ArrayList<TableIdentifier>(tables);
+  /**
+   * Determines the FK dependencies for each table in the passed List,
+   * and sorts them so that data can be imported without violating
+   * foreign key constraints
+   *
+   * @param tables the list of tables to be sorted
+   * @returns the tables sorted according to their FK dependencies
+   */
+  private List<TableIdentifier> getSortedTableList(List<TableIdentifier> tables, boolean addMissing, boolean bottomUp) {
+    cancel = false;
 
-		final AggregatingMap<TableIdentifier, DependencyNode> tableNodes = new AggregatingMap<TableIdentifier, DependencyNode>(false);
-		final Map<TableIdentifier, Integer> totalLevels = new HashMap<TableIdentifier, Integer>();
-		final Map<TableIdentifier, Integer> refCounters = new HashMap<TableIdentifier, Integer>();
+    if (validateInputTables) {
+      // make sure only existing tables are kept in the list of tables that need processing
+      tables = validateTables(tables);
+    }
 
-		for (DependencyNode node : allNodes)
-		{
-			tableNodes.addValue(node.getTable(), node);
+    Collection<DependencyNode> allNodes = collectRoots(tables);
 
-			int level = 0;
-			Integer lvl = totalLevels.get(node.getTable());
-			if (lvl != null)
-			{
-				level = lvl.intValue();
-			}
-			level += node.getLevel();
-			totalLevels.put(node.getTable(), Integer.valueOf(level));
-		}
+    if (cancel) {
+      return Collections.emptyList();
+    }
 
-		final Comparator<TableIdentifier> depComp = new Comparator<TableIdentifier>()
-		{
-			final int factor = bottomUp ? -1 : 1;
+    if (this.monitor != null) {
+      this.monitor.setCurrentObject(ResourceMgr.getFormattedString("MsgCalcDelDeps"), -1, -1);
+    }
 
-			@Override
-			public int compare(TableIdentifier o1, TableIdentifier o2)
-			{
-				if (o1.equals(o2))
-				{
-					return 0;
-				}
+    if (addMissing) {
+      Set<TableIdentifier> missing = new HashSet<TableIdentifier>();
+      for (DependencyNode node : allNodes) {
+        if (!tables.contains(node.getTable())) {
+          missing.add(node.getTable());
+        }
+      }
+      tables.addAll(missing);
+    }
 
-				int levelOne = getLevelTotal(o1);
-				int levelTwo = getLevelTotal(o2);
+    List<TableIdentifier> result = sortTables(allNodes, tables, bottomUp);
 
-				int result = 0;
+    return result;
+  }
 
-				if (levelOne == levelTwo)
-				{
-					int refCountOne = getReferenceCounter(o1);
-					int refCountTwo = getReferenceCounter(o2);
-					result = factor * (refCountOne - refCountTwo);
-				}
-				else
-				{
-					result = factor * (levelOne - levelTwo);
-				}
+  private List<TableIdentifier> validateTables(List<TableIdentifier> toCheck) {
+    List<TableIdentifier> result = new ArrayList<TableIdentifier>(toCheck.size());
+    for (TableIdentifier tbl : toCheck) {
+      TableIdentifier realTable = dbConn.getMetadata().findTable(tbl);
+      if (realTable != null) {
+        result.add(realTable);
+      }
+    }
+    return result;
+  }
 
-				int sign = (int)Math.signum(result);
-				if (result == 0 || sign == factor)
-				{
-					Set<DependencyNode> o2nodes = tableNodes.get(o2);
-					for (DependencyNode n2 : o2nodes)
-					{
-						if (n2.containsParentTable(o1))
-						{
-							return -factor;
-						}
-						if (result == 0 && n2.containsChildTable(o1))
-						{
-							return factor;
-						}
-					}
-				}
+  private DependencyNode findChildTree(Collection<DependencyNode> nodes, TableIdentifier tbl) {
+    int maxLevel = Integer.MIN_VALUE;
+    DependencyNode lastNode = null;
 
-				if (result == 0 || sign == -factor)
-				{
-					Set<DependencyNode> o1nodes = tableNodes.get(o1);
-					for (DependencyNode n1 : o1nodes)
-					{
-						if (n1.containsParentTable(o2))
-						{
-							return factor;
-						}
-						if (result == 0 && n1.containsChildTable(o2))
-						{
-							return -factor;
-						}
-					}
-				}
-				if (result == 0)
-				{
-					// if all parameters are equal, sort them alphabetically
-					result = o1.getTableExpression().compareTo(o2.getTableExpression());
-				}
-				return result;
-			}
+    for (DependencyNode node : nodes) {
+      DependencyNode child = node.findChildTree(tbl);
+      if (child != null) {
+        int childLevel = child.getLevel();
+        if (child.getLevel() > maxLevel) {
+          maxLevel = childLevel;
+          lastNode = child;
+        }
+      }
+    }
+    return lastNode;
+  }
 
-			private int getReferenceCounter(TableIdentifier tbl)
-			{
-				Integer ref = refCounters.get(tbl);
-				if (ref != null)
-				{
-					return ref.intValue();
-				}
+  public boolean isCancelled() {
+    return cancel;
+  }
 
-				int refCount = 0;
-				for (DependencyNode node : allNodes)
-				{
-					if (node.getTable().equals(tbl) || node.containsParentTable(tbl))
-					{
-						refCount ++;
-					}
-				}
-				refCounters.put(tbl, Integer.valueOf(refCount));
-				return refCount;
-			}
+  public void cancel() {
+    cancel = true;
+    if (this.dependencyReader != null) {
+      dependencyReader.cancel();
+    }
+  }
 
-			private int getLevelTotal(TableIdentifier tbl)
-			{
-				Integer lvl = totalLevels.get(tbl);
-				if (lvl == null)
-				{
-					return 0;
-				}
-				return lvl.intValue();
-			}
-		};
+  private List<DependencyNode> collectRoots(List<TableIdentifier> tables) {
+    List<DependencyNode> allNodes = new ArrayList<DependencyNode>(tables.size() * 2);
+    Set<DependencyNode> rootNodes = new HashSet<DependencyNode>(tables.size());
+    dependencyReader = new TableDependency(dbConn);
 
-		Collections.sort(sorted, depComp);
+    int num = 1;
+    for (TableIdentifier tbl : tables) {
+      if (cancel) break;
 
-		long duration = System.currentTimeMillis() - start;
+      if (this.monitor != null) {
+        this.monitor.setCurrentObject(tbl.getTableExpression(), num, tables.size());
+      }
+      num++;
+      DependencyNode root = findChildTree(allNodes, tbl);
+      if (root == null) {
+        dependencyReader.setMainTable(tbl);
+        dependencyReader.readTreeForChildren();
+        if (dependencyReader.wasAborted()) {
+          cycleErrors.add(tbl);
+        }
+        root = dependencyReader.getRootNode();
+        rootNodes.add(root);
+      } else {
+        LogMgr.logDebug("TableDependencySorter.createLevelMapping()", "Re-using child tree for " + tbl + " with level: " + root.getLevel());
+      }
+      List<DependencyNode> allChildren = getAllNodes(root);
+      allNodes.addAll(allChildren);
+    }
 
-		LogMgr.logDebug("TableDependencySorter.sortTables()", "Sorting " + sorted.size() + " tables took " + duration + "ms");
-		return sorted;
-	}
+    if (cancel) return Collections.emptyList();
 
-	private DependencyNode findNodeForTable(Collection<DependencyNode> nodes, TableIdentifier tbl)
-	{
-		int maxLevel = Integer.MIN_VALUE;
-		DependencyNode lastNode = null;
-		for (DependencyNode node : nodes)
-		{
-			if (node.getTable().compareNames(tbl))
-			{
-				int level = node.getLevel();
-				if (level > maxLevel)
-				{
-					lastNode = node;
-					maxLevel = level;
-				}
-			}
-		}
-		return lastNode;
-	}
+    // The "starting" tables have not been added yet.
+    // They only need to be added if they did not appear as a child
+    // in one of the sub-trees
+    for (DependencyNode node : rootNodes) {
+      DependencyNode check = findNodeForTable(allNodes, node.getTable());
+      if (check == null) {
+        allNodes.add(node);
+      }
+    }
+    return allNodes;
+  }
 
-	/**
-	 * Get all nodes of the passed dependency hierarchy as a "flat" list.
-	 * This is public mainly to be able to run a unit test agains it.
-	 */
-	public List<DependencyNode> getAllNodes(DependencyNode startWith)
-	{
-		if (startWith == null) return Collections.emptyList();
+  private DependencyNode findNodeForTable(Collection<DependencyNode> nodes, TableIdentifier tbl) {
+    int maxLevel = Integer.MIN_VALUE;
+    DependencyNode lastNode = null;
+    for (DependencyNode node : nodes) {
+      if (node.getTable().compareNames(tbl)) {
+        int level = node.getLevel();
+        if (level > maxLevel) {
+          lastNode = node;
+          maxLevel = level;
+        }
+      }
+    }
+    return lastNode;
+  }
 
-		List<DependencyNode> children = startWith.getChildren();
+  /**
+   * Get all nodes of the passed dependency hierarchy as a "flat" list.
+   * This is public mainly to be able to run a unit test agains it.
+   */
+  public List<DependencyNode> getAllNodes(DependencyNode startWith) {
+    if (startWith == null) return Collections.emptyList();
 
-		if (children.isEmpty()) return Collections.emptyList();
+    List<DependencyNode> children = startWith.getChildren();
 
-		ArrayList<DependencyNode> result = new ArrayList<DependencyNode>();
+    if (children.isEmpty()) return Collections.emptyList();
 
-		for (DependencyNode node : children)
-		{
-			if (!(node.getTable().compareNames(startWith.getTable()))) result.add(node);
-			result.addAll(getAllNodes(node));
-		}
-		return result;
-	}
+    ArrayList<DependencyNode> result = new ArrayList<DependencyNode>();
+
+    for (DependencyNode node : children) {
+      if (!(node.getTable().compareNames(startWith.getTable()))) result.add(node);
+      result.addAll(getAllNodes(node));
+    }
+    return result;
+  }
 }
 
 

@@ -22,327 +22,279 @@
  */
 package workbench.db.importer;
 
-import java.io.File;
-import java.util.List;
-
-import workbench.interfaces.ImportFileParser;
-
 import workbench.db.ColumnIdentifier;
 import workbench.db.TableIdentifier;
 import workbench.db.WbConnection;
-
+import workbench.interfaces.ImportFileParser;
 import workbench.sql.wbcommands.CommonArgs;
 import workbench.sql.wbcommands.WbImport;
-
 import workbench.util.StringUtil;
 import workbench.util.ValueConverter;
 
+import java.io.File;
+import java.util.List;
+
 /**
- *	A factory for RowDataProducer to import text or XML files.
+ * A factory for RowDataProducer to import text or XML files.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class ProducerFactory
-{
-	public enum ImportType {
-		Text,
-		XML,
-		Spreadsheet;
+public class ProducerFactory {
+  private ImportType importType = null;
 
-		public static ImportType valueOf(int type)
-		{
-			if (type == 0) return Text;
-			if (type == 1) return XML;
-			if (type == 2) return Spreadsheet;
-			return null;
-		}
+  ;
+  private TextImportOptions textOptions;
+  private ImportOptions generalOptions;
+  private File inputFile;
+  private List<ColumnIdentifier> inputColumns;
+  private TableIdentifier table;
+  private RowDataProducer producer;
+  private ImportFileParser fileParser;
+  private WbConnection connection;
+  public ProducerFactory(File file) {
+    this.setInputFile(file);
+  }
 
-		public int toInteger()
-		{
-			if (this == Text) return 0;
-			if (this == XML) return 1;
-			if (this == Spreadsheet) return 2;
-			return -1;
-		}
-	};
+  public void setConnection(WbConnection conn) {
+    if (this.connection != conn) {
+      this.producer = null;
+    }
+    this.connection = conn;
+  }
 
-	private ImportType importType = null;
-	private TextImportOptions textOptions;
-	private ImportOptions generalOptions;
-	private File inputFile;
-	private List<ColumnIdentifier> inputColumns;
-	private TableIdentifier table;
-	private RowDataProducer producer;
-	private ImportFileParser fileParser;
-	private WbConnection connection;
+  public ImportOptions getGeneralOptions() {
+    return generalOptions;
+  }
 
-	public ProducerFactory(File file)
-	{
-		this.setInputFile(file);
-	}
+  public void setGeneralOptions(ImportOptions options) {
+    this.generalOptions = options;
+  }
 
-	public void setConnection(WbConnection conn)
-	{
-		if (this.connection != conn)
-		{
-			this.producer = null;
-		}
-		this.connection = conn;
-	}
+  public TextImportOptions getTextOptions() {
+    return this.textOptions;
+  }
 
-	public ImportOptions getGeneralOptions()
-	{
-		return generalOptions;
-	}
+  public void setTextOptions(TextImportOptions options) {
+    this.textOptions = options;
+  }
 
-	public void setGeneralOptions(ImportOptions options)
-	{
-		this.generalOptions = options;
-	}
+  public void setImporterOptions(DataImporter importer) {
+    importer.setMode(generalOptions.getMode());
+  }
 
-	public void setTextOptions(TextImportOptions options)
-	{
-		this.textOptions = options;
-	}
+  public void setType(ImportType type) {
+    if (type == ImportType.Text) {
+      this.setImportTypeText();
+    } else if (type == ImportType.XML) {
+      this.setImportTypeXml();
+    }
+  }
 
-	public TextImportOptions getTextOptions()
-	{
-		return this.textOptions;
-	}
+  public boolean isTextImport() {
+    return this.importType == ImportType.Text;
+  }
 
-	public void setImporterOptions(DataImporter importer)
-	{
-		importer.setMode(generalOptions.getMode());
-	}
+  public boolean isXmlImport() {
+    return this.importType == ImportType.XML;
+  }
 
-	public void setType(ImportType type)
-	{
-		if (type == ImportType.Text)
-		{
-			this.setImportTypeText();
-		}
-		else if (type == ImportType.XML)
-		{
-			this.setImportTypeXml();
-		}
-	}
+  public boolean isSpreadsheetImport() {
+    return this.importType == ImportType.Spreadsheet;
+  }
 
-	public boolean isTextImport()
-	{
-		return this.importType == ImportType.Text;
-	}
+  public void setImportTypeSpreadsheet() {
+    this.importType = ImportType.Spreadsheet;
+    this.producer = null;
+  }
 
-	public boolean isXmlImport()
-	{
-		return this.importType == ImportType.XML;
-	}
+  public void setImportTypeText() {
+    this.importType = ImportType.Text;
+    this.producer = null;
+  }
 
-	public boolean isSpreadsheetImport()
-	{
-		return this.importType == ImportType.Spreadsheet;
-	}
+  public void setImportTypeXml() {
+    this.importType = ImportType.XML;
+    this.producer = null;
+  }
 
-	public void setImportTypeSpreadsheet()
-	{
-		this.importType = ImportType.Spreadsheet;
-		this.producer = null;
-	}
+  private void setInputFile(File inputFilename) {
+    this.inputFile = inputFilename;
+    this.inputColumns = null;
+    this.producer = null;
+    this.fileParser = null;
+  }
 
-	public void setImportTypeText()
-	{
-		this.importType = ImportType.Text;
-		this.producer = null;
-	}
+  public void setTargetTable(TableIdentifier tableId) {
+    this.table = tableId;
+    if (this.table == null) return;
+    if (this.producer == null) getProducer();
+    fileParser.setTableName(tableId.getTableExpression());
+  }
 
-	public void setImportTypeXml()
-	{
-		this.importType = ImportType.XML;
-		this.producer = null;
-	}
+  public RowDataProducer getProducer() {
+    if (this.producer == null) {
+      switch (this.importType) {
+        case Text:
+          createTextFileParser();
+          break;
+        case XML:
+          createXmlFileParser();
+          break;
+        case Spreadsheet:
+          createSpreadsheetParser();
+      }
+    }
+    return this.producer;
+  }
 
-	private void setInputFile(File inputFilename)
-	{
-		this.inputFile = inputFilename;
-		this.inputColumns = null;
-		this.producer = null;
-		this.fileParser = null;
-	}
+  /**
+   * Return the list of columns defined in the file
+   */
+  public List<ColumnIdentifier> getFileColumns() {
+    if (this.inputColumns == null) {
+      getProducer();
+      this.inputColumns = fileParser.getColumnsFromFile();
+    }
+    return this.inputColumns;
+  }
 
-	public void setTargetTable(TableIdentifier tableId)
-	{
-		this.table = tableId;
-		if (this.table == null) return;
-		if (this.producer == null) getProducer();
-		fileParser.setTableName(tableId.getTableExpression());
-	}
+  public void setColumnMap(List<ColumnIdentifier> sourceColumns, List<ColumnIdentifier> targetColumns)
+      throws Exception {
+    // A column mapping is only possible for text imports where the source contains a header row
+    if (this.importType == ImportType.Text && this.textOptions.getContainsHeader()) {
+      ((TextFileParser) producer).setColumnMap(sourceColumns, targetColumns);
+    } else {
+      setImportColumns(targetColumns);
+    }
+  }
 
-	public RowDataProducer getProducer()
-	{
-		if (this.producer == null)
-		{
-			switch (this.importType)
-			{
-				case Text:
-					createTextFileParser();
-					break;
-				case XML:
-					createXmlFileParser();
-					break;
-				case Spreadsheet:
-					createSpreadsheetParser();
-			}
-		}
-		return this.producer;
-	}
+  public void setImportColumns(List<ColumnIdentifier> cols)
+      throws Exception {
+    if (this.producer == null) getProducer();
+    this.fileParser.setColumns(cols);
+  }
 
-	/**
-	 *	Return the list of columns defined in the file
-	 */
-	public List<ColumnIdentifier> getFileColumns()
-	{
-		if (this.inputColumns == null)
-		{
-			getProducer();
-			this.inputColumns = fileParser.getColumnsFromFile();
-		}
-		return this.inputColumns;
-	}
+  private void createTextFileParser() {
+    TextFileParser parser = new TextFileParser(inputFile);
+    parser.setEncoding(this.generalOptions.getEncoding());
+    parser.setContainsHeader(this.textOptions.getContainsHeader());
+    parser.setTextQuoteChar(this.textOptions.getTextQuoteChar());
+    parser.setDecode(this.textOptions.getDecode());
+    parser.setTextDelimiter(this.textOptions.getTextDelimiter());
+    parser.setConnection(this.connection);
+    parser.setQuoteEscaping(textOptions.getQuoteEscaping());
+    parser.setAlwaysQuoted(textOptions.getQuoteAlways());
+    ValueConverter converter = new ValueConverter();
+    converter.setDefaultDateFormat(this.generalOptions.getDateFormat());
+    converter.setDefaultTimestampFormat(this.generalOptions.getTimestampFormat());
+    String dec = this.textOptions.getDecimalChar();
+    if (dec != null) converter.setDecimalCharacter(dec.charAt(0));
+    parser.setValueConverter(converter);
 
-	public void setColumnMap(List<ColumnIdentifier> sourceColumns, List<ColumnIdentifier> targetColumns)
-		throws Exception
-	{
-		// A column mapping is only possible for text imports where the source contains a header row
-		if (this.importType == ImportType.Text && this.textOptions.getContainsHeader())
-		{
-			((TextFileParser)producer).setColumnMap(sourceColumns, targetColumns);
-		}
-		else
-		{
-			setImportColumns(targetColumns);
-		}
-	}
+    if (this.table != null) {
+      parser.setTableName(this.table.getTableExpression());
+    }
+    this.inputColumns = null;
+    this.producer = parser;
+    this.fileParser = parser;
+  }
 
-	public void setImportColumns(List<ColumnIdentifier> cols)
-		throws Exception
-	{
-		if (this.producer == null) getProducer();
-		this.fileParser.setColumns(cols);
-	}
+  public File getSourceFile() {
+    return this.inputFile;
+  }
 
-	private void createTextFileParser()
-	{
-		TextFileParser parser = new TextFileParser(inputFile);
-		parser.setEncoding(this.generalOptions.getEncoding());
-		parser.setContainsHeader(this.textOptions.getContainsHeader());
-		parser.setTextQuoteChar(this.textOptions.getTextQuoteChar());
-		parser.setDecode(this.textOptions.getDecode());
-		parser.setTextDelimiter(this.textOptions.getTextDelimiter());
-		parser.setConnection(this.connection);
-		parser.setQuoteEscaping(textOptions.getQuoteEscaping());
-		parser.setAlwaysQuoted(textOptions.getQuoteAlways());
-		ValueConverter converter = new ValueConverter();
-		converter.setDefaultDateFormat(this.generalOptions.getDateFormat());
-		converter.setDefaultTimestampFormat(this.generalOptions.getTimestampFormat());
-		String dec = this.textOptions.getDecimalChar();
-		if (dec != null) converter.setDecimalCharacter(dec.charAt(0));
-		parser.setValueConverter(converter);
+  private void createSpreadsheetParser() {
+    this.inputColumns = null;
+    this.producer = null;
+    this.fileParser = null;
+  }
 
-		if (this.table != null)
-		{
-			parser.setTableName(this.table.getTableExpression());
-		}
-		this.inputColumns = null;
-		this.producer = parser;
-		this.fileParser = parser;
-	}
+  private void createXmlFileParser() {
+    XmlDataFileParser parser = new XmlDataFileParser(inputFile);
+    parser.setEncoding(this.generalOptions.getEncoding());
+    if (this.table != null) {
+      parser.setTableName(this.table.getTableName());
+    }
+    this.inputColumns = null;
+    this.producer = parser;
+    this.fileParser = parser;
+  }
 
-	public File getSourceFile()
-	{
-		return this.inputFile;
-	}
+  /**
+   * Appends text import options to the passed sql command
+   */
+  private void appendTextOptions(StringBuilder command, StringBuilder indent) {
+    if (this.textOptions == null) return;
+    appendArgument(command, WbImport.ARG_CONTAINSHEADER, textOptions.getContainsHeader(), indent);
+    appendArgument(command, WbImport.ARG_DECODE, textOptions.getDecode(), indent);
+    String delim = textOptions.getTextDelimiter();
+    if ("\t".equals(delim)) delim = "\\t";
 
-	private void createSpreadsheetParser()
-	{
-		this.inputColumns = null;
-		this.producer = null;
-		this.fileParser = null;
-	}
+    CommonArgs.appendArgument(command, CommonArgs.ARG_DATE_FORMAT, generalOptions.getDateFormat(), indent);
+    CommonArgs.appendArgument(command, CommonArgs.ARG_TIMESTAMP_FORMAT, generalOptions.getTimestampFormat(), indent);
+    CommonArgs.appendArgument(command, CommonArgs.ARG_DELIM, "'" + delim + "'", indent);
+    CommonArgs.appendArgument(command, WbImport.ARG_QUOTE, textOptions.getTextQuoteChar(), indent);
+    CommonArgs.appendArgument(command, CommonArgs.ARG_DECCHAR, textOptions.getDecimalChar(), indent);
+    CommonArgs.appendArgument(command, WbImport.ARG_FILECOLUMNS, this.fileParser.getColumns(), indent);
+    CommonArgs.appendArgument(command, CommonArgs.ARG_QUOTE_ESCAPE, textOptions.getQuoteEscaping().toString(), indent);
+  }
 
-	private void createXmlFileParser()
-	{
-		XmlDataFileParser parser = new XmlDataFileParser(inputFile);
-		parser.setEncoding(this.generalOptions.getEncoding());
-		if (this.table != null)
-		{
-			parser.setTableName(this.table.getTableName());
-		}
-		this.inputColumns = null;
-		this.producer = parser;
-		this.fileParser = parser;
-	}
+  private void appendArgument(StringBuilder result, String arg, boolean value, StringBuilder indent) {
+    CommonArgs.appendArgument(result, arg, Boolean.toString(value), indent);
+  }
 
-	/**
-	 * Appends text import options to the passed sql command
-	 */
-	private void appendTextOptions(StringBuilder command, StringBuilder indent)
-	{
-		if (this.textOptions == null) return;
-		appendArgument(command, WbImport.ARG_CONTAINSHEADER, textOptions.getContainsHeader(), indent);
-		appendArgument(command, WbImport.ARG_DECODE, textOptions.getDecode(), indent);
-		String delim = textOptions.getTextDelimiter();
-		if ("\t".equals(delim)) delim = "\\t";
+  /**
+   * Generates a WB SQL command from the current import
+   * settings
+   */
+  public StringBuilder getWbCommand() {
+    StringBuilder result = new StringBuilder(150);
+    StringBuilder indent = new StringBuilder();
+    indent.append('\n');
+    for (int i = 0; i < WbImport.VERB.length(); i++) {
+      indent.append(' ');
+    }
+    indent.append(' ');
+    result.append(WbImport.VERB + " -" + WbImport.ARG_FILE + "=");
+    String filename = inputFile.getAbsolutePath();
+    if (filename.indexOf('-') > -1) result.append('"');
+    result.append(StringUtil.replace(filename, "\\", "/"));
+    if (filename.indexOf('-') > -1) result.append('"');
+    result.append(indent);
+    result.append('-');
+    result.append(WbImport.ARG_TYPE);
+    result.append('=');
+    if (this.isXmlImport()) {
+      result.append("xml");
+    } else {
+      result.append("text");
+    }
 
-		CommonArgs.appendArgument(command, CommonArgs.ARG_DATE_FORMAT, generalOptions.getDateFormat(), indent);
-		CommonArgs.appendArgument(command, CommonArgs.ARG_TIMESTAMP_FORMAT, generalOptions.getTimestampFormat(), indent);
-		CommonArgs.appendArgument(command, CommonArgs.ARG_DELIM, "'" + delim + "'", indent);
-		CommonArgs.appendArgument(command, WbImport.ARG_QUOTE, textOptions.getTextQuoteChar(), indent);
-		CommonArgs.appendArgument(command, CommonArgs.ARG_DECCHAR, textOptions.getDecimalChar(), indent);
-		CommonArgs.appendArgument(command, WbImport.ARG_FILECOLUMNS, this.fileParser.getColumns(), indent);
-		CommonArgs.appendArgument(command, CommonArgs.ARG_QUOTE_ESCAPE, textOptions.getQuoteEscaping().toString(), indent);
-	}
+    CommonArgs.appendArgument(result, WbImport.ARG_TARGETTABLE, this.table.getTableName(), indent);
+    CommonArgs.appendArgument(result, CommonArgs.ARG_ENCODING, this.generalOptions.getEncoding(), indent);
+    appendTextOptions(result, indent);
 
-	private void appendArgument(StringBuilder result, String arg, boolean value, StringBuilder indent)
-	{
-		CommonArgs.appendArgument(result, arg, Boolean.toString(value), indent);
-	}
+    return result;
+  }
 
-	/**
-	 *	Generates a WB SQL command from the current import
-	 *  settings
-	 */
-	public StringBuilder getWbCommand()
-	{
-		StringBuilder result = new StringBuilder(150);
-		StringBuilder indent = new StringBuilder();
-		indent.append('\n');
-		for (int i = 0; i < WbImport.VERB.length(); i++)
-		{
-			indent.append(' ');
-		}
-		indent.append(' ');
-		result.append(WbImport.VERB + " -" + WbImport.ARG_FILE + "=");
-		String filename = inputFile.getAbsolutePath();
-		if (filename.indexOf('-') > -1) result.append('"');
-		result.append(StringUtil.replace(filename, "\\", "/"));
-		if (filename.indexOf('-') > -1) result.append('"');
-		result.append(indent);
-		result.append('-');
-		result.append(WbImport.ARG_TYPE);
-		result.append('=');
-		if (this.isXmlImport())
-		{
-			result.append("xml");
-		}
-		else
-		{
-			result.append("text");
-		}
+  public enum ImportType {
+    Text,
+    XML,
+    Spreadsheet;
 
-		CommonArgs.appendArgument(result, WbImport.ARG_TARGETTABLE, this.table.getTableName(), indent);
-		CommonArgs.appendArgument(result, CommonArgs.ARG_ENCODING, this.generalOptions.getEncoding(), indent);
-		appendTextOptions(result, indent);
+    public static ImportType valueOf(int type) {
+      if (type == 0) return Text;
+      if (type == 1) return XML;
+      if (type == 2) return Spreadsheet;
+      return null;
+    }
 
-		return result;
-	}
+    public int toInteger() {
+      if (this == Text) return 0;
+      if (this == XML) return 1;
+      if (this == Spreadsheet) return 2;
+      return -1;
+    }
+  }
 
 }

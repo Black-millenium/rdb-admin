@@ -22,201 +22,185 @@
  */
 package workbench.gui.profiles;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.sql.Driver;
-import java.util.List;
+import workbench.db.DbDriver;
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.components.ClassFinderGUI;
+import workbench.gui.components.FlatButton;
+import workbench.gui.components.TextComponentMouseListener;
+import workbench.gui.components.WbStatusLabel;
+import workbench.interfaces.Validator;
+import workbench.resource.IconMgr;
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
+import workbench.util.ClassFinder;
+import workbench.util.CollectionUtil;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
-import workbench.interfaces.Validator;
-import workbench.resource.IconMgr;
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
-import workbench.db.DbDriver;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.components.ClassFinderGUI;
-import workbench.gui.components.FlatButton;
-import workbench.gui.components.TextComponentMouseListener;
-import workbench.gui.components.WbStatusLabel;
-
-import workbench.util.ClassFinder;
-import workbench.util.CollectionUtil;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Driver;
+import java.util.List;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class DriverEditorPanel
-	extends JPanel
-	implements DocumentListener, ActionListener
-{
-	private DbDriver currentDriver;
-	private Validator validator;
-	private GridBagConstraints defaultErrorConstraints;
-	private JLabel errorLabel;
+    extends JPanel
+    implements DocumentListener, ActionListener {
+  private DbDriver currentDriver;
+  private Validator validator;
+  private GridBagConstraints defaultErrorConstraints;
+  private JLabel errorLabel;
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private workbench.gui.components.ClasspathEditor classpathEditor;
+  private javax.swing.JButton detectDriverButton;
+  private javax.swing.JLabel lblClassName;
+  private javax.swing.JLabel lblLibrary;
+  private javax.swing.JLabel lblName;
+  private javax.swing.JLabel lblSample;
+  private javax.swing.JLabel statusLabel;
+  private javax.swing.JTextField tfClassName;
+  private javax.swing.JTextField tfName;
+  private javax.swing.JTextField tfSampleUrl;
 
-	public DriverEditorPanel()
-	{
-		super();
-		initComponents();
+  public DriverEditorPanel() {
+    super();
+    initComponents();
     statusLabel.setText("");
-    statusLabel.setBorder(new EmptyBorder(0,0,0,0));
+    statusLabel.setBorder(new EmptyBorder(0, 0, 0, 0));
     defaultErrorConstraints = new GridBagConstraints();
-		defaultErrorConstraints.gridx = 0;
-		defaultErrorConstraints.gridy = 0;
-		defaultErrorConstraints.gridwidth = GridBagConstraints.REMAINDER;
-		defaultErrorConstraints.fill = GridBagConstraints.HORIZONTAL;
-		defaultErrorConstraints.ipadx = 0;
-		defaultErrorConstraints.ipady = 0;
-		defaultErrorConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		defaultErrorConstraints.insets = new java.awt.Insets(15, 8, 0, 3);
+    defaultErrorConstraints.gridx = 0;
+    defaultErrorConstraints.gridy = 0;
+    defaultErrorConstraints.gridwidth = GridBagConstraints.REMAINDER;
+    defaultErrorConstraints.fill = GridBagConstraints.HORIZONTAL;
+    defaultErrorConstraints.ipadx = 0;
+    defaultErrorConstraints.ipady = 0;
+    defaultErrorConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    defaultErrorConstraints.insets = new java.awt.Insets(15, 8, 0, 3);
 
-		errorLabel = new JLabel(ResourceMgr.getString("ErrDrvNameNotUnique"));
-		Border b = new CompoundBorder(new LineBorder(Color.RED.brighter(), 1), new EmptyBorder(3, 5, 3, 5));
-		errorLabel.setBorder(b);
-		errorLabel.setFont(errorLabel.getFont().deriveFont(Font.BOLD));
-		errorLabel.setBackground(new Color(255, 255, 220));
-		errorLabel.setOpaque(true);
+    errorLabel = new JLabel(ResourceMgr.getString("ErrDrvNameNotUnique"));
+    Border b = new CompoundBorder(new LineBorder(Color.RED.brighter(), 1), new EmptyBorder(3, 5, 3, 5));
+    errorLabel.setBorder(b);
+    errorLabel.setFont(errorLabel.getFont().deriveFont(Font.BOLD));
+    errorLabel.setBackground(new Color(255, 255, 220));
+    errorLabel.setOpaque(true);
 
-		tfName.getDocument().addDocumentListener(this);
-		classpathEditor.setLastDirProperty("workbench.drivers.lastlibdir");
-		classpathEditor.addActionListener(this);
-		WbSwingUtilities.setMinimumSize(tfName, 40);
-		WbSwingUtilities.setMinimumSize(tfClassName, 50);
-	}
+    tfName.getDocument().addDocumentListener(this);
+    classpathEditor.setLastDirProperty("workbench.drivers.lastlibdir");
+    classpathEditor.addActionListener(this);
+    WbSwingUtilities.setMinimumSize(tfName, 40);
+    WbSwingUtilities.setMinimumSize(tfClassName, 50);
+  }
 
-	public void setValidator(Validator nameValidator)
-	{
-		this.validator = nameValidator;
-	}
+  public void setValidator(Validator nameValidator) {
+    this.validator = nameValidator;
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		selectClass();
-	}
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    selectClass();
+  }
 
-	protected void selectClass()
-	{
-		ClassFinder finder = new ClassFinder(Driver.class);
+  protected void selectClass() {
+    ClassFinder finder = new ClassFinder(Driver.class);
 
-		// Ignore deprecated drivers
-		List<String> classes = Settings.getInstance().getListProperty("workbench.db.drivers.deprecated", false);
-		finder.setExcludedClasses(classes);
+    // Ignore deprecated drivers
+    List<String> classes = Settings.getInstance().getListProperty("workbench.db.drivers.deprecated", false);
+    finder.setExcludedClasses(classes);
 
-		List<String> libs = classpathEditor.getRealJarPaths();
-		detectDriverButton.setEnabled(CollectionUtil.isNonEmpty(libs));
+    List<String> libs = classpathEditor.getRealJarPaths();
+    detectDriverButton.setEnabled(CollectionUtil.isNonEmpty(libs));
 
-		ClassFinderGUI gui = new ClassFinderGUI(finder, tfClassName, statusLabel);
-		gui.setStatusBarKey("TxtSearchingDriver");
-		gui.setWindowTitleKey("TxtSelectDriver");
-		gui.setClassPath(libs);
-		gui.startCheck();
-	}
+    ClassFinderGUI gui = new ClassFinderGUI(finder, tfClassName, statusLabel);
+    gui.setStatusBarKey("TxtSearchingDriver");
+    gui.setWindowTitleKey("TxtSelectDriver");
+    gui.setClassPath(libs);
+    gui.startCheck();
+  }
 
-	public boolean validateName()
-	{
-		boolean valid = false;
-		if (validator.isValid(tfName.getText()))
-		{
-			this.remove(errorLabel);
-			valid = true;
-		}
-		else
-		{
-			this.add(errorLabel, defaultErrorConstraints);
-		}
-		this.doLayout();
-		this.validate();
-		return valid;
-	}
+  public boolean validateName() {
+    boolean valid = false;
+    if (validator.isValid(tfName.getText())) {
+      this.remove(errorLabel);
+      valid = true;
+    } else {
+      this.add(errorLabel, defaultErrorConstraints);
+    }
+    this.doLayout();
+    this.validate();
+    return valid;
+  }
 
-	@Override
-	public void insertUpdate(DocumentEvent e)
-	{
-		validateName();
-	}
+  @Override
+  public void insertUpdate(DocumentEvent e) {
+    validateName();
+  }
 
-	@Override
-	public void removeUpdate(DocumentEvent e)
-	{
-		validateName();
-	}
+  @Override
+  public void removeUpdate(DocumentEvent e) {
+    validateName();
+  }
 
-	@Override
-	public void changedUpdate(DocumentEvent e)
-	{
-		validateName();
-	}
+  @Override
+  public void changedUpdate(DocumentEvent e) {
+    validateName();
+  }
 
-	public String getCurrentName()
-	{
-		return tfName.getText().trim();
-	}
+  public String getCurrentName() {
+    return tfName.getText().trim();
+  }
 
-	public void setDriver(DbDriver driver)
-	{
-		this.currentDriver = driver;
-		this.tfName.setText(driver.getName());
-		this.tfClassName.setText(driver.getDriverClass());
-		List<String> libraryList = driver.getLibraryList();
-		DefaultListModel model = new DefaultListModel();
-		for (String lib : libraryList)
-		{
-			model.addElement(new LibraryElement(lib));
-		}
-		classpathEditor.setLibraries(libraryList);
-		classpathEditor.setFileSelectionEnabled(!getCurrentName().equals("sun.jdbc.odbc.JdbcOdbcDriver"));
-		this.tfSampleUrl.setText(driver.getSampleUrl());
-		this.detectDriverButton.setEnabled(classpathEditor.hasLibraries());
+  public void updateDriver() {
+    this.currentDriver.setName(tfName.getText().trim());
+    this.currentDriver.setDriverClass(tfClassName.getText().trim());
+    this.currentDriver.setLibraryList(classpathEditor.getLibraries());
+    this.currentDriver.setSampleUrl(tfSampleUrl.getText());
+  }
 
-	}
+  public DbDriver getDriver() {
+    this.updateDriver();
+    return this.currentDriver;
+  }
 
-	public void updateDriver()
-	{
-		this.currentDriver.setName(tfName.getText().trim());
-		this.currentDriver.setDriverClass(tfClassName.getText().trim());
-		this.currentDriver.setLibraryList(classpathEditor.getLibraries());
-		this.currentDriver.setSampleUrl(tfSampleUrl.getText());
-	}
+  public void setDriver(DbDriver driver) {
+    this.currentDriver = driver;
+    this.tfName.setText(driver.getName());
+    this.tfClassName.setText(driver.getDriverClass());
+    List<String> libraryList = driver.getLibraryList();
+    DefaultListModel model = new DefaultListModel();
+    for (String lib : libraryList) {
+      model.addElement(new LibraryElement(lib));
+    }
+    classpathEditor.setLibraries(libraryList);
+    classpathEditor.setFileSelectionEnabled(!getCurrentName().equals("sun.jdbc.odbc.JdbcOdbcDriver"));
+    this.tfSampleUrl.setText(driver.getSampleUrl());
+    this.detectDriverButton.setEnabled(classpathEditor.hasLibraries());
 
-	public DbDriver getDriver()
-	{
-		this.updateDriver();
-		return this.currentDriver;
-	}
+  }
 
-	public void reset()
-	{
-		this.currentDriver = null;
-		this.tfName.setText("");
-		this.tfClassName.setText("");
-		this.classpathEditor.reset();
-		this.tfSampleUrl.setText("");
-	}
+  public void reset() {
+    this.currentDriver = null;
+    this.tfName.setText("");
+    this.tfClassName.setText("");
+    this.classpathEditor.reset();
+    this.tfSampleUrl.setText("");
+  }
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
 
     lblName = new javax.swing.JLabel();
@@ -243,10 +227,8 @@ public class DriverEditorPanel
     tfName.setHorizontalAlignment(javax.swing.JTextField.LEFT);
     tfName.setMinimumSize(new java.awt.Dimension(50, 20));
     tfName.addMouseListener(new TextComponentMouseListener());
-    tfName.addFocusListener(new java.awt.event.FocusAdapter()
-    {
-      public void focusLost(java.awt.event.FocusEvent evt)
-      {
+    tfName.addFocusListener(new java.awt.event.FocusAdapter() {
+      public void focusLost(java.awt.event.FocusEvent evt) {
         DriverEditorPanel.this.focusLost(evt);
       }
     });
@@ -271,10 +253,8 @@ public class DriverEditorPanel
     tfClassName.setColumns(10);
     tfClassName.setHorizontalAlignment(javax.swing.JTextField.LEFT);
     tfClassName.addMouseListener(new TextComponentMouseListener());
-    tfClassName.addFocusListener(new java.awt.event.FocusAdapter()
-    {
-      public void focusLost(java.awt.event.FocusEvent evt)
-      {
+    tfClassName.addFocusListener(new java.awt.event.FocusAdapter() {
+      public void focusLost(java.awt.event.FocusEvent evt) {
         DriverEditorPanel.this.focusLost(evt);
       }
     });
@@ -327,10 +307,8 @@ public class DriverEditorPanel
     detectDriverButton.setIcon(IconMgr.getInstance().getLabelIcon("magnifier"));
     detectDriverButton.setToolTipText(ResourceMgr.getString("MsgDetectDriver")); // NOI18N
     detectDriverButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
-    detectDriverButton.addActionListener(new java.awt.event.ActionListener()
-    {
-      public void actionPerformed(java.awt.event.ActionEvent evt)
-      {
+    detectDriverButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
         detectDriverButtonActionPerformed(evt);
       }
     });
@@ -349,29 +327,16 @@ public class DriverEditorPanel
     add(classpathEditor, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
 
-	private void focusLost(java.awt.event.FocusEvent evt)//GEN-FIRST:event_focusLost
-	{//GEN-HEADEREND:event_focusLost
-		if (validateName())
-		{
-			this.currentDriver.setName(tfName.getText().trim());
-		}
-	}//GEN-LAST:event_focusLost
+  private void focusLost(java.awt.event.FocusEvent evt)//GEN-FIRST:event_focusLost
+  {//GEN-HEADEREND:event_focusLost
+    if (validateName()) {
+      this.currentDriver.setName(tfName.getText().trim());
+    }
+  }//GEN-LAST:event_focusLost
 
-	private void detectDriverButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_detectDriverButtonActionPerformed
-	{//GEN-HEADEREND:event_detectDriverButtonActionPerformed
-		selectClass();
-	}//GEN-LAST:event_detectDriverButtonActionPerformed
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private workbench.gui.components.ClasspathEditor classpathEditor;
-  private javax.swing.JButton detectDriverButton;
-  private javax.swing.JLabel lblClassName;
-  private javax.swing.JLabel lblLibrary;
-  private javax.swing.JLabel lblName;
-  private javax.swing.JLabel lblSample;
-  private javax.swing.JLabel statusLabel;
-  private javax.swing.JTextField tfClassName;
-  private javax.swing.JTextField tfName;
-  private javax.swing.JTextField tfSampleUrl;
+  private void detectDriverButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_detectDriverButtonActionPerformed
+  {//GEN-HEADEREND:event_detectDriverButtonActionPerformed
+    selectClass();
+  }//GEN-LAST:event_detectDriverButtonActionPerformed
   // End of variables declaration//GEN-END:variables
 }

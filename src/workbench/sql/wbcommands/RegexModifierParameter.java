@@ -22,46 +22,39 @@
  */
 package workbench.sql.wbcommands;
 
-import java.util.regex.PatternSyntaxException;
 import workbench.db.exporter.RegexReplacingModifier;
 import workbench.log.LogMgr;
 import workbench.util.ArgumentParser;
 import workbench.util.StringUtil;
 
+import java.util.regex.PatternSyntaxException;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public class RegexModifierParameter
-{
+public class RegexModifierParameter {
 
-	public static final String ARG_REPLACE_REGEX = "replaceExpression";
-	public static final String ARG_REPLACE_WITH = "replaceWith";
+  public static final String ARG_REPLACE_REGEX = "replaceExpression";
+  public static final String ARG_REPLACE_WITH = "replaceWith";
 
-	public static void addArguments(ArgumentParser cmdLine)
-	{
-		cmdLine.addArgument(ARG_REPLACE_WITH);
-		cmdLine.addArgument(ARG_REPLACE_REGEX);
-	}
+  public static void addArguments(ArgumentParser cmdLine) {
+    cmdLine.addArgument(ARG_REPLACE_WITH);
+    cmdLine.addArgument(ARG_REPLACE_REGEX);
+  }
 
-	public static RegexReplacingModifier buildFromCommandline(ArgumentParser cmdLine)
-	{
-		String regex = cmdLine.getValue(ARG_REPLACE_REGEX);
-		String replacement = cmdLine.getValue(ARG_REPLACE_WITH);
+  public static RegexReplacingModifier buildFromCommandline(ArgumentParser cmdLine) {
+    String regex = cmdLine.getValue(ARG_REPLACE_REGEX);
+    String replacement = cmdLine.getValue(ARG_REPLACE_WITH);
 
-		if (StringUtil.isNonBlank(regex) && replacement != null)
-		{
-			try
-			{
-				RegexReplacingModifier modifier = new RegexReplacingModifier(regex, replacement);
-				return modifier;
-			}
-			catch (PatternSyntaxException ex)
-			{
-				LogMgr.logError("RegexModifierParameter.parseParameterValue()", "Could not create modifier", ex);
-			}
-		}
-		return null;
-	}
+    if (StringUtil.isNonBlank(regex) && replacement != null) {
+      try {
+        RegexReplacingModifier modifier = new RegexReplacingModifier(regex, replacement);
+        return modifier;
+      } catch (PatternSyntaxException ex) {
+        LogMgr.logError("RegexModifierParameter.parseParameterValue()", "Could not create modifier", ex);
+      }
+    }
+    return null;
+  }
 
 }

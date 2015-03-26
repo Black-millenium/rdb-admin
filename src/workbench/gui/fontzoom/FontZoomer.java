@@ -22,76 +22,62 @@
  */
 package workbench.gui.fontzoom;
 
-import java.awt.Font;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import javax.swing.JComponent;
 import workbench.gui.actions.WbAction;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class FontZoomer
-	implements MouseWheelListener
-{
+    implements MouseWheelListener {
 
-	private JComponent client;
-	private Font originalFont;
+  private JComponent client;
+  private Font originalFont;
 
-	public FontZoomer(JComponent toZoom)
-	{
-		client = toZoom;
-	}
+  public FontZoomer(JComponent toZoom) {
+    client = toZoom;
+  }
 
-	public void resetFontZoom()
-	{
-		if (originalFont != null)
-		{
-			client.setFont(originalFont);
-		}
-		originalFont = null;
-	}
+  public void resetFontZoom() {
+    if (originalFont != null) {
+      client.setFont(originalFont);
+    }
+    originalFont = null;
+  }
 
-	public void increaseFontSize()
-	{
-		applyFontScale(1.1d);
-	}
+  public void increaseFontSize() {
+    applyFontScale(1.1d);
+  }
 
-	public void decreaseFontSize()
-	{
-		applyFontScale(0.9d);
-	}
+  public void decreaseFontSize() {
+    applyFontScale(0.9d);
+  }
 
-	private void applyFontScale(double scale)
-	{
-		Font f = client.getFont();
-		if (f == null)
-		{
-			return;
-		}
+  private void applyFontScale(double scale) {
+    Font f = client.getFont();
+    if (f == null) {
+      return;
+    }
 
-		if (originalFont == null)
-		{
-			originalFont = f;
-		}
-		Font newFont = f.deriveFont((float) (f.getSize() * scale));
-		client.setFont(newFont);
-	}
+    if (originalFont == null) {
+      originalFont = f;
+    }
+    Font newFont = f.deriveFont((float) (f.getSize() * scale));
+    client.setFont(newFont);
+  }
 
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent e)
-	{
-		if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && WbAction.isCtrlPressed(e.getModifiers()))
-		{
-			if (e.getWheelRotation() > 0)
-			{
-				decreaseFontSize();
-			}
-			else
-			{
-				increaseFontSize();
-			}
-		}
-	}
+  @Override
+  public void mouseWheelMoved(MouseWheelEvent e) {
+    if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && WbAction.isCtrlPressed(e.getModifiers())) {
+      if (e.getWheelRotation() > 0) {
+        decreaseFontSize();
+      } else {
+        increaseFontSize();
+      }
+    }
+  }
 }

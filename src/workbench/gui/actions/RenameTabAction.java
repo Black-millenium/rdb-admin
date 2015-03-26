@@ -22,49 +22,44 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import workbench.gui.WbSwingUtilities;
 import workbench.gui.sql.RenameableTab;
 import workbench.resource.ResourceMgr;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.event.ActionEvent;
+
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class RenameTabAction
-	extends WbAction
-	implements ChangeListener
-{
-	private RenameableTab client;
+    extends WbAction
+    implements ChangeListener {
+  private RenameableTab client;
 
-	public RenameTabAction(RenameableTab aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtRenameTab");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_VIEW);
-		client.addTabChangeListener(this);
-		setEnabled(client.canRenameTab());
-		this.setIcon(null);
-	}
+  public RenameTabAction(RenameableTab aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtRenameTab");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_VIEW);
+    client.addTabChangeListener(this);
+    setEnabled(client.canRenameTab());
+    this.setIcon(null);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		String oldName = client.getCurrentTabTitle();
-		String newName = WbSwingUtilities.getUserInput(client.getComponent(), ResourceMgr.getString("MsgEnterNewTabName"), oldName);
-		
-		if (newName != null)
-		{
-			client.setCurrentTabTitle(newName);
-		}
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    String oldName = client.getCurrentTabTitle();
+    String newName = WbSwingUtilities.getUserInput(client.getComponent(), ResourceMgr.getString("MsgEnterNewTabName"), oldName);
 
-	@Override
-	public void stateChanged(ChangeEvent e)
-	{
-		setEnabled(client.canRenameTab());
-	}
+    if (newName != null) {
+      client.setCurrentTabTitle(newName);
+    }
+  }
+
+  @Override
+  public void stateChanged(ChangeEvent e) {
+    setEnabled(client.canRenameTab());
+  }
 }

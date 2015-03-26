@@ -23,20 +23,19 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ProgressReporter
-{
-	/**
-	 * The default progress interval when reporting 
-	 * progress of the export.
-	 */
-	int DEFAULT_PROGRESS_INTERVAL = 10;
-	
-	/**
-	 * Define the interval in which progress messages are displayed.
-	 * @param interval the interval, 0 means no progress display
-	 */
-	void setReportInterval(int interval);
+public interface ProgressReporter {
+  /**
+   * The default progress interval when reporting
+   * progress of the export.
+   */
+  int DEFAULT_PROGRESS_INTERVAL = 10;
+
+  /**
+   * Define the interval in which progress messages are displayed.
+   *
+   * @param interval the interval, 0 means no progress display
+   */
+  void setReportInterval(int interval);
 }

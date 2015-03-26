@@ -25,11 +25,14 @@ package workbench.storage.filter;
 /**
  * @author Thomas Kellerer
  */
-public interface ExpressionValue
-{
-	boolean isIgnoreCase();
-	void setIgnoreCase(boolean flag);
-	String getColumnName();
-	ColumnComparator getComparator();
-	Object getFilterValue();
+public interface ExpressionValue {
+  boolean isIgnoreCase();
+
+  void setIgnoreCase(boolean flag);
+
+  String getColumnName();
+
+  ColumnComparator getComparator();
+
+  Object getFilterValue();
 }

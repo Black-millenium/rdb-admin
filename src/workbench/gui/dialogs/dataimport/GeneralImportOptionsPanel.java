@@ -23,7 +23,6 @@
 package workbench.gui.dialogs.dataimport;
 
 import workbench.db.importer.ImportOptions;
-import javax.swing.JPanel;
 import workbench.gui.WbSwingUtilities;
 import workbench.gui.components.HistoryTextField;
 import workbench.interfaces.ValidatingComponent;
@@ -31,187 +30,172 @@ import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
 import workbench.util.StringUtil;
 
+import javax.swing.*;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class GeneralImportOptionsPanel
-	extends JPanel
-	implements ImportOptions, ValidatingComponent
-{
-	public GeneralImportOptionsPanel()
-	{
-		super();
-		initComponents();
-	}
+    extends JPanel
+    implements ImportOptions, ValidatingComponent {
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JComboBox dateFormat;
+  private javax.swing.JLabel dateFormatLabel;
+  private workbench.gui.components.EncodingPanel encodingPanel;
+  private javax.swing.JPanel jPanel1;
+  private javax.swing.JComboBox modeComboBox;
+  private javax.swing.JLabel modeLabel;
+  private javax.swing.JComboBox timestampFormat;
+  private javax.swing.JLabel timestampFormatLabel;
 
-	public void setEncodingVisible(boolean flag)
-	{
-		this.encodingPanel.setEnabled(false);
-		this.encodingPanel.setVisible(false);
-	}
+  public GeneralImportOptionsPanel() {
+    super();
+    initComponents();
+  }
 
-	public void setModeSelectorEnabled(boolean flag)
-	{
-		this.modeComboBox.setEnabled(flag);
-		this.modeComboBox.setSelectedIndex(0);
-		this.modeComboBox.setVisible(flag);
-	}
+  public void setEncodingVisible(boolean flag) {
+    this.encodingPanel.setEnabled(false);
+    this.encodingPanel.setVisible(false);
+  }
 
-	public void saveSettings()
-	{
-		saveSettings("general");
-	}
+  public void setModeSelectorEnabled(boolean flag) {
+    this.modeComboBox.setEnabled(flag);
+    this.modeComboBox.setSelectedIndex(0);
+    this.modeComboBox.setVisible(flag);
+  }
 
-	public void saveSettings(String key)
-	{
-		HistoryTextField dateFmt = (HistoryTextField)dateFormat;
-		HistoryTextField tsFmt = (HistoryTextField)timestampFormat;
+  public void saveSettings() {
+    saveSettings("general");
+  }
 
-		dateFmt.setSettingsProperty("dateformat");
-		tsFmt.setSettingsProperty("timestampformat");
-		Settings s = Settings.getInstance();
-		if (StringUtil.isEmptyString(key))
-		{
-			key = "general";
-		}
-		//s.setProperty(, this.getDateFormat());
-		dateFmt.saveSettings(s, "workbench.import." + key + ".");
-		tsFmt.saveSettings(s, "workbench.import." + key + ".");
+  public void saveSettings(String key) {
+    HistoryTextField dateFmt = (HistoryTextField) dateFormat;
+    HistoryTextField tsFmt = (HistoryTextField) timestampFormat;
 
-		s.setProperty("workbench.import." + key + ".encoding", this.getEncoding());
-		s.setProperty("workbench.import." + key + ".mode", this.getMode());
+    dateFmt.setSettingsProperty("dateformat");
+    tsFmt.setSettingsProperty("timestampformat");
+    Settings s = Settings.getInstance();
+    if (StringUtil.isEmptyString(key)) {
+      key = "general";
+    }
+    //s.setProperty(, this.getDateFormat());
+    dateFmt.saveSettings(s, "workbench.import." + key + ".");
+    tsFmt.saveSettings(s, "workbench.import." + key + ".");
 
-		// remove obsolete property
-		s.removeProperty("workbench.import." + key + ".dateformat");
-		s.removeProperty("workbench.import." + key + ".timestampformat");
-	}
+    s.setProperty("workbench.import." + key + ".encoding", this.getEncoding());
+    s.setProperty("workbench.import." + key + ".mode", this.getMode());
 
-	public void restoreSettings()
-	{
-		restoreSettings("general");
-	}
+    // remove obsolete property
+    s.removeProperty("workbench.import." + key + ".dateformat");
+    s.removeProperty("workbench.import." + key + ".timestampformat");
+  }
 
-	public void restoreSettings(String key)
-	{
-		Settings s = Settings.getInstance();
-		HistoryTextField dateFmt = (HistoryTextField)dateFormat;
-		HistoryTextField tsFmt = (HistoryTextField)timestampFormat;
-		dateFmt.setSettingsProperty("dateformat");
-		dateFmt.restoreSettings(s, "workbench.import." + key + ".");
+  public void restoreSettings() {
+    restoreSettings("general");
+  }
 
-		tsFmt.setSettingsProperty("timestampformat");
-		tsFmt.restoreSettings(s, "workbench.import." + key + ".");
+  public void restoreSettings(String key) {
+    Settings s = Settings.getInstance();
+    HistoryTextField dateFmt = (HistoryTextField) dateFormat;
+    HistoryTextField tsFmt = (HistoryTextField) timestampFormat;
+    dateFmt.setSettingsProperty("dateformat");
+    dateFmt.restoreSettings(s, "workbench.import." + key + ".");
 
-		if (StringUtil.isEmptyString(dateFmt.getText()))
-		{
-			// old property before changing to a history textfield
-			this.setDateFormat(s.getProperty("workbench.import." + key + ".dateformat", s.getDefaultDateFormat()));
-		}
+    tsFmt.setSettingsProperty("timestampformat");
+    tsFmt.restoreSettings(s, "workbench.import." + key + ".");
 
-		if (StringUtil.isEmptyString(tsFmt.getText()))
-		{
-			// old property before changing to a history textfield
-			this.setTimestampFormat(s.getProperty("workbench.import." + key + ".timestampformat", s.getDefaultTimestampFormat()));
-		}
-		this.setEncoding(s.getProperty("workbench.export." + key + ".encoding", s.getDefaultDataEncoding()));
-		this.setMode(s.getProperty("workbench.import." + key + ".mode", "insert"));
-	}
+    if (StringUtil.isEmptyString(dateFmt.getText())) {
+      // old property before changing to a history textfield
+      this.setDateFormat(s.getProperty("workbench.import." + key + ".dateformat", s.getDefaultDateFormat()));
+    }
 
-	@Override
-	public String getMode()
-	{
-		return (String)this.modeComboBox.getSelectedItem();
-	}
+    if (StringUtil.isEmptyString(tsFmt.getText())) {
+      // old property before changing to a history textfield
+      this.setTimestampFormat(s.getProperty("workbench.import." + key + ".timestampformat", s.getDefaultTimestampFormat()));
+    }
+    this.setEncoding(s.getProperty("workbench.export." + key + ".encoding", s.getDefaultDataEncoding()));
+    this.setMode(s.getProperty("workbench.import." + key + ".mode", "insert"));
+  }
 
-	@Override
-	public void setMode(String mode)
-	{
-		this.modeComboBox.setSelectedItem(mode);
-	}
+  @Override
+  public String getMode() {
+    return (String) this.modeComboBox.getSelectedItem();
+  }
 
-	@Override
-	public String getDateFormat()
-	{
-		return ((HistoryTextField)this.dateFormat).getText();
-	}
+  @Override
+  public void setMode(String mode) {
+    this.modeComboBox.setSelectedItem(mode);
+  }
 
-	@Override
-	public String getEncoding()
-	{
-		return encodingPanel.getEncoding();
-	}
+  @Override
+  public String getDateFormat() {
+    return ((HistoryTextField) this.dateFormat).getText();
+  }
 
-	@Override
-	public String getTimestampFormat()
-	{
-		return ((HistoryTextField)this.timestampFormat).getText();
-	}
+  @Override
+  public void setDateFormat(String format) {
+    ((HistoryTextField) dateFormat).setText(format);
+  }
 
-	@Override
-	public void setDateFormat(String format)
-	{
-		((HistoryTextField)dateFormat).setText(format);
-	}
+  @Override
+  public String getEncoding() {
+    return encodingPanel.getEncoding();
+  }
 
-	@Override
-	public void setEncoding(String enc)
-	{
-		encodingPanel.setEncoding(enc);
-	}
+  @Override
+  public void setEncoding(String enc) {
+    encodingPanel.setEncoding(enc);
+  }
 
-	@Override
-	public void setTimestampFormat(String format)
-	{
-		((HistoryTextField)timestampFormat).setText(format);
-	}
+  @Override
+  public String getTimestampFormat() {
+    return ((HistoryTextField) this.timestampFormat).getText();
+  }
 
-	@Override
-	public boolean validateInput()
-	{
-		String format = getDateFormat();
+  @Override
+  public void setTimestampFormat(String format) {
+    ((HistoryTextField) timestampFormat).setText(format);
+  }
 
-		if (StringUtil.isNonBlank(format))
-		{
-			String err = StringUtil.isDatePatternValid(format);
-			if (err != null)
-			{
-				String msg = ResourceMgr.getFormattedString("ErrInvalidInput", dateFormatLabel.getText(), err);
-				WbSwingUtilities.showErrorMessage(this, ResourceMgr.getString("TxtError"), msg);
-				return false;
-			}
-		}
+  @Override
+  public boolean validateInput() {
+    String format = getDateFormat();
 
-		format = getTimestampFormat();
-		if (StringUtil.isNonBlank(format))
-		{
-			String err = StringUtil.isDatePatternValid(format);
-			if (err != null)
-			{
-				String msg = ResourceMgr.getFormattedString("ErrInvalidInput", timestampFormatLabel.getText(), err);
-				WbSwingUtilities.showErrorMessage(this, ResourceMgr.getString("TxtError"), msg);
-				return false;
-			}
-		}
+    if (StringUtil.isNonBlank(format)) {
+      String err = StringUtil.isDatePatternValid(format);
+      if (err != null) {
+        String msg = ResourceMgr.getFormattedString("ErrInvalidInput", dateFormatLabel.getText(), err);
+        WbSwingUtilities.showErrorMessage(this, ResourceMgr.getString("TxtError"), msg);
+        return false;
+      }
+    }
 
-		return true;
-	}
+    format = getTimestampFormat();
+    if (StringUtil.isNonBlank(format)) {
+      String err = StringUtil.isDatePatternValid(format);
+      if (err != null) {
+        String msg = ResourceMgr.getFormattedString("ErrInvalidInput", timestampFormatLabel.getText(), err);
+        WbSwingUtilities.showErrorMessage(this, ResourceMgr.getString("TxtError"), msg);
+        return false;
+      }
+    }
 
-	@Override
-	public void componentDisplayed()
-	{
+    return true;
+  }
 
-	}
+  @Override
+  public void componentDisplayed() {
 
+  }
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
 
     encodingPanel = new workbench.gui.components.EncodingPanel();
@@ -266,7 +250,7 @@ public class GeneralImportOptionsPanel
     gridBagConstraints.insets = new java.awt.Insets(4, 4, 0, 4);
     add(modeLabel, gridBagConstraints);
 
-    modeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "insert", "update", "insert,update", "update,insert" }));
+    modeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"insert", "update", "insert,update", "update,insert"}));
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 6;
@@ -291,17 +275,6 @@ public class GeneralImportOptionsPanel
     gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
     add(timestampFormat, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
-
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JComboBox dateFormat;
-  private javax.swing.JLabel dateFormatLabel;
-  private workbench.gui.components.EncodingPanel encodingPanel;
-  private javax.swing.JPanel jPanel1;
-  private javax.swing.JComboBox modeComboBox;
-  private javax.swing.JLabel modeLabel;
-  private javax.swing.JComboBox timestampFormat;
-  private javax.swing.JLabel timestampFormatLabel;
   // End of variables declaration//GEN-END:variables
 
 }

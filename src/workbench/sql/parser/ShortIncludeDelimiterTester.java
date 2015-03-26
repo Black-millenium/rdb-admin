@@ -24,79 +24,66 @@ import workbench.sql.DelimiterDefinition;
 import workbench.sql.lexer.SQLToken;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class ShortIncludeDelimiterTester
-	implements DelimiterTester
-{
-	private DelimiterDefinition defaultDelimiter = DelimiterDefinition.STANDARD_DELIMITER;
-	private boolean checkShortInclude = true;
+    implements DelimiterTester {
+  private DelimiterDefinition defaultDelimiter = DelimiterDefinition.STANDARD_DELIMITER;
+  private boolean checkShortInclude = true;
 
-	public ShortIncludeDelimiterTester()
-	{
-	}
+  public ShortIncludeDelimiterTester() {
+  }
 
 
-	@Override
-	public void setDelimiter(DelimiterDefinition delim)
-	{
-		defaultDelimiter = delim;
-		checkShortInclude = defaultDelimiter.isStandard();
-	}
+  @Override
+  public void setDelimiter(DelimiterDefinition delim) {
+    defaultDelimiter = delim;
+    checkShortInclude = defaultDelimiter.isStandard();
+  }
 
-	@Override
-	public void setAlternateDelimiter(DelimiterDefinition delimiter)
-	{
-	}
+  @Override
+  public void setAlternateDelimiter(DelimiterDefinition delimiter) {
+  }
 
-	@Override
-	public boolean supportsMixedDelimiters()
-	{
-		return false;
-	}
+  @Override
+  public boolean supportsMixedDelimiters() {
+    return false;
+  }
 
-	@Override
-	public void currentToken(SQLToken token, boolean isStartOfStatement)
-	{
-	}
+  @Override
+  public void currentToken(SQLToken token, boolean isStartOfStatement) {
+  }
 
-	@Override
-	public DelimiterDefinition getCurrentDelimiter()
-	{
-		if (defaultDelimiter != null) return defaultDelimiter;
-		return DelimiterDefinition.STANDARD_DELIMITER;
-	}
+  @Override
+  public DelimiterDefinition getCurrentDelimiter() {
+    if (defaultDelimiter != null) return defaultDelimiter;
+    return DelimiterDefinition.STANDARD_DELIMITER;
+  }
 
-	@Override
-	public void statementFinished()
-	{
-	}
+  @Override
+  public void statementFinished() {
+  }
 
-	@Override
-	public boolean supportsSingleLineStatements()
-	{
-		return true;
-	}
+  @Override
+  public boolean supportsSingleLineStatements() {
+    return true;
+  }
 
-	@Override
-	public boolean isSingleLineStatement(SQLToken token, boolean isStartOfLine)
-	{
-		if (!checkShortInclude) return false;
-		
-		if (token == null) return false;
+  @Override
+  public boolean isSingleLineStatement(SQLToken token, boolean isStartOfLine) {
+    if (!checkShortInclude) return false;
 
-		if (isStartOfLine && !token.isWhiteSpace())
-		{
-			String text = token.getText();
-			return text.charAt(0) == '@';
-		}
-		return false;
-	}
+    if (token == null) return false;
 
-	@Override
-	public void lineEnd()
-	{
-	}
+    if (isStartOfLine && !token.isWhiteSpace()) {
+      String text = token.getText();
+      return text.charAt(0) == '@';
+    }
+    return false;
+  }
+
+  @Override
+  public void lineEnd() {
+  }
 
 }

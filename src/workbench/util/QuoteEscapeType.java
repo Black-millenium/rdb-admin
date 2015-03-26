@@ -23,12 +23,10 @@
 package workbench.util;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum QuoteEscapeType
-{
-	none,
-	duplicate,
-	escape
+public enum QuoteEscapeType {
+  none,
+  duplicate,
+  escape
 }

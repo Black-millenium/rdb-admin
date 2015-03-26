@@ -22,10 +22,8 @@ package workbench.gui;
 import workbench.gui.sql.DwPanel;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface PanelReloader
-{
+public interface PanelReloader {
   void startReloadPanel(DwPanel panel);
 }

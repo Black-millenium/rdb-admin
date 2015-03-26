@@ -22,63 +22,55 @@
  */
 package workbench.gui.sql;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.JTextArea;
-
-import workbench.resource.Settings;
-
 import workbench.gui.WbSwingUtilities;
 import workbench.gui.components.TextComponentMouseListener;
+import workbench.resource.Settings;
+
+import javax.swing.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * @author Thomas Kellerer
  */
 public class LogArea
-	extends JTextArea
-	implements PropertyChangeListener
-{
-	private TextComponentMouseListener contextMenu;
+    extends JTextArea
+    implements PropertyChangeListener {
+  private TextComponentMouseListener contextMenu;
 
-	public LogArea()
-	{
-		super();
-		setBorder(WbSwingUtilities.EMPTY_BORDER);
-		setFont(Settings.getInstance().getMsgLogFont());
-		setEditable(false);
-		setLineWrap(true);
-		setWrapStyleWord(true);
+  public LogArea() {
+    super();
+    setBorder(WbSwingUtilities.EMPTY_BORDER);
+    setFont(Settings.getInstance().getMsgLogFont());
+    setEditable(false);
+    setLineWrap(true);
+    setWrapStyleWord(true);
 
-		initColors();
+    initColors();
 
-		contextMenu = new TextComponentMouseListener();
-		addMouseListener(contextMenu);
+    contextMenu = new TextComponentMouseListener();
+    addMouseListener(contextMenu);
 
-		Settings.getInstance().addPropertyChangeListener(this,
-			Settings.PROPERTY_EDITOR_FG_COLOR,
-			Settings.PROPERTY_EDITOR_BG_COLOR);
-	}
+    Settings.getInstance().addPropertyChangeListener(this,
+        Settings.PROPERTY_EDITOR_FG_COLOR,
+        Settings.PROPERTY_EDITOR_BG_COLOR);
+  }
 
-	public void dispose()
-	{
-		setText("");
-		Settings.getInstance().removePropertyChangeListener(this);
-		if (contextMenu != null)
-		{
-			contextMenu.dispose();
-		}
-	}
+  public void dispose() {
+    setText("");
+    Settings.getInstance().removePropertyChangeListener(this);
+    if (contextMenu != null) {
+      contextMenu.dispose();
+    }
+  }
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt)
-	{
-		initColors();
-	}
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+    initColors();
+  }
 
-	private void initColors()
-	{
-		setBackground(Settings.getInstance().getEditorBackgroundColor());
-		setForeground(Settings.getInstance().getEditorTextColor());
-	}
+  private void initColors() {
+    setBackground(Settings.getInstance().getEditorBackgroundColor());
+    setForeground(Settings.getInstance().getEditorTextColor());
+  }
 }

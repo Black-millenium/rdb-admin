@@ -23,21 +23,18 @@
 package workbench.gui.settings;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum ExternalFileHandling
-{
-	none,
-	content,
-	link;
+public enum ExternalFileHandling {
+  none,
+  content,
+  link;
 
-	public static ExternalFileHandling getValue(String input)
-	{
-		if (input == null) return none;
-		if (input.equalsIgnoreCase(content.toString())) return content;
-		if (input.equalsIgnoreCase(link.toString())) return link;
-		return none;
-	}
-	
+  public static ExternalFileHandling getValue(String input) {
+    if (input == null) return none;
+    if (input.equalsIgnoreCase(content.toString())) return content;
+    if (input.equalsIgnoreCase(link.toString())) return link;
+    return none;
+  }
+
 }

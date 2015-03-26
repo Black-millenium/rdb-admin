@@ -24,10 +24,9 @@ package workbench.db.exporter;
 
 /**
  * An interface for writing control files.
- * 
+ *
  * @author Thomas Kellerer
  */
-public interface FormatFileWriter
-{
-	void writeFormatFile(DataExporter exporter, RowDataConverter converter);
+public interface FormatFileWriter {
+  void writeFormatFile(DataExporter exporter, RowDataConverter converter);
 }

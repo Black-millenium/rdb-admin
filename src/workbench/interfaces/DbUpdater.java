@@ -25,11 +25,10 @@ package workbench.interfaces;
 import workbench.db.WbConnection;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface DbUpdater
-{
+public interface DbUpdater {
   void saveChangesToDatabase(boolean confirm);
+
   WbConnection getConnection();
 }

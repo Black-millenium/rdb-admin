@@ -22,76 +22,61 @@
  */
 package workbench.gui.components;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.SwingUtilities;
-
-import workbench.resource.ResourceMgr;
-
 import workbench.db.TableIdentifier;
 import workbench.db.WbConnection;
-
+import workbench.resource.ResourceMgr;
 import workbench.storage.DataStore;
-
 import workbench.util.Alias;
 import workbench.util.SqlUtil;
 
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public class UpdateTableSelector
-{
-	private WbTable tableData;
+public class UpdateTableSelector {
+  private WbTable tableData;
 
-	public UpdateTableSelector(WbTable client)
-	{
-		tableData = client;
-	}
+  public UpdateTableSelector(WbTable client) {
+    tableData = client;
+  }
 
-	public TableIdentifier selectUpdateTable()
-	{
-		if (tableData == null) return null;
+  public TableIdentifier selectUpdateTable() {
+    if (tableData == null) return null;
 
-		DataStore data = tableData.getDataStore();
-		if (data == null) return null;
+    DataStore data = tableData.getDataStore();
+    if (data == null) return null;
 
-		String csql = data.getGeneratingSql();
-		WbConnection conn = data.getOriginalConnection();
-		List<Alias> tables = SqlUtil.getTables(csql, false, conn);
+    String csql = data.getGeneratingSql();
+    WbConnection conn = data.getOriginalConnection();
+    List<Alias> tables = SqlUtil.getTables(csql, false, conn);
 
-		TableIdentifier table = null;
+    TableIdentifier table = null;
 
-		if (tables.size() > 1)
-		{
-			List<String> tableNames = new ArrayList<>(tables.size());
-			for (Alias a : tables)
-			{
-				tableNames.add(a.getObjectName());
-			}
-			SelectTablePanel p = new SelectTablePanel(tableNames);
+    if (tables.size() > 1) {
+      List<String> tableNames = new ArrayList<>(tables.size());
+      for (Alias a : tables) {
+        tableNames.add(a.getObjectName());
+      }
+      SelectTablePanel p = new SelectTablePanel(tableNames);
 
-			boolean ok = ValidatingDialog.showConfirmDialog(SwingUtilities.getWindowAncestor(tableData), p, ResourceMgr.getString("MsgSelectTableTitle"));
-			String selectedTable = null;
-			if (ok)
-			{
-				selectedTable = p.getSelectedTable();
-			}
-			if (selectedTable != null)
-			{
-				table = new TableIdentifier(selectedTable, conn);
-			}
-		}
-		else if (tables.size() == 1)
-		{
-			table = data.getUpdateTable();
-			if (table == null)
-			{
-				table = new TableIdentifier(tables.get(0).getObjectName(), conn);
-			}
-		}
-		return table;
-	}
+      boolean ok = ValidatingDialog.showConfirmDialog(SwingUtilities.getWindowAncestor(tableData), p, ResourceMgr.getString("MsgSelectTableTitle"));
+      String selectedTable = null;
+      if (ok) {
+        selectedTable = p.getSelectedTable();
+      }
+      if (selectedTable != null) {
+        table = new TableIdentifier(selectedTable, conn);
+      }
+    } else if (tables.size() == 1) {
+      table = data.getUpdateTable();
+      if (table == null) {
+        table = new TableIdentifier(tables.get(0).getObjectName(), conn);
+      }
+    }
+    return table;
+  }
 
 }

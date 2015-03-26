@@ -22,93 +22,77 @@
  */
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-
 import workbench.resource.ResourceMgr;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
 import workbench.sql.lexer.SQLLexer;
 import workbench.sql.lexer.SQLLexerFactory;
 import workbench.sql.lexer.SQLToken;
-
 import workbench.util.ArgumentParser;
 import workbench.util.StringUtil;
 
+import java.sql.SQLException;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class WbHideWarnings
-	extends SqlCommand
-{
-	public static final String VERB = "WbHideWarnings";
+    extends SqlCommand {
+  public static final String VERB = "WbHideWarnings";
 
-	public WbHideWarnings()
-	{
-		super();
-		this.cmdLine = new ArgumentParser(false);
-		this.cmdLine.addArgument("on");
-		this.cmdLine.addArgument("off");
-	}
+  public WbHideWarnings() {
+    super();
+    this.cmdLine = new ArgumentParser(false);
+    this.cmdLine.addArgument("on");
+    this.cmdLine.addArgument("off");
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
-		result.setSuccess();
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult();
+    result.setSuccess();
 
-		SQLLexer lexer = SQLLexerFactory.createLexer(currentConnection, sql);
-		// Skip the SQL Verb
-		SQLToken token = lexer.getNextToken(false, false);
+    SQLLexer lexer = SQLLexerFactory.createLexer(currentConnection, sql);
+    // Skip the SQL Verb
+    SQLToken token = lexer.getNextToken(false, false);
 
-		// get the parameter
-		token = lexer.getNextToken(false, false);
-		String parm = (token != null ? token.getContents() : null);
+    // get the parameter
+    token = lexer.getNextToken(false, false);
+    String parm = (token != null ? token.getContents() : null);
 
-		if (parm != null)
-		{
-			if (!parm.equalsIgnoreCase("on") && !parm.equalsIgnoreCase("off") &&
-				  !parm.equalsIgnoreCase("true") && !parm.equalsIgnoreCase("false"))
-			{
-				result.setFailure();
-				result.addMessage(ResourceMgr.getString("ErrShowWarnWrongParameter"));
-				return result;
-			}
-			else
-			{
-				this.runner.setHideWarnings(StringUtil.stringToBool(parm));
-			}
-		}
+    if (parm != null) {
+      if (!parm.equalsIgnoreCase("on") && !parm.equalsIgnoreCase("off") &&
+          !parm.equalsIgnoreCase("true") && !parm.equalsIgnoreCase("false")) {
+        result.setFailure();
+        result.addMessage(ResourceMgr.getString("ErrShowWarnWrongParameter"));
+        return result;
+      } else {
+        this.runner.setHideWarnings(StringUtil.stringToBool(parm));
+      }
+    }
 
-		if (runner.getHideWarnings())
-		{
-			result.addMessage(ResourceMgr.getString("MsgWarningsDisabled"));
-		}
-		else
-		{
-			result.addMessage(ResourceMgr.getString("MsgWarningsEnabled"));
-		}
-		return result;
-	}
+    if (runner.getHideWarnings()) {
+      result.addMessage(ResourceMgr.getString("MsgWarningsDisabled"));
+    } else {
+      result.addMessage(ResourceMgr.getString("MsgWarningsEnabled"));
+    }
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 
 }

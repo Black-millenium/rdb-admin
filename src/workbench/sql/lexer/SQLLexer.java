@@ -23,17 +23,16 @@ import java.io.IOException;
 
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface SQLLexer
-{
-	SQLToken getNextToken(boolean returnComments, boolean returnWhiteSpace);
+public interface SQLLexer {
+  SQLToken getNextToken(boolean returnComments, boolean returnWhiteSpace);
 
-	void reset(java.io.Reader reader, int yychar, int yycolumn)
-		throws IOException;
+  void reset(java.io.Reader reader, int yychar, int yycolumn)
+      throws IOException;
 
-	void setInput(String sql);
-	void setInput(CharSequence sql);
+  void setInput(String sql);
+
+  void setInput(CharSequence sql);
 
 }

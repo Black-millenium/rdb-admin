@@ -20,63 +20,52 @@
 
 package workbench.gui.dialogs;
 
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-
 import workbench.resource.ResourceMgr;
-
 import workbench.util.QuoteEscapeType;
 
+import javax.swing.*;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class QuoteEscapeSelector
-	extends JComboBox
-{
-	
-	public QuoteEscapeSelector()
-	{
-		super();
-		String[] items = new String[]
-		{
-			ResourceMgr.getString("TxtQuote.none"),
-			ResourceMgr.getString("TxtQuote.escape"),
-			ResourceMgr.getString("TxtQuote.duplicate")
-		};
-		ComboBoxModel model = new DefaultComboBoxModel(items);
-		setModel(model);
-	}
+    extends JComboBox {
 
-	public void setEscapeType(QuoteEscapeType type)
-	{
-		switch (type)
-		{
-			case none:
-				setSelectedIndex(0);
-				break;
-			case escape:
-				setSelectedIndex(1);
-				break;
-			case duplicate:
-				setSelectedIndex(2);
-				break;
-		}
-	}
+  public QuoteEscapeSelector() {
+    super();
+    String[] items = new String[]
+        {
+            ResourceMgr.getString("TxtQuote.none"),
+            ResourceMgr.getString("TxtQuote.escape"),
+            ResourceMgr.getString("TxtQuote.duplicate")
+        };
+    ComboBoxModel model = new DefaultComboBoxModel(items);
+    setModel(model);
+  }
 
-	public QuoteEscapeType getEscapeType()
-	{
-		int index = getSelectedIndex();
-		if (index == 1)
-		{
-			return QuoteEscapeType.escape;
-		}
-		if (index == 2)
-		{
-			return QuoteEscapeType.duplicate;
-		}
-		return QuoteEscapeType.none;
-	}
+  public QuoteEscapeType getEscapeType() {
+    int index = getSelectedIndex();
+    if (index == 1) {
+      return QuoteEscapeType.escape;
+    }
+    if (index == 2) {
+      return QuoteEscapeType.duplicate;
+    }
+    return QuoteEscapeType.none;
+  }
+
+  public void setEscapeType(QuoteEscapeType type) {
+    switch (type) {
+      case none:
+        setSelectedIndex(0);
+        break;
+      case escape:
+        setSelectedIndex(1);
+        break;
+      case duplicate:
+        setSelectedIndex(2);
+        break;
+    }
+  }
 
 }

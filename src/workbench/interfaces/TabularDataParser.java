@@ -22,28 +22,27 @@
  */
 package workbench.interfaces;
 
+import workbench.db.ColumnIdentifier;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import workbench.db.ColumnIdentifier;
-
 /**
- *
  * @author Thomas Kellerer
  */
 public interface TabularDataParser
-	extends ImportFileParser
-{
-	void setContainsHeader(boolean flag);
-	void checkTargetTable()
-		throws SQLException;
+    extends ImportFileParser {
+  void setContainsHeader(boolean flag);
 
-	void setupFileColumns(List<ColumnIdentifier> importColumns)
-		throws SQLException, IOException;
+  void checkTargetTable()
+      throws SQLException;
 
-	void setColumns(List<ColumnIdentifier> fileColumns, List<ColumnIdentifier> columnsToImport)
-		throws SQLException;
+  void setupFileColumns(List<ColumnIdentifier> importColumns)
+      throws SQLException, IOException;
 
-	void done();
+  void setColumns(List<ColumnIdentifier> fileColumns, List<ColumnIdentifier> columnsToImport)
+      throws SQLException;
+
+  void done();
 }

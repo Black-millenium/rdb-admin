@@ -22,58 +22,49 @@
  */
 package workbench.db;
 
+import workbench.log.LogMgr;
+import workbench.util.SqlUtil;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.sql.Statement;
-import workbench.log.LogMgr;
-import workbench.util.SqlUtil;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class DefaultTransactionChecker
-	implements TransactionChecker
-{
+    implements TransactionChecker {
 
-	private String query;
-	public DefaultTransactionChecker(String sql)
-	{
-		query = sql;
-	}
+  private String query;
 
-	@Override
-	public boolean hasUncommittedChanges(WbConnection con)
-	{
-		Savepoint sp = null;
-		ResultSet rs = null;
-		Statement stmt = null;
-		int count = 0;
-		try
-		{
-			if (con.getDbSettings().useSavePointForDML())
-			{
-				sp = con.setSavepoint();
-			}
-			stmt = con.createStatementForQuery();
-			rs = stmt.executeQuery(query);
-			if (rs.next())
-			{
-				count = rs.getInt(1);
-			}
-			con.releaseSavepoint(sp);
-		}
-		catch (SQLException sql)
-		{
-			LogMgr.logDebug(getClass().getSimpleName() + ".hasUncommittedChanges()", "Could not retrieve transaction state", sql);
-			con.rollback(sp);
-		}
-		finally
-		{
-			SqlUtil.closeAll(rs, stmt);
-		}
-		return count > 0;
-	}
+  public DefaultTransactionChecker(String sql) {
+    query = sql;
+  }
+
+  @Override
+  public boolean hasUncommittedChanges(WbConnection con) {
+    Savepoint sp = null;
+    ResultSet rs = null;
+    Statement stmt = null;
+    int count = 0;
+    try {
+      if (con.getDbSettings().useSavePointForDML()) {
+        sp = con.setSavepoint();
+      }
+      stmt = con.createStatementForQuery();
+      rs = stmt.executeQuery(query);
+      if (rs.next()) {
+        count = rs.getInt(1);
+      }
+      con.releaseSavepoint(sp);
+    } catch (SQLException sql) {
+      LogMgr.logDebug(getClass().getSimpleName() + ".hasUncommittedChanges()", "Could not retrieve transaction state", sql);
+      con.rollback(sp);
+    } finally {
+      SqlUtil.closeAll(rs, stmt);
+    }
+    return count > 0;
+  }
 
 }

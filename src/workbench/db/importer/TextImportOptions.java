@@ -25,23 +25,34 @@ package workbench.db.importer;
 import workbench.util.QuoteEscapeType;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface TextImportOptions
-{
-	String getTextDelimiter();
-	void setTextDelimiter(String delim);
-	boolean getContainsHeader();
-	void setContainsHeader(boolean flag);
-	String getTextQuoteChar();
-	void setTextQuoteChar(String quote);
-	boolean getDecode();
-	void setDecode(boolean flag);
-	String getDecimalChar();
-	void setDecimalChar(String s);
-	QuoteEscapeType getQuoteEscaping();
-	boolean getQuoteAlways();
-	String getNullString();
-	void setNullString(String nullString);
+public interface TextImportOptions {
+  String getTextDelimiter();
+
+  void setTextDelimiter(String delim);
+
+  boolean getContainsHeader();
+
+  void setContainsHeader(boolean flag);
+
+  String getTextQuoteChar();
+
+  void setTextQuoteChar(String quote);
+
+  boolean getDecode();
+
+  void setDecode(boolean flag);
+
+  String getDecimalChar();
+
+  void setDecimalChar(String s);
+
+  QuoteEscapeType getQuoteEscaping();
+
+  boolean getQuoteAlways();
+
+  String getNullString();
+
+  void setNullString(String nullString);
 }

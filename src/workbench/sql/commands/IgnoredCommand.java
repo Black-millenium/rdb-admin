@@ -22,52 +22,47 @@
  */
 package workbench.sql.commands;
 
-import java.sql.SQLException;
-
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
 
+import java.sql.SQLException;
+
 /**
  * This class simply ignores the command and does not send it to the DBMS.
- *
+ * <p/>
  * Thus scripts e.g. intended for SQL*Plus (containing WHENEVER or EXIT)
  * can be executed from within the workbench.
  * The commands to be ignored can be configured in workbench.settings
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class IgnoredCommand
-	extends SqlCommand
-{
-	private String verb;
+    extends SqlCommand {
+  private String verb;
 
-	public IgnoredCommand(String aVerb)
-	{
-		super();
-		this.verb = aVerb.toUpperCase();
-	}
+  public IgnoredCommand(String aVerb) {
+    super();
+    this.verb = aVerb.toUpperCase();
+  }
 
-	@Override
-	public StatementRunnerResult execute(String aSql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
-		if (Settings.getInstance().getShowIgnoredWarning())
-		{
-			String msg = ResourceMgr.getFormattedString("MsgCommandIgnored", this.verb);
-			result.addMessage(msg);
-		}
-		result.setSuccess();
-		this.done();
-		return result;
-	}
+  @Override
+  public StatementRunnerResult execute(String aSql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult();
+    if (Settings.getInstance().getShowIgnoredWarning()) {
+      String msg = ResourceMgr.getFormattedString("MsgCommandIgnored", this.verb);
+      result.addMessage(msg);
+    }
+    result.setSuccess();
+    this.done();
+    return result;
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return verb;
-	}
+  @Override
+  public String getVerb() {
+    return verb;
+  }
 
 }

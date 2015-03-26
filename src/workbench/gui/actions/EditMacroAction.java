@@ -22,62 +22,53 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.JFrame;
-
 import workbench.WbManager;
-import workbench.resource.Settings;
-
 import workbench.gui.WbSwingUtilities;
 import workbench.gui.components.ValidatingDialog;
 import workbench.gui.macros.MacroDefinitionPanel;
-
+import workbench.resource.Settings;
 import workbench.sql.macros.MacroDefinition;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class EditMacroAction
-	extends WbAction
-{
-	private final String windowKey = "workbench.gui.macroeditor";
-	private MacroDefinition macro;
+    extends WbAction {
+  private final String windowKey = "workbench.gui.macroeditor";
+  private MacroDefinition macro;
 
-	public EditMacroAction()
-	{
-		super();
-		setMenuTextByKey("LblEditMacro");
-		this.setIcon(null);
-		setEnabled(false);
-	}
+  public EditMacroAction() {
+    super();
+    setMenuTextByKey("LblEditMacro");
+    this.setIcon(null);
+    setEnabled(false);
+  }
 
-	public void setMacro(MacroDefinition def)
-	{
-		this.macro = def;
-		setEnabled(macro != null);
-	}
+  public void setMacro(MacroDefinition def) {
+    this.macro = def;
+    setEnabled(macro != null);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		if (this.macro == null) return;
-		JFrame frame = WbManager.getInstance().getCurrentWindow();
-		MacroDefinitionPanel panel = new MacroDefinitionPanel(null);
-		MacroDefinition editMacro = macro.createCopy();
-		panel.setMacro(editMacro);
-		ValidatingDialog dialog = new ValidatingDialog(frame, "Edit macro", panel);
-		if (!Settings.getInstance().restoreWindowSize(dialog, windowKey))
-		{
-			dialog.setSize(650, 500);
-		}
-		WbSwingUtilities.center(dialog, frame);
-		dialog.setVisible(true);
-		Settings.getInstance().storeWindowSize(dialog, windowKey);
-		if (!dialog.isCancelled())
-		{
-			panel.applyChanges();
-			editMacro.copyTo(macro);
-		}
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    if (this.macro == null) return;
+    JFrame frame = WbManager.getInstance().getCurrentWindow();
+    MacroDefinitionPanel panel = new MacroDefinitionPanel(null);
+    MacroDefinition editMacro = macro.createCopy();
+    panel.setMacro(editMacro);
+    ValidatingDialog dialog = new ValidatingDialog(frame, "Edit macro", panel);
+    if (!Settings.getInstance().restoreWindowSize(dialog, windowKey)) {
+      dialog.setSize(650, 500);
+    }
+    WbSwingUtilities.center(dialog, frame);
+    dialog.setVisible(true);
+    Settings.getInstance().storeWindowSize(dialog, windowKey);
+    if (!dialog.isCancelled()) {
+      panel.applyChanges();
+      editMacro.copyTo(macro);
+    }
+  }
 }

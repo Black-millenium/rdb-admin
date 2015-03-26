@@ -35,100 +35,80 @@ import java.util.Scanner;
  * @author Thomas Kellerer
  */
 public class SystemConsole
-	implements WbConsole
-{
+    implements WbConsole {
 
-	public SystemConsole()
-	{
-	}
-
-  @Override
-  public void clearScreen()
-  {
+  public SystemConsole() {
   }
 
   @Override
-  public char readCharacter()
-  {
-		if (System.console() == null) return 0;
-    try
-    {
+  public void clearScreen() {
+  }
+
+  @Override
+  public char readCharacter() {
+    if (System.console() == null) return 0;
+    try {
       int value = System.console().reader().read();
-      return (char)value;
-    }
-    catch (IOException ex)
-    {
+      return (char) value;
+    } catch (IOException ex) {
     }
     return 0;
   }
 
   @Override
-  public void reset()
-  {
-		if (System.console() == null) return;
-    try
-    {
+  public void reset() {
+    if (System.console() == null) return;
+    try {
       System.console().reader().reset();
-    }
-    catch (IOException ex)
-    {
+    } catch (IOException ex) {
     }
   }
 
-	@Override
-	public String readPassword(String prompt)
-	{
-		if (System.console() != null)
-		{
-			char[] input = System.console().readPassword(prompt + " ");
-			if (input == null) return null;
-			String result = new String(input);
-			Arrays.fill(input, 'x');
-			return result;
-		}
-		return readLine(prompt);
-	}
+  @Override
+  public String readPassword(String prompt) {
+    if (System.console() != null) {
+      char[] input = System.console().readPassword(prompt + " ");
+      if (input == null) return null;
+      String result = new String(input);
+      Arrays.fill(input, 'x');
+      return result;
+    }
+    return readLine(prompt);
+  }
 
-	@Override
-	public String readLine(String prompt)
-	{
-		if (System.console() != null)
-		{
-			return System.console().readLine(prompt);
-		}
-		// Fallback in case console() is not available
-		// this might also be the case e.g. inside NetBeans
-		System.out.print(prompt);
-		Scanner inputScanner = new Scanner(System.in);
-		String line = inputScanner.nextLine();
-		return line;
-	}
+  @Override
+  public String readLine(String prompt) {
+    if (System.console() != null) {
+      return System.console().readLine(prompt);
+    }
+    // Fallback in case console() is not available
+    // this might also be the case e.g. inside NetBeans
+    System.out.print(prompt);
+    Scanner inputScanner = new Scanner(System.in);
+    String line = inputScanner.nextLine();
+    return line;
+  }
 
-	@Override
-	public void shutdown()
-	{
-	}
+  @Override
+  public void shutdown() {
+  }
 
-	@Override
-	public int getColumns()
-	{
-		return -1;
-	}
+  @Override
+  public int getColumns() {
+    return -1;
+  }
 
-	@Override
-	public String readLineWithoutHistory(String prompt)
-	{
-		return readLine(prompt);
-	}
+  @Override
+  public String readLineWithoutHistory(String prompt) {
+    return readLine(prompt);
+  }
 
-	@Override
-	public void clearHistory()
-	{
-	}
+  @Override
+  public void clearHistory() {
+  }
 
-	@Override
-	public void addToHistory(List<String> lines)
-	{
-	}
+  @Override
+  public void addToHistory(List<String> lines) {
+  }
 
 }

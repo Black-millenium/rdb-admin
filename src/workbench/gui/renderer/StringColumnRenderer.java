@@ -32,24 +32,19 @@ package workbench.gui.renderer;
  * instead of toString() which is much faster when no exceptions
  * are thrown.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class StringColumnRenderer
-	extends ToolTipRenderer
-{
+    extends ToolTipRenderer {
 
-	@Override
-	public void prepareDisplay(Object aValue)
-	{
-		try
-		{
-			this.displayValue = (String)aValue;
-		}
-		catch (Throwable e)
-		{
-			displayValue = (aValue == null ? null : aValue.toString());
-		}
-		setTooltip(displayValue);
-	}
+  @Override
+  public void prepareDisplay(Object aValue) {
+    try {
+      this.displayValue = (String) aValue;
+    } catch (Throwable e) {
+      displayValue = (aValue == null ? null : aValue.toString());
+    }
+    setTooltip(displayValue);
+  }
 
 }

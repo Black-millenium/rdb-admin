@@ -23,12 +23,12 @@
 package workbench.gui.renderer;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface WbRenderer
-{
-	String getDisplayValue();
-	int getHorizontalAlignment();
-	void prepareDisplay(Object value);
+public interface WbRenderer {
+  String getDisplayValue();
+
+  int getHorizontalAlignment();
+
+  void prepareDisplay(Object value);
 }

@@ -23,11 +23,12 @@
 package workbench.interfaces;
 
 /**
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface ResultLogger
-{
-	void clearLog();
-	void appendToLog(String msg);
-	void showLogMessage(String msg);
+public interface ResultLogger {
+  void clearLog();
+
+  void appendToLog(String msg);
+
+  void showLogMessage(String msg);
 }

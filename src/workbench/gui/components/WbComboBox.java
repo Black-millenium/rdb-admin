@@ -22,67 +22,55 @@
  */
 package workbench.gui.components;
 
-import java.awt.Dimension;
-
-import javax.swing.ComboBoxModel;
-import javax.swing.JComboBox;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * A JComboBox allowing a popup that is wider than the combobox itself.
- *
+ * <p/>
  * As this is not natively supported by Java, this is done using an ugly hack
  * that is floating around on the internet, and which I have found in various places.
  *
  * @author Thomas Kellerer
  */
 public class WbComboBox
-	extends JComboBox
-{
-	private boolean layingOut;
-	private int popupWidth;
+    extends JComboBox {
+  private boolean layingOut;
+  private int popupWidth;
 
-	public WbComboBox()
-	{
-	}
+  public WbComboBox() {
+  }
 
-	public WbComboBox(ComboBoxModel aModel)
-	{
-		super(aModel);
-	}
+  public WbComboBox(ComboBoxModel aModel) {
+    super(aModel);
+  }
 
-	/**
-	 * Overriden to handle the popup Size
-	 */
-	@Override
-	public void doLayout()
-	{
-		try
-		{
-			layingOut = true;
-			super.doLayout();
-		}
-		finally
-		{
-			layingOut = false;
-		}
-	}
+  /**
+   * Overriden to handle the popup Size
+   */
+  @Override
+  public void doLayout() {
+    try {
+      layingOut = true;
+      super.doLayout();
+    } finally {
+      layingOut = false;
+    }
+  }
 
-	public void setPopupWidth(int width)
-	{
-		this.popupWidth = width;
-	}
+  public void setPopupWidth(int width) {
+    this.popupWidth = width;
+  }
 
-	/**
-	 * Overriden to handle the popup Size
-	 */
-	@Override
-	public Dimension getSize()
-	{
-		Dimension dim = super.getSize();
-		if (!layingOut && popupWidth != 0 && dim.width < popupWidth)
-		{
-			dim.width = popupWidth;
-		}
-		return dim;
-	}
+  /**
+   * Overriden to handle the popup Size
+   */
+  @Override
+  public Dimension getSize() {
+    Dimension dim = super.getSize();
+    if (!layingOut && popupWidth != 0 && dim.width < popupWidth) {
+      dim.width = popupWidth;
+    }
+    return dim;
+  }
 }

@@ -22,106 +22,132 @@
  */
 package workbench.gui.settings;
 
-import java.awt.event.ActionListener;
-
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JPanel;
-
+import workbench.gui.WbSwingUtilities;
 import workbench.interfaces.Restoreable;
 import workbench.resource.GeneratedIdentifierCase;
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
-
-import workbench.gui.WbSwingUtilities;
-
 import workbench.sql.formatter.JoinWrapStyle;
-
 import workbench.util.StringUtil;
 
+import javax.swing.*;
+import java.awt.event.ActionListener;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class FormatterOptionsPanel
-	extends JPanel
-	implements Restoreable, ActionListener
-{
-	public FormatterOptionsPanel()
-	{
-		super();
-		initComponents();
-		ComboBoxModel model = new DefaultComboBoxModel(JoinWrapStyle.values());
-		joinWrappingStyle.setModel(model);
-		ComboBoxModel caseModel = new DefaultComboBoxModel(GeneratedIdentifierCase.values());
-		keywordCase.setModel(caseModel);
-		ComboBoxModel idModel = new DefaultComboBoxModel(GeneratedIdentifierCase.values());
-		identifierCase.setModel(idModel);
-		ComboBoxModel funcModel = new DefaultComboBoxModel(GeneratedIdentifierCase.values());
-		functionCase.setModel(funcModel);
-		String mnu = ResourceMgr.getPlainString("MnuTxtMakeCharInList");
-		String lbl = ResourceMgr.getFormattedString("LblMaxElements", mnu);
-		jLabel1.setText(lbl);
-		WbSwingUtilities.setMinimumSizeFromCols(subselectMaxLength);
-		WbSwingUtilities.setMinimumSizeFromCols(insertColumns);
-		WbSwingUtilities.setMinimumSizeFromCols(updateColumns);
-		WbSwingUtilities.setMinimumSizeFromCols(selectColumns);
-		WbSwingUtilities.setMinimumSizeFromCols(maxCharElements);
-		WbSwingUtilities.setMinimumSizeFromCols(maxNumElements);
-	}
+    extends JPanel
+    implements Restoreable, ActionListener {
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JCheckBox addSpaceAfterLineBreakComma;
+  private javax.swing.JPanel colsPerLinePanel;
+  private javax.swing.JCheckBox commaAfterLineBreak;
+  private javax.swing.JComboBox functionCase;
 
-	@Override
-	public void restoreSettings()
-	{
+  // Code for dispatching events from components to event handlers.
+  private javax.swing.JLabel functionCaseLabel;
+  private javax.swing.JComboBox identifierCase;
+  private javax.swing.JLabel identifierCaseLabel;
+  private javax.swing.JTextField insertColumns;
+  private javax.swing.JLabel insertColumnsLabel;
+  private javax.swing.JCheckBox insertWithColumnNames;
+  private javax.swing.JLabel jLabel1;
+  private javax.swing.JLabel jLabel2;
+  private javax.swing.JLabel jLabel3;
+  private javax.swing.JPanel jPanel1;
+  private javax.swing.JPanel jPanel2;
+  private javax.swing.JPanel jPanel3;
+  private javax.swing.JSeparator jSeparator1;
+  private javax.swing.JSeparator jSeparator2;
+  private javax.swing.JSeparator jSeparator3;
+  private javax.swing.JSeparator jSeparator4;
+  private javax.swing.JComboBox joinWrappingStyle;
+  private javax.swing.JComboBox keywordCase;
+  private javax.swing.JLabel keywordCaseLabel;
+  private javax.swing.JTextField maxCharElements;
+  private javax.swing.JLabel maxCharElementsLabel;
+  private javax.swing.JTextField maxNumElements;
+  private javax.swing.JLabel maxNumElementsLabel;
+  private javax.swing.JTextField selectColumns;
+  private javax.swing.JLabel selectColumnsLabel;
+  private javax.swing.JCheckBox spaceAfterComma;
+  private javax.swing.JLabel subselectMaxLabel;
+  private javax.swing.JTextField subselectMaxLength;
+  private javax.swing.JTextField updateColumns;
+  private javax.swing.JLabel updateColumnsLabel;
+  public FormatterOptionsPanel() {
+    super();
+    initComponents();
+    ComboBoxModel model = new DefaultComboBoxModel(JoinWrapStyle.values());
+    joinWrappingStyle.setModel(model);
+    ComboBoxModel caseModel = new DefaultComboBoxModel(GeneratedIdentifierCase.values());
+    keywordCase.setModel(caseModel);
+    ComboBoxModel idModel = new DefaultComboBoxModel(GeneratedIdentifierCase.values());
+    identifierCase.setModel(idModel);
+    ComboBoxModel funcModel = new DefaultComboBoxModel(GeneratedIdentifierCase.values());
+    functionCase.setModel(funcModel);
+    String mnu = ResourceMgr.getPlainString("MnuTxtMakeCharInList");
+    String lbl = ResourceMgr.getFormattedString("LblMaxElements", mnu);
+    jLabel1.setText(lbl);
+    WbSwingUtilities.setMinimumSizeFromCols(subselectMaxLength);
+    WbSwingUtilities.setMinimumSizeFromCols(insertColumns);
+    WbSwingUtilities.setMinimumSizeFromCols(updateColumns);
+    WbSwingUtilities.setMinimumSizeFromCols(selectColumns);
+    WbSwingUtilities.setMinimumSizeFromCols(maxCharElements);
+    WbSwingUtilities.setMinimumSizeFromCols(maxNumElements);
+  }
 
-		functionCase.setSelectedItem(Settings.getInstance().getFormatterFunctionCase());
-		insertColumns.setText(Integer.toString(Settings.getInstance().getFormatterMaxColumnsInInsert()));
-		updateColumns.setText(Integer.toString(Settings.getInstance().getFormatterMaxColumnsInUpdate()));
-		keywordCase.setSelectedItem(Settings.getInstance().getFormatterKeywordsCase());
-		identifierCase.setSelectedItem(Settings.getInstance().getFormatterIdentifierCase());
-		spaceAfterComma.setSelected(Settings.getInstance().getFormatterAddSpaceAfterComma());
-		commaAfterLineBreak.setSelected(Settings.getInstance().getFormatterCommaAfterLineBreak());
-		addSpaceAfterLineBreakComma.setSelected(Settings.getInstance().getFormatterAddSpaceAfterLineBreakComma());
-		addSpaceAfterLineBreakComma.setEnabled(commaAfterLineBreak.isSelected());
-		insertWithColumnNames.setSelected(Settings.getInstance().getFormatterAddColumnNameComment());
-		JoinWrapStyle style = Settings.getInstance().getFormatterJoinWrapStyle();
-		joinWrappingStyle.setSelectedItem(style);
-		selectColumns.setText(Integer.toString(Settings.getInstance().getFormatterMaxColumnsInSelect()));
-		subselectMaxLength.setText(Integer.toString(Settings.getInstance().getFormatterMaxSubselectLength()));
-		maxCharElements.setText(Integer.toString(Settings.getInstance().getMaxCharInListElements()));
-		maxNumElements.setText(Integer.toString(Settings.getInstance().getMaxNumInListElements()));
-	}
+  @Override
+  public void restoreSettings() {
 
-	@Override
-	public void saveSettings()
-	{
-		Settings set = Settings.getInstance();
-		set.setMaxNumInListElements(StringUtil.getIntValue(maxNumElements.getText(),-1));
-		set.setMaxCharInListElements(StringUtil.getIntValue(maxCharElements.getText(),-1));
-		set.setFormatterMaxSubselectLength(StringUtil.getIntValue(subselectMaxLength.getText(),60));
-		set.setFormatterMaxColumnsInSelect(StringUtil.getIntValue(selectColumns.getText(),1));
-		set.setFormatterFunctionCase((GeneratedIdentifierCase)functionCase.getSelectedItem());
-		set.setFormatterMaxColumnsInInsert(StringUtil.getIntValue(insertColumns.getText(),1));
-		set.setFormatterMaxColumnsInUpdate(StringUtil.getIntValue(updateColumns.getText(),1));
-		set.setFormatterKeywordsCase((GeneratedIdentifierCase)keywordCase.getSelectedItem());
-		set.setFormatterIdentifierCase((GeneratedIdentifierCase)identifierCase.getSelectedItem());
-		set.setFormatterAddSpaceAfterComma(spaceAfterComma.isSelected());
-		set.setFormatterCommaAfterLineBreak(commaAfterLineBreak.isSelected());
-		set.setFormatterAddSpaceAfterLineBreakComma(addSpaceAfterLineBreakComma.isSelected());
-		set.setFormatterAddColumnNameComment(insertWithColumnNames.isSelected());
+    functionCase.setSelectedItem(Settings.getInstance().getFormatterFunctionCase());
+    insertColumns.setText(Integer.toString(Settings.getInstance().getFormatterMaxColumnsInInsert()));
+    updateColumns.setText(Integer.toString(Settings.getInstance().getFormatterMaxColumnsInUpdate()));
+    keywordCase.setSelectedItem(Settings.getInstance().getFormatterKeywordsCase());
+    identifierCase.setSelectedItem(Settings.getInstance().getFormatterIdentifierCase());
+    spaceAfterComma.setSelected(Settings.getInstance().getFormatterAddSpaceAfterComma());
+    commaAfterLineBreak.setSelected(Settings.getInstance().getFormatterCommaAfterLineBreak());
+    addSpaceAfterLineBreakComma.setSelected(Settings.getInstance().getFormatterAddSpaceAfterLineBreakComma());
+    addSpaceAfterLineBreakComma.setEnabled(commaAfterLineBreak.isSelected());
+    insertWithColumnNames.setSelected(Settings.getInstance().getFormatterAddColumnNameComment());
+    JoinWrapStyle style = Settings.getInstance().getFormatterJoinWrapStyle();
+    joinWrappingStyle.setSelectedItem(style);
+    selectColumns.setText(Integer.toString(Settings.getInstance().getFormatterMaxColumnsInSelect()));
+    subselectMaxLength.setText(Integer.toString(Settings.getInstance().getFormatterMaxSubselectLength()));
+    maxCharElements.setText(Integer.toString(Settings.getInstance().getMaxCharInListElements()));
+    maxNumElements.setText(Integer.toString(Settings.getInstance().getMaxNumInListElements()));
+  }
 
-		JoinWrapStyle style = (JoinWrapStyle)joinWrappingStyle.getSelectedItem();
-		set.setFormatterJoinWrapStyle(style);
-	}
+  @Override
+  public void saveSettings() {
+    Settings set = Settings.getInstance();
+    set.setMaxNumInListElements(StringUtil.getIntValue(maxNumElements.getText(), -1));
+    set.setMaxCharInListElements(StringUtil.getIntValue(maxCharElements.getText(), -1));
+    set.setFormatterMaxSubselectLength(StringUtil.getIntValue(subselectMaxLength.getText(), 60));
+    set.setFormatterMaxColumnsInSelect(StringUtil.getIntValue(selectColumns.getText(), 1));
+    set.setFormatterFunctionCase((GeneratedIdentifierCase) functionCase.getSelectedItem());
+    set.setFormatterMaxColumnsInInsert(StringUtil.getIntValue(insertColumns.getText(), 1));
+    set.setFormatterMaxColumnsInUpdate(StringUtil.getIntValue(updateColumns.getText(), 1));
+    set.setFormatterKeywordsCase((GeneratedIdentifierCase) keywordCase.getSelectedItem());
+    set.setFormatterIdentifierCase((GeneratedIdentifierCase) identifierCase.getSelectedItem());
+    set.setFormatterAddSpaceAfterComma(spaceAfterComma.isSelected());
+    set.setFormatterCommaAfterLineBreak(commaAfterLineBreak.isSelected());
+    set.setFormatterAddSpaceAfterLineBreakComma(addSpaceAfterLineBreakComma.isSelected());
+    set.setFormatterAddColumnNameComment(insertWithColumnNames.isSelected());
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+    JoinWrapStyle style = (JoinWrapStyle) joinWrappingStyle.getSelectedItem();
+    set.setFormatterJoinWrapStyle(style);
+  }
+
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
 
     spaceAfterComma = new javax.swing.JCheckBox();
@@ -474,57 +500,16 @@ public class FormatterOptionsPanel
     add(jPanel3, gridBagConstraints);
   }
 
-  // Code for dispatching events from components to event handlers.
-
-  public void actionPerformed(java.awt.event.ActionEvent evt)
-  {
-    if (evt.getSource() == commaAfterLineBreak)
-    {
+  public void actionPerformed(java.awt.event.ActionEvent evt) {
+    if (evt.getSource() == commaAfterLineBreak) {
       FormatterOptionsPanel.this.commaAfterLineBreakActionPerformed(evt);
     }
   }// </editor-fold>//GEN-END:initComponents
 
-	private void commaAfterLineBreakActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_commaAfterLineBreakActionPerformed
-	{//GEN-HEADEREND:event_commaAfterLineBreakActionPerformed
-		addSpaceAfterLineBreakComma.setEnabled(commaAfterLineBreak.isSelected());
-	}//GEN-LAST:event_commaAfterLineBreakActionPerformed
-
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JCheckBox addSpaceAfterLineBreakComma;
-  private javax.swing.JPanel colsPerLinePanel;
-  private javax.swing.JCheckBox commaAfterLineBreak;
-  private javax.swing.JComboBox functionCase;
-  private javax.swing.JLabel functionCaseLabel;
-  private javax.swing.JComboBox identifierCase;
-  private javax.swing.JLabel identifierCaseLabel;
-  private javax.swing.JTextField insertColumns;
-  private javax.swing.JLabel insertColumnsLabel;
-  private javax.swing.JCheckBox insertWithColumnNames;
-  private javax.swing.JLabel jLabel1;
-  private javax.swing.JLabel jLabel2;
-  private javax.swing.JLabel jLabel3;
-  private javax.swing.JPanel jPanel1;
-  private javax.swing.JPanel jPanel2;
-  private javax.swing.JPanel jPanel3;
-  private javax.swing.JSeparator jSeparator1;
-  private javax.swing.JSeparator jSeparator2;
-  private javax.swing.JSeparator jSeparator3;
-  private javax.swing.JSeparator jSeparator4;
-  private javax.swing.JComboBox joinWrappingStyle;
-  private javax.swing.JComboBox keywordCase;
-  private javax.swing.JLabel keywordCaseLabel;
-  private javax.swing.JTextField maxCharElements;
-  private javax.swing.JLabel maxCharElementsLabel;
-  private javax.swing.JTextField maxNumElements;
-  private javax.swing.JLabel maxNumElementsLabel;
-  private javax.swing.JTextField selectColumns;
-  private javax.swing.JLabel selectColumnsLabel;
-  private javax.swing.JCheckBox spaceAfterComma;
-  private javax.swing.JLabel subselectMaxLabel;
-  private javax.swing.JTextField subselectMaxLength;
-  private javax.swing.JTextField updateColumns;
-  private javax.swing.JLabel updateColumnsLabel;
+  private void commaAfterLineBreakActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_commaAfterLineBreakActionPerformed
+  {//GEN-HEADEREND:event_commaAfterLineBreakActionPerformed
+    addSpaceAfterLineBreakComma.setEnabled(commaAfterLineBreak.isSelected());
+  }//GEN-LAST:event_commaAfterLineBreakActionPerformed
   // End of variables declaration//GEN-END:variables
 
 }

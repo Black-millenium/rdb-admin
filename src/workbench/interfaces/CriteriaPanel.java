@@ -27,15 +27,22 @@ import workbench.gui.actions.WbAction;
 /**
  * @author Thomas Kellerer
  */
-public interface CriteriaPanel
-{
-	void setFocusToEntryField();
-	String getText();
-	void setText(String aText);
-	void addToToolbar(WbAction action, boolean atFront, boolean withSep);
-	void saveSettings();
-	void restoreSettings();
-	void saveSettings(PropertyStorage props, String key);
-	void restoreSettings(PropertyStorage props, String key);
-	void setColumnList(String[] names);
+public interface CriteriaPanel {
+  void setFocusToEntryField();
+
+  String getText();
+
+  void setText(String aText);
+
+  void addToToolbar(WbAction action, boolean atFront, boolean withSep);
+
+  void saveSettings();
+
+  void restoreSettings();
+
+  void saveSettings(PropertyStorage props, String key);
+
+  void restoreSettings(PropertyStorage props, String key);
+
+  void setColumnList(String[] names);
 }

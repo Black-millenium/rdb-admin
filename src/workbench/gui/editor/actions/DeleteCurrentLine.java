@@ -22,45 +22,38 @@
  */
 package workbench.gui.editor.actions;
 
-import java.awt.event.ActionEvent;
-import javax.swing.text.BadLocationException;
 import workbench.gui.editor.InputHandler;
 import workbench.gui.editor.JEditTextArea;
 import workbench.resource.Settings;
 
+import javax.swing.text.BadLocationException;
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class DeleteCurrentLine
-	extends EditorAction
-{
-	public DeleteCurrentLine()
-	{
-		super("TxtEdDelLine", null);
-	}
+    extends EditorAction {
+  public DeleteCurrentLine() {
+    super("TxtEdDelLine", null);
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt)
-	{
-		JEditTextArea textArea = InputHandler.getTextArea(evt);
-		if (textArea == null) return;
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    JEditTextArea textArea = InputHandler.getTextArea(evt);
+    if (textArea == null) return;
 
-		int line = textArea.getCaretLine();
+    int line = textArea.getCaretLine();
 
-		int lineStart = textArea.getLineStartOffset(line);
-		int len = textArea.getLineLength(line);
-		if (line < textArea.getLineCount() - 1)
-		{
-			 len += Settings.getInstance().getInternalEditorLineEnding().length();
-		}
-		try
-		{
-			textArea.getDocument().remove(lineStart, len);
-		}
-		catch (BadLocationException bl)
-		{
-			bl.printStackTrace();
-		}
-	}
+    int lineStart = textArea.getLineStartOffset(line);
+    int len = textArea.getLineLength(line);
+    if (line < textArea.getLineCount() - 1) {
+      len += Settings.getInstance().getInternalEditorLineEnding().length();
+    }
+    try {
+      textArea.getDocument().remove(lineStart, len);
+    } catch (BadLocationException bl) {
+      bl.printStackTrace();
+    }
+  }
 }

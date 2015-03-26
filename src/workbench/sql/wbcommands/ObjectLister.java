@@ -20,125 +20,102 @@
 
 package workbench.sql.wbcommands;
 
+import workbench.db.TableIdentifier;
+import workbench.db.WbConnection;
+import workbench.storage.DataStore;
+import workbench.util.ArgumentParser;
+import workbench.util.StringUtil;
+
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
-import workbench.db.TableIdentifier;
-import workbench.db.WbConnection;
-
-import workbench.storage.DataStore;
-
-import workbench.util.ArgumentParser;
-import workbench.util.StringUtil;
-
 /**
- *
  * @author Thomas Kellerer
  */
-public class ObjectLister
-{
+public class ObjectLister {
 
-	public DataStore getSelectableObjects(ArgumentParser cmdLine, String userInput, WbConnection connection)
-		throws SQLException
-	{
-		String[] types = connection.getMetadata().getSelectableTypes();
-		return getObjects(cmdLine, userInput, connection, types);
-	}
+  public DataStore getSelectableObjects(ArgumentParser cmdLine, String userInput, WbConnection connection)
+      throws SQLException {
+    String[] types = connection.getMetadata().getSelectableTypes();
+    return getObjects(cmdLine, userInput, connection, types);
+  }
 
-	public DataStore getObjects(ArgumentParser cmdLine, String userInput, WbConnection connection)
-		throws SQLException
-	{
-		String[] types = types = connection.getMetadata().getSelectableTypes();
-		return getObjects(cmdLine, userInput, connection, types);
-	}
+  public DataStore getObjects(ArgumentParser cmdLine, String userInput, WbConnection connection)
+      throws SQLException {
+    String[] types = types = connection.getMetadata().getSelectableTypes();
+    return getObjects(cmdLine, userInput, connection, types);
+  }
 
-	private DataStore getObjects(ArgumentParser cmdLine, String userInput, WbConnection connection, String[] types)
-		throws SQLException
-	{
-		String objects = userInput;
-		String schema = null;
-		String catalog = null;
+  private DataStore getObjects(ArgumentParser cmdLine, String userInput, WbConnection connection, String[] types)
+      throws SQLException {
+    String objects = userInput;
+    String schema = null;
+    String catalog = null;
 
-		cmdLine.parse(userInput);
+    cmdLine.parse(userInput);
 
-		if (cmdLine.hasArguments())
-		{
-			objects = cmdLine.getValue(CommonArgs.ARG_OBJECTS);
+    if (cmdLine.hasArguments()) {
+      objects = cmdLine.getValue(CommonArgs.ARG_OBJECTS);
 
-			List<String> typeList = cmdLine.getListValue(CommonArgs.ARG_TYPES);
-			if (typeList.size() == 1 && (typeList.get(0).equals("*") || typeList.get(0).equals("%")))
-			{
-				Collection<String> allTypes = connection.getMetadata().getObjectTypes();
-				types = StringUtil.toArray(allTypes, true, true);
-			}
-			else if (typeList.size() > 0)
-			{
-				types = StringUtil.toArray(typeList, true, true);
-			}
-			schema = cmdLine.getValue(CommonArgs.ARG_SCHEMA);
-			catalog = cmdLine.getValue(CommonArgs.ARG_CATALOG);
-		}
-		else
-		{
-			objects = userInput;
-			if (types == null)
-			{
-				types = connection.getMetadata().getSelectableTypes();
-			}
-		}
+      List<String> typeList = cmdLine.getListValue(CommonArgs.ARG_TYPES);
+      if (typeList.size() == 1 && (typeList.get(0).equals("*") || typeList.get(0).equals("%"))) {
+        Collection<String> allTypes = connection.getMetadata().getObjectTypes();
+        types = StringUtil.toArray(allTypes, true, true);
+      } else if (typeList.size() > 0) {
+        types = StringUtil.toArray(typeList, true, true);
+      }
+      schema = cmdLine.getValue(CommonArgs.ARG_SCHEMA);
+      catalog = cmdLine.getValue(CommonArgs.ARG_CATALOG);
+    } else {
+      objects = userInput;
+      if (types == null) {
+        types = connection.getMetadata().getSelectableTypes();
+      }
+    }
 
-		if (StringUtil.isBlank(schema))
-		{
-			schema = connection.getMetadata().getCurrentSchema();
-		}
+    if (StringUtil.isBlank(schema)) {
+      schema = connection.getMetadata().getCurrentSchema();
+    }
 
-		if (StringUtil.isBlank(catalog))
-		{
-			catalog = connection.getMetadata().getCurrentCatalog();
-		}
+    if (StringUtil.isBlank(catalog)) {
+      catalog = connection.getMetadata().getCurrentCatalog();
+    }
 
-		DataStore resultList = null;
+    DataStore resultList = null;
 
-		if (StringUtil.isBlank(objects))
-		{
-			objects = "%";
-		}
+    if (StringUtil.isBlank(objects)) {
+      objects = "%";
+    }
 
-		List<String> objectFilters = StringUtil.stringToList(objects, ",", true, true, false, true);
+    List<String> objectFilters = StringUtil.stringToList(objects, ",", true, true, false, true);
 
-		for (String filter : objectFilters)
-		{
-			// Create a tableidentifier for parsing e.g. parameters
-			// like -tables=public.*
-			TableIdentifier tbl = new TableIdentifier(connection.getMetadata().adjustObjectnameCase(filter), connection);
-			String tschema = tbl.getSchema();
-			if (StringUtil.isBlank(tschema))
-			{
-				tschema = schema;
-			}
-			tschema = connection.getMetadata().adjustSchemaNameCase(tschema);
-			String tcatalog = tbl.getCatalog();
-			if (StringUtil.isBlank(tcatalog))
-			{
-				tcatalog = catalog;
-			}
-			tcatalog = connection.getMetadata().adjustObjectnameCase(tcatalog);
+    for (String filter : objectFilters) {
+      // Create a tableidentifier for parsing e.g. parameters
+      // like -tables=public.*
+      TableIdentifier tbl = new TableIdentifier(connection.getMetadata().adjustObjectnameCase(filter), connection);
+      String tschema = tbl.getSchema();
+      if (StringUtil.isBlank(tschema)) {
+        tschema = schema;
+      }
+      tschema = connection.getMetadata().adjustSchemaNameCase(tschema);
+      String tcatalog = tbl.getCatalog();
+      if (StringUtil.isBlank(tcatalog)) {
+        tcatalog = catalog;
+      }
+      tcatalog = connection.getMetadata().adjustObjectnameCase(tcatalog);
 
-			String tname = tbl.getTableName();
+      String tname = tbl.getTableName();
 
-			DataStore ds = connection.getMetadata().getObjects(tcatalog, tschema, tname, types);
-			if (resultList == null)
-			{
-				// first result retrieved
-				resultList = ds;
-			}
-			else
-			{
-				// additional results retrieved, add them to the current result
-				resultList.copyFrom(ds);
-			}
-		}
-		return resultList;
-	}
+      DataStore ds = connection.getMetadata().getObjects(tcatalog, tschema, tname, types);
+      if (resultList == null) {
+        // first result retrieved
+        resultList = ds;
+      } else {
+        // additional results retrieved, add them to the current result
+        resultList.copyFrom(ds);
+      }
+    }
+    return resultList;
+  }
 }

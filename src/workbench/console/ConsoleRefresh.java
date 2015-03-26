@@ -19,61 +19,46 @@
  */
 package workbench.console;
 
-import java.util.List;
-import java.util.Set;
-
+import workbench.gui.sql.AutomaticRefreshMgr;
 import workbench.log.LogMgr;
 import workbench.resource.ResourceMgr;
-
-import workbench.gui.sql.AutomaticRefreshMgr;
-
 import workbench.sql.BatchRunner;
 import workbench.sql.RefreshAnnotation;
 import workbench.sql.StatementHistory;
 import workbench.sql.WbAnnotation;
+import workbench.util.*;
 
-import workbench.util.CollectionUtil;
-import workbench.util.DurationFormatter;
-import workbench.util.SqlUtil;
-import workbench.util.StringUtil;
-import workbench.util.WbThread;
+import java.util.List;
+import java.util.Set;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class ConsoleRefresh
-{
+public class ConsoleRefresh {
   private boolean doRefresh;
   private WbThread refreshThread;
   private WbThread inputThread;
 
-  public ConsoleRefresh()
-  {
+  public ConsoleRefresh() {
   }
 
-  public HandlerState handleRefresh(BatchRunner runner, String sql, StatementHistory history)
-  {
+  public HandlerState handleRefresh(BatchRunner runner, String sql, StatementHistory history) {
     if (sql == null) return HandlerState.notHandled;
     if (refreshThread != null) return HandlerState.notHandled;
 
     String verb = SqlUtil.getSqlVerb(sql);
     String interval = null;
     boolean manualRefresh = false;
-    if (RefreshAnnotation.ANNOTATION.equalsIgnoreCase(verb))
-    {
+    if (RefreshAnnotation.ANNOTATION.equalsIgnoreCase(verb)) {
       if (history.size() == 0) return HandlerState.notHandled;
 
       interval = SqlUtil.stripVerb(SqlUtil.makeCleanSql(sql, false, false));
-      if (StringUtil.isBlank(interval))
-      {
+      if (StringUtil.isBlank(interval)) {
         interval = ConsoleSettings.getDefaultRefreshInterval();
       }
       sql = history.get(history.size() - 1);
       manualRefresh = true;
-    }
-    else
-    {
+    } else {
       Set<String> tags = CollectionUtil.caseInsensitiveSet(WbAnnotation.getTag(RefreshAnnotation.ANNOTATION));
       List<WbAnnotation> annotations = WbAnnotation.readAllAnnotations(sql, tags);
       if (annotations.size() != 1) return HandlerState.notHandled;
@@ -81,8 +66,7 @@ public class ConsoleRefresh
     }
 
     int milliSeconds = AutomaticRefreshMgr.parseInterval(interval);
-    if (milliSeconds <= 5)
-    {
+    if (milliSeconds <= 5) {
       // if this was a manual "WbRefresh", don't handle the actual statement
       // returning true signals to the caller that the statement does
       // not need to be processed further (which is the case for a "WbRefresh" command)
@@ -95,21 +79,16 @@ public class ConsoleRefresh
     return HandlerState.handled;
   }
 
-  private void startRefresh(final BatchRunner runner, final String sql, final int interval)
-  {
+  private void startRefresh(final BatchRunner runner, final String sql, final int interval) {
     doRefresh = true;
 
-    inputThread = new WbThread(new Runnable()
-    {
+    inputThread = new WbThread(new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         WbConsole console = WbConsoleFactory.getConsole();
-        while (doRefresh)
-        {
+        while (doRefresh) {
           char c = console.readCharacter();
-          if (Character.toLowerCase(c) == 'q' || Character.toLowerCase(c) == 'x')
-          {
+          if (Character.toLowerCase(c) == 'q' || Character.toLowerCase(c) == 'x') {
             doRefresh = false;
             break;
           }
@@ -119,29 +98,21 @@ public class ConsoleRefresh
     }, "Console Refresh Input");
     inputThread.start();
 
-    refreshThread = new WbThread(new Runnable()
-    {
+    refreshThread = new WbThread(new Runnable() {
 
       @Override
-      public void run()
-      {
+      public void run() {
         doRefresh(runner, sql, interval);
       }
     }, "Console Refresh");
 
-    try
-    {
+    try {
       refreshThread.start();
       refreshThread.join();
-    }
-    catch (InterruptedException ex)
-    {
+    } catch (InterruptedException ex) {
       // this is excpected
-    }
-    finally
-    {
-      if (inputThread != null)
-      {
+    } finally {
+      if (inputThread != null) {
         inputThread.interrupt();
         WbConsoleFactory.getConsole().reset();
         inputThread = null;
@@ -151,36 +122,29 @@ public class ConsoleRefresh
     }
   }
 
-  private void doRefresh(BatchRunner runner, String sql, int interval)
-  {
+  private void doRefresh(BatchRunner runner, String sql, int interval) {
     DurationFormatter formatter = new DurationFormatter();
     String intDisplay = formatter.formatDuration(interval, false);
 
     boolean clearScreen = ConsoleSettings.getClearScreenForRefresh();
     String quitMsg = ResourceMgr.getString("MsgRefreshQuit");
 
-    while (doRefresh)
-    {
-      try
-      {
-        if (clearScreen)
-        {
+    while (doRefresh) {
+      try {
+        if (clearScreen) {
           WbConsoleFactory.getConsole().clearScreen();
         }
 
         boolean hasError = runner.runScript(sql);
 
-        if (hasError)
-        {
+        if (hasError) {
           break;
         }
-        
+
         String msg = "*** " + ResourceMgr.getFormattedString("MsgRefreshing", intDisplay, StringUtil.getCurrentTimestamp()) + " - " + quitMsg;
         System.out.println(msg);
         inputThread.join(interval);
-      }
-      catch (Exception ex)
-      {
+      } catch (Exception ex) {
         LogMgr.logError("ConsoleRefresh", "Error refreshing last statement", ex);
         break;
       }

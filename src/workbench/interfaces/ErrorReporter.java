@@ -23,11 +23,10 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ErrorReporter
-{
-	void addError(String msg);
-	void addWarning(String warning);
+public interface ErrorReporter {
+  void addError(String msg);
+
+  void addWarning(String warning);
 }

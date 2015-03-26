@@ -22,32 +22,30 @@
  */
 package workbench.gui.actions;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 /**
- *	Toggle highlighting of the currently executed statement.
- *	@author  Thomas Kellerer
+ * Toggle highlighting of the currently executed statement.
+ *
+ * @author Thomas Kellerer
  */
 public class HighlightCurrentStatement
-	extends CheckBoxAction
-	implements PropertyChangeListener
-{
+    extends CheckBoxAction
+    implements PropertyChangeListener {
 
-	public HighlightCurrentStatement()
-	{
-		super("MnuTxtHighlightCurrent", Settings.PROPERTY_HIGHLIGHT_CURRENT_STATEMENT);
-		this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
-		Settings.getInstance().addPropertyChangeListener(this, Settings.PROPERTY_HIGHLIGHT_CURRENT_STATEMENT);
-	}
+  public HighlightCurrentStatement() {
+    super("MnuTxtHighlightCurrent", Settings.PROPERTY_HIGHLIGHT_CURRENT_STATEMENT);
+    this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
+    Settings.getInstance().addPropertyChangeListener(this, Settings.PROPERTY_HIGHLIGHT_CURRENT_STATEMENT);
+  }
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt)
-	{
-		this.setSwitchedOn(Settings.getInstance().getBoolProperty(Settings.PROPERTY_HIGHLIGHT_CURRENT_STATEMENT, false));
-	}
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+    this.setSwitchedOn(Settings.getInstance().getBoolProperty(Settings.PROPERTY_HIGHLIGHT_CURRENT_STATEMENT, false));
+  }
 
 }

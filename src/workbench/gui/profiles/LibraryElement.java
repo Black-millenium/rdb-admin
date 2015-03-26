@@ -22,92 +22,71 @@ package workbench.gui.profiles;
 
 
 import workbench.gui.components.LibListUtil;
-
 import workbench.util.WbFile;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class LibraryElement
-{
-	private final String fullPath;
-	private String displayString;
+public class LibraryElement {
+  private final String fullPath;
+  private String displayString;
 
-	public LibraryElement(String filename)
-	{
-		this(new WbFile(filename));
-	}
+  public LibraryElement(String filename) {
+    this(new WbFile(filename));
+  }
 
-	public LibraryElement(WbFile file)
-	{
-		String fname = file.getName();
-		if (fname.equalsIgnoreCase("rt.jar"))
-		{
-			// this is for the Look & Feel dialog and the JDBC/ODBC bridge driver
-			// otherwise the "rt.jar" would be shown with a wrong file path
-			displayString = fname;
-			fullPath = fname;
-		}
-		else
-		{
-			LibListUtil util = new LibListUtil();
-			WbFile realFile = util.replacePlaceHolder(file);
+  public LibraryElement(WbFile file) {
+    String fname = file.getName();
+    if (fname.equalsIgnoreCase("rt.jar")) {
+      // this is for the Look & Feel dialog and the JDBC/ODBC bridge driver
+      // otherwise the "rt.jar" would be shown with a wrong file path
+      displayString = fname;
+      fullPath = fname;
+    } else {
+      LibListUtil util = new LibListUtil();
+      WbFile realFile = util.replacePlaceHolder(file);
 
-			// if replacePlaceHolder() returned the same file, no placeholder is present
-			if (realFile == file)
-			{
-				if (file.isAbsolute())
-				{
-					fullPath = file.getFullPath();
-				}
-				else
-				{
-					// don't use getFullPath() on files that are not absolute filenames
-					// otherwise driver templates that don't contain a path to the driver jar
-					// would show up as defined in the current directory which is quite confusing.
-					fullPath = file.getName();
-				}
+      // if replacePlaceHolder() returned the same file, no placeholder is present
+      if (realFile == file) {
+        if (file.isAbsolute()) {
+          fullPath = file.getFullPath();
+        } else {
+          // don't use getFullPath() on files that are not absolute filenames
+          // otherwise driver templates that don't contain a path to the driver jar
+          // would show up as defined in the current directory which is quite confusing.
+          fullPath = file.getName();
+        }
 
-				if (file.exists())
-				{
-					displayString = fullPath;
-				}
-				else
-				{
-					displayString = "<html><span style='color:red'><i>" + fullPath + "</i></span></html>";
-				}
-			}
-			else
-			{
-				// we can't use WbFile.getFullPath() or File.getAbsolutePath() due to the placeholder
-				fullPath = file.getParent() + System.getProperty("file.separator") + file.getName();
-				displayString = fullPath;
-				if (!realFile.exists())
-				{
-					displayString = "<html><span style='color:red'><i>" + displayString + "</i></span></html>";
-				}
-			}
-		}
-	}
+        if (file.exists()) {
+          displayString = fullPath;
+        } else {
+          displayString = "<html><span style='color:red'><i>" + fullPath + "</i></span></html>";
+        }
+      } else {
+        // we can't use WbFile.getFullPath() or File.getAbsolutePath() due to the placeholder
+        fullPath = file.getParent() + System.getProperty("file.separator") + file.getName();
+        displayString = fullPath;
+        if (!realFile.exists()) {
+          displayString = "<html><span style='color:red'><i>" + displayString + "</i></span></html>";
+        }
+      }
+    }
+  }
 
-	public String getRealPath()
-	{
-		LibListUtil util = new LibListUtil();
-		WbFile file = util.replacePlaceHolder(new WbFile(fullPath));
-		return file.getFullPath();
-	}
+  public String getRealPath() {
+    LibListUtil util = new LibListUtil();
+    WbFile file = util.replacePlaceHolder(new WbFile(fullPath));
+    return file.getFullPath();
+  }
 
-	public String getPath()
-	{
-		return fullPath;
-	}
+  public String getPath() {
+    return fullPath;
+  }
 
-	@Override
-	public String toString()
-	{
-		return displayString;
-	}
+  @Override
+  public String toString() {
+    return displayString;
+  }
 
 
 }

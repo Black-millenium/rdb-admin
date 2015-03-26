@@ -20,37 +20,32 @@
 
 package workbench.console;
 
-import java.util.List;
-import java.util.Map;
-
+import jline.Completor;
 import workbench.log.LogMgr;
-
 import workbench.sql.macros.MacroDefinition;
 import workbench.sql.macros.MacroManager;
 
-import jline.Completor;
+import java.util.List;
+import java.util.Map;
+
 /**
- *
  * An implementation of a JLine Completor that completes clip keywords with the macro text.
  *
  * @author Thomas Kellerer
  */
 public class ClipCompletor
-	implements Completor
-{
+    implements Completor {
 
-	@Override
-	public int complete(String buffer, int cursor, List candidates)
-	{
-		LogMgr.logDebug("ClipCompletor.complete()", "Checking completion for: " + buffer);
-		Map<String, MacroDefinition> macros = MacroManager.getInstance().getExpandableMacros(MacroManager.DEFAULT_STORAGE);
-		MacroDefinition def = macros.get(buffer);
-		if (def != null)
-		{
-			candidates.add(def.getText());
-			return 0;
-		}
-		return -1;
-	}
+  @Override
+  public int complete(String buffer, int cursor, List candidates) {
+    LogMgr.logDebug("ClipCompletor.complete()", "Checking completion for: " + buffer);
+    Map<String, MacroDefinition> macros = MacroManager.getInstance().getExpandableMacros(MacroManager.DEFAULT_STORAGE);
+    MacroDefinition def = macros.get(buffer);
+    if (def != null) {
+      candidates.add(def.getText());
+      return 0;
+    }
+    return -1;
+  }
 
 }

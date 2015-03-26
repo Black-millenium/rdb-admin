@@ -22,11 +22,10 @@
  */
 package workbench.gui.fontzoom;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.KeyStroke;
-
 import workbench.gui.actions.WbAction;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * An action to be used for font zooming.
@@ -34,42 +33,36 @@ import workbench.gui.actions.WbAction;
  * @author Thomas Kellerer
  */
 public abstract class FontSizeAction
-	extends WbAction
-{
+    extends WbAction {
 
-	private FontZoomer zoomer;
+  private FontZoomer zoomer;
 
-	protected FontSizeAction(String resourceKey, int keyCode, int keyMask)
-	{
-		this(resourceKey, keyCode, keyMask, null);
-	}
+  protected FontSizeAction(String resourceKey, int keyCode, int keyMask) {
+    this(resourceKey, keyCode, keyMask, null);
+  }
 
-	protected FontSizeAction(String resourceKey, int keyCode, int keyMask, FontZoomer fontZoomer)
-	{
-		super();
-		initMenuDefinition(resourceKey, KeyStroke.getKeyStroke(keyCode, keyMask));
-		zoomer = fontZoomer;
-	}
+  protected FontSizeAction(String resourceKey, int keyCode, int keyMask, FontZoomer fontZoomer) {
+    super();
+    initMenuDefinition(resourceKey, KeyStroke.getKeyStroke(keyCode, keyMask));
+    zoomer = fontZoomer;
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt)
-	{
-		FontZoomer toUse = zoomer;
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    FontZoomer toUse = zoomer;
 
-		if (toUse == null && evt.getSource() instanceof FontZoomProvider)
-		{
-			// If no zoomer has been registered, check if the source component
-			// can be zoomed. If yes, then use the zoomer provided by it
-			FontZoomProvider provider = (FontZoomProvider) evt.getSource();
-			toUse = provider.getFontZoomer();
-		}
+    if (toUse == null && evt.getSource() instanceof FontZoomProvider) {
+      // If no zoomer has been registered, check if the source component
+      // can be zoomed. If yes, then use the zoomer provided by it
+      FontZoomProvider provider = (FontZoomProvider) evt.getSource();
+      toUse = provider.getFontZoomer();
+    }
 
-		if (toUse != null)
-		{
-			doFontChange(toUse);
-		}
-	}
+    if (toUse != null) {
+      doFontChange(toUse);
+    }
+  }
 
-	public abstract void doFontChange(FontZoomer fontZoomer);
+  public abstract void doFontChange(FontZoomer fontZoomer);
 
 }

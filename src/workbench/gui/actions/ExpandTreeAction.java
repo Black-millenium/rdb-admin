@@ -22,31 +22,28 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.interfaces.ExpandableTree;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Expand all items in a Tree
-
+ *
  * @author Thomas Kellerer
  */
 public class ExpandTreeAction
-	extends WbAction
-{
-	private ExpandableTree client;
+    extends WbAction {
+  private ExpandableTree client;
 
-	public ExpandTreeAction(ExpandableTree tree)
-	{
-		super();
-		this.client = tree;
-		this.initMenuDefinition("LblExpandAll");
-		this.setIcon("expand");
-	}
+  public ExpandTreeAction(ExpandableTree tree) {
+    super();
+    this.client = tree;
+    this.initMenuDefinition("LblExpandAll");
+    this.setIcon("expand");
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.expandAll();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.expandAll();
+  }
 }

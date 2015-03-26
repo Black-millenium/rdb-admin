@@ -25,28 +25,24 @@ package workbench.db.exporter;
 /**
  * An ExportWriter to generate JSON files.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class JsonExportWriter
-	extends ExportWriter
-{
-	public JsonExportWriter(DataExporter exp)
-	{
-		super(exp);
-	}
+    extends ExportWriter {
+  public JsonExportWriter(DataExporter exp) {
+    super(exp);
+  }
 
-	@Override
-	public RowDataConverter createConverter()
-	{
-		return new JsonRowDataConverter();
-	}
+  @Override
+  public RowDataConverter createConverter() {
+    return new JsonRowDataConverter();
+  }
 
-	@Override
-	public void configureConverter()
-	{
-		super.configureConverter();
-		JsonRowDataConverter conv = (JsonRowDataConverter)this.converter;
-		conv.setNullString(exporter.getNullString());
-	}
+  @Override
+  public void configureConverter() {
+    super.configureConverter();
+    JsonRowDataConverter conv = (JsonRowDataConverter) this.converter;
+    conv.setNullString(exporter.getNullString());
+  }
 
 }

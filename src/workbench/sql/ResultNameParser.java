@@ -29,18 +29,15 @@ package workbench.sql;
  * @author Thomas Kellerer
  */
 public class ResultNameParser
-	extends WbAnnotation
-{
-	public static final String ANNOTATION = "WbResult";
+    extends WbAnnotation {
+  public static final String ANNOTATION = "WbResult";
 
-	public ResultNameParser()
-	{
-		super(ANNOTATION);
-	}
+  public ResultNameParser() {
+    super(ANNOTATION);
+  }
 
-	public String getResultName(String sql)
-	{
-		return getAnnotationValue(sql);
-	}
+  public String getResultName(String sql) {
+    return getAnnotationValue(sql);
+  }
 
 }

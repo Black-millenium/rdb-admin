@@ -22,86 +22,70 @@
  */
 package workbench.db.mssql;
 
+import workbench.db.SchemaInformationReader;
+import workbench.db.WbConnection;
+import workbench.log.LogMgr;
+import workbench.util.SqlUtil;
+
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import workbench.log.LogMgr;
-
-import workbench.db.SchemaInformationReader;
-import workbench.db.WbConnection;
-
-import workbench.util.SqlUtil;
-
 /**
- *
  * @author Thomas Kellerer
  */
 public class SqlServerSchemaInfoReader
-	implements SchemaInformationReader
-{
-	private String defaultSchema;
+    implements SchemaInformationReader {
+  private String defaultSchema;
 
-	public SqlServerSchemaInfoReader(WbConnection con)
-	{
-		// As the default schema is a property of the user definition and nothing that can change at runtime (at least not easily)
-		// I assume it's safe to cache the current schema.
+  public SqlServerSchemaInfoReader(WbConnection con) {
+    // As the default schema is a property of the user definition and nothing that can change at runtime (at least not easily)
+    // I assume it's safe to cache the current schema.
 
-		String sql =
-			"SELECT default_schema_name\n" +
-			"FROM sys.database_principals with (nolock) \n" +
-			"WHERE type = 'S' \n" +
-			"AND name = current_user";
+    String sql =
+        "SELECT default_schema_name\n" +
+            "FROM sys.database_principals with (nolock) \n" +
+            "WHERE type = 'S' \n" +
+            "AND name = current_user";
 
-		Statement stmt = null;
-		ResultSet rs = null;
-		try
-		{
-			stmt = con.createStatement();
-			rs = stmt.executeQuery(sql);
-			if (rs.next())
-			{
-				defaultSchema = rs.getString(1);
-			}
-		}
-		catch (Exception e)
-		{
-			LogMgr.logError("SqlServerSchemaInfoReader", "Could not obtain default schema using: \n" + sql, e);
-		}
-		finally
-		{
-			SqlUtil.closeAll(rs, stmt);
-		}
-	}
+    Statement stmt = null;
+    ResultSet rs = null;
+    try {
+      stmt = con.createStatement();
+      rs = stmt.executeQuery(sql);
+      if (rs.next()) {
+        defaultSchema = rs.getString(1);
+      }
+    } catch (Exception e) {
+      LogMgr.logError("SqlServerSchemaInfoReader", "Could not obtain default schema using: \n" + sql, e);
+    } finally {
+      SqlUtil.closeAll(rs, stmt);
+    }
+  }
 
-	@Override
-	public boolean isSupported()
-	{
-		return true;
-	}
+  @Override
+  public boolean isSupported() {
+    return true;
+  }
 
-	@Override
-	public void clearCache()
-	{
-		this.defaultSchema = null;
-	}
+  @Override
+  public void clearCache() {
+    this.defaultSchema = null;
+  }
 
-	@Override
-	public String getCachedSchema()
-	{
-		return defaultSchema;
-	}
+  @Override
+  public String getCachedSchema() {
+    return defaultSchema;
+  }
 
-	@Override
-	public String getCurrentSchema()
-	{
-		return defaultSchema;
-	}
+  @Override
+  public String getCurrentSchema() {
+    return defaultSchema;
+  }
 
-	@Override
-	public void dispose()
-	{
-		// nothing to do
-	}
+  @Override
+  public void dispose() {
+    // nothing to do
+  }
 
 
 }

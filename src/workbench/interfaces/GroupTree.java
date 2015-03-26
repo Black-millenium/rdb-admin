@@ -23,10 +23,8 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface GroupTree
-{
-	String addGroup();
+public interface GroupTree {
+  String addGroup();
 }

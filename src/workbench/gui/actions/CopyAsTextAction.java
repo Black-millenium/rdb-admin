@@ -22,71 +22,60 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
+import workbench.gui.components.ClipBoardCopier;
+import workbench.gui.components.WbTable;
 import workbench.resource.GuiSettings;
 import workbench.resource.PlatformShortcuts;
 import workbench.resource.ResourceMgr;
 
-import workbench.gui.components.ClipBoardCopier;
-import workbench.gui.components.WbTable;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * Action to copy the contents of a WbTable as tab-separated text to the clipboard
  *
+ * @author Thomas Kellerer
  * @see workbench.gui.components.ClipBoardCopier
  * @see GuiSettings#alwaysDisplayCopyAsTextDialog()
- *
- * @author  Thomas Kellerer
  */
 public class CopyAsTextAction
-	extends WbAction
-{
-	private final WbTable client;
-	protected boolean copySelected;
+    extends WbAction {
+  private final WbTable client;
+  protected boolean copySelected;
 
-	public CopyAsTextAction(WbTable aClient)
-	{
-		super();
-		this.client = aClient;
-		this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
-		this.initMenuDefinition("MnuTxtDataToClipboard", KeyStroke.getKeyStroke(KeyEvent.VK_Y, PlatformShortcuts.getDefaultModifier()));
-		copySelected = false;
-		this.setEnabled(false);
-	}
+  public CopyAsTextAction(WbTable aClient) {
+    super();
+    this.client = aClient;
+    this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
+    this.initMenuDefinition("MnuTxtDataToClipboard", KeyStroke.getKeyStroke(KeyEvent.VK_Y, PlatformShortcuts.getDefaultModifier()));
+    copySelected = false;
+    this.setEnabled(false);
+  }
 
-	@Override
-	public boolean hasCtrlModifier()
-	{
-		return true;
-	}
+  @Override
+  public boolean hasCtrlModifier() {
+    return true;
+  }
 
-	@Override
-	public boolean hasShiftModifier()
-	{
-		return true;
-	}
+  @Override
+  public boolean hasShiftModifier() {
+    return true;
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		ClipBoardCopier copier = new ClipBoardCopier(this.client);
-		boolean copyHeaders = true;
-		boolean selectColumns = false;
+  @Override
+  public void executeAction(ActionEvent e) {
+    ClipBoardCopier copier = new ClipBoardCopier(this.client);
+    boolean copyHeaders = true;
+    boolean selectColumns = false;
 
-		if (invokedByMouse(e))
-		{
-			copyHeaders = !isShiftPressed(e);
-			selectColumns = isCtrlPressed(e) || GuiSettings.alwaysDisplayCopyAsTextDialog();
-		}
-		else
-		{
-			selectColumns = GuiSettings.alwaysDisplayCopyAsTextDialog();
-		}
-		copier.copyDataToClipboard(copyHeaders, copySelected, selectColumns);
-	}
+    if (invokedByMouse(e)) {
+      copyHeaders = !isShiftPressed(e);
+      selectColumns = isCtrlPressed(e) || GuiSettings.alwaysDisplayCopyAsTextDialog();
+    } else {
+      selectColumns = GuiSettings.alwaysDisplayCopyAsTextDialog();
+    }
+    copier.copyDataToClipboard(copyHeaders, copySelected, selectColumns);
+  }
 
 }

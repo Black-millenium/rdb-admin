@@ -30,40 +30,33 @@ import workbench.db.WbConnection;
  * @author Thomas Kellerer
  */
 public class DefaultStatementHook
-	implements StatementHook
-{
+    implements StatementHook {
 
-	@Override
-	public String preExec(StatementRunner runner, String sql)
-	{
-		return sql;
-	}
+  @Override
+  public String preExec(StatementRunner runner, String sql) {
+    return sql;
+  }
 
-	@Override
-	public void postExec(StatementRunner runner, String sql, StatementRunnerResult result)
-	{
-	}
+  @Override
+  public void postExec(StatementRunner runner, String sql, StatementRunnerResult result) {
+  }
 
-	@Override
-	public boolean displayResults()
-	{
-		return true;
-	}
+  @Override
+  public boolean displayResults() {
+    return true;
+  }
 
-	@Override
-	public boolean isPending()
-	{
-		return false;
-	}
-	
-	@Override
-	public boolean fetchResults()
-	{
-		return true;
-	}
+  @Override
+  public boolean isPending() {
+    return false;
+  }
 
-	@Override
-	public void close(WbConnection conn)
-	{
-	}
+  @Override
+  public boolean fetchResults() {
+    return true;
+  }
+
+  @Override
+  public void close(WbConnection conn) {
+  }
 }

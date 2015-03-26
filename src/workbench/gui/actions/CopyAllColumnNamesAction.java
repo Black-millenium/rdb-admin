@@ -22,13 +22,13 @@
  */
 package workbench.gui.actions;
 
-import java.awt.Toolkit;
+import workbench.gui.components.WbTable;
+import workbench.resource.Settings;
+
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
-
-import workbench.gui.components.WbTable;
-import workbench.resource.Settings;
 
 /**
  * Action to copy the names of all columns into the clipboard
@@ -36,46 +36,39 @@ import workbench.resource.Settings;
  * @author Andreas Krist
  */
 public class CopyAllColumnNamesAction
-	extends WbAction
-{
-	private static final long serialVersionUID = 5433513843703540824L;
-	private WbTable client;
+    extends WbAction {
+  private static final long serialVersionUID = 5433513843703540824L;
+  private WbTable client;
 
-	public CopyAllColumnNamesAction(WbTable aClient)
-	{
-		super();
-		this.client = aClient;
-		isConfigurable = false;
-		initMenuDefinition("MnuTxtCopyAllColNames");
-		removeIcon();
-	}
+  public CopyAllColumnNamesAction(WbTable aClient) {
+    super();
+    this.client = aClient;
+    isConfigurable = false;
+    initMenuDefinition("MnuTxtCopyAllColNames");
+    removeIcon();
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		int columnCount = client.getColumnCount();
-		if (columnCount > 0)
-		{
-			boolean spaceAfterComma = Settings.getInstance().getFormatterAddSpaceAfterComma();
+  @Override
+  public void executeAction(ActionEvent e) {
+    int columnCount = client.getColumnCount();
+    if (columnCount > 0) {
+      boolean spaceAfterComma = Settings.getInstance().getFormatterAddSpaceAfterComma();
 
-			StringBuilder columnNames = new StringBuilder();
+      StringBuilder columnNames = new StringBuilder();
 
-			for (int i = 0; i < columnCount; i++)
-			{
-				String columnName = client.getColumnName(i);
-				columnNames.append(columnName);
-				if (i + 1 != columnCount)
-				{
-					columnNames.append(",");
-					if (spaceAfterComma)
-					{
-						columnNames.append(" ");
-					}
-				}
-			}
+      for (int i = 0; i < columnCount; i++) {
+        String columnName = client.getColumnName(i);
+        columnNames.append(columnName);
+        if (i + 1 != columnCount) {
+          columnNames.append(",");
+          if (spaceAfterComma) {
+            columnNames.append(" ");
+          }
+        }
+      }
 
-			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-			clipboard.setContents(new StringSelection(columnNames.toString()),null);
-		}
-	}
+      Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+      clipboard.setContents(new StringSelection(columnNames.toString()), null);
+    }
+  }
 }

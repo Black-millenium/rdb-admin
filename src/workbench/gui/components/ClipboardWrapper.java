@@ -22,53 +22,46 @@
  */
 package workbench.gui.components;
 
-import javax.swing.text.JTextComponent;
 import workbench.interfaces.ClipboardSupport;
+
+import javax.swing.text.JTextComponent;
 
 /**
  * @author Thomas Kellerer
  */
 public class ClipboardWrapper
-	implements ClipboardSupport
-{
-	private JTextComponent client;
+    implements ClipboardSupport {
+  private JTextComponent client;
 
-	public ClipboardWrapper(JTextComponent aClient)
-	{
-		this.client = aClient;
-	}
+  public ClipboardWrapper(JTextComponent aClient) {
+    this.client = aClient;
+  }
 
-	@Override
-	public void copy()
-	{
-		this.client.copy();
-	}
+  @Override
+  public void copy() {
+    this.client.copy();
+  }
 
-	@Override
-	public void clear()
-	{
-		if (this.client.isEditable())
-		{
-			this.client.replaceSelection("");
-		}
-	}
+  @Override
+  public void clear() {
+    if (this.client.isEditable()) {
+      this.client.replaceSelection("");
+    }
+  }
 
-	@Override
-	public void cut()
-	{
-		this.client.cut();
-	}
+  @Override
+  public void cut() {
+    this.client.cut();
+  }
 
-	@Override
-	public void paste()
-	{
-		this.client.paste();
-	}
+  @Override
+  public void paste() {
+    this.client.paste();
+  }
 
-	@Override
-	public void selectAll()
-	{
-		this.client.select(0, this.client.getText().length());
-	}
+  @Override
+  public void selectAll() {
+    this.client.select(0, this.client.getText().length());
+  }
 
 }

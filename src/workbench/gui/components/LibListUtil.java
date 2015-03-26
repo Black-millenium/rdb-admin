@@ -21,69 +21,55 @@
 package workbench.gui.components;
 
 
-import java.io.File;
-
 import workbench.resource.Settings;
-
 import workbench.util.StringUtil;
 import workbench.util.WbFile;
 
+import java.io.File;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public class LibListUtil
-{
-	private final String libDir;
+public class LibListUtil {
+  private final String libDir;
 
-	public LibListUtil()
-	{
-		this(Settings.getInstance().getProperty(Settings.PROP_LIBDIR, null));
-	}
+  public LibListUtil() {
+    this(Settings.getInstance().getProperty(Settings.PROP_LIBDIR, null));
+  }
 
-	public LibListUtil(String dir)
-	{
-		if (StringUtil.isBlank(dir))
-		{
-			this.libDir = null;
-		}
-		else
-		{
-			this.libDir = dir;
-		}
-	}
+  public LibListUtil(String dir) {
+    if (StringUtil.isBlank(dir)) {
+      this.libDir = null;
+    } else {
+      this.libDir = dir;
+    }
+  }
 
-	public WbFile replacePlaceHolder(WbFile file)
-	{
-		if (libDir == null) return file;
+  public WbFile replacePlaceHolder(WbFile file) {
+    if (libDir == null) return file;
 
-		String dir = file.getParent();
-		if (dir != null && dir.toLowerCase().contains(Settings.LIB_DIR_KEY.toLowerCase()))
-		{
-			String fullpath = dir.replace(Settings.LIB_DIR_KEY, libDir);
-			return new WbFile(fullpath, file.getName());
-		}
-		else
-		{
-			return file;
-		}
-	}
+    String dir = file.getParent();
+    if (dir != null && dir.toLowerCase().contains(Settings.LIB_DIR_KEY.toLowerCase())) {
+      String fullpath = dir.replace(Settings.LIB_DIR_KEY, libDir);
+      return new WbFile(fullpath, file.getName());
+    } else {
+      return file;
+    }
+  }
 
-	public WbFile replaceLibDir(WbFile file)
-	{
-		if (libDir == null) return file;
+  public WbFile replaceLibDir(WbFile file) {
+    if (libDir == null) return file;
 
-		WbFile lib = new WbFile(libDir);
+    WbFile lib = new WbFile(libDir);
 
-		File fileDir = file.getParentFile();
-		while (!fileDir.equals(lib))
-		{
-			fileDir = fileDir.getParentFile();
-			if (fileDir == null) break;
-		}
-		if (fileDir == null) return file;
-		String fpath = file.getAbsolutePath().replace(fileDir.getAbsolutePath(), Settings.LIB_DIR_KEY);
-		return new WbFile(fpath);
-	}
+    File fileDir = file.getParentFile();
+    while (!fileDir.equals(lib)) {
+      fileDir = fileDir.getParentFile();
+      if (fileDir == null) break;
+    }
+    if (fileDir == null) return file;
+    String fpath = file.getAbsolutePath().replace(fileDir.getAbsolutePath(), Settings.LIB_DIR_KEY);
+    return new WbFile(fpath);
+  }
 
 }

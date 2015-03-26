@@ -23,13 +23,14 @@
 package workbench.gui.editor;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface LineScroller
-{
-	boolean canScrollUp();
-	boolean canScrollDown();
-	void scrollDown();
-	void scrollUp();
+public interface LineScroller {
+  boolean canScrollUp();
+
+  boolean canScrollDown();
+
+  void scrollDown();
+
+  void scrollUp();
 }

@@ -22,12 +22,11 @@
  */
 package workbench.db.h2database;
 
-import java.sql.SQLException;
-
 import workbench.db.DbObject;
 import workbench.db.WbConnection;
-
 import workbench.util.SqlUtil;
+
+import java.sql.SQLException;
 
 /**
  * A class representing a CONSTANT in H2 Database
@@ -35,120 +34,101 @@ import workbench.util.SqlUtil;
  * @author Thomas Kellerer
  */
 public class H2Constant
-	implements DbObject
-{
-	private String catalog;
-	private String schema;
-	private String constantName;
-	private final String objectType = "CONSTANT";
-	private String remarks;
-	private String value;
-	private String dataType;
+    implements DbObject {
+  private final String objectType = "CONSTANT";
+  private String catalog;
+  private String schema;
+  private String constantName;
+  private String remarks;
+  private String value;
+  private String dataType;
 
-	public H2Constant(String dcatalog, String dschema, String name)
-	{
-		catalog = dcatalog;
-		schema = dschema;
-		constantName = name;
-	}
+  public H2Constant(String dcatalog, String dschema, String name) {
+    catalog = dcatalog;
+    schema = dschema;
+    constantName = name;
+  }
 
-	public void setDataType(String dbmsType)
-	{
-		dataType = dbmsType;
-	}
+  public String getDataType() {
+    return dataType;
+  }
 
-	public String getDataType()
-	{
-		return dataType;
-	}
+  public void setDataType(String dbmsType) {
+    dataType = dbmsType;
+  }
 
-	public void setValue(String constantValue)
-	{
-		value = constantValue;
-	}
+  public String getValue() {
+    return value;
+  }
 
-	public String getValue()
-	{
-		return value;
-	}
+  public void setValue(String constantValue) {
+    value = constantValue;
+  }
 
-	@Override
-	public String getCatalog()
-	{
-		return catalog;
-	}
+  @Override
+  public String getCatalog() {
+    return catalog;
+  }
 
-	@Override
-	public String getSchema()
-	{
-		return schema;
-	}
+  @Override
+  public String getSchema() {
+    return schema;
+  }
 
-	@Override
-	public String getObjectType()
-	{
-		return objectType;
-	}
+  @Override
+  public String getObjectType() {
+    return objectType;
+  }
 
-	@Override
-	public String getObjectName()
-	{
-		return constantName;
-	}
+  @Override
+  public String getObjectName() {
+    return constantName;
+  }
 
-	@Override
-	public String getObjectName(WbConnection conn)
-	{
-		return constantName;
-	}
+  @Override
+  public String getObjectName(WbConnection conn) {
+    return constantName;
+  }
 
-	@Override
-	public String getFullyQualifiedName(WbConnection conn)
-	{
-		return SqlUtil.buildExpression(conn, catalog, schema, constantName);
-	}
+  @Override
+  public String getFullyQualifiedName(WbConnection conn) {
+    return SqlUtil.buildExpression(conn, catalog, schema, constantName);
+  }
 
-	@Override
-	public String getObjectExpression(WbConnection conn)
-	{
-		return constantName;
-	}
+  @Override
+  public String getObjectExpression(WbConnection conn) {
+    return constantName;
+  }
 
-	@Override
-	public String toString()
-	{
-		return getObjectName();
-	}
+  @Override
+  public String toString() {
+    return getObjectName();
+  }
 
-	@Override
-	public CharSequence getSource(WbConnection con)
-		throws SQLException
-	{
-		return con.getMetadata().getObjectSource(this);
-	}
+  @Override
+  public CharSequence getSource(WbConnection con)
+      throws SQLException {
+    return con.getMetadata().getObjectSource(this);
+  }
 
-	@Override
-	public String getDropStatement(WbConnection con, boolean cascade)
-	{
-		return null;
-	}
+  @Override
+  public String getDropStatement(WbConnection con, boolean cascade) {
+    return null;
+  }
 
-	@Override
-	public String getObjectNameForDrop(WbConnection con)
-	{
-		return getFullyQualifiedName(con);
-	}
+  @Override
+  public String getObjectNameForDrop(WbConnection con) {
+    return getFullyQualifiedName(con);
+  }
 
-	@Override
-	public String getComment()
-	{
-		return remarks;
-	}
+  @Override
+  public String getComment() {
+    return remarks;
+  }
 
-	@Override
-	public void setComment(String cmt)
-	{
-		remarks = cmt;
-	}
+  @Override
+  public void setComment(String cmt) {
+    remarks = cmt;
+  }
 
 }

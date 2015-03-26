@@ -22,31 +22,29 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.interfaces.ClipboardSupport;
 import workbench.resource.ResourceMgr;
 
+import java.awt.event.ActionEvent;
+
 /**
- *	Action to clear the contents of a entry field
- *	@author  Thomas Kellerer
+ * Action to clear the contents of a entry field
+ *
+ * @author Thomas Kellerer
  */
 public class ClearAction
-	extends WbAction
-{
-	private ClipboardSupport client;
+    extends WbAction {
+  private ClipboardSupport client;
 
-	public ClearAction(ClipboardSupport aClient)
-	{
-		super();
-		this.client = aClient;
-		this.setMenuTextByKey("MnuTxtClear");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-	}
+  public ClearAction(ClipboardSupport aClient) {
+    super();
+    this.client = aClient;
+    this.setMenuTextByKey("MnuTxtClear");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.clear();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.clear();
+  }
 }

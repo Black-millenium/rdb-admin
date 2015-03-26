@@ -27,8 +27,8 @@ package workbench.sql.macros;
  *
  * @author Thomas Kellerer
  */
-public interface Sortable
-{
-	int getSortOrder();
-	void setSortOrder(int newIndex);
+public interface Sortable {
+  int getSortOrder();
+
+  void setSortOrder(int newIndex);
 }

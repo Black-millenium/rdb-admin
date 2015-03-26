@@ -22,425 +22,346 @@
  */
 package workbench.gui.profiles;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-
-import workbench.interfaces.EventDisplay;
-import workbench.resource.IconMgr;
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
 import workbench.db.ConnectionMgr;
 import workbench.db.ConnectionProfile;
 import workbench.db.DbDriver;
-
 import workbench.gui.WbSwingUtilities;
 import workbench.gui.actions.EscAction;
 import workbench.gui.components.ValidatingDialog;
 import workbench.gui.components.WbButton;
 import workbench.gui.help.HelpManager;
-
+import workbench.interfaces.EventDisplay;
+import workbench.resource.IconMgr;
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
 import workbench.util.EventNotifier;
 import workbench.util.NotifierEvent;
 import workbench.util.StringUtil;
 
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import java.awt.*;
+import java.awt.event.*;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class ProfileSelectionDialog
-	extends JDialog
-	implements ActionListener, WindowListener, TreeSelectionListener, MouseListener, EventDisplay
-{
-	private JPanel okCancelPanel;
-	private JButton okButton;
-	private JButton cancelButton;
-	private WbButton helpButton;
-	private WbButton manageDriversButton;
-	private ProfileEditorPanel profiles;
-	private ConnectionProfile selectedProfile;
-	private boolean cancelled;
-	private String escActionCommand;
-	private JLabel versionInfo;
-	private boolean processEscKey;
-	private static boolean firstDisplay = true;
+    extends JDialog
+    implements ActionListener, WindowListener, TreeSelectionListener, MouseListener, EventDisplay {
+  private static boolean firstDisplay = true;
+  private JPanel okCancelPanel;
+  private JButton okButton;
+  private JButton cancelButton;
+  private WbButton helpButton;
+  private WbButton manageDriversButton;
+  private ProfileEditorPanel profiles;
+  private ConnectionProfile selectedProfile;
+  private boolean cancelled;
+  private String escActionCommand;
+  private JLabel versionInfo;
+  private boolean processEscKey;
 
-	public ProfileSelectionDialog(Frame parent, boolean modal, String lastProfileKey)
-	{
-		super(parent, modal);
-		initComponents(lastProfileKey);
-		if (firstDisplay)
-		{
-			EventNotifier.getInstance().addEventDisplay(this);
-			firstDisplay = false;
-		}
-		enableDefaultButtons();
-		EscAction esc = new EscAction(this, this);
-		escActionCommand = esc.getActionName();
-	}
+  public ProfileSelectionDialog(Frame parent, boolean modal, String lastProfileKey) {
+    super(parent, modal);
+    initComponents(lastProfileKey);
+    if (firstDisplay) {
+      EventNotifier.getInstance().addEventDisplay(this);
+      firstDisplay = false;
+    }
+    enableDefaultButtons();
+    EscAction esc = new EscAction(this, this);
+    escActionCommand = esc.getActionName();
+  }
 
-	public void enableDefaultButtons()
-	{
-		JRootPane root = this.getRootPane();
-		root.setDefaultButton(okButton);
-		processEscKey = true;
-	}
+  public static boolean doPrompt(Window parent, ConnectionProfile profile) {
+    if (profile == null) return true;
 
-	public void disableDefaultButtons()
-	{
-		JRootPane root = this.getRootPane();
-		root.setDefaultButton(null);
-		processEscKey = false;
-	}
+    if (profile.getPromptForUsername()) {
+      return promptUsername(parent, profile);
+    }
 
-	private void initComponents(String lastProfileKey)
-	{
-		profiles = new ProfileEditorPanel(lastProfileKey);
+    if (!profile.getStorePassword()) {
+      return promptPassword(parent, profile);
+    }
+    return true;
+  }
 
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.setLayout(new BorderLayout(0, 0));
+  private static boolean promptUsername(Window parent, ConnectionProfile profile) {
+    if (profile == null) return false;
 
-		JPanel toolsButtonPanel = new JPanel();
-		toolsButtonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+    LoginPrompt prompt = new LoginPrompt(profile.getSettingsKey());
+    boolean ok = ValidatingDialog.showConfirmDialog(parent, prompt, ResourceMgr.getString("TxtEnterLogin"));
+    if (!ok) return false;
+    profile.setPassword(prompt.getPassword());
+    profile.setTemporaryUsername(prompt.getUserName());
+    return true;
+  }
 
-		manageDriversButton = new WbButton();
-		manageDriversButton.setResourceKey("LblEditDrivers");
-		manageDriversButton.addActionListener(this);
+  private static boolean promptPassword(Window parent, ConnectionProfile profile) {
+    if (profile == null) return false;
+    if (profile.hasPassword()) return true;
 
-		helpButton = new WbButton();
-		helpButton.setResourceKey("LblHelp");
-		helpButton.addActionListener(this);
-		toolsButtonPanel.add(manageDriversButton);
-		toolsButtonPanel.add(helpButton);
+    String pwd = WbSwingUtilities.getUserInputHidden(parent, ResourceMgr.getString("MsgInputPwdWindowTitle"), "");
+    if (StringUtil.isEmptyString(pwd)) return false;
+    profile.setPassword(pwd);
+    return true;
+  }
 
-		okCancelPanel = new JPanel();
-		buttonPanel.add(okCancelPanel, BorderLayout.EAST);
-		buttonPanel.add(toolsButtonPanel, BorderLayout.WEST);
-		versionInfo = new JLabel("  ");
-		versionInfo.setForeground(Color.RED);
-		versionInfo.setBorder(new EmptyBorder(0, 15, 0, 0));
-		buttonPanel.add(versionInfo, BorderLayout.CENTER);
+  public void enableDefaultButtons() {
+    JRootPane root = this.getRootPane();
+    root.setDefaultButton(okButton);
+    processEscKey = true;
+  }
 
-		okButton = new WbButton(ResourceMgr.getString(ResourceMgr.TXT_OK));
-		okButton.setEnabled(profiles.getSelectedProfile() != null);
+  public void disableDefaultButtons() {
+    JRootPane root = this.getRootPane();
+    root.setDefaultButton(null);
+    processEscKey = false;
+  }
 
-		cancelButton = new WbButton(ResourceMgr.getString(ResourceMgr.TXT_CANCEL));
+  private void initComponents(String lastProfileKey) {
+    profiles = new ProfileEditorPanel(lastProfileKey);
 
-		WbSwingUtilities.makeEqualWidth(manageDriversButton, helpButton);
-		WbSwingUtilities.makeEqualWidth(okButton, cancelButton);
+    JPanel buttonPanel = new JPanel();
+    buttonPanel.setLayout(new BorderLayout(0, 0));
 
-		addWindowListener(this);
-		okCancelPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+    JPanel toolsButtonPanel = new JPanel();
+    toolsButtonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-		okCancelPanel.add(okButton);
-		okButton.addActionListener(this);
+    manageDriversButton = new WbButton();
+    manageDriversButton.setResourceKey("LblEditDrivers");
+    manageDriversButton.addActionListener(this);
 
-		okCancelPanel.add(cancelButton);
-		cancelButton.addActionListener(this);
+    helpButton = new WbButton();
+    helpButton.setResourceKey("LblHelp");
+    helpButton.addActionListener(this);
+    toolsButtonPanel.add(manageDriversButton);
+    toolsButtonPanel.add(helpButton);
 
-		profiles.addListMouseListener(this);
-		profiles.addSelectionListener(this);
+    okCancelPanel = new JPanel();
+    buttonPanel.add(okCancelPanel, BorderLayout.EAST);
+    buttonPanel.add(toolsButtonPanel, BorderLayout.WEST);
+    versionInfo = new JLabel("  ");
+    versionInfo.setForeground(Color.RED);
+    versionInfo.setBorder(new EmptyBorder(0, 15, 0, 0));
+    buttonPanel.add(versionInfo, BorderLayout.CENTER);
 
-		BorderLayout bl = new BorderLayout();
-		this.getContentPane().setLayout(bl);
-		getContentPane().add(profiles, BorderLayout.CENTER);
-		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+    okButton = new WbButton(ResourceMgr.getString(ResourceMgr.TXT_OK));
+    okButton.setEnabled(profiles.getSelectedProfile() != null);
 
-		setTitle(ResourceMgr.getString("LblSelectProfile"));
-		this.restoreSize();
+    cancelButton = new WbButton(ResourceMgr.getString(ResourceMgr.TXT_CANCEL));
 
-		WbSwingUtilities.requestComponentFocus(this, profiles.getInitialFocusComponent());
-	}
+    WbSwingUtilities.makeEqualWidth(manageDriversButton, helpButton);
+    WbSwingUtilities.makeEqualWidth(okButton, cancelButton);
 
-	@Override
-	public void showAlert(final NotifierEvent event)
-	{
-		if (versionInfo == null) return;
+    addWindowListener(this);
+    okCancelPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-		versionInfo.addMouseListener(
-			new MouseAdapter()
-			{
-				@Override
-				public void mouseClicked(MouseEvent e)
-				{
-					if (e.getButton() == MouseEvent.BUTTON1)
-					{
-						ActionEvent evt = new ActionEvent(ProfileSelectionDialog.this, -1, event.getType());
-						versionInfo.removeMouseListener(this);
-						event.getHandler().actionPerformed(evt);
-					}
-				}
-			});
+    okCancelPanel.add(okButton);
+    okButton.addActionListener(this);
 
-		WbSwingUtilities.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				versionInfo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-				versionInfo.setIcon(IconMgr.getInstance().getLabelIcon(event.getIconKey()));
-				versionInfo.setText("<html><b>" + event.getMessage() + "</b></html>");
-				String tip = event.getTooltip();
-				if (StringUtil.isNonEmpty(tip))
-				{
-					versionInfo.setToolTipText(tip);
-				}
-				versionInfo.getParent().doLayout();
-			}
-		});
-	}
+    okCancelPanel.add(cancelButton);
+    cancelButton.addActionListener(this);
 
-	@Override
-	public void removeAlert()
-	{
-		if (versionInfo == null) return;
+    profiles.addListMouseListener(this);
+    profiles.addSelectionListener(this);
 
-		WbSwingUtilities.invoke(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				versionInfo.setCursor(null);
-				versionInfo.setIcon(null);
-				versionInfo.setText("");
-				versionInfo.getParent().doLayout();
-			}
-		});
-	}
+    BorderLayout bl = new BorderLayout();
+    this.getContentPane().setLayout(bl);
+    getContentPane().add(profiles, BorderLayout.CENTER);
+    getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
-	private void closeDialog()
-	{
-		this.saveSize();
-		this.profiles.saveSettings();
-		this.setVisible(false);
-		dispose();
-	}
+    setTitle(ResourceMgr.getString("LblSelectProfile"));
+    this.restoreSize();
 
-	public ConnectionProfile getSelectedProfile()
-	{
-		return this.selectedProfile;
-	}
+    WbSwingUtilities.requestComponentFocus(this, profiles.getInitialFocusComponent());
+  }
 
-	public void restoreSize()
-	{
-		if (!Settings.getInstance().restoreWindowSize(this))
-		{
-			this.pack();
-			WbSwingUtilities.scale(this, 1.02, 1.025);
-		}
-	}
+  @Override
+  public void showAlert(final NotifierEvent event) {
+    if (versionInfo == null) return;
 
-	public void saveSize()
-	{
-		Settings s = Settings.getInstance();
-		s.storeWindowSize(this);
-	}
+    versionInfo.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            if (e.getButton() == MouseEvent.BUTTON1) {
+              ActionEvent evt = new ActionEvent(ProfileSelectionDialog.this, -1, event.getType());
+              versionInfo.removeMouseListener(this);
+              event.getHandler().actionPerformed(evt);
+            }
+          }
+        });
 
-	public void selectProfile()
-	{
-		if (this.profiles.validateInput())
-		{
-			this.selectedProfile = this.profiles.getSelectedProfile();
-			boolean ok = true;
+    WbSwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        versionInfo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        versionInfo.setIcon(IconMgr.getInstance().getLabelIcon(event.getIconKey()));
+        versionInfo.setText("<html><b>" + event.getMessage() + "</b></html>");
+        String tip = event.getTooltip();
+        if (StringUtil.isNonEmpty(tip)) {
+          versionInfo.setToolTipText(tip);
+        }
+        versionInfo.getParent().doLayout();
+      }
+    });
+  }
 
-			if (selectedProfile != null && this.selectedProfile.getPromptForUsername())
-			{
-				ok = promptUsername(this, selectedProfile);
-			}
-			else if (selectedProfile != null && !this.selectedProfile.getStorePassword())
-			{
-				ok = promptPassword(this, selectedProfile);
-			}
+  @Override
+  public void removeAlert() {
+    if (versionInfo == null) return;
 
-			if (ok)
-			{
-				this.cancelled = false;
-				this.closeDialog();
-				if (Settings.getInstance().getSaveProfilesImmediately())
-				{
-					ConnectionMgr.getInstance().saveProfiles();
-				}
-			}
-		}
-	}
+    WbSwingUtilities.invoke(new Runnable() {
+      @Override
+      public void run() {
+        versionInfo.setCursor(null);
+        versionInfo.setIcon(null);
+        versionInfo.setText("");
+        versionInfo.getParent().doLayout();
+      }
+    });
+  }
 
-	public static boolean doPrompt(Window parent, ConnectionProfile profile)
-	{
-		if (profile == null) return true;
+  private void closeDialog() {
+    this.saveSize();
+    this.profiles.saveSettings();
+    this.setVisible(false);
+    dispose();
+  }
 
-		if (profile.getPromptForUsername())
-		{
-			return promptUsername(parent, profile);
-		}
+  public ConnectionProfile getSelectedProfile() {
+    return this.selectedProfile;
+  }
 
-		if (!profile.getStorePassword())
-		{
-			return promptPassword(parent, profile);
-		}
-		return true;
-	}
+  public void restoreSize() {
+    if (!Settings.getInstance().restoreWindowSize(this)) {
+      this.pack();
+      WbSwingUtilities.scale(this, 1.02, 1.025);
+    }
+  }
 
-	private static boolean promptUsername(Window parent, ConnectionProfile profile)
-	{
-		if (profile == null) return false;
+  public void saveSize() {
+    Settings s = Settings.getInstance();
+    s.storeWindowSize(this);
+  }
 
-		LoginPrompt prompt = new LoginPrompt(profile.getSettingsKey());
-		boolean ok = ValidatingDialog.showConfirmDialog(parent, prompt, ResourceMgr.getString("TxtEnterLogin"));
-		if (!ok) return false;
-		profile.setPassword(prompt.getPassword());
-		profile.setTemporaryUsername(prompt.getUserName());
-		return true;
-	}
+  public void selectProfile() {
+    if (this.profiles.validateInput()) {
+      this.selectedProfile = this.profiles.getSelectedProfile();
+      boolean ok = true;
 
-	private static boolean promptPassword(Window parent, ConnectionProfile profile)
-	{
-		if (profile == null) return false;
-		if (profile.hasPassword()) return true;
+      if (selectedProfile != null && this.selectedProfile.getPromptForUsername()) {
+        ok = promptUsername(this, selectedProfile);
+      } else if (selectedProfile != null && !this.selectedProfile.getStorePassword()) {
+        ok = promptPassword(this, selectedProfile);
+      }
 
-		String pwd = WbSwingUtilities.getUserInputHidden(parent, ResourceMgr.getString("MsgInputPwdWindowTitle"), "");
-		if (StringUtil.isEmptyString(pwd)) return false;
-		profile.setPassword(pwd);
-		return true;
-	}
+      if (ok) {
+        this.cancelled = false;
+        this.closeDialog();
+        if (Settings.getInstance().getSaveProfilesImmediately()) {
+          ConnectionMgr.getInstance().saveProfiles();
+        }
+      }
+    }
+  }
 
-	public void profileListClicked(MouseEvent evt)
-	{
-		if (evt.getButton() == MouseEvent.BUTTON1 && evt.getClickCount() == 2)
-		{
-			if (profiles.getSelectedProfile() != null)
-			{
-				profiles.applyProfiles();
-				selectProfile();
-			}
-		}
-	}
+  public void profileListClicked(MouseEvent evt) {
+    if (evt.getButton() == MouseEvent.BUTTON1 && evt.getClickCount() == 2) {
+      if (profiles.getSelectedProfile() != null) {
+        profiles.applyProfiles();
+        selectProfile();
+      }
+    }
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		if (e.getSource() == this.okButton)
-		{
-			profiles.applyProfiles();
-			selectProfile();
-		}
-		else if (e.getSource() == this.cancelButton || (processEscKey && e.getActionCommand().equals(escActionCommand)))
-		{
-			this.selectedProfile = null;
-			this.cancelled = true;
-			this.closeDialog();
-		}
-		else if (e.getSource() == this.manageDriversButton)
-		{
-			showDriverEditorDialog();
-		}
-		else if (e.getSource() == this.helpButton)
-		{
-			HelpManager.showProfileHelp();
-		}
-	}
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == this.okButton) {
+      profiles.applyProfiles();
+      selectProfile();
+    } else if (e.getSource() == this.cancelButton || (processEscKey && e.getActionCommand().equals(escActionCommand))) {
+      this.selectedProfile = null;
+      this.cancelled = true;
+      this.closeDialog();
+    } else if (e.getSource() == this.manageDriversButton) {
+      showDriverEditorDialog();
+    } else if (e.getSource() == this.helpButton) {
+      HelpManager.showProfileHelp();
+    }
+  }
 
-	public boolean isCancelled()
-	{
-		return this.cancelled;
-	}
+  public boolean isCancelled() {
+    return this.cancelled;
+  }
 
-	@Override
-	public void windowActivated(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowActivated(WindowEvent e) {
+  }
 
-	@Override
-	public void windowClosed(WindowEvent e)
-	{
-		this.profiles.done();
-	}
+  @Override
+  public void windowClosed(WindowEvent e) {
+    this.profiles.done();
+  }
 
-	@Override
-	public void windowClosing(WindowEvent e)
-	{
-		this.cancelled = true;
-		this.selectedProfile = null;
-		this.closeDialog();
-	}
+  @Override
+  public void windowClosing(WindowEvent e) {
+    this.cancelled = true;
+    this.selectedProfile = null;
+    this.closeDialog();
+  }
 
-	@Override
-	public void windowDeactivated(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowDeactivated(WindowEvent e) {
+  }
 
-	@Override
-	public void windowDeiconified(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowDeiconified(WindowEvent e) {
+  }
 
-	@Override
-	public void windowIconified(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowIconified(WindowEvent e) {
+  }
 
-	@Override
-	public void windowOpened(WindowEvent e)
-	{
-		this.cancelled = true;
-		this.selectedProfile = null;
-	}
+  @Override
+  public void windowOpened(WindowEvent e) {
+    this.cancelled = true;
+    this.selectedProfile = null;
+  }
 
-	@Override
-	public void valueChanged(TreeSelectionEvent e)
-	{
-		this.okButton.setEnabled(profiles.getSelectedProfile() != null);
-	}
+  @Override
+  public void valueChanged(TreeSelectionEvent e) {
+    this.okButton.setEnabled(profiles.getSelectedProfile() != null);
+  }
 
-	@Override
-	public void mouseClicked(MouseEvent evt)
-	{
-		profileListClicked(evt);
-	}
+  @Override
+  public void mouseClicked(MouseEvent evt) {
+    profileListClicked(evt);
+  }
 
-	@Override
-	public void mousePressed(MouseEvent e)
-	{
-	}
+  @Override
+  public void mousePressed(MouseEvent e) {
+  }
 
-	@Override
-	public void mouseReleased(MouseEvent e)
-	{
-	}
+  @Override
+  public void mouseReleased(MouseEvent e) {
+  }
 
-	@Override
-	public void mouseEntered(MouseEvent e)
-	{
-	}
+  @Override
+  public void mouseEntered(MouseEvent e) {
+  }
 
-	@Override
-	public void mouseExited(MouseEvent e)
-	{
-	}
+  @Override
+  public void mouseExited(MouseEvent e) {
+  }
 
-	private void showDriverEditorDialog()
-	{
-		final Frame parent = (Frame)this.getParent();
-		final DbDriver drv = this.profiles.getCurrentDriver();
-		DriverEditorDialog.showDriverDialog(parent, drv);
-	}
+  private void showDriverEditorDialog() {
+    final Frame parent = (Frame) this.getParent();
+    final DbDriver drv = this.profiles.getCurrentDriver();
+    DriverEditorDialog.showDriverDialog(parent, drv);
+  }
 }

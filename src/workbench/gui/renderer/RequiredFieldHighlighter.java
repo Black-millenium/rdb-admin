@@ -22,14 +22,15 @@
  */
 package workbench.gui.renderer;
 
-import java.awt.Color;
+import java.awt.*;
 
 /**
  * @author Thomas Kellerer
  */
-public interface RequiredFieldHighlighter
-{
-	void setHighlightColumns(boolean[] cols);
-	void setEditingRow(int row);
-	void setHighlightBackground(Color requiredColor);
+public interface RequiredFieldHighlighter {
+  void setHighlightColumns(boolean[] cols);
+
+  void setEditingRow(int row);
+
+  void setHighlightBackground(Color requiredColor);
 }

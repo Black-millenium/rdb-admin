@@ -22,77 +22,82 @@
  */
 package workbench.db.importer;
 
+import workbench.db.ColumnIdentifier;
+import workbench.db.TableIdentifier;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import workbench.db.ColumnIdentifier;
-import workbench.db.TableIdentifier;
-
 /**
- *
  * @author Thomas Kellerer
  */
-public interface DataReceiver
-{
-	/**
-	 * Returns true if the receiver will create the target table "on the fly"
-	 */
-	boolean getCreateTarget();
-	boolean shouldProcessNextRow();
-	void nextRowSkipped();
+public interface DataReceiver {
+  /**
+   * Returns true if the receiver will create the target table "on the fly"
+   */
+  boolean getCreateTarget();
 
-	/**
-	 * Set the list of tables that will be processed by the row data producer
-	 *
-	 * @param targetTables
-	 */
-	void setTableList(List<TableIdentifier> targetTables);
+  boolean shouldProcessNextRow();
 
-	void deleteTargetTables()
-		throws SQLException;
+  void nextRowSkipped();
 
-	void beginMultiTable()
-		throws SQLException;
+  /**
+   * Set the list of tables that will be processed by the row data producer
+   *
+   * @param targetTables
+   */
+  void setTableList(List<TableIdentifier> targetTables);
 
-	void endMultiTable();
+  void deleteTargetTables()
+      throws SQLException;
 
-	void processFile(StreamImporter stream)
-		throws SQLException, IOException;
+  void beginMultiTable()
+      throws SQLException;
 
-	/**
-	 * Import a single row into the table previously defined by setTargetTable().
-	 *
-	 * @param row  the row to insert
-	 * @throws SQLException
-	 * @see #setTargetTable(workbench.db.TableIdentifier, java.util.List)
-	 */
-	void processRow(Object[] row)
-		throws SQLException;
+  void endMultiTable();
 
-	void setTableCount(int total);
-	void setCurrentTable(int current);
-	/**
-	 * Initialize the import for the target table and the columns.
-	 *
-	 * @param table    the table to process
-	 * @param columns  the columns of that column to be used for inserting
-	 * @throws SQLException
-	 */
-	void setTargetTable(TableIdentifier table, List<ColumnIdentifier> columns)
-		throws SQLException;
+  void processFile(StreamImporter stream)
+      throws SQLException, IOException;
 
-	void importFinished();
-	void importCancelled();
-	void tableImportError();
-	void tableImportFinished()
-		throws SQLException;
+  /**
+   * Import a single row into the table previously defined by setTargetTable().
+   *
+   * @param row the row to insert
+   * @throws SQLException
+   * @see #setTargetTable(workbench.db.TableIdentifier, java.util.List)
+   */
+  void processRow(Object[] row)
+      throws SQLException;
 
-	/**
-	 * Log an error with the receiver that might have occurred
-	 * during parsing of the source data.
-	 */
-	void recordRejected(String record, long importRow, Throwable e);
+  void setTableCount(int total);
 
-	boolean isTransactionControlEnabled();
+  void setCurrentTable(int current);
+
+  /**
+   * Initialize the import for the target table and the columns.
+   *
+   * @param table   the table to process
+   * @param columns the columns of that column to be used for inserting
+   * @throws SQLException
+   */
+  void setTargetTable(TableIdentifier table, List<ColumnIdentifier> columns)
+      throws SQLException;
+
+  void importFinished();
+
+  void importCancelled();
+
+  void tableImportError();
+
+  void tableImportFinished()
+      throws SQLException;
+
+  /**
+   * Log an error with the receiver that might have occurred
+   * during parsing of the source data.
+   */
+  void recordRejected(String record, long importRow, Throwable e);
+
+  boolean isTransactionControlEnabled();
 }

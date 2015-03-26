@@ -26,12 +26,12 @@ import workbench.db.ColumnIdentifier;
 
 /**
  * An interface for modifiers that are applied during importing data.
- * 
+ *
  * @author Thomas Kellerer
  * @see workbench.interfaces.ImportFileParser#setValueModifier(workbench.db.importer.modifier.ImportValueModifier)
  */
-public interface ImportValueModifier 
-{
-	int getSize();
-	String modifyValue(ColumnIdentifier column, String value);
+public interface ImportValueModifier {
+  int getSize();
+
+  String modifyValue(ColumnIdentifier column, String value);
 }

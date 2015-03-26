@@ -22,83 +22,66 @@
  */
 package workbench.gui.dialogs.export;
 
-import java.awt.Component;
-
-import workbench.log.LogMgr;
-
 import workbench.db.exporter.DataExporter;
-
 import workbench.gui.WbSwingUtilities;
-
+import workbench.log.LogMgr;
 import workbench.storage.DataStore;
-
 import workbench.util.WbFile;
 
+import java.awt.*;
+
 /**
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class DataStoreExporter
-{
-	private DataStore source;
-	private Component caller;
-	private ExportFileDialog dialog;
-	private WbFile output;
+public class DataStoreExporter {
+  private DataStore source;
+  private Component caller;
+  private ExportFileDialog dialog;
+  private WbFile output;
 
-	public DataStoreExporter(DataStore source, Component caller)
-	{
-		this.caller = caller;
-		this.source = source;
-	}
+  public DataStoreExporter(DataStore source, Component caller) {
+    this.caller = caller;
+    this.source = source;
+  }
 
-	public void saveAs()
-	{
-		this.dialog = new ExportFileDialog(this.caller, source);
-		this.dialog.setSelectDirectoryOnly(false);
-		this.output = null;
-		boolean selected = dialog.selectOutput();
-		if (selected)
-		{
-			this.output = new WbFile(dialog.getSelectedFilename());
-			writeFile();
-		}
-	}
+  public void saveAs() {
+    this.dialog = new ExportFileDialog(this.caller, source);
+    this.dialog.setSelectDirectoryOnly(false);
+    this.output = null;
+    boolean selected = dialog.selectOutput();
+    if (selected) {
+      this.output = new WbFile(dialog.getSelectedFilename());
+      writeFile();
+    }
+  }
 
-	public DataStore getSource()
-	{
-		return source;
-	}
+  public DataStore getSource() {
+    return source;
+  }
 
-	public void setSource(DataStore source)
-	{
-		this.source = source;
-	}
+  public void setSource(DataStore source) {
+    this.source = source;
+  }
 
-	private void writeFile()
-	{
-		if (this.source == null) return;
-		if (this.output == null)
-		{
-			throw new NullPointerException("No outputfile defined");
-		}
-		DataExporter exporter = new DataExporter(this.source.getOriginalConnection());
-		dialog.setExporterOptions(exporter);
+  private void writeFile() {
+    if (this.source == null) return;
+    if (this.output == null) {
+      throw new NullPointerException("No outputfile defined");
+    }
+    DataExporter exporter = new DataExporter(this.source.getOriginalConnection());
+    dialog.setExporterOptions(exporter);
 
-		try
-		{
-			exporter.startExport(output, this.source, this.dialog.getColumnsToExport());
-			if (!exporter.isSuccess())
-			{
-				CharSequence msg = exporter.getErrors();
-				if (msg != null)
-				{
-					WbSwingUtilities.showErrorMessage(caller, msg.toString());
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			LogMgr.logError("DataStoreExporter.writeFile()", "Error writing export file", e);
-		}
-	}
+    try {
+      exporter.startExport(output, this.source, this.dialog.getColumnsToExport());
+      if (!exporter.isSuccess()) {
+        CharSequence msg = exporter.getErrors();
+        if (msg != null) {
+          WbSwingUtilities.showErrorMessage(caller, msg.toString());
+        }
+      }
+    } catch (Exception e) {
+      LogMgr.logError("DataStoreExporter.writeFile()", "Error writing export file", e);
+    }
+  }
 
 }

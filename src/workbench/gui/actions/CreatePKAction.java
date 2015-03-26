@@ -22,9 +22,6 @@
  */
 package workbench.gui.actions;
 
-import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import java.util.List;
 import workbench.db.ColumnIdentifier;
 import workbench.db.DbObject;
 import workbench.db.DbObjectChanger;
@@ -35,56 +32,52 @@ import workbench.resource.ResourceMgr;
 import workbench.util.CollectionUtil;
 import workbench.util.StringUtil;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.List;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class CreatePKAction
-	extends WbAction
-{
-	private DbObjectList columns;
+    extends WbAction {
+  private DbObjectList columns;
 
-	public CreatePKAction(DbObjectList cols)
-	{
-		super();
-		this.columns = cols;
-		this.initMenuDefinition("MnuTxtCreatePK");
-	}
+  public CreatePKAction(DbObjectList cols) {
+    super();
+    this.columns = cols;
+    this.initMenuDefinition("MnuTxtCreatePK");
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		List<? extends DbObject> selected = columns.getSelectedObjects();
-		if (selected == null) return;
-		if (selected.size() == 0) return;
-		List<ColumnIdentifier> cols = CollectionUtil.arrayList();
-		for (DbObject dbo : selected)
-		{
-			cols.add((ColumnIdentifier)dbo);
-		}
-		
-		TableIdentifier table = columns.getObjectTable();
-		
-		DbObjectChanger changer = new DbObjectChanger(columns.getConnection());
-		String sql = changer.getAddPKScript(table, cols);
-		if (StringUtil.isBlank(sql)) return;
+  @Override
+  public void executeAction(ActionEvent e) {
+    List<? extends DbObject> selected = columns.getSelectedObjects();
+    if (selected == null) return;
+    if (selected.size() == 0) return;
+    List<ColumnIdentifier> cols = CollectionUtil.arrayList();
+    for (DbObject dbo : selected) {
+      cols.add((ColumnIdentifier) dbo);
+    }
 
-		RunScriptPanel panel = new RunScriptPanel(columns.getConnection(), sql);
-		
-		panel.openWindow(columns.getComponent(), ResourceMgr.getString("TxtCreatePK"));
+    TableIdentifier table = columns.getObjectTable();
 
-		if (panel.wasRun() && columns != null)
-		{
-			EventQueue.invokeLater(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					columns.reload();
-				}
-			});
-		}
+    DbObjectChanger changer = new DbObjectChanger(columns.getConnection());
+    String sql = changer.getAddPKScript(table, cols);
+    if (StringUtil.isBlank(sql)) return;
 
-	}
+    RunScriptPanel panel = new RunScriptPanel(columns.getConnection(), sql);
+
+    panel.openWindow(columns.getComponent(), ResourceMgr.getString("TxtCreatePK"));
+
+    if (panel.wasRun() && columns != null) {
+      EventQueue.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          columns.reload();
+        }
+      });
+    }
+
+  }
 
 }

@@ -22,37 +22,32 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
+import workbench.gui.sql.DwPanel;
 import workbench.resource.ResourceMgr;
 
-import workbench.gui.sql.DwPanel;
+import java.awt.event.ActionEvent;
 
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class SelectKeyColumnsAction
-	extends WbAction
-{
-	private DwPanel client;
+    extends WbAction {
+  private DwPanel client;
 
-	public SelectKeyColumnsAction(DwPanel aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtSelectKeyColumns");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
-		this.setIcon("table_key");
-		this.setEnabled(false);
-	}
+  public SelectKeyColumnsAction(DwPanel aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtSelectKeyColumns");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
+    this.setIcon("table_key");
+    this.setEnabled(false);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		if (this.client != null)
-		{
-			this.client.checkAndSelectKeyColumns();
-		}
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    if (this.client != null) {
+      this.client.checkAndSelectKeyColumns();
+    }
+  }
 
 }

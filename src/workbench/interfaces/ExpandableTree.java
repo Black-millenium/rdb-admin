@@ -23,11 +23,10 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface ExpandableTree
-{
-	void expandAll();
-	void collapseAll();
+public interface ExpandableTree {
+  void expandAll();
+
+  void collapseAll();
 }

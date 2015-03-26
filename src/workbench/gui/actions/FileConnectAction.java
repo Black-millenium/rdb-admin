@@ -22,33 +22,30 @@
  */
 package workbench.gui.actions;
 
+import workbench.gui.MainWindow;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.KeyStroke;
-
-import workbench.gui.MainWindow;
-
 /**
  * Display the connect dialog
+ *
  * @author Thomas Kellerer
  */
 public class FileConnectAction
-	extends WbAction
-{
-	private MainWindow window;
+    extends WbAction {
+  private MainWindow window;
 
-	public FileConnectAction(MainWindow aWindow)
-	{
-		super();
-		this.window = aWindow;
-		this.initMenuDefinition("MnuTxtConnect", KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK));
-	}
+  public FileConnectAction(MainWindow aWindow) {
+    super();
+    this.window = aWindow;
+    this.initMenuDefinition("MnuTxtConnect", KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK));
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.window.selectConnection();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.window.selectConnection();
+  }
 }

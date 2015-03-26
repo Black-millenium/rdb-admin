@@ -25,11 +25,10 @@ package workbench.interfaces;
 import workbench.db.WbConnection;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface DbExecutionListener
-{
-	void executionStart(WbConnection conn, Object source);
-	void executionEnd(WbConnection conn, Object source);
+public interface DbExecutionListener {
+  void executionStart(WbConnection conn, Object source);
+
+  void executionEnd(WbConnection conn, Object source);
 }

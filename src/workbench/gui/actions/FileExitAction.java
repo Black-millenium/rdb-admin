@@ -22,36 +22,31 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.WbManager;
 import workbench.gui.WbSwingUtilities;
 import workbench.resource.ResourceMgr;
 
+import java.awt.event.ActionEvent;
+
 /**
  * Exit and close the application.
  *
- * @see workbench.WbManager#exitWorkbench(boolean) 
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
+ * @see workbench.WbManager#exitWorkbench(boolean)
  */
 public class FileExitAction
-	extends WbAction
-{
-	public FileExitAction()
-	{
-		super();
-		this.initMenuDefinition("MnuTxtExit");
-	}
+    extends WbAction {
+  public FileExitAction() {
+    super();
+    this.initMenuDefinition("MnuTxtExit");
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		boolean forceShutdown = false;
-		if (isCtrlPressed(e))
-		{
-			forceShutdown = WbSwingUtilities.getYesNo(WbManager.getInstance().getCurrentWindow(), ResourceMgr.getString("MsgAbortWarning"));
-		}
-		WbManager.getInstance().exitWorkbench(forceShutdown);
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    boolean forceShutdown = false;
+    if (isCtrlPressed(e)) {
+      forceShutdown = WbSwingUtilities.getYesNo(WbManager.getInstance().getCurrentWindow(), ResourceMgr.getString("MsgAbortWarning"));
+    }
+    WbManager.getInstance().exitWorkbench(forceShutdown);
+  }
 }

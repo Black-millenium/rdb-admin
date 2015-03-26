@@ -22,79 +22,62 @@
  */
 package workbench.gui.editor.actions;
 
-import java.awt.event.ActionEvent;
-import javax.swing.KeyStroke;
 import workbench.gui.editor.InputHandler;
 import workbench.gui.editor.JEditTextArea;
 import workbench.resource.PlatformShortcuts;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class LineStart
-	extends EditorAction
-{
-	protected boolean select;
+    extends EditorAction {
+  protected boolean select;
 
-	public LineStart()
-	{
-		super("TxtEdLineStart", PlatformShortcuts.getDefaultStartOfLine(false));
-		select = false;
-	}
+  public LineStart() {
+    super("TxtEdLineStart", PlatformShortcuts.getDefaultStartOfLine(false));
+    select = false;
+  }
 
-	protected LineStart(String resourceKey, KeyStroke key)
-	{
-		super(resourceKey, key);
-	}
+  protected LineStart(String resourceKey, KeyStroke key) {
+    super(resourceKey, key);
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt)
-	{
-		JEditTextArea textArea = InputHandler.getTextArea(evt);
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    JEditTextArea textArea = InputHandler.getTextArea(evt);
 
-		int caret = textArea.getCaretPosition();
+    int caret = textArea.getCaretPosition();
 
-		int firstLine = textArea.getFirstLine();
+    int firstLine = textArea.getFirstLine();
 
-		int firstOfLine = textArea.getLineStartOffset(textArea.getCaretLine());
-		int firstVisibleLine = (firstLine == 0 ? 0 : firstLine + textArea.getElectricScroll());
-		int firstVisible = textArea.getLineStartOffset(firstVisibleLine);
+    int firstOfLine = textArea.getLineStartOffset(textArea.getCaretLine());
+    int firstVisibleLine = (firstLine == 0 ? 0 : firstLine + textArea.getElectricScroll());
+    int firstVisible = textArea.getLineStartOffset(firstVisibleLine);
 
-		if (caret == 0)
-		{
-			textArea.getToolkit().beep();
-			if (!select)
-			{
-				textArea.selectNone();
-			}
-			return;
-		}
-		else if (!Boolean.TRUE.equals(textArea.getClientProperty(InputHandler.SMART_HOME_END_PROPERTY)))
-		{
-			caret = firstOfLine;
-		}
-		else if (caret == firstVisible)
-		{
-			caret = 0;
-		}
-		else if (caret == firstOfLine)
-		{
-			caret = firstVisible;
-		}
-		else
-		{
-			caret = firstOfLine;
-		}
+    if (caret == 0) {
+      textArea.getToolkit().beep();
+      if (!select) {
+        textArea.selectNone();
+      }
+      return;
+    } else if (!Boolean.TRUE.equals(textArea.getClientProperty(InputHandler.SMART_HOME_END_PROPERTY))) {
+      caret = firstOfLine;
+    } else if (caret == firstVisible) {
+      caret = 0;
+    } else if (caret == firstOfLine) {
+      caret = firstVisible;
+    } else {
+      caret = firstOfLine;
+    }
 
-		if (select)
-		{
-			textArea.select(textArea.getMarkPosition(), caret);
-		}
-		else
-		{
-			textArea.selectNone();
-			textArea.setCaretPosition(caret);
-		}
-	}
+    if (select) {
+      textArea.select(textArea.getMarkPosition(), caret);
+    } else {
+      textArea.selectNone();
+      textArea.setCaretPosition(caret);
+    }
+  }
 }

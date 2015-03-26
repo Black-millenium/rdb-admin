@@ -22,119 +22,99 @@
  */
 package workbench.gui.settings;
 
-import java.awt.EventQueue;
+import workbench.resource.ResourceMgr;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.UIManager;
-
-import workbench.resource.ResourceMgr;
-
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class KeyboardMapper
-	extends JPanel
-	implements KeyListener
-{
-	private JTextField display;
-	private KeyStroke newkey;
+    extends JPanel
+    implements KeyListener {
+  private JTextField display;
+  private KeyStroke newkey;
 
-	public KeyboardMapper()
-	{
-		super();
-		this.display = new JTextField(20);
-		this.display.addKeyListener(this);
-		this.display.setEditable(false);
-		this.display.setDisabledTextColor(display.getForeground());
-		this.display.setBackground(UIManager.getColor("TextArea.background"));
-		this.add(display);
-	}
+  public KeyboardMapper() {
+    super();
+    this.display = new JTextField(20);
+    this.display.addKeyListener(this);
+    this.display.setEditable(false);
+    this.display.setDisabledTextColor(display.getForeground());
+    this.display.setBackground(UIManager.getColor("TextArea.background"));
+    this.add(display);
+  }
 
-	@Override
-	public void grabFocus()
-	{
-		this.display.grabFocus();
-		this.display.requestFocusInWindow();
-	}
+  public static KeyStroke getKeyStroke(JComponent parent) {
+    final KeyboardMapper mapper = new KeyboardMapper();
+    EventQueue.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        mapper.grabFocus();
+      }
+    });
 
-	@Override
-	public void keyPressed(KeyEvent e)
-	{
-	}
+    String[] options = new String[]{
+        ResourceMgr.getPlainString("LblOK"),
+        ResourceMgr.getPlainString("LblCancel")
+    };
 
-	@Override
-	public void keyReleased(KeyEvent e)
-	{
-		int modifier = e.getModifiers();
-		int code = e.getKeyCode();
+    JOptionPane overwritePane = new JOptionPane(mapper, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options);
+    JDialog dialog = overwritePane.createDialog(parent, ResourceMgr.getString("LblEnterKeyWindowTitle"));
 
-		// only allow action keys without modifier!
-		if (modifier == 0 && !e.isActionKey()) return;
+    dialog.setResizable(true);
+    dialog.setVisible(true);
+    Object result = overwritePane.getValue();
+    dialog.dispose();
 
-		// keyReleased is also called when the Ctrl or Shift keys are release
-		// in that case the keycode is 0 --> ignore it
-		if (code >= 32
-			|| code == KeyEvent.VK_ENTER
-			|| code == KeyEvent.VK_BACK_SPACE
-			|| code == KeyEvent.VK_TAB
-			|| code == KeyEvent.VK_ESCAPE)
-		{
-			String key = KeyEvent.getKeyText(code);
-			if (modifier > 0) key = KeyEvent.getKeyModifiersText(modifier) + "-" + key;
-			this.newkey = KeyStroke.getKeyStroke(code, modifier);
-			this.display.setText(key);
-		}
-	}
+    KeyStroke key = null;
+    if (options[0].equals(result)) {
+      key = mapper.getKeyStroke();
+    }
+    return key;
+  }
 
-	public KeyStroke getKeyStroke()
-	{
-		return this.newkey;
-	}
+  @Override
+  public void grabFocus() {
+    this.display.grabFocus();
+    this.display.requestFocusInWindow();
+  }
 
-	@Override
-	public void keyTyped(KeyEvent e)
-	{
-	}
+  @Override
+  public void keyPressed(KeyEvent e) {
+  }
 
-	public static KeyStroke getKeyStroke(JComponent parent)
-	{
-		final KeyboardMapper mapper = new KeyboardMapper();
-		EventQueue.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				mapper.grabFocus();
-			}
-		});
+  @Override
+  public void keyReleased(KeyEvent e) {
+    int modifier = e.getModifiers();
+    int code = e.getKeyCode();
 
-		String[] options = new String[] {
-			ResourceMgr.getPlainString("LblOK"),
-			ResourceMgr.getPlainString("LblCancel")
-		};
+    // only allow action keys without modifier!
+    if (modifier == 0 && !e.isActionKey()) return;
 
-		JOptionPane overwritePane = new JOptionPane(mapper, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options);
-		JDialog dialog = overwritePane.createDialog(parent, ResourceMgr.getString("LblEnterKeyWindowTitle"));
+    // keyReleased is also called when the Ctrl or Shift keys are release
+    // in that case the keycode is 0 --> ignore it
+    if (code >= 32
+        || code == KeyEvent.VK_ENTER
+        || code == KeyEvent.VK_BACK_SPACE
+        || code == KeyEvent.VK_TAB
+        || code == KeyEvent.VK_ESCAPE) {
+      String key = KeyEvent.getKeyText(code);
+      if (modifier > 0) key = KeyEvent.getKeyModifiersText(modifier) + "-" + key;
+      this.newkey = KeyStroke.getKeyStroke(code, modifier);
+      this.display.setText(key);
+    }
+  }
 
-		dialog.setResizable(true);
-		dialog.setVisible(true);
-		Object result = overwritePane.getValue();
-		dialog.dispose();
+  public KeyStroke getKeyStroke() {
+    return this.newkey;
+  }
 
-		KeyStroke key = null;
-		if (options[0].equals(result))
-		{
-			key = mapper.getKeyStroke();
-		}
-		return key;
-	}
+  @Override
+  public void keyTyped(KeyEvent e) {
+  }
 
 }

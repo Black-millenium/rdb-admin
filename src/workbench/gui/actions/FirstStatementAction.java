@@ -22,34 +22,31 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
+import workbench.gui.sql.SqlHistory;
 import workbench.resource.ResourceMgr;
 
-import workbench.gui.sql.SqlHistory;
+import java.awt.event.ActionEvent;
 
 /**
- *	Jump to the first statement in the SQL History
- *	@author  Thomas Kellerer
+ * Jump to the first statement in the SQL History
+ *
+ * @author Thomas Kellerer
  */
-public class FirstStatementAction extends WbAction
-{
-	private SqlHistory history;
+public class FirstStatementAction extends WbAction {
+  private SqlHistory history;
 
-	public FirstStatementAction(SqlHistory aHistory)
-	{
-		super();
-		this.history = aHistory;
-		this.initMenuDefinition("MnuTxtFirstStatement");
-		this.setIcon("First");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
-		this.setCreateMenuSeparator(true);
-		this.setCreateToolbarSeparator(true);
-	}
+  public FirstStatementAction(SqlHistory aHistory) {
+    super();
+    this.history = aHistory;
+    this.initMenuDefinition("MnuTxtFirstStatement");
+    this.setIcon("First");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
+    this.setCreateMenuSeparator(true);
+    this.setCreateToolbarSeparator(true);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.history.showFirstStatement();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.history.showFirstStatement();
+  }
 }

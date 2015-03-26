@@ -29,36 +29,30 @@ import java.lang.reflect.Method;
  * <br>
  * If Log4J is available, it will call
  * org.apache.log4j.Log4JLoggerFactory.setLoggerFqcn() passing LogMgr.class
- *
+ * <p/>
  * All this is done using Reflection, so Log4J does not need to be available.
- *
  *
  * @author Peter Franken
  * @author Thomas Kellerer
  */
-public class Log4JHelper
-{
-	private static boolean tested;
-	private static boolean available;
+public class Log4JHelper {
+  private static boolean tested;
+  private static boolean available;
 
-	public static boolean isLog4JAvailable()
-	{
-		if (tested) return available;
-		try
-		{
-			tested = true;
-			Class.forName("org.apache.log4j.Logger");
-			Class factory = Class.forName("workbench.log.Log4JLoggerFactory");
-			Method setLoggerFqcn = factory.getDeclaredMethod("setLoggerFqcn", new Class[] { Class.class });
-			setLoggerFqcn.invoke(null, new Object[] { LogMgr.class } );
-			available = true;
-		}
-		catch (Throwable th)
-		{
-			th.printStackTrace(System.err);
-			available = false;
-		}
-		return available;
-	}
+  public static boolean isLog4JAvailable() {
+    if (tested) return available;
+    try {
+      tested = true;
+      Class.forName("org.apache.log4j.Logger");
+      Class factory = Class.forName("workbench.log.Log4JLoggerFactory");
+      Method setLoggerFqcn = factory.getDeclaredMethod("setLoggerFqcn", new Class[]{Class.class});
+      setLoggerFqcn.invoke(null, new Object[]{LogMgr.class});
+      available = true;
+    } catch (Throwable th) {
+      th.printStackTrace(System.err);
+      available = false;
+    }
+    return available;
+  }
 
 }

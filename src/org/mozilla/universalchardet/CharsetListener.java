@@ -37,7 +37,6 @@
 
 package org.mozilla.universalchardet;
 
-public interface CharsetListener
-{
-    public void report(String charset);
+public interface CharsetListener {
+  public void report(String charset);
 }

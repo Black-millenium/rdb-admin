@@ -22,91 +22,84 @@
  */
 package workbench.gui.dialogs;
 
-import java.awt.BorderLayout;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.WindowConstants;
-import javax.swing.border.EmptyBorder;
-
 import workbench.gui.MainWindow;
-import workbench.log.LogMgr;
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
 import workbench.gui.actions.EscAction;
 import workbench.gui.actions.HelpContactAction;
 import workbench.gui.components.WbLabelField;
-
+import workbench.log.LogMgr;
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
 import workbench.util.BrowserLauncher;
 import workbench.util.MemoryWatcher;
 import workbench.util.WbFile;
 
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.*;
+
 /**
  * The about box for SQL Workbench/J
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class WbAboutDialog
-	extends JDialog
-	implements ActionListener
-{
-	private EscAction escAction;
+    extends JDialog
+    implements ActionListener {
+  private EscAction escAction;
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private JLabel builtWithNbLabel;
+  private JPanel buttonPanel;
+  private JButton closeButton;
+  private JPanel contentPanel;
+  private JLabel homepageLabel;
+  private JPanel infoPanel;
+  private JLabel jdkVersion;
+  private JLabel jeditLabel;
+  private JLabel labelCopyright;
+  private JLabel labelDesc;
+  private JLabel labelTitel;
+  private JLabel labelVersion;
+  private JLabel licenseLabel;
+  private JTextField logfileLabel;
+  private JLabel logo;
+  private JLabel mailToLabel;
+  private JLabel memoryLabel;
+  private JTextField settingsLabel;
+  public WbAboutDialog(java.awt.Frame parent) {
+    super(parent, true);
+    initComponents();
+    homepageLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    mailToLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    builtWithNbLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    jeditLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    licenseLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-	public WbAboutDialog(java.awt.Frame parent)
-	{
-		super(parent, true);
-		initComponents();
-		homepageLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		mailToLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		builtWithNbLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		jeditLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		licenseLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    getRootPane().setDefaultButton(closeButton);
+    escAction = new EscAction(this, this);
+    WbFile f = Settings.getInstance().getConfigFile();
+    String s = ResourceMgr.getFormattedString("LblSettingsLocation", f.getFullPath());
+    settingsLabel.setText(s);
+    settingsLabel.setCaretPosition(0);
+    settingsLabel.setBorder(new EmptyBorder(1, 0, 1, 0));
+    WbFile logFile = LogMgr.getLogfile();
+    logfileLabel.setText(ResourceMgr.getFormattedString("LblLogLocation", logFile == null ? "" : logFile.getFullPath()));
+    logfileLabel.setCaretPosition(0);
+    logfileLabel.setBorder(new EmptyBorder(1, 0, 1, 0));
+    long freeMem = MemoryWatcher.getFreeMemory() / (1024 * 1024);
+    long maxMem = MemoryWatcher.MAX_MEMORY / (1024 * 1024);
+    memoryLabel.setText(ResourceMgr.getString("LblMemory") + " " + freeMem + "MB/" + maxMem + "MB");
+    pack();
+  }
 
-		getRootPane().setDefaultButton(closeButton);
-		escAction = new EscAction(this, this);
-		WbFile f = Settings.getInstance().getConfigFile();
-		String s = ResourceMgr.getFormattedString("LblSettingsLocation", f.getFullPath());
-		settingsLabel.setText(s);
-		settingsLabel.setCaretPosition(0);
-		settingsLabel.setBorder(new EmptyBorder(1, 0, 1, 0));
-		WbFile logFile = LogMgr.getLogfile();
-		logfileLabel.setText(ResourceMgr.getFormattedString("LblLogLocation", logFile == null ? "": logFile.getFullPath()));
-		logfileLabel.setCaretPosition(0);
-		logfileLabel.setBorder(new EmptyBorder(1, 0, 1, 0));
-		long freeMem = MemoryWatcher.getFreeMemory() / (1024*1024);
-		long maxMem = MemoryWatcher.MAX_MEMORY / (1024*1024);
-		memoryLabel.setText(ResourceMgr.getString("LblMemory") + " " + freeMem + "MB/" + maxMem + "MB");
-		pack();
-	}
-
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     GridBagConstraints gridBagConstraints;
 
     buttonPanel = new JPanel();
@@ -131,10 +124,8 @@ public class WbAboutDialog
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     setTitle(ResourceMgr.getString("TxtAbout") + " " + ResourceMgr.TXT_PRODUCT_NAME);
     setName("AboutDialog"); // NOI18N
-    addWindowListener(new WindowAdapter()
-    {
-      public void windowClosing(WindowEvent evt)
-      {
+    addWindowListener(new WindowAdapter() {
+      public void windowClosing(WindowEvent evt) {
         closeDialog(evt);
       }
     });
@@ -143,10 +134,8 @@ public class WbAboutDialog
 
     closeButton.setText(ResourceMgr.getString("LblClose")); // NOI18N
     closeButton.setName("close"); // NOI18N
-    closeButton.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent evt)
-      {
+    closeButton.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent evt) {
         closeButtonActionPerformed(evt);
       }
     });
@@ -209,10 +198,8 @@ public class WbAboutDialog
     contentPanel.add(labelCopyright, gridBagConstraints);
 
     builtWithNbLabel.setText("<html>Built with NetBeans (<u>www.netbeans.org</u>)</html>");
-    builtWithNbLabel.addMouseListener(new MouseAdapter()
-    {
-      public void mouseClicked(MouseEvent evt)
-      {
+    builtWithNbLabel.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent evt) {
         builtWithNbLabelMouseClicked(evt);
       }
     });
@@ -227,10 +214,8 @@ public class WbAboutDialog
 
     jeditLabel.setText("<html>The editor is based on jEdit's 2.2.2 <u>syntax highlighting package</u></html>");
     jeditLabel.setToolTipText("http://syntax.jedit.org/");
-    jeditLabel.addMouseListener(new MouseAdapter()
-    {
-      public void mouseClicked(MouseEvent evt)
-      {
+    jeditLabel.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent evt) {
         jeditLabelMouseClicked(evt);
       }
     });
@@ -253,10 +238,8 @@ public class WbAboutDialog
     contentPanel.add(jdkVersion, gridBagConstraints);
 
     homepageLabel.setText("<html><u>www.sql-workbench.net</u></html>");
-    homepageLabel.addMouseListener(new MouseAdapter()
-    {
-      public void mouseClicked(MouseEvent evt)
-      {
+    homepageLabel.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent evt) {
         homepageLabelMouseClicked(evt);
       }
     });
@@ -269,10 +252,8 @@ public class WbAboutDialog
     contentPanel.add(homepageLabel, gridBagConstraints);
 
     licenseLabel.setText(ResourceMgr.getString("TxtLicense")); // NOI18N
-    licenseLabel.addMouseListener(new MouseAdapter()
-    {
-      public void mouseClicked(MouseEvent evt)
-      {
+    licenseLabel.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent evt) {
         licenseLabelMouseClicked(evt);
       }
     });
@@ -287,10 +268,8 @@ public class WbAboutDialog
     contentPanel.add(licenseLabel, gridBagConstraints);
 
     mailToLabel.setText("support@sql-workbench.net");
-    mailToLabel.addMouseListener(new MouseAdapter()
-    {
-      public void mouseClicked(MouseEvent evt)
-      {
+    mailToLabel.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent evt) {
         mailToLabelMouseClicked(evt);
       }
     });
@@ -348,108 +327,68 @@ public class WbAboutDialog
     pack();
   }// </editor-fold>//GEN-END:initComponents
 
-	private void mailToLabelMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_mailToLabelMouseClicked
-	{//GEN-HEADEREND:event_mailToLabelMouseClicked
-		try
-		{
-			if (evt.getClickCount() == 1)
-			{
-				Window owner = this.getOwner();
-				MainWindow mainWin = null;
-				if (owner instanceof MainWindow)
-				{
-					mainWin = (MainWindow)owner;
-				}
-				HelpContactAction.sendEmail(mainWin);
-			}
-		}
-		catch (Exception e)
-		{
-		}
+  private void mailToLabelMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_mailToLabelMouseClicked
+  {//GEN-HEADEREND:event_mailToLabelMouseClicked
+    try {
+      if (evt.getClickCount() == 1) {
+        Window owner = this.getOwner();
+        MainWindow mainWin = null;
+        if (owner instanceof MainWindow) {
+          mainWin = (MainWindow) owner;
+        }
+        HelpContactAction.sendEmail(mainWin);
+      }
+    } catch (Exception e) {
+    }
 
-	}//GEN-LAST:event_mailToLabelMouseClicked
+  }//GEN-LAST:event_mailToLabelMouseClicked
 
-	private void homepageLabelMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_homepageLabelMouseClicked
-	{//GEN-HEADEREND:event_homepageLabelMouseClicked
-		try
-		{
-			if (evt.getClickCount() == 1) BrowserLauncher.openURL("http://www.sql-workbench.net");
-		}
-		catch (Exception e)
-		{
-		}
-	}//GEN-LAST:event_homepageLabelMouseClicked
+  private void homepageLabelMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_homepageLabelMouseClicked
+  {//GEN-HEADEREND:event_homepageLabelMouseClicked
+    try {
+      if (evt.getClickCount() == 1) BrowserLauncher.openURL("http://www.sql-workbench.net");
+    } catch (Exception e) {
+    }
+  }//GEN-LAST:event_homepageLabelMouseClicked
 
-	private void builtWithNbLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_builtWithNbLabelMouseClicked
-		try
-		{
-			if (evt.getClickCount() == 1) BrowserLauncher.openURL("http://www.netbeans.org");
-		}
-		catch (Exception e)
-		{
-		}
-}//GEN-LAST:event_builtWithNbLabelMouseClicked
+  private void builtWithNbLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_builtWithNbLabelMouseClicked
+    try {
+      if (evt.getClickCount() == 1) BrowserLauncher.openURL("http://www.netbeans.org");
+    } catch (Exception e) {
+    }
+  }//GEN-LAST:event_builtWithNbLabelMouseClicked
 
-	private void closeButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_closeButtonActionPerformed
-	{//GEN-HEADEREND:event_closeButtonActionPerformed
-		this.closeDialog(null);
-	}//GEN-LAST:event_closeButtonActionPerformed
+  private void closeButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_closeButtonActionPerformed
+  {//GEN-HEADEREND:event_closeButtonActionPerformed
+    this.closeDialog(null);
+  }//GEN-LAST:event_closeButtonActionPerformed
 
-	private void closeDialog(java.awt.event.WindowEvent evt)
-	{//GEN-FIRST:event_closeDialog
-		setVisible(false);
-		dispose();
-	}//GEN-LAST:event_closeDialog
+  private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
+    setVisible(false);
+    dispose();
+  }//GEN-LAST:event_closeDialog
 
-	private void jeditLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jeditLabelMouseClicked
-		try
-		{
-			if (evt.getClickCount() == 1) BrowserLauncher.openURL("http://syntax.jedit.org/");
-		}
-		catch (Exception e)
-		{
-		}
-}//GEN-LAST:event_jeditLabelMouseClicked
+  private void jeditLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jeditLabelMouseClicked
+    try {
+      if (evt.getClickCount() == 1) BrowserLauncher.openURL("http://syntax.jedit.org/");
+    } catch (Exception e) {
+    }
+  }//GEN-LAST:event_jeditLabelMouseClicked
 
   private void licenseLabelMouseClicked(MouseEvent evt)//GEN-FIRST:event_licenseLabelMouseClicked
   {//GEN-HEADEREND:event_licenseLabelMouseClicked
-		try
-		{
-			if (evt.getClickCount() == 1) BrowserLauncher.openURL("http://www.sql-workbench.net/manual/license.html");
-		}
-		catch (Exception e)
-		{
-		}
+    try {
+      if (evt.getClickCount() == 1) BrowserLauncher.openURL("http://www.sql-workbench.net/manual/license.html");
+    } catch (Exception e) {
+    }
   }//GEN-LAST:event_licenseLabelMouseClicked
 
-	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		if (e.getSource() == escAction)
-		{
-			closeDialog(null);
-		}
-	}
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private JLabel builtWithNbLabel;
-  private JPanel buttonPanel;
-  private JButton closeButton;
-  private JPanel contentPanel;
-  private JLabel homepageLabel;
-  private JPanel infoPanel;
-  private JLabel jdkVersion;
-  private JLabel jeditLabel;
-  private JLabel labelCopyright;
-  private JLabel labelDesc;
-  private JLabel labelTitel;
-  private JLabel labelVersion;
-  private JLabel licenseLabel;
-  private JTextField logfileLabel;
-  private JLabel logo;
-  private JLabel mailToLabel;
-  private JLabel memoryLabel;
-  private JTextField settingsLabel;
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == escAction) {
+      closeDialog(null);
+    }
+  }
   // End of variables declaration//GEN-END:variables
 
 }

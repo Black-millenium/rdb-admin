@@ -22,14 +22,13 @@
  */
 package workbench.interfaces;
 
-import java.util.List;
 import workbench.db.TableIdentifier;
 
+import java.util.List;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface TableDeleteListener
-{
-	void tableDataDeleted(List<TableIdentifier> tables);
+public interface TableDeleteListener {
+  void tableDataDeleted(List<TableIdentifier> tables);
 }

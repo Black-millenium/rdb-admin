@@ -22,54 +22,48 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import workbench.resource.ResourceMgr;
-
 import workbench.gui.components.ClipBoardCopier;
 import workbench.gui.components.WbTable;
+import workbench.resource.ResourceMgr;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Action to copy the contents of a table to the clipboard as pairs of
  * DELETE/INSERT statements
+ *
+ * @author Thomas Kellerer
  * @see workbench.gui.components.ClipBoardCopier
- * @author  Thomas Kellerer
  */
-public class CopyAsSqlDeleteInsertAction extends WbAction
-{
-	private WbTable client;
+public class CopyAsSqlDeleteInsertAction extends WbAction {
+  private WbTable client;
 
-	public CopyAsSqlDeleteInsertAction(WbTable aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtCopyAsSqlDeleteInsert");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
-		this.setEnabled(false);
-	}
+  public CopyAsSqlDeleteInsertAction(WbTable aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtCopyAsSqlDeleteInsert");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
+    this.setEnabled(false);
+  }
 
-	@Override
-	public boolean hasCtrlModifier()
-	{
-		return true;
-	}
+  @Override
+  public boolean hasCtrlModifier() {
+    return true;
+  }
 
-	@Override
-	public boolean hasShiftModifier()
-	{
-		return true;
-	}
+  @Override
+  public boolean hasShiftModifier() {
+    return true;
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		ClipBoardCopier copier = new ClipBoardCopier(this.client);
-		boolean selectColumns = false;
-		if (invokedByMouse(e))
-		{
-			selectColumns = isCtrlPressed(e) ;
-		}
-		copier.copyAsSqlDeleteInsert(false, selectColumns);
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    ClipBoardCopier copier = new ClipBoardCopier(this.client);
+    boolean selectColumns = false;
+    if (invokedByMouse(e)) {
+      selectColumns = isCtrlPressed(e);
+    }
+    copier.copyAsSqlDeleteInsert(false, selectColumns);
+  }
 
 }

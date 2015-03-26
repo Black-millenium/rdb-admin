@@ -22,60 +22,61 @@
  */
 package workbench.db.importer;
 
+import workbench.util.MessageBuffer;
+import workbench.util.WbFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import workbench.util.MessageBuffer;
-import workbench.util.WbFile;
-
 /**
- *
  * @author Thomas Kellerer
  */
-public interface SpreadsheetReader
-{
-	MessageBuffer getMessages();
-	List<String> getHeaderColumns();
-	void setActiveWorksheet(int index);
-	void setActiveWorksheet(String name);
-	List<Object> getRowValues(int row);
-	void setNullString(String nullString);
+public interface SpreadsheetReader {
+  MessageBuffer getMessages();
+
+  List<String> getHeaderColumns();
+
+  void setActiveWorksheet(int index);
+
+  void setActiveWorksheet(String name);
+
+  List<Object> getRowValues(int row);
+
+  void setNullString(String nullString);
+
   void setEmptyStringIsNull(boolean flag);
-  
-	/**
-	 * Return the total row count in the spreadsheet including a possible header row.
-	 *
-	 * @return the row count
-	 */
-	int getRowCount();
-	void done();
-	void load()
-		throws IOException;
 
-	List<String> getSheets();
+  /**
+   * Return the total row count in the spreadsheet including a possible header row.
+   *
+   * @return the row count
+   */
+  int getRowCount();
 
-	public static class Factory
-	{
-		public static SpreadsheetReader createReader(File inputFile, int sheetIndex, String sheetName)
-		{
-			WbFile f = new WbFile(inputFile);
-			String ext = f.getExtension();
-			if (ext == null) return null;
+  void done();
 
-			ext = ext.toLowerCase();
+  void load()
+      throws IOException;
 
-			SpreadsheetReader reader = null;
+  List<String> getSheets();
 
-			if (ext.startsWith("xls"))
-			{
-				reader = new ExcelReader(inputFile, sheetIndex, sheetName);
-			}
-			else if (ext.equals("ods"))
-			{
-				reader = new OdsReader(inputFile, sheetIndex, sheetName);
-			}
-			return reader;
-		}
-	}
+  public static class Factory {
+    public static SpreadsheetReader createReader(File inputFile, int sheetIndex, String sheetName) {
+      WbFile f = new WbFile(inputFile);
+      String ext = f.getExtension();
+      if (ext == null) return null;
+
+      ext = ext.toLowerCase();
+
+      SpreadsheetReader reader = null;
+
+      if (ext.startsWith("xls")) {
+        reader = new ExcelReader(inputFile, sheetIndex, sheetName);
+      } else if (ext.equals("ods")) {
+        reader = new OdsReader(inputFile, sheetIndex, sheetName);
+      }
+      return reader;
+    }
+  }
 }

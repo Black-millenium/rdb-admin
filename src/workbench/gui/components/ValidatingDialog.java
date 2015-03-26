@@ -22,333 +22,261 @@
  */
 package workbench.gui.components;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dialog;
-import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.Window;
+import workbench.WbManager;
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.actions.EscAction;
+import workbench.interfaces.ValidatingComponent;
+import workbench.resource.ResourceMgr;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
-import javax.swing.border.Border;
-
-import workbench.WbManager;
-import workbench.interfaces.ValidatingComponent;
-import workbench.resource.ResourceMgr;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.actions.EscAction;
-
 
 /**
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class ValidatingDialog
-	extends JDialog
-	implements WindowListener, ActionListener
-{
-	protected ValidatingComponent validator;
-	protected JComponent editorComponent;
-	private JButton[] optionButtons;
+    extends JDialog
+    implements WindowListener, ActionListener {
+  protected ValidatingComponent validator;
+  protected JComponent editorComponent;
+  private JButton[] optionButtons;
 
-	private JButton cancelButton;
-	private boolean isCancelled = true;
-	private int selectedOption = -1;
-	private EscAction esc;
-	private JPanel buttonPanel;
+  private JButton cancelButton;
+  private boolean isCancelled = true;
+  private int selectedOption = -1;
+  private EscAction esc;
+  private JPanel buttonPanel;
 
-	public ValidatingDialog(Dialog owner, String title, JComponent editor)
-	{
-		super(owner, title, true);
-		init(editor, new String[] { ResourceMgr.getString("LblOK") }, true);
-	}
+  public ValidatingDialog(Dialog owner, String title, JComponent editor) {
+    super(owner, title, true);
+    init(editor, new String[]{ResourceMgr.getString("LblOK")}, true);
+  }
 
-	public ValidatingDialog(Frame owner, String title, JComponent editor)
-	{
-		this(owner, title, editor, true);
-	}
+  public ValidatingDialog(Frame owner, String title, JComponent editor) {
+    this(owner, title, editor, true);
+  }
 
-	public ValidatingDialog(Frame owner, String title, JComponent editor, boolean addCancelButton)
-	{
-		super(owner, title, true);
-		init(editor, new String[] { ResourceMgr.getString("LblOK") }, addCancelButton);
-	}
+  public ValidatingDialog(Frame owner, String title, JComponent editor, boolean addCancelButton) {
+    super(owner, title, true);
+    init(editor, new String[]{ResourceMgr.getString("LblOK")}, addCancelButton);
+  }
 
-	public ValidatingDialog(Dialog owner, String title, JComponent editor, boolean addCancelButton)
-	{
-		super(owner, title, true);
-		init(editor, new String[] { ResourceMgr.getString("LblOK") }, addCancelButton);
-	}
+  public ValidatingDialog(Dialog owner, String title, JComponent editor, boolean addCancelButton) {
+    super(owner, title, true);
+    init(editor, new String[]{ResourceMgr.getString("LblOK")}, addCancelButton);
+  }
 
-	public ValidatingDialog(Dialog owner, String title, JComponent editor, String[] options)
-	{
-		this(owner, title, editor, options, true);
-	}
+  public ValidatingDialog(Dialog owner, String title, JComponent editor, String[] options) {
+    this(owner, title, editor, options, true);
+  }
 
-	public ValidatingDialog(Dialog owner, String title, JComponent editor, String[] options, boolean addCancelButton)
-	{
-		super(owner, title, true);
-		init(editor, options, addCancelButton);
-	}
+  public ValidatingDialog(Dialog owner, String title, JComponent editor, String[] options, boolean addCancelButton) {
+    super(owner, title, true);
+    init(editor, options, addCancelButton);
+  }
 
-	public void setDefaultButton(int index)
-	{
-		JRootPane root = this.getRootPane();
-		if (index >= optionButtons.length && cancelButton != null)
-		{
-			root.setDefaultButton(cancelButton);
-		}
-		else
-		{
-			root.setDefaultButton(optionButtons[index]);
-		}
-	}
+  public static boolean showConfirmDialog(Window parent, JComponent editor, String title) {
+    return showConfirmDialog(parent, editor, title, null, 0, false);
+  }
 
-	private void init(JComponent editor, String[] options, boolean addCancelButton)
-	{
-		if (editor instanceof ValidatingComponent)
-		{
-			this.validator = (ValidatingComponent)editor;
-		}
-		this.editorComponent = editor;
-		this.optionButtons = new JButton[options.length];
-		for (int i = 0; i < options.length; i++)
-		{
-			this.optionButtons[i] = new WbButton(options[i]);
-			String label = optionButtons[i].getText();
-			if (label.equals("OK"))
-			{
-				optionButtons[i].setName("ok");
-			}
-			this.optionButtons[i].addActionListener(this);
-		}
+  public static boolean showOKCancelDialog(Dialog parent, JComponent editor, String title) {
+    ValidatingDialog dialog = new ValidatingDialog(parent, title, editor, true);
+    WbSwingUtilities.center(dialog, parent);
+    dialog.setDefaultButton(0);
+    dialog.setVisible(true);
+    return !dialog.isCancelled();
+  }
 
-		if (addCancelButton)
-		{
-			this.cancelButton = new WbButton(ResourceMgr.getString("LblCancel"));
-			this.cancelButton.setName("cancel");
-			this.cancelButton.addActionListener(this);
-		}
+  public static boolean showConfirmDialog(Window parent, JComponent editor, String title, int defaultButton) {
+    return showConfirmDialog(parent, editor, title, null, defaultButton, false);
+  }
 
-		JRootPane root = this.getRootPane();
-		root.setDefaultButton(optionButtons[0]);
+  public static ValidatingDialog createDialog(Window parent, JComponent editor, String title, Component reference, int defaultButton, boolean centeredButtons) {
+    ValidatingDialog dialog = null;
+    if (parent == null) {
+      dialog = new ValidatingDialog(WbManager.getInstance().getCurrentWindow(), title, editor);
+    } else {
+      if (parent instanceof Frame) {
+        dialog = new ValidatingDialog((Frame) parent, title, editor);
+      } else if (parent instanceof Dialog) {
+        dialog = new ValidatingDialog((Dialog) parent, title, editor);
+      } else {
+        throw new IllegalArgumentException("Parent component must be Dialog or Frame");
+      }
+    }
 
-		if (addCancelButton)
-		{
-			esc = new EscAction(this, this);
-			//esc.addToInputMap(editor);
-		}
+    if (reference != null) {
+      WbSwingUtilities.center(dialog, reference);
+    } else {
+      WbSwingUtilities.center(dialog, parent);
+    }
 
-		JPanel content = new JPanel();
-		content.setLayout(new BorderLayout());
-		Border b = BorderFactory.createEmptyBorder(5,5,5,5);
-		content.setBorder(b);
-		content.add(editor, BorderLayout.CENTER);
-		buttonPanel = new JPanel();
-		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 0));
-		
-		int length = optionButtons.length + (cancelButton == null ? 0 : 1);
-		JComponent[] allButtons = new JComponent[length];
-		for (int i=0; i < optionButtons.length; i++)
-		{
-			buttonPanel.add(optionButtons[i]);
-			allButtons[i] = optionButtons[i];
-		}
+    dialog.setDefaultButton(defaultButton);
+    if (centeredButtons) {
+      dialog.buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+    }
+    return dialog;
+  }
 
-		if (cancelButton != null)
-		{
-			buttonPanel.add(cancelButton);
-			allButtons[allButtons.length - 1] = cancelButton;
-		}
+  public static boolean showConfirmDialog(Window parent, JComponent editor, String title, Component reference, int defaultButton, boolean centeredButtons) {
+    ValidatingDialog dialog = createDialog(parent, editor, title, reference, defaultButton, centeredButtons);
+    dialog.setVisible(true);
 
-		b = BorderFactory.createEmptyBorder(2, 0, 0, 0);
+    return !dialog.isCancelled();
+  }
 
-		WbSwingUtilities.makeEqualWidth(allButtons);
-		buttonPanel.setBorder(b);
-		content.add(buttonPanel, BorderLayout.SOUTH);
-		this.getContentPane().add(content);
-		this.doLayout();
-		this.pack();
-		this.addWindowListener(this);
-	}
+  public void setDefaultButton(int index) {
+    JRootPane root = this.getRootPane();
+    if (index >= optionButtons.length && cancelButton != null) {
+      root.setDefaultButton(cancelButton);
+    } else {
+      root.setDefaultButton(optionButtons[index]);
+    }
+  }
 
-	public int getSelectedOption()
-	{
-		return this.selectedOption;
-	}
+  private void init(JComponent editor, String[] options, boolean addCancelButton) {
+    if (editor instanceof ValidatingComponent) {
+      this.validator = (ValidatingComponent) editor;
+    }
+    this.editorComponent = editor;
+    this.optionButtons = new JButton[options.length];
+    for (int i = 0; i < options.length; i++) {
+      this.optionButtons[i] = new WbButton(options[i]);
+      String label = optionButtons[i].getText();
+      if (label.equals("OK")) {
+        optionButtons[i].setName("ok");
+      }
+      this.optionButtons[i].addActionListener(this);
+    }
 
-	public boolean isCancelled()
-	{
-		return this.isCancelled;
-	}
+    if (addCancelButton) {
+      this.cancelButton = new WbButton(ResourceMgr.getString("LblCancel"));
+      this.cancelButton.setName("cancel");
+      this.cancelButton.addActionListener(this);
+    }
 
-	public static boolean showConfirmDialog(Window parent, JComponent editor, String title)
-	{
-		return showConfirmDialog(parent, editor, title, null, 0, false);
-	}
+    JRootPane root = this.getRootPane();
+    root.setDefaultButton(optionButtons[0]);
 
-	public static boolean showOKCancelDialog(Dialog parent, JComponent editor, String title)
-	{
-		ValidatingDialog dialog = new ValidatingDialog(parent, title, editor, true);
-		WbSwingUtilities.center(dialog, parent);
-		dialog.setDefaultButton(0);
-		dialog.setVisible(true);
-		return !dialog.isCancelled();
-	}
+    if (addCancelButton) {
+      esc = new EscAction(this, this);
+      //esc.addToInputMap(editor);
+    }
 
-	public static boolean showConfirmDialog(Window parent, JComponent editor, String title, int defaultButton)
-	{
-		return showConfirmDialog(parent, editor, title, null, defaultButton, false);
-	}
+    JPanel content = new JPanel();
+    content.setLayout(new BorderLayout());
+    Border b = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+    content.setBorder(b);
+    content.add(editor, BorderLayout.CENTER);
+    buttonPanel = new JPanel();
+    buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 0));
 
-	public static ValidatingDialog createDialog(Window parent, JComponent editor, String title, Component reference, int defaultButton, boolean centeredButtons)
-	{
-		ValidatingDialog dialog = null;
-		if (parent == null)
-		{
-			dialog = new ValidatingDialog(WbManager.getInstance().getCurrentWindow(), title, editor);
-		}
-		else
-		{
-			if (parent instanceof Frame)
-			{
-				dialog = new ValidatingDialog((Frame) parent, title, editor);
-			}
-			else if (parent instanceof Dialog)
-			{
-				dialog = new ValidatingDialog((Dialog) parent, title, editor);
-			}
-			else
-			{
-				throw new IllegalArgumentException("Parent component must be Dialog or Frame");
-			}
-		}
+    int length = optionButtons.length + (cancelButton == null ? 0 : 1);
+    JComponent[] allButtons = new JComponent[length];
+    for (int i = 0; i < optionButtons.length; i++) {
+      buttonPanel.add(optionButtons[i]);
+      allButtons[i] = optionButtons[i];
+    }
 
-		if (reference != null)
-		{
-			WbSwingUtilities.center(dialog, reference);
-		}
-		else
-		{
-			WbSwingUtilities.center(dialog, parent);
-		}
+    if (cancelButton != null) {
+      buttonPanel.add(cancelButton);
+      allButtons[allButtons.length - 1] = cancelButton;
+    }
 
-		dialog.setDefaultButton(defaultButton);
-		if (centeredButtons)
-		{
-			dialog.buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-		}
-		return dialog;
-	}
+    b = BorderFactory.createEmptyBorder(2, 0, 0, 0);
 
-	public static boolean showConfirmDialog(Window parent, JComponent editor, String title, Component reference, int defaultButton, boolean centeredButtons)
-	{
-		ValidatingDialog dialog = createDialog(parent, editor, title, reference, defaultButton, centeredButtons);
-		dialog.setVisible(true);
+    WbSwingUtilities.makeEqualWidth(allButtons);
+    buttonPanel.setBorder(b);
+    content.add(buttonPanel, BorderLayout.SOUTH);
+    this.getContentPane().add(content);
+    this.doLayout();
+    this.pack();
+    this.addWindowListener(this);
+  }
 
-		return !dialog.isCancelled();
-	}
+  public int getSelectedOption() {
+    return this.selectedOption;
+  }
 
-	private void close()
-	{
-		this.setVisible(false);
-		this.dispose();
-	}
+  public boolean isCancelled() {
+    return this.isCancelled;
+  }
 
-	@Override
-	public void windowActivated(WindowEvent e)
-	{
-		if (validator == null) editorComponent.requestFocusInWindow();
-	}
+  private void close() {
+    this.setVisible(false);
+    this.dispose();
+  }
 
-	@Override
-	public void windowClosed(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowActivated(WindowEvent e) {
+    if (validator == null) editorComponent.requestFocusInWindow();
+  }
 
-	@Override
-	public void windowClosing(WindowEvent e)
-	{
-		this.close();
-	}
+  @Override
+  public void windowClosed(WindowEvent e) {
+  }
 
-	@Override
-	public void windowDeactivated(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowClosing(WindowEvent e) {
+    this.close();
+  }
 
-	@Override
-	public void windowDeiconified(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowDeactivated(WindowEvent e) {
+  }
 
-	@Override
-	public void windowIconified(WindowEvent e)
-	{
-	}
+  @Override
+  public void windowDeiconified(WindowEvent e) {
+  }
 
-	@Override
-	public void windowOpened(WindowEvent e)
-	{
-		EventQueue.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				if (validator != null)
-				{
-					validator.componentDisplayed();
-				}
-				else
-				{
-					editorComponent.requestFocus();
-				}
-			}
-		});
-	}
+  @Override
+  public void windowIconified(WindowEvent e) {
+  }
 
-	public void approveAndClose()
-	{
-		this.selectedOption = 0;
-		this.isCancelled = false;
-		this.close();
-	}
+  @Override
+  public void windowOpened(WindowEvent e) {
+    EventQueue.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        if (validator != null) {
+          validator.componentDisplayed();
+        } else {
+          editorComponent.requestFocus();
+        }
+      }
+    });
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		if (e.getSource() == this.cancelButton || e.getSource() == this.esc)
-		{
-			this.selectedOption = -1;
-			this.isCancelled = true;
-			this.close();
-		}
-		else
-		{
-			for (int i = 0; i < optionButtons.length; i++)
-			{
-				if (e.getSource() == optionButtons[i])
-				{
-					this.selectedOption = i;
-					break;
-				}
-			}
-			if (validator == null || this.validator.validateInput())
-			{
-				this.isCancelled = false;
-				this.close();
-			}
-		}
-	}
+  public void approveAndClose() {
+    this.selectedOption = 0;
+    this.isCancelled = false;
+    this.close();
+  }
+
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == this.cancelButton || e.getSource() == this.esc) {
+      this.selectedOption = -1;
+      this.isCancelled = true;
+      this.close();
+    } else {
+      for (int i = 0; i < optionButtons.length; i++) {
+        if (e.getSource() == optionButtons[i]) {
+          this.selectedOption = i;
+          break;
+        }
+      }
+      if (validator == null || this.validator.validateInput()) {
+        this.isCancelled = false;
+        this.close();
+      }
+    }
+  }
 
 }

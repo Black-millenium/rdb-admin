@@ -22,26 +22,24 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.WbManager;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Open a new SQL MainWindow
- *	@author  Thomas Kellerer
+ *
+ * @author Thomas Kellerer
  */
 public class FileNewWindowAction
-	extends WbAction
-{
-	public FileNewWindowAction()
-	{
-		super();
-		this.initMenuDefinition("MnuTxtFileNewWindow");
-	}
+    extends WbAction {
+  public FileNewWindowAction() {
+    super();
+    this.initMenuDefinition("MnuTxtFileNewWindow");
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		WbManager.getInstance().openNewWindow();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    WbManager.getInstance().openNewWindow();
+  }
 }

@@ -22,72 +22,59 @@
  */
 package workbench.gui.completion;
 
-import workbench.resource.ResourceMgr;
-
 import workbench.db.WbConnection;
-
+import workbench.resource.ResourceMgr;
 import workbench.sql.lexer.SQLLexer;
 import workbench.sql.lexer.SQLLexerFactory;
 import workbench.sql.lexer.SQLToken;
-
 import workbench.util.StringUtil;
 
 /**
  * Supply a list of stored procedures for EXEC or WbCall
- *
  */
 public class ExecAnalyzer
-	extends BaseAnalyzer
-{
-	private String qualifier;
+    extends BaseAnalyzer {
+  private String qualifier;
 
-	public ExecAnalyzer(WbConnection conn, String statement, int cursorPos)
-	{
-		super(conn, statement, cursorPos);
-	}
+  public ExecAnalyzer(WbConnection conn, String statement, int cursorPos) {
+    super(conn, statement, cursorPos);
+  }
 
-	@Override
-	protected void checkContext()
-	{
-		SQLLexer lexer = SQLLexerFactory.createLexer(dbConnection, this.sql);
-		SQLToken verbToken = lexer.getNextToken(false, false);
+  @Override
+  protected void checkContext() {
+    SQLLexer lexer = SQLLexerFactory.createLexer(dbConnection, this.sql);
+    SQLToken verbToken = lexer.getNextToken(false, false);
 
-		if (verbToken == null)
-		{
-			this.context = NO_CONTEXT;
-			return;
-		}
+    if (verbToken == null) {
+      this.context = NO_CONTEXT;
+      return;
+    }
 
-		context = CONTEXT_TABLE_LIST;
-		qualifier = getQualifierLeftOfCursor();
-	}
+    context = CONTEXT_TABLE_LIST;
+    qualifier = getQualifierLeftOfCursor();
+  }
 
-	@Override
-	protected void buildResult()
-	{
-		if (context == NO_CONTEXT) return;
+  @Override
+  protected void buildResult() {
+    if (context == NO_CONTEXT) return;
 
-		title = ResourceMgr.getString("TxtDbExplorerProcs");
-		String schema = null;
+    title = ResourceMgr.getString("TxtDbExplorerProcs");
+    String schema = null;
 
-		if (StringUtil.isNonBlank(qualifier))
-		{
-			String[] parsed = qualifier.split("\\.");
-			if (parsed.length == 1)
-			{
-				schema = parsed[0];
-			}
-			if (parsed.length == 2)
-			{
-				schema = parsed[1];
-			}
-		}
+    if (StringUtil.isNonBlank(qualifier)) {
+      String[] parsed = qualifier.split("\\.");
+      if (parsed.length == 1) {
+        schema = parsed[0];
+      }
+      if (parsed.length == 2) {
+        schema = parsed[1];
+      }
+    }
 
-		if (schema == null)
-		{
-			schema = this.dbConnection.getCurrentSchema();
-		}
-		elements = dbConnection.getObjectCache().getProcedures(schema);
-	}
+    if (schema == null) {
+      schema = this.dbConnection.getCurrentSchema();
+    }
+    elements = dbConnection.getObjectCache().getProcedures(schema);
+  }
 
 }

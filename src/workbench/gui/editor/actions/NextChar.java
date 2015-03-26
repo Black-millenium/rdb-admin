@@ -22,53 +22,44 @@
  */
 package workbench.gui.editor.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import workbench.gui.editor.InputHandler;
 import workbench.gui.editor.JEditTextArea;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class NextChar
-	extends EditorAction
-{
-	protected boolean select;
+    extends EditorAction {
+  protected boolean select;
 
-	public NextChar()
-	{
-		super("TxtEdNxtChar", KeyEvent.VK_RIGHT, 0);
-		select = false;
-	}
+  public NextChar() {
+    super("TxtEdNxtChar", KeyEvent.VK_RIGHT, 0);
+    select = false;
+  }
 
-	public NextChar(String resourceKey, int key, int modifier)
-	{
-		super(resourceKey, key, modifier);
-	}
+  public NextChar(String resourceKey, int key, int modifier) {
+    super(resourceKey, key, modifier);
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt)
-	{
-		JEditTextArea textArea = InputHandler.getTextArea(evt);
-		int caret = textArea.getCaretPosition();
-		if (caret == textArea.getDocumentLength())
-		{
-			textArea.getToolkit().beep();
-			if (!select)
-			{
-				textArea.selectNone();
-			}
-			return;
-		}
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    JEditTextArea textArea = InputHandler.getTextArea(evt);
+    int caret = textArea.getCaretPosition();
+    if (caret == textArea.getDocumentLength()) {
+      textArea.getToolkit().beep();
+      if (!select) {
+        textArea.selectNone();
+      }
+      return;
+    }
 
-		if (select)
-		{
-			textArea.select(textArea.getMarkPosition(), caret + 1);
-		}
-		else
-		{
-			textArea.setCaretPosition(caret + 1);
-		}
-	}
+    if (select) {
+      textArea.select(textArea.getMarkPosition(), caret + 1);
+    } else {
+      textArea.setCaretPosition(caret + 1);
+    }
+  }
 }

@@ -22,29 +22,18 @@
  */
 package workbench.sql.wbcommands;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import workbench.log.LogMgr;
 import workbench.resource.ResourceMgr;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
 import workbench.sql.lexer.SQLLexer;
 import workbench.sql.lexer.SQLLexerFactory;
 import workbench.sql.lexer.SQLToken;
+import workbench.util.*;
 
-import workbench.util.ExceptionUtil;
-import workbench.util.FileUtil;
-import workbench.util.SqlUtil;
-import workbench.util.StringUtil;
-import workbench.util.WbFile;
+import java.io.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * A SQL statement that can retrieve the data from a blob column into a file
@@ -64,153 +53,127 @@ import workbench.util.WbFile;
  * @see WbExport
  */
 public class WbSelectBlob
-	extends SqlCommand
-{
-	public static final String VERB = "WbSelectBlob";
+    extends SqlCommand {
+  public static final String VERB = "WbSelectBlob";
 
-	public WbSelectBlob()
-	{
-		super();
-		this.isUpdatingCommand = false;
-	}
+  public WbSelectBlob() {
+    super();
+    this.isUpdatingCommand = false;
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	public StatementRunnerResult execute(final String sqlCommand)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult(sqlCommand);
-		SQLLexer lexer = SQLLexerFactory.createLexer(currentConnection, sqlCommand);
+  @Override
+  public StatementRunnerResult execute(final String sqlCommand)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult(sqlCommand);
+    SQLLexer lexer = SQLLexerFactory.createLexer(currentConnection, sqlCommand);
 
-		StringBuilder sql = new StringBuilder(sqlCommand.length());
+    StringBuilder sql = new StringBuilder(sqlCommand.length());
 
-		WbFile outputFile = null;
+    WbFile outputFile = null;
 
-		SQLToken token  = lexer.getNextToken(false, false);
-		if (!token.getContents().equals("WBSELECTBLOB"))
-		{
-			result.addMessage(ResourceMgr.getString("ErrSelectBlobSyntax"));
-			result.setFailure();
-			return result;
-		}
-		sql.append("SELECT ");
-		while (token != null)
-		{
-			token = lexer.getNextToken(false, true);
-			if (token.getContents().equals("INTO"))
-			{
-				break;
-			}
-			sql.append(token.getContents());
-		}
+    SQLToken token = lexer.getNextToken(false, false);
+    if (!token.getContents().equals("WBSELECTBLOB")) {
+      result.addMessage(ResourceMgr.getString("ErrSelectBlobSyntax"));
+      result.setFailure();
+      return result;
+    }
+    sql.append("SELECT ");
+    while (token != null) {
+      token = lexer.getNextToken(false, true);
+      if (token.getContents().equals("INTO")) {
+        break;
+      }
+      sql.append(token.getContents());
+    }
 
-		if (token != null && !token.getContents().equals("INTO"))
-		{
-			result.addMessage(ResourceMgr.getString("ErrSelectBlobSyntax"));
-			result.setFailure();
-			return result;
-		}
-		else
-		{
-			// Next token must be the filename
-			token = lexer.getNextToken(false, false);
-			String filename = token.getContents();
-			outputFile = new WbFile(StringUtil.trimQuotes(filename));
-			sql.append(' ');
-			sql.append(sqlCommand.substring(token.getCharEnd() + 1));
-		}
+    if (token != null && !token.getContents().equals("INTO")) {
+      result.addMessage(ResourceMgr.getString("ErrSelectBlobSyntax"));
+      result.setFailure();
+      return result;
+    } else {
+      // Next token must be the filename
+      token = lexer.getNextToken(false, false);
+      String filename = token.getContents();
+      outputFile = new WbFile(StringUtil.trimQuotes(filename));
+      sql.append(' ');
+      sql.append(sqlCommand.substring(token.getCharEnd() + 1));
+    }
 
-		LogMgr.logDebug("WbSelectBlob.execute()", "Using SQL=" + sql + " for file: " + outputFile.getFullPath());
-		ResultSet rs = null;
-		OutputStream out = null;
-		InputStream in = null;
-		long filesize = 0;
+    LogMgr.logDebug("WbSelectBlob.execute()", "Using SQL=" + sql + " for file: " + outputFile.getFullPath());
+    ResultSet rs = null;
+    OutputStream out = null;
+    InputStream in = null;
+    long filesize = 0;
 
-		File outputDir = outputFile.getParentFile();
-		String baseFilename = outputFile.getFileName();
-		String extension = outputFile.getExtension();
-		if (StringUtil.isEmptyString(extension)) extension = "";
-		else extension = "." + extension;
+    File outputDir = outputFile.getParentFile();
+    String baseFilename = outputFile.getFileName();
+    String extension = outputFile.getExtension();
+    if (StringUtil.isEmptyString(extension)) extension = "";
+    else extension = "." + extension;
 
-		try
-		{
-			currentStatement = currentConnection.createStatementForQuery();
-			rs = currentStatement.executeQuery(sql.toString());
-			int row = 0;
-			while (rs.next())
-			{
-				WbFile currentFile = null;
+    try {
+      currentStatement = currentConnection.createStatementForQuery();
+      rs = currentStatement.executeQuery(sql.toString());
+      int row = 0;
+      while (rs.next()) {
+        WbFile currentFile = null;
 
-				if (currentConnection.getDbSettings().useGetBytesForBlobs())
-				{
-					byte[] data = rs.getBytes(1);
-					in = new ByteArrayInputStream(data);
-				}
-				else
-				{
-					in = rs.getBinaryStream(1);
-				}
+        if (currentConnection.getDbSettings().useGetBytesForBlobs()) {
+          byte[] data = rs.getBytes(1);
+          in = new ByteArrayInputStream(data);
+        } else {
+          in = rs.getBinaryStream(1);
+        }
 
-				if (in == null)
-				{
-					//result.setFailure();
-					String msg = ResourceMgr.getString("ErrSelectBlobNoStream");
-					result.addMessage(StringUtil.replace(msg, "%row%", Integer.toString(row)));
-					result.setWarning(true);
-					continue;
-				}
+        if (in == null) {
+          //result.setFailure();
+          String msg = ResourceMgr.getString("ErrSelectBlobNoStream");
+          result.addMessage(StringUtil.replace(msg, "%row%", Integer.toString(row)));
+          result.setWarning(true);
+          continue;
+        }
 
-				if (row == 0)
-				{
-					currentFile = outputFile;
-				}
-				else
-				{
-					currentFile = new WbFile(outputDir, baseFilename + "_" + Integer.toString(row) + extension);
-				}
+        if (row == 0) {
+          currentFile = outputFile;
+        } else {
+          currentFile = new WbFile(outputDir, baseFilename + "_" + Integer.toString(row) + extension);
+        }
 
-				out = new FileOutputStream(currentFile);
-				filesize = FileUtil.copy(in, out);
-				String msg = ResourceMgr.getString("MsgBlobSaved");
-				msg = msg.replace("%filename%", currentFile.getFullPath());
-				msg = msg.replace("%filesize%", Long.toString(filesize));
-				result.addMessage(msg);
-				result.setSuccess();
-				row ++;
-			}
-			this.appendSuccessMessage(result);
-		}
-		catch (IOException e)
-		{
-			String msg = StringUtil.replace(ResourceMgr.getString("ErrSelectBlobFileError"), "%filename%", outputFile.getFullPath());
-			result.addMessage(msg);
-			result.setFailure();
-			return result;
-		}
-		catch (SQLException e)
-		{
-			String msg = StringUtil.replace(ResourceMgr.getString("ErrSelectBlobSqlError"), "%filename%", outputFile.getFullPath());
-			result.addMessage(msg);
-			result.addMessage(ExceptionUtil.getDisplay(e));
-			result.setFailure();
-			return result;
-		}
-		finally
-		{
-			SqlUtil.closeAll(rs, currentStatement);
-		}
+        out = new FileOutputStream(currentFile);
+        filesize = FileUtil.copy(in, out);
+        String msg = ResourceMgr.getString("MsgBlobSaved");
+        msg = msg.replace("%filename%", currentFile.getFullPath());
+        msg = msg.replace("%filesize%", Long.toString(filesize));
+        result.addMessage(msg);
+        result.setSuccess();
+        row++;
+      }
+      this.appendSuccessMessage(result);
+    } catch (IOException e) {
+      String msg = StringUtil.replace(ResourceMgr.getString("ErrSelectBlobFileError"), "%filename%", outputFile.getFullPath());
+      result.addMessage(msg);
+      result.setFailure();
+      return result;
+    } catch (SQLException e) {
+      String msg = StringUtil.replace(ResourceMgr.getString("ErrSelectBlobSqlError"), "%filename%", outputFile.getFullPath());
+      result.addMessage(msg);
+      result.addMessage(ExceptionUtil.getDisplay(e));
+      result.setFailure();
+      return result;
+    } finally {
+      SqlUtil.closeAll(rs, currentStatement);
+    }
 
-		return result;
-	}
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 }

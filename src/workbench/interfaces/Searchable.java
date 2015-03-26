@@ -23,12 +23,12 @@
 package workbench.interfaces;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface Searchable
-{
-	int find();
-	int findNext();
-	int findPrevious();
+public interface Searchable {
+  int find();
+
+  int findNext();
+
+  int findPrevious();
 }

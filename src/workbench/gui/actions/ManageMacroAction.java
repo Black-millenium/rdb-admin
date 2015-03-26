@@ -22,41 +22,36 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
-import workbench.resource.PlatformShortcuts;
-import workbench.resource.ResourceMgr;
-
 import workbench.gui.MainWindow;
 import workbench.gui.macros.MacroManagerDialog;
 import workbench.gui.sql.SqlPanel;
+import workbench.resource.PlatformShortcuts;
+import workbench.resource.ResourceMgr;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 /**
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class ManageMacroAction
-	extends WbAction
-{
-	private MainWindow client;
+    extends WbAction {
+  private MainWindow client;
 
-	public ManageMacroAction(MainWindow aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtManageMacros",KeyStroke.getKeyStroke(KeyEvent.VK_M, PlatformShortcuts.getDefaultModifier()));
-		this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
-		this.setIcon(null);
-	}
+  public ManageMacroAction(MainWindow aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtManageMacros", KeyStroke.getKeyStroke(KeyEvent.VK_M, PlatformShortcuts.getDefaultModifier()));
+    this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
+    this.setIcon(null);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		SqlPanel sql = this.client.getCurrentSqlPanel();
-		MacroManagerDialog d = new MacroManagerDialog(client, sql, client.getMacroClientId());
-		d.setVisible(true);
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    SqlPanel sql = this.client.getCurrentSqlPanel();
+    MacroManagerDialog d = new MacroManagerDialog(client, sql, client.getMacroClientId());
+    d.setVisible(true);
+  }
 
 }

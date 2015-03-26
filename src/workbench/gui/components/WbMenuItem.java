@@ -22,83 +22,65 @@
  */
 package workbench.gui.components;
 
-import javax.swing.JMenuItem;
-
+import workbench.gui.WbSwingUtilities;
 import workbench.resource.ResourceMgr;
 
-import workbench.gui.WbSwingUtilities;
+import javax.swing.*;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class WbMenuItem
-	extends JMenuItem
-{
-	public WbMenuItem()
-	{
-		super();
-	}
+    extends JMenuItem {
+  public WbMenuItem() {
+    super();
+  }
 
-	public WbMenuItem(String aText)
-	{
-		super(aText);
-	}
+  public WbMenuItem(String aText) {
+    super(aText);
+  }
 
-	public void setMenuTextByKey(String key)
-	{
-		this.setText(ResourceMgr.getString(key));
-		this.setToolTipText(ResourceMgr.getDescription(key));
-	}
+  public void setMenuTextByKey(String key) {
+    this.setText(ResourceMgr.getString(key));
+    this.setToolTipText(ResourceMgr.getDescription(key));
+  }
 
-	@Override
-	public void setText(String aText)
-	{
-		if (aText == null)
-		{
-			return;
-		}
-		int pos = aText.indexOf('&');
-		if (pos > -1)
-		{
-			char mnemonic = aText.charAt(pos + 1);
-			if (mnemonic != ' ')
-			{
-				aText = aText.substring(0, pos) + aText.substring(pos + 1);
-			}
-			super.setText(aText);
-			if (mnemonic != ' ' && mnemonic != '&')
-			{
-				this.setMnemonic((int) mnemonic);
-				try
-				{
-					this.setDisplayedMnemonicIndex(pos);
-				}
-				catch (Exception e)
-				{
-				}
-			}
-		}
-		else
-		{
-			super.setText(aText);
-		}
-	}
+  @Override
+  public void setText(String aText) {
+    if (aText == null) {
+      return;
+    }
+    int pos = aText.indexOf('&');
+    if (pos > -1) {
+      char mnemonic = aText.charAt(pos + 1);
+      if (mnemonic != ' ') {
+        aText = aText.substring(0, pos) + aText.substring(pos + 1);
+      }
+      super.setText(aText);
+      if (mnemonic != ' ' && mnemonic != '&') {
+        this.setMnemonic((int) mnemonic);
+        try {
+          this.setDisplayedMnemonicIndex(pos);
+        } catch (Exception e) {
+        }
+      }
+    } else {
+      super.setText(aText);
+    }
+  }
 
-	@Override
-	public void removeAll()
-	{
-		super.removeAll();
-		this.itemListener = null;
-		this.changeListener = null;
-		this.actionListener = null;
-		this.setIcon(null);
-		this.setAction(null);
-	}
+  @Override
+  public void removeAll() {
+    super.removeAll();
+    this.itemListener = null;
+    this.changeListener = null;
+    this.actionListener = null;
+    this.setIcon(null);
+    this.setAction(null);
+  }
 
-	public void dispose()
-	{
-		WbSwingUtilities.removeAllListeners(this);
-		removeAll();
-	}
+  public void dispose() {
+    WbSwingUtilities.removeAllListeners(this);
+    removeAll();
+  }
 }

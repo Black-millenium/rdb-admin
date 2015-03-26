@@ -22,58 +22,49 @@
  */
 package workbench.gui.components;
 
-import java.awt.Insets;
-import javax.swing.Action;
-import javax.swing.Icon;
+import javax.swing.*;
+import java.awt.*;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class WbToolbarButton
-	extends WbButton
-{
-	public static final Insets MARGIN = new Insets(1,1,1,1);
+    extends WbButton {
+  public static final Insets MARGIN = new Insets(1, 1, 1, 1);
 
-	public WbToolbarButton()
-	{
-		super();
-		init();
-	}
+  public WbToolbarButton() {
+    super();
+    init();
+  }
 
-	public WbToolbarButton(String aText)
-	{
-		super(aText);
-		init();
-	}
+  public WbToolbarButton(String aText) {
+    super(aText);
+    init();
+  }
 
-	public WbToolbarButton(Action a)
-	{
-		super(a);
-		this.setText(null);
-		iconButton = true;
-		init();
-	}
+  public WbToolbarButton(Action a) {
+    super(a);
+    this.setText(null);
+    iconButton = true;
+    init();
+  }
 
-	public WbToolbarButton(Icon icon)
-	{
-		super(icon);
-		this.setText(null);
-		init();
-	}
+  public WbToolbarButton(Icon icon) {
+    super(icon);
+    this.setText(null);
+    init();
+  }
 
-	@Override
-	public void setAction(Action a)
-	{
-		super.setAction(a);
-		this.setText(null);
-		init();
-	}
+  @Override
+  public void setAction(Action a) {
+    super.setAction(a);
+    this.setText(null);
+    init();
+  }
 
-	private void init()
-	{
-		this.setMargin(MARGIN);
+  private void init() {
+    this.setMargin(MARGIN);
     this.setFocusable(false);
-	}
+  }
 
 }

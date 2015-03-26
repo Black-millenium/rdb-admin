@@ -22,222 +22,183 @@
  */
 package workbench.gui.components;
 
+import workbench.db.exporter.ExportType;
+import workbench.resource.ResourceMgr;
+import workbench.util.CollectionUtil;
+import workbench.util.WbFile;
+
+import javax.swing.filechooser.FileFilter;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.filechooser.FileFilter;
-
-import workbench.resource.ResourceMgr;
-import workbench.db.exporter.ExportType;
-import workbench.util.CollectionUtil;
-import workbench.util.WbFile;
-
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class ExtensionFileFilter
-	extends FileFilter
-{
-	// The created FileFilters are stored in variables
-	// as in some cases it is necessary to access the
-	// instance (e.g. for JFileChooser.setFileFilter()
-	private static Map<String, ExtensionFileFilter> filters = new HashMap<String, ExtensionFileFilter>();
-	private static FileFilter jarFileFilter;
+    extends FileFilter {
+  public static final String SQL_EXT = "sql";
+  public static final String TXT_EXT = "txt";
+  public static final String CSV_EXT = "csv";
+  public static final String WORKSPACE_EXT = "wksp";
+  public static final String XML_EXT = "xml";
+  public static final String HTML_EXT = "html";
+  public static final String XLS_EXT = "xls";
+  public static final String XLSX_EXT = "xlsx";
+  public static final String XLSM_EXT = "xml";
+  public static final String ODS_EXT = "ods";
+  public static final String JSON_EXT = "json";
+  // The created FileFilters are stored in variables
+  // as in some cases it is necessary to access the
+  // instance (e.g. for JFileChooser.setFileFilter()
+  private static Map<String, ExtensionFileFilter> filters = new HashMap<String, ExtensionFileFilter>();
+  private static FileFilter jarFileFilter;
+  private List<String> extensions;
+  private String desc;
+  private boolean ignoreCase = true;
+  private ExportType exportType;
 
-	private List<String> extensions;
-	private String desc;
-	public static final String SQL_EXT = "sql";
-	public static final String TXT_EXT = "txt";
-	public static final String CSV_EXT = "csv";
-	public static final String WORKSPACE_EXT = "wksp";
-	public static final String XML_EXT = "xml";
-	public static final String HTML_EXT = "html";
-	public static final String XLS_EXT = "xls";
-	public static final String XLSX_EXT = "xlsx";
-	public static final String XLSM_EXT = "xml";
-	public static final String ODS_EXT = "ods";
-	public static final String JSON_EXT = "json";
+  public ExtensionFileFilter(String aDescription, List<String> anExtensionList, boolean ignoreFilenameCase) {
+    super();
+    this.desc = aDescription;
+    this.extensions = anExtensionList;
+    this.ignoreCase = ignoreFilenameCase;
+  }
 
-	private boolean ignoreCase = true;
-	private ExportType exportType;
+  public static String getExtension(File f) {
+    return getExtension(f.getName());
+  }
 
-	public ExtensionFileFilter(String aDescription, List<String> anExtensionList, boolean ignoreFilenameCase)
-	{
-		super();
-		this.desc = aDescription;
-		this.extensions = anExtensionList;
-		this.ignoreCase = ignoreFilenameCase;
-	}
+  public static String getExtension(String s) {
+    WbFile f = new WbFile(s);
+    return f.getExtension();
+  }
 
-	public ExportType getExportType()
-	{
-		return exportType;
-	}
+  public static boolean hasSqlExtension(String aFilename) {
+    String ext = getExtension(aFilename);
+    return SQL_EXT.equalsIgnoreCase(ext);
+  }
 
-	public boolean hasFilter(String extension)
-	{
-		return this.extensions.contains(extension);
-	}
+  public static boolean hasTxtExtension(String aFilename) {
+    String ext = getExtension(aFilename);
+    return TXT_EXT.equalsIgnoreCase(ext) || CSV_EXT.equalsIgnoreCase(ext);
+  }
 
-	public String getDefaultExtension()
-	{
-		return this.extensions.get(0);
-	}
+  public static boolean hasHtmlExtension(String aFilename) {
+    String ext = getExtension(aFilename);
+    return "html".equalsIgnoreCase(ext);
+  }
 
-	public static String getExtension(File f)
-	{
-		return getExtension(f.getName());
-	}
+  public static boolean hasXmlExtension(String aFilename) {
+    String ext = getExtension(aFilename);
+    return XML_EXT.equalsIgnoreCase(ext);
+  }
 
-	public static String getExtension(String s)
-	{
-		WbFile f = new WbFile(s);
-		return f.getExtension();
-	}
+  public static FileFilter getJarFileFilter() {
+    if (jarFileFilter == null) {
+      List<String> ext = CollectionUtil.arrayList("jar", "zip");
+      String desc = ResourceMgr.getString("TxtArchivesFilterName");
+      jarFileFilter = new ExtensionFileFilter(desc, ext, true);
+    }
+    return jarFileFilter;
+  }
 
-	public static boolean hasSqlExtension(String aFilename)
-	{
-		String ext = getExtension(aFilename);
-		return SQL_EXT.equalsIgnoreCase(ext);
-	}
+  public static FileFilter getSqlFileFilter() {
+    return getFileFilter("TxtFileFilterSql", ExportType.SQL_INSERT, SQL_EXT);
+  }
 
-	public static boolean hasTxtExtension(String aFilename)
-	{
-		String ext = getExtension(aFilename);
-		return TXT_EXT.equalsIgnoreCase(ext) || CSV_EXT.equalsIgnoreCase(ext);
-	}
+  public static FileFilter getSqlInsertDeleteFilter() {
+    return getFileFilter("TxtFileFilterSqlInsDel", ExportType.SQL_DELETE_INSERT, SQL_EXT);
+  }
 
-	public static boolean hasHtmlExtension(String aFilename)
-	{
-		String ext = getExtension(aFilename);
-		return "html".equalsIgnoreCase(ext);
-	}
+  public static FileFilter getSqlUpdateFileFilter() {
+    return getFileFilter("TxtFileFilterSqlInsDel", ExportType.SQL_UPDATE, SQL_EXT);
+  }
 
-	public static boolean hasXmlExtension(String aFilename)
-	{
-		String ext = getExtension(aFilename);
-		return XML_EXT.equalsIgnoreCase(ext);
-	}
+  public static FileFilter getTextFileFilter() {
+    return getFileFilter("TxtFileFilterText", ExportType.TEXT, TXT_EXT, CSV_EXT);
+  }
 
-	@Override
-	public boolean accept(File f)
-	{
-		if (f.isDirectory())
-		{
-			return true;
-		}
-		if (this.extensions == null || this.extensions.isEmpty()) return true;
+  public static FileFilter getXmlFileFilter() {
+    return getFileFilter("TxtFileFilterXml", ExportType.XML, XML_EXT);
+  }
 
-		String extension = getExtension(f);
-		if (extension == null) return false;
+  public static FileFilter getWorkspaceFileFilter() {
+    return getFileFilter("TxtFileFilterWksp", null, WORKSPACE_EXT);
+  }
 
-		if (this.extensions.contains(extension))
-		{
-			return true;
-		}
-		else if (this.ignoreCase)
-		{
-			for (int i=0; i < this.extensions.size(); i ++)
-			{
-				if (extension.equalsIgnoreCase(this.extensions.get(i))) return true;
-			}
-		}
+  public static FileFilter getHtmlFileFilter() {
+    return getFileFilter("TxtFileFilterHtml", ExportType.HTML, HTML_EXT);
+  }
 
-		return false;
-	}
+  public static FileFilter getXlsFileFilter() {
+    return getFileFilter("TxtFileFilterXls", ExportType.XLS, XLS_EXT);
+  }
 
-	public static FileFilter getJarFileFilter()
-	{
-		if (jarFileFilter == null)
-		{
-			List<String> ext = CollectionUtil.arrayList("jar","zip");
-			String desc = ResourceMgr.getString("TxtArchivesFilterName");
-			jarFileFilter = new ExtensionFileFilter(desc, ext, true);
-		}
-		return jarFileFilter;
-	}
+  public static FileFilter getXlsXFileFilter() {
+    return getFileFilter("TxtFileFilterXlsX", ExportType.XLSX, XLSX_EXT);
+  }
 
-	public static FileFilter getSqlFileFilter()
-	{
-		return getFileFilter("TxtFileFilterSql", ExportType.SQL_INSERT, SQL_EXT);
-	}
+  public static FileFilter getXlsMFileFilter() {
+    return getFileFilter("TxtFileFilterXlsM", ExportType.XLSM, XLSM_EXT);
+  }
 
-	public static FileFilter getSqlInsertDeleteFilter()
-	{
-		return getFileFilter("TxtFileFilterSqlInsDel", ExportType.SQL_DELETE_INSERT, SQL_EXT);
-	}
+  public static FileFilter getOdsFileFilter() {
+    return getFileFilter("TxtFileFilterOds", ExportType.ODS, ODS_EXT);
+  }
 
-	public static FileFilter getSqlUpdateFileFilter()
-	{
-		return getFileFilter("TxtFileFilterSqlInsDel", ExportType.SQL_UPDATE, SQL_EXT);
-	}
+  public static FileFilter getJsonFilterFilter() {
+    return getFileFilter("TxtFileFilterJson", ExportType.JSON, JSON_EXT);
+  }
 
-	public static FileFilter getTextFileFilter()
-	{
-		return getFileFilter("TxtFileFilterText", ExportType.TEXT, TXT_EXT, CSV_EXT);
-	}
+  private static ExtensionFileFilter getFileFilter(String key, ExportType type, String... ext) {
+    ExtensionFileFilter ff = filters.get(key);
+    if (ff == null) {
+      String desc = ResourceMgr.getString(key);
+      ff = new ExtensionFileFilter(desc, Arrays.asList(ext), true);
+      ff.exportType = type;
+      filters.put(key, ff);
+    }
+    return ff;
+  }
 
-	public static FileFilter getXmlFileFilter()
-	{
-		return getFileFilter("TxtFileFilterXml", ExportType.XML, XML_EXT);
-	}
+  public ExportType getExportType() {
+    return exportType;
+  }
 
-	public static FileFilter getWorkspaceFileFilter()
-	{
-		return getFileFilter("TxtFileFilterWksp", null, WORKSPACE_EXT);
-	}
+  public boolean hasFilter(String extension) {
+    return this.extensions.contains(extension);
+  }
 
-	public static FileFilter getHtmlFileFilter()
-	{
-		return getFileFilter("TxtFileFilterHtml", ExportType.HTML, HTML_EXT);
-	}
+  public String getDefaultExtension() {
+    return this.extensions.get(0);
+  }
 
-	public static FileFilter getXlsFileFilter()
-	{
-		return getFileFilter("TxtFileFilterXls", ExportType.XLS, XLS_EXT);
-	}
+  @Override
+  public boolean accept(File f) {
+    if (f.isDirectory()) {
+      return true;
+    }
+    if (this.extensions == null || this.extensions.isEmpty()) return true;
 
-	public static FileFilter getXlsXFileFilter()
-	{
-		return getFileFilter("TxtFileFilterXlsX", ExportType.XLSX, XLSX_EXT);
-	}
+    String extension = getExtension(f);
+    if (extension == null) return false;
 
-	public static FileFilter getXlsMFileFilter()
-	{
-		 return getFileFilter("TxtFileFilterXlsM", ExportType.XLSM, XLSM_EXT);
-	}
+    if (this.extensions.contains(extension)) {
+      return true;
+    } else if (this.ignoreCase) {
+      for (int i = 0; i < this.extensions.size(); i++) {
+        if (extension.equalsIgnoreCase(this.extensions.get(i))) return true;
+      }
+    }
 
-	public static FileFilter getOdsFileFilter()
-	{
-		return getFileFilter("TxtFileFilterOds", ExportType.ODS, ODS_EXT);
-	}
+    return false;
+  }
 
-	public static FileFilter getJsonFilterFilter()
-	{
-		return getFileFilter("TxtFileFilterJson", ExportType.JSON, JSON_EXT);
-	}
-
-	private static ExtensionFileFilter getFileFilter(String key, ExportType type, String... ext)
-	{
-		ExtensionFileFilter ff = filters.get(key);
-		if (ff == null)
-		{
-			String desc = ResourceMgr.getString(key);
-			ff = new ExtensionFileFilter(desc, Arrays.asList(ext), true);
-			ff.exportType = type;
-			filters.put(key, ff);
-		}
-		return ff;
-	}
-
-	@Override
-	public String getDescription()
-	{
-		return this.desc;
-	}
+  @Override
+  public String getDescription() {
+    return this.desc;
+  }
 }

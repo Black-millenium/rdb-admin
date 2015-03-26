@@ -22,75 +22,60 @@
  */
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-
+import workbench.db.*;
 import workbench.resource.ResourceMgr;
-
-import workbench.db.DbObject;
-import workbench.db.TableIdentifier;
-import workbench.db.TriggerDefinition;
-import workbench.db.TriggerReader;
-import workbench.db.TriggerReaderFactory;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
 
+import java.sql.SQLException;
+
 /**
  * Display the source code of a trigger.
- * @see workbench.db.TriggerReader#getTriggerSource(workbench.db.TriggerDefinition, boolean)
  *
  * @author Thomas Kellerer
+ * @see workbench.db.TriggerReader#getTriggerSource(workbench.db.TriggerDefinition, boolean)
  */
 public class WbTriggerSource
-	extends SqlCommand
-{
-	public static final String VERB = "WbTriggerSource";
+    extends SqlCommand {
+  public static final String VERB = "WbTriggerSource";
 
-	public WbTriggerSource()
-	{
-		super();
-	}
+  public WbTriggerSource() {
+    super();
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
-		String args = getCommandLine(sql);
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult();
+    String args = getCommandLine(sql);
 
-		DbObject object = new TableIdentifier(args, currentConnection);
+    DbObject object = new TableIdentifier(args, currentConnection);
 
-		TriggerReader reader = TriggerReaderFactory.createReader(currentConnection);
-		TriggerDefinition trg = reader.findTrigger(object.getCatalog(), object.getSchema(), object.getObjectName());
-		String source = null;
-		if (trg != null)
-		{
-			source = reader.getTriggerSource(trg, true);
-		}
+    TriggerReader reader = TriggerReaderFactory.createReader(currentConnection);
+    TriggerDefinition trg = reader.findTrigger(object.getCatalog(), object.getSchema(), object.getObjectName());
+    String source = null;
+    if (trg != null) {
+      source = reader.getTriggerSource(trg, true);
+    }
 
-		if (source != null)
-		{
-			result.addMessage(source);
-			result.setSuccess();
-		}
-		else
-		{
-			result.addMessage(ResourceMgr.getFormattedString("ErrTrgNotFound", object.getObjectExpression(currentConnection)));
-			result.setFailure();
-		}
+    if (source != null) {
+      result.addMessage(source);
+      result.setSuccess();
+    } else {
+      result.addMessage(ResourceMgr.getFormattedString("ErrTrgNotFound", object.getObjectExpression(currentConnection)));
+      result.setFailure();
+    }
 
-		return result;
-	}
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 }

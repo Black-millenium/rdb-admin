@@ -19,102 +19,81 @@
  */
 package workbench.gui.sql;
 
-import workbench.resource.GuiSettings;
-
 import workbench.gui.WbSwingUtilities;
-
+import workbench.resource.GuiSettings;
 import workbench.sql.ErrorDescriptor;
 import workbench.sql.parser.ScriptParser;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class Highlighter
-{
+public class Highlighter {
   private EditorPanel editor;
 
-  public Highlighter(EditorPanel editorPanel)
-  {
+  public Highlighter(EditorPanel editorPanel) {
     this.editor = editorPanel;
   }
 
-	void highlightStatement(ScriptParser scriptParser, int command, int startOffset)
-	{
-		if (this.editor == null) return;
-		final int startPos = scriptParser.getStartPosForCommand(command) + startOffset;
-		final int endPos = scriptParser.getEndPosForCommand(command) + startOffset;
-		final int line = this.editor.getLineOfOffset(startPos);
+  void highlightStatement(ScriptParser scriptParser, int command, int startOffset) {
+    if (this.editor == null) return;
+    final int startPos = scriptParser.getStartPosForCommand(command) + startOffset;
+    final int endPos = scriptParser.getEndPosForCommand(command) + startOffset;
+    final int line = this.editor.getLineOfOffset(startPos);
 
-		WbSwingUtilities.invoke(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				editor.scrollTo(line, 0);
-				editor.selectStatementTemporary(startPos, endPos);
-			}
-		});
-	}
+    WbSwingUtilities.invoke(new Runnable() {
+      @Override
+      public void run() {
+        editor.scrollTo(line, 0);
+        editor.selectStatementTemporary(startPos, endPos);
+      }
+    });
+  }
 
-	void highlightError(final boolean doHighlight, ScriptParser scriptParser, int commandWithError, int startOffset, ErrorDescriptor error)
-	{
-		if (this.editor == null) return;
-		if (!doHighlight && !GuiSettings.jumpToError()) return;
-		if (scriptParser == null) return;
+  void highlightError(final boolean doHighlight, ScriptParser scriptParser, int commandWithError, int startOffset, ErrorDescriptor error) {
+    if (this.editor == null) return;
+    if (!doHighlight && !GuiSettings.jumpToError()) return;
+    if (scriptParser == null) return;
 
-		final int startPos;
-		final int endPos;
-		final int line;
-		final int newCaret;
+    final int startPos;
+    final int endPos;
+    final int line;
+    final int newCaret;
 
-		boolean jumpToError = false;
+    boolean jumpToError = false;
 
-		if (error != null && error.getErrorPosition() > -1)
-		{
-			int startOfCommand = scriptParser.getStartPosForCommand(commandWithError) + startOffset;
-			line = this.editor.getLineOfOffset(startOfCommand + error.getErrorPosition());
-			startPos = editor.getLineStartOffset(line);
-			endPos = editor.getLineEndOffset(line) - 1;
-			jumpToError = true;
-			if (error.getErrorColumn() > -1)
-			{
-				newCaret = startPos + error.getErrorColumn();
-			}
-			else
-			{
-				newCaret = startOfCommand + error.getErrorPosition();
-			}
-		}
-		else
-		{
-			startPos = scriptParser.getStartPosForCommand(commandWithError) + startOffset;
-			endPos = scriptParser.getEndPosForCommand(commandWithError) + startOffset;
-			line = this.editor.getLineOfOffset(startPos);
-			newCaret = -1;
-		}
+    if (error != null && error.getErrorPosition() > -1) {
+      int startOfCommand = scriptParser.getStartPosForCommand(commandWithError) + startOffset;
+      line = this.editor.getLineOfOffset(startOfCommand + error.getErrorPosition());
+      startPos = editor.getLineStartOffset(line);
+      endPos = editor.getLineEndOffset(line) - 1;
+      jumpToError = true;
+      if (error.getErrorColumn() > -1) {
+        newCaret = startPos + error.getErrorColumn();
+      } else {
+        newCaret = startOfCommand + error.getErrorPosition();
+      }
+    } else {
+      startPos = scriptParser.getStartPosForCommand(commandWithError) + startOffset;
+      endPos = scriptParser.getEndPosForCommand(commandWithError) + startOffset;
+      line = this.editor.getLineOfOffset(startPos);
+      newCaret = -1;
+    }
 
-		if (!doHighlight && !jumpToError) return;
+    if (!doHighlight && !jumpToError) return;
 
-		WbSwingUtilities.invoke(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				if (!editor.isLineVisible(line))
-				{
-					editor.scrollTo(line, 0);
-				}
-				if (doHighlight)
-				{
-					editor.selectError(startPos, endPos);
-				}
-				else
-				{
-					editor.setCaretPosition(newCaret);
-				}
-			}
-		});
-	}
+    WbSwingUtilities.invoke(new Runnable() {
+      @Override
+      public void run() {
+        if (!editor.isLineVisible(line)) {
+          editor.scrollTo(line, 0);
+        }
+        if (doHighlight) {
+          editor.selectError(startPos, endPos);
+        } else {
+          editor.setCaretPosition(newCaret);
+        }
+      }
+    });
+  }
 
 }

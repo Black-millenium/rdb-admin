@@ -26,66 +26,55 @@ package workbench.storage.filter;
  * @author Thomas Kellerer
  */
 public class IsNotNullComparator
-	implements ColumnComparator
-{
+    implements ColumnComparator {
 
-	@Override
-	public String getValueExpression(Object value)
-	{
-		return (value == null ? "" : value.toString());
-	}
+  @Override
+  public String getValueExpression(Object value) {
+    return (value == null ? "" : value.toString());
+  }
 
-	@Override
-	public String getOperator()
-	{
-		return "not null";
-	}
+  @Override
+  public String getOperator() {
+    return "not null";
+  }
 
-	@Override
-	public String getDescription()
-	{
-		return getOperator();
-	}
+  @Override
+  public String getDescription() {
+    return getOperator();
+  }
 
-	@Override
-	public boolean needsValue()
-	{
-		return false;
-	}
+  @Override
+  public boolean needsValue() {
+    return false;
+  }
 
-	@Override
-	public boolean validateInput(Object value)
-	{
-		return true;
-	}
+  @Override
+  public boolean validateInput(Object value) {
+    return true;
+  }
 
-	@Override
-	public boolean comparesEquality()
-	{
-		return false;
-	}
+  @Override
+  public boolean comparesEquality() {
+    return false;
+  }
 
-	@Override
-	public boolean evaluate(Object reference, Object value, boolean ignoreCase)
-	{
-		return (value != null);
-	}
+  @Override
+  public boolean evaluate(Object reference, Object value, boolean ignoreCase) {
+    return (value != null);
+  }
 
-	@Override
-	public boolean supportsType(Class valueClass)
-	{
-		return true;
-	}
+  @Override
+  public boolean supportsType(Class valueClass) {
+    return true;
+  }
 
-	@Override
-	public boolean supportsIgnoreCase()
-	{
-		return false;
-	}
+  @Override
+  public boolean supportsIgnoreCase() {
+    return false;
+  }
 
-	@Override
-	public boolean equals(Object other)
-	{
-		return (other.getClass().equals(this.getClass()));
-	}
+  @Override
+  public boolean equals(Object other) {
+    return (other.getClass().equals(this.getClass()));
+  }
 }

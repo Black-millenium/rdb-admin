@@ -21,26 +21,25 @@
  *
  */
 package workbench.gui.actions;
-import java.awt.event.ActionEvent;
+
 import workbench.WbManager;
 import workbench.resource.ResourceMgr;
 
-/**
- *	@author  Thomas Kellerer
- */
-public class ManageDriversAction extends WbAction
-{
-	public ManageDriversAction()
-	{
-		super();
-		this.initMenuDefinition("MnuTxtEditDrivers");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_FILE);
-	}
+import java.awt.event.ActionEvent;
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		WbManager.getInstance().showDialog("workbench.gui.profiles.DriverEditorDialog");
-	}
+/**
+ * @author Thomas Kellerer
+ */
+public class ManageDriversAction extends WbAction {
+  public ManageDriversAction() {
+    super();
+    this.initMenuDefinition("MnuTxtEditDrivers");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_FILE);
+  }
+
+  @Override
+  public void executeAction(ActionEvent e) {
+    WbManager.getInstance().showDialog("workbench.gui.profiles.DriverEditorDialog");
+  }
 
 }

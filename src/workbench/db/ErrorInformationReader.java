@@ -23,22 +23,20 @@
 package workbench.db;
 
 import workbench.db.oracle.OracleErrorInformationReader;
-
 import workbench.sql.ErrorDescriptor;
 
 /**
  * An interface for reading extended error information from the database.
- *
+ * <p/>
  * This should be implemented for any database that can return additional
  * error information after running DDL statements.
- *
+ * <p/>
  * Currently only implemented for Oracle to retrieve detailed error messages
  * after a CREATE PROCEDURE or similar statement.
  *
  * @author Thomas Kellerer
  * @see OracleErrorInformationReader
  */
-public interface ErrorInformationReader
-{
-	ErrorDescriptor getErrorInfo(String schema, String object, String type, boolean formatMessage);
+public interface ErrorInformationReader {
+  ErrorDescriptor getErrorInfo(String schema, String object, String type, boolean formatMessage);
 }

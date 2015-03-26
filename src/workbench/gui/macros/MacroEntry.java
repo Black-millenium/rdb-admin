@@ -27,41 +27,34 @@ package workbench.gui.macros;
  *
  * @author Thomas Kellerer
  */
-public class MacroEntry
-{
-	private String text;
-	private String name;
+public class MacroEntry {
+  private String text;
+  private String name;
 
-	public MacroEntry(String aName, String aText)
-	{
-		this.text = aText;
-		this.name = aName;
-	}
+  public MacroEntry(String aName, String aText) {
+    this.text = aText;
+    this.name = aName;
+  }
 
-	@Override
-	public String toString()
-	{
-		return this.name;
-	}
+  @Override
+  public String toString() {
+    return this.name;
+  }
 
-	public final String getName()
-	{
-		return this.name;
-	}
+  public final String getName() {
+    return this.name;
+  }
 
-	public final void setName(String aName)
-	{
-		this.name = aName;
-	}
+  public final void setName(String aName) {
+    this.name = aName;
+  }
 
-	public final String getText()
-	{
-		return this.text;
-	}
+  public final String getText() {
+    return this.text;
+  }
 
-	public final void setText(String aText)
-	{
-		this.text = aText;
-	}
+  public final void setText(String aText) {
+    this.text = aText;
+  }
 
 }

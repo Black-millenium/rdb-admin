@@ -28,23 +28,19 @@ import java.util.List;
  * @author Thomas Kellerer
  */
 public class DummyInsert
-	extends DummyDML
-	implements DbObject
-{
-	public DummyInsert(TableIdentifier tbl)
-	{
-		super(tbl, false);
-	}
+    extends DummyDML
+    implements DbObject {
+  public DummyInsert(TableIdentifier tbl) {
+    super(tbl, false);
+  }
 
-	public DummyInsert(TableIdentifier tbl, List<ColumnIdentifier> cols)
-	{
-		super(tbl, cols, false);
-	}
+  public DummyInsert(TableIdentifier tbl, List<ColumnIdentifier> cols) {
+    super(tbl, cols, false);
+  }
 
-	@Override
-	public String getObjectType()
-	{
-		return "INSERT";
-	}
+  @Override
+  public String getObjectType() {
+    return "INSERT";
+  }
 
 }

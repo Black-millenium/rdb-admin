@@ -25,17 +25,14 @@ package workbench.gui.editor.actions;
 import java.awt.event.KeyEvent;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class SelectNextPage
-	extends NextPage
-{
+    extends NextPage {
 
-	public SelectNextPage()
-	{
-		super("TxtEdNxtPageSel", KeyEvent.VK_PAGE_DOWN, KeyEvent.SHIFT_MASK);
-		select = true;
-	}
+  public SelectNextPage() {
+    super("TxtEdNxtPageSel", KeyEvent.VK_PAGE_DOWN, KeyEvent.SHIFT_MASK);
+    select = true;
+  }
 
 }

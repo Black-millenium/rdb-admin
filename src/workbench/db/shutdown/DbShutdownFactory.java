@@ -26,29 +26,25 @@ import workbench.db.WbConnection;
 
 /**
  * A factory to create instances of the DbShutdownHook interface.
- * 
+ *
  * @author Thomas Kellerer
  */
-public class DbShutdownFactory 
-{
-	/**
-	 * Create a DbShutdownHook for the given connection.
-	 * @param con the connection for which to create the shutdown hook
-	 * @return null if not shutdown processing is necessary, an approriate instance otherwise
-	 */
-	public static DbShutdownHook getShutdownHook(WbConnection con)
-	{
-		if (con == null) return null;
-		if (con.getMetadata() == null) return null;
-		
-		if (con.getMetadata().isHsql())
-		{
-			return new HsqlShutdownHook();
-		}
-		else if (con.getMetadata().isApacheDerby())
-		{
-			return new DerbyShutdownHook();
-		}
-		return null;
-	}
+public class DbShutdownFactory {
+  /**
+   * Create a DbShutdownHook for the given connection.
+   *
+   * @param con the connection for which to create the shutdown hook
+   * @return null if not shutdown processing is necessary, an approriate instance otherwise
+   */
+  public static DbShutdownHook getShutdownHook(WbConnection con) {
+    if (con == null) return null;
+    if (con.getMetadata() == null) return null;
+
+    if (con.getMetadata().isHsql()) {
+      return new HsqlShutdownHook();
+    } else if (con.getMetadata().isApacheDerby()) {
+      return new DerbyShutdownHook();
+    }
+    return null;
+  }
 }

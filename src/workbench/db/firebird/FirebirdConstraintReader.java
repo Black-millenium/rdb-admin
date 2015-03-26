@@ -28,35 +28,32 @@ import workbench.db.DbMetadata;
 /**
  * An implementation of {@link AbstractConstraintReader} for the
  * <a href="http://www.firebirdsql.org">Firebird</a> database server
- * @author  Thomas Kellerer
+ *
+ * @author Thomas Kellerer
  */
 public class FirebirdConstraintReader
-	extends AbstractConstraintReader
-{
+    extends AbstractConstraintReader {
 
-	private final String TABLE_SQL =
-		 "select trim(cc.rdb$constraint_name), trg.rdb$trigger_source " +
-		 "from rdb$relation_constraints rc  \n" +
-		 "  join rdb$check_constraints cc on rc.rdb$constraint_name = cc.rdb$constraint_name \n" +
-		 "  join rdb$triggers trg on cc.rdb$trigger_name = trg.rdb$trigger_name \n" +
-		 "where rc.rdb$relation_name = ? \n" +
-		 "  and rc.rdb$constraint_type = 'CHECK' \n" +
-		 "  and trg.rdb$trigger_type = 1 \n";
+  private final String TABLE_SQL =
+      "select trim(cc.rdb$constraint_name), trg.rdb$trigger_source " +
+          "from rdb$relation_constraints rc  \n" +
+          "  join rdb$check_constraints cc on rc.rdb$constraint_name = cc.rdb$constraint_name \n" +
+          "  join rdb$triggers trg on cc.rdb$trigger_name = trg.rdb$trigger_name \n" +
+          "where rc.rdb$relation_name = ? \n" +
+          "  and rc.rdb$constraint_type = 'CHECK' \n" +
+          "  and trg.rdb$trigger_type = 1 \n";
 
-	public FirebirdConstraintReader()
-	{
-		super(DbMetadata.DBID_FIREBIRD);
-	}
+  public FirebirdConstraintReader() {
+    super(DbMetadata.DBID_FIREBIRD);
+  }
 
-	@Override
-	public String getColumnConstraintSql()
-	{
-		return null;
-	}
+  @Override
+  public String getColumnConstraintSql() {
+    return null;
+  }
 
-	@Override
-	public String getTableConstraintSql()
-	{
-		return TABLE_SQL;
-	}
+  @Override
+  public String getTableConstraintSql() {
+    return TABLE_SQL;
+  }
 }

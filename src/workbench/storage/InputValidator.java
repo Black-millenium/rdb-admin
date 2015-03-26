@@ -25,10 +25,8 @@ package workbench.storage;
 import workbench.gui.components.DataStoreTableModel;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface InputValidator
-{
-	boolean isValid(Object newValue, int row, int col, DataStoreTableModel source);
+public interface InputValidator {
+  boolean isValid(Object newValue, int row, int col, DataStoreTableModel source);
 }

@@ -22,63 +22,52 @@
  */
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-
 import workbench.resource.ResourceMgr;
-
-import workbench.storage.PkMapping;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
+import workbench.storage.PkMapping;
+
+import java.sql.SQLException;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class WbListPkDef
-	extends SqlCommand
-{
+    extends SqlCommand {
 
-	public static final String VERB = "WbListPkDef";
+  public static final String VERB = "WbListPkDef";
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String aSql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
+  @Override
+  public StatementRunnerResult execute(String aSql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult();
 
-		result.setSuccess();
+    result.setSuccess();
 
-		String info = PkMapping.getInstance().getMappingAsText();
-		if (info != null)
-		{
-			result.addMessage(ResourceMgr.getString("MsgPkDefinitions"));
-			result.addMessage("");
-			result.addMessage(info);
-			result.addMessage(ResourceMgr.getString("MsgPkDefinitionsEnd"));
-		}
-		else
-		{
-			result.addMessage(ResourceMgr.getString("MsgPkDefinitionsEmpty"));
-		}
-		return result;
-	}
+    String info = PkMapping.getInstance().getMappingAsText();
+    if (info != null) {
+      result.addMessage(ResourceMgr.getString("MsgPkDefinitions"));
+      result.addMessage("");
+      result.addMessage(info);
+      result.addMessage(ResourceMgr.getString("MsgPkDefinitionsEnd"));
+    } else {
+      result.addMessage(ResourceMgr.getString("MsgPkDefinitionsEmpty"));
+    }
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 }

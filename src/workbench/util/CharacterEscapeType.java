@@ -23,13 +23,11 @@
 package workbench.util;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum CharacterEscapeType
-{
-	unicode,
-	hex,
-	pgOctal,
-	pgHex;
+public enum CharacterEscapeType {
+  unicode,
+  hex,
+  pgOctal,
+  pgHex;
 }

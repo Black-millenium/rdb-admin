@@ -22,7 +22,6 @@
  */
 package workbench.db.shutdown;
 
-import java.sql.SQLException;
 import workbench.db.ConnectionMgr;
 import workbench.db.ConnectionProfile;
 import workbench.db.DbDriver;
@@ -31,83 +30,74 @@ import workbench.log.LogMgr;
 import workbench.util.ExceptionUtil;
 import workbench.util.StringUtil;
 
+import java.sql.SQLException;
+
 /**
  * A Shutdown hook for Apache Derby.
  *
  * @author Thomas Kellerer
  */
 public class DerbyShutdownHook
-	implements DbShutdownHook
-{
+    implements DbShutdownHook {
 
-	@Override
-	public void shutdown(WbConnection conn)
-		throws SQLException
-	{
-		if (ConnectionMgr.getInstance().isActive(conn)) return;
+  @Override
+  public void shutdown(WbConnection conn)
+      throws SQLException {
+    if (ConnectionMgr.getInstance().isActive(conn)) return;
 
-		try
-		{
-			conn.rollback();
-		}
-		catch (Throwable th)
-		{
-			// ignore
-		}
+    try {
+      conn.rollback();
+    } catch (Throwable th) {
+      // ignore
+    }
 
-		conn.shutdown();
+    conn.shutdown();
 
-		if (!canShutdown(conn)) return;
+    if (!canShutdown(conn)) return;
 
-		ConnectionProfile prof = conn.getProfile();
+    ConnectionProfile prof = conn.getProfile();
 
-		String drvClass = prof.getDriverclass();
-		String drvName = prof.getDriverName();
+    String drvClass = prof.getDriverclass();
+    String drvName = prof.getDriverName();
 
-		String url = prof.getUrl();
-		int pos = url.indexOf(';');
-		if (pos < 0) pos = url.length();
-		String command = url.substring(0, pos) + ";shutdown=true";
+    String url = prof.getUrl();
+    int pos = url.indexOf(';');
+    if (pos < 0) pos = url.length();
+    String command = url.substring(0, pos) + ";shutdown=true";
 
-		try
-		{
-			DbDriver drv = ConnectionMgr.getInstance().findDriverByName(drvClass, drvName);
-			LogMgr.logInfo("ConnectionMgr.shutdownDerby()", "Local Derby connection detected. Shutting down engine...");
-			drv.commandConnect(command);
-		}
-		catch (SQLException e)
-		{
-			// This exception is expected!
-			// Cloudscape/Derby reports the shutdown success through an exception
-			LogMgr.logInfo("ConnectionMgr.shutdownDerby()", ExceptionUtil.getDisplay(e));
-		}
-		catch (Throwable th)
-		{
-			LogMgr.logError("ConnectionMgr.shutdownDerby()", "Error when shutting down Cloudscape/Derby", th);
-		}
-	}
+    try {
+      DbDriver drv = ConnectionMgr.getInstance().findDriverByName(drvClass, drvName);
+      LogMgr.logInfo("ConnectionMgr.shutdownDerby()", "Local Derby connection detected. Shutting down engine...");
+      drv.commandConnect(command);
+    } catch (SQLException e) {
+      // This exception is expected!
+      // Cloudscape/Derby reports the shutdown success through an exception
+      LogMgr.logInfo("ConnectionMgr.shutdownDerby()", ExceptionUtil.getDisplay(e));
+    } catch (Throwable th) {
+      LogMgr.logError("ConnectionMgr.shutdownDerby()", "Error when shutting down Cloudscape/Derby", th);
+    }
+  }
 
-	private boolean canShutdown(WbConnection conn)
-	{
-		String cls = conn.getProfile().getDriverclass();
+  private boolean canShutdown(WbConnection conn) {
+    String cls = conn.getProfile().getDriverclass();
 
-		// Never send a shutdown to a Derby server connection
-		if (!cls.equals("org.apache.derby.jdbc.EmbeddedDriver")) return false;
+    // Never send a shutdown to a Derby server connection
+    if (!cls.equals("org.apache.derby.jdbc.EmbeddedDriver")) return false;
 
-		String url = conn.getUrl();
-		int pos = StringUtil.indexOf(url, ':', 2);
-		if (pos < 0) return true;
+    String url = conn.getUrl();
+    int pos = StringUtil.indexOf(url, ':', 2);
+    if (pos < 0) return true;
 
-		String prefix = url.substring(pos + 1);
+    String prefix = url.substring(pos + 1);
 
-		// Do not shutdown Cloudscape server connections!
-		if (url.startsWith(prefix + "net:")) return false;
+    // Do not shutdown Cloudscape server connections!
+    if (url.startsWith(prefix + "net:")) return false;
 
-		// Derby network URL starts with a //
-		if (url.startsWith(prefix + "//")) return false;
+    // Derby network URL starts with a //
+    if (url.startsWith(prefix + "//")) return false;
 
-		return true;
-	}
-	
+    return true;
+  }
+
 }
 

@@ -22,8 +22,18 @@
  */
 package workbench.gui.components;
 
-import java.awt.Component;
-import java.awt.HeadlessException;
+import workbench.gui.WbSwingUtilities;
+import workbench.interfaces.EncodingSelector;
+import workbench.interfaces.ValidatingComponent;
+import workbench.resource.GuiSettings;
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
+import workbench.util.CollectionUtil;
+import workbench.util.FileUtil;
+import workbench.util.StringUtil;
+
+import javax.swing.*;
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -32,171 +42,124 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-
-import workbench.interfaces.EncodingSelector;
-import workbench.interfaces.ValidatingComponent;
-import workbench.resource.GuiSettings;
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
-import workbench.gui.WbSwingUtilities;
-
-import workbench.util.CollectionUtil;
-import workbench.util.FileUtil;
-import workbench.util.StringUtil;
-
 /**
- *
  * @author Thomas Kellerer
  */
 public class WbFileChooser
-		extends JFileChooser
-		implements PropertyChangeListener
-{
-	private String windowSettingsId;
-	private JDialog dialog;
+    extends JFileChooser
+    implements PropertyChangeListener {
+  private String windowSettingsId;
+  private JDialog dialog;
   private EncodingSelector selector;
 
-	public WbFileChooser()
-	{
-		super();
-		init();
-	}
+  public WbFileChooser() {
+    super();
+    init();
+  }
 
-	public WbFileChooser(File currentDirectoryPath)
-	{
-		super(currentDirectoryPath);
-		init();
-	}
+  public WbFileChooser(File currentDirectoryPath) {
+    super(currentDirectoryPath);
+    init();
+  }
 
-	public WbFileChooser(String currentDirectoryPath)
-	{
-		super(currentDirectoryPath);
-		init();
-	}
+  public WbFileChooser(String currentDirectoryPath) {
+    super(currentDirectoryPath);
+    init();
+  }
 
-	private void init()
-	{
-		addPropertyChangeListener(this);
-		putClientProperty("FileChooser.useShellFolder", GuiSettings.getUseShellFolders());
-	}
+  private void init() {
+    addPropertyChangeListener(this);
+    putClientProperty("FileChooser.useShellFolder", GuiSettings.getUseShellFolders());
+  }
 
-	public void setSettingsID(String id)
-	{
-		this.windowSettingsId = id;
-	}
+  public void setSettingsID(String id) {
+    this.windowSettingsId = id;
+  }
 
-	public JDialog getCurrentDialog()
-	{
-		return dialog;
-	}
+  public JDialog getCurrentDialog() {
+    return dialog;
+  }
 
-  public void setEncodingSelector(EncodingSelector component)
-  {
+  public void setEncodingSelector(EncodingSelector component) {
     selector = component;
   }
 
-	@Override
-	public JDialog createDialog(Component parent)
-		throws HeadlessException
-	{
-		this.dialog = super.createDialog(parent);
-		ResourceMgr.setWindowIcons(dialog, "workbench");
-		if (Settings.getInstance().restoreWindowSize(dialog, windowSettingsId))
-		{
-			dialog.setLocationRelativeTo(parent);
-		}
-		return dialog;
-	}
-
-	@Override
-	public void propertyChange(PropertyChangeEvent evt)
-	{
-		if (evt.getPropertyName().equals("JFileChooserDialogIsClosingProperty") && windowSettingsId != null)
-		{
-			try
-			{
-				JDialog d = (JDialog)evt.getOldValue();
-				Settings.getInstance().storeWindowSize(d, windowSettingsId);
-			}
-			catch (Throwable th)
-			{
-				// ignore
-			}
-		}
-	}
-
-	public boolean validateInput()
-	{
-		JComponent accessory = getAccessory();
-		if (accessory instanceof ValidatingComponent)
-		{
-			ValidatingComponent vc = (ValidatingComponent)accessory;
-			return vc.validateInput();
-		}
-
-		if (isFileSelectionEnabled())
-    {
-      return encodingMatches();
+  @Override
+  public JDialog createDialog(Component parent)
+      throws HeadlessException {
+    this.dialog = super.createDialog(parent);
+    ResourceMgr.setWindowIcons(dialog, "workbench");
+    if (Settings.getInstance().restoreWindowSize(dialog, windowSettingsId)) {
+      dialog.setLocationRelativeTo(parent);
     }
-    else
-		{
-			File f = getSelectedFile();
-			String errKey = null;
-			if (!f.isDirectory())
-			{
-				errKey = "ErrExportOutputDirNotDir";
-			}
+    return dialog;
+  }
 
-			if (!f.exists())
-			{
-				errKey = "ErrOutputDirNotFound";
-			}
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+    if (evt.getPropertyName().equals("JFileChooserDialogIsClosingProperty") && windowSettingsId != null) {
+      try {
+        JDialog d = (JDialog) evt.getOldValue();
+        Settings.getInstance().storeWindowSize(d, windowSettingsId);
+      } catch (Throwable th) {
+        // ignore
+      }
+    }
+  }
 
-			if (errKey != null)
-			{
-				String msg = ResourceMgr.getFormattedString(errKey, f.getAbsolutePath());
-				WbSwingUtilities.showErrorMessage(this.dialog, msg);
-				return false;
-			}
-		}
-		return true;
-	}
+  public boolean validateInput() {
+    JComponent accessory = getAccessory();
+    if (accessory instanceof ValidatingComponent) {
+      ValidatingComponent vc = (ValidatingComponent) accessory;
+      return vc.validateInput();
+    }
 
-  private List<String> getFileEncodings()
-  {
+    if (isFileSelectionEnabled()) {
+      return encodingMatches();
+    } else {
+      File f = getSelectedFile();
+      String errKey = null;
+      if (!f.isDirectory()) {
+        errKey = "ErrExportOutputDirNotDir";
+      }
+
+      if (!f.exists()) {
+        errKey = "ErrOutputDirNotFound";
+      }
+
+      if (errKey != null) {
+        String msg = ResourceMgr.getFormattedString(errKey, f.getAbsolutePath());
+        WbSwingUtilities.showErrorMessage(this.dialog, msg);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private List<String> getFileEncodings() {
     Set<String> fileEncodings = CollectionUtil.caseInsensitiveSet();
 
     File[] files = null;
 
-    if (isMultiSelectionEnabled())
-    {
+    if (isMultiSelectionEnabled()) {
       files = getSelectedFiles();
-    }
-    else
-    {
+    } else {
       File file = getSelectedFile();
-      if (file != null) files = new File[] { file };
+      if (file != null) files = new File[]{file};
     }
 
     if (files == null || files.length == 0) return Collections.emptyList();
 
-    for (File f : files)
-    {
+    for (File f : files) {
       String fileEncoding = FileUtil.detectFileEncoding(f);
-      if (fileEncoding != null)
-      {
+      if (fileEncoding != null) {
         fileEncodings.add(fileEncoding);
       }
     }
     return new ArrayList<>(fileEncodings);
   }
 
-  private boolean encodingMatches()
-  {
+  private boolean encodingMatches() {
     if (selector == null) return true;
 
     String selectedEncoding = selector.getEncoding();
@@ -207,27 +170,23 @@ public class WbFileChooser
     List<String> fileEncodings = getFileEncodings();
     if (CollectionUtil.isEmpty(fileEncodings)) return true;
 
-    if (fileEncodings.size() != 1)
-    {
+    if (fileEncodings.size() != 1) {
       WbSwingUtilities.showErrorMessage(ResourceMgr.getString("MsgEncodingsMismatch"));
       return false;
     }
 
-    if (StringUtil.stringsAreNotEqual(fileEncodings.get(0), selectedEncoding))
-    {
-      String msg = ResourceMgr.getFormattedString("MsgEncodingWrong", selectedEncoding,  fileEncodings.get(0));
+    if (StringUtil.stringsAreNotEqual(fileEncodings.get(0), selectedEncoding)) {
+      String msg = ResourceMgr.getFormattedString("MsgEncodingWrong", selectedEncoding, fileEncodings.get(0));
       return WbSwingUtilities.getYesNo(this, msg);
     }
     return true;
   }
 
-	@Override
-	public void approveSelection()
-	{
-		if (validateInput())
-		{
-			super.approveSelection();
-		}
-	}
+  @Override
+  public void approveSelection() {
+    if (validateInput()) {
+      super.approveSelection();
+    }
+  }
 
 }

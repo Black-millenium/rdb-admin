@@ -22,224 +22,233 @@
  */
 package workbench.gui.settings;
 
-import java.awt.EventQueue;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.io.File;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-
-import workbench.interfaces.Restoreable;
-import workbench.interfaces.ValidatingComponent;
-import workbench.resource.GuiSettings;
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
 import workbench.gui.WbSwingUtilities;
 import workbench.gui.components.NumberField;
 import workbench.gui.components.TextFieldWidthAdjuster;
 import workbench.gui.components.WbFilePicker;
 import workbench.gui.editor.BracketCompleter;
 import workbench.gui.sql.FileReloadType;
-
+import workbench.interfaces.Restoreable;
+import workbench.interfaces.ValidatingComponent;
+import workbench.resource.GuiSettings;
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
 import workbench.util.StringUtil;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.File;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class EditorOptionsPanel
-	extends JPanel
-	implements Restoreable, ActionListener, ValidatingComponent, ItemListener
-{
+    extends JPanel
+    implements Restoreable, ActionListener, ValidatingComponent, ItemListener {
 
-	public EditorOptionsPanel()
-	{
-		super();
-		initComponents();
-		TextFieldWidthAdjuster adjuster = new TextFieldWidthAdjuster();
-		adjuster.adjustAllFields(this);
-		defaultDir.setSelectDirectoryOnly(true);
-	}
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private JCheckBox allowEditDuringExec;
+  private JLabel altDelimLabel;
+  private JTextField alternateDelimiter;
+  private JCheckBox alwaysAllowExecSel;
+  private JCheckBox autoAdvance;
+  private JTextField autoCloseBrackets;
+  private JComboBox cbxDbName;
+  private WbFilePicker defaultDir;
 
-	@Override
-	public void restoreSettings()
-	{
+  // Code for dispatching events from components to event handlers.
+  private JLabel editorTabSizeLabel;
+  private JTextField electricScroll;
+  private JLabel electricScrollLabel;
+  private JCheckBox emptyLineDelimiter;
+  private JComboBox externalLineEnding;
+  private JLabel externalLineEndingLabel;
+  private JCheckBox followCurrentDir;
+  private JCheckBox hiliteCurrent;
+  private JCheckBox hiliteError;
+  private JTextField historySizeField;
+  private JLabel historySizeLabel;
+  private JCheckBox includeFilesInHistory;
+  private JComboBox internalLineEnding;
+  private JLabel internalLineEndingLabel;
+  private JLabel jLabel1;
+  private JLabel jLabel2;
+  private JPanel jPanel1;
+  private JPanel jPanel2;
+  private JPanel jPanel3;
+  private JCheckBox keepHilite;
+  private JTextField noWordSep;
+  private JLabel noWordSepLabel;
+  private JLabel reloadLabel;
+  private JComboBox reloadType;
+  private JCheckBox rightClickMovesCursor;
+  private JCheckBox storeDirInWksp;
+  private JTextField tabSize;
+  private JCheckBox useCurrentLineStmt;
+  private JCheckBox useTabs;
+  private JLabel wheelScrollLabel;
+  private JTextField wheelScrollLines;
+  public EditorOptionsPanel() {
+    super();
+    initComponents();
+    TextFieldWidthAdjuster adjuster = new TextFieldWidthAdjuster();
+    adjuster.adjustAllFields(this);
+    defaultDir.setSelectDirectoryOnly(true);
+  }
 
-		String[] items = new String[] {
-			ResourceMgr.getString("LblLTDefault"),
-			ResourceMgr.getString("LblLTDos"),
-			ResourceMgr.getString("LblLTUnix")
-		};
+  @Override
+  public void restoreSettings() {
 
-		DbDelimiter[] names = DbDelimiter.getMapping();
-		cbxDbName.setModel(new DefaultComboBoxModel(names));
+    String[] items = new String[]{
+        ResourceMgr.getString("LblLTDefault"),
+        ResourceMgr.getString("LblLTDos"),
+        ResourceMgr.getString("LblLTUnix")
+    };
 
-		DbDelimiter def = (DbDelimiter)cbxDbName.getSelectedItem();
-		alternateDelimiter.setText(def.getDelimiter());
+    DbDelimiter[] names = DbDelimiter.getMapping();
+    cbxDbName.setModel(new DefaultComboBoxModel(names));
 
-		internalLineEnding.setModel(new DefaultComboBoxModel(items));
-		externalLineEnding.setModel(new DefaultComboBoxModel(items));
-		useCurrentLineStmt.setSelected(GuiSettings.getUseStatementInCurrentLine());
+    DbDelimiter def = (DbDelimiter) cbxDbName.getSelectedItem();
+    alternateDelimiter.setText(def.getDelimiter());
 
-		reloadType.setModel(new DefaultComboBoxModel(FileReloadType.values()));
-		reloadType.doLayout();
+    internalLineEnding.setModel(new DefaultComboBoxModel(items));
+    externalLineEnding.setModel(new DefaultComboBoxModel(items));
+    useCurrentLineStmt.setSelected(GuiSettings.getUseStatementInCurrentLine());
 
-		FileReloadType type = GuiSettings.getReloadType();
-		reloadType.setSelectedItem(type);
+    reloadType.setModel(new DefaultComboBoxModel(FileReloadType.values()));
+    reloadType.doLayout();
 
-		String value = Settings.getInstance().getInteralLineEndingValue();
-		internalLineEnding.setSelectedIndex(lineEndingValueToIndex(value));
+    FileReloadType type = GuiSettings.getReloadType();
+    reloadType.setSelectedItem(type);
 
-		value = Settings.getInstance().getExternalLineEndingValue();
-		externalLineEnding.setSelectedIndex(lineEndingValueToIndex(value));
+    String value = Settings.getInstance().getInteralLineEndingValue();
+    internalLineEnding.setSelectedIndex(lineEndingValueToIndex(value));
 
-		noWordSep.setText(Settings.getInstance().getEditorNoWordSep());
-		useTabs.setSelected(Settings.getInstance().getEditorUseTabCharacter());
-		followCurrentDir.setSelected(GuiSettings.getFollowFileDirectory());
-		storeDirInWksp.setSelected(Settings.getInstance().getStoreScriptDirInWksp());
-		File dir = GuiSettings.getDefaultFileDir();
-		if (dir != null)
-		{
-			defaultDir.setFilename(dir.getAbsolutePath());
-		}
-		defaultDir.setEnabled(followCurrentDir.isSelected());
-		keepHilite.setSelected(GuiSettings.getKeepCurrentSqlHighlight());
-		historySizeField.setText(Integer.toString(Settings.getInstance().getMaxHistorySize()));
-		electricScroll.setText(Integer.toString(Settings.getInstance().getElectricScroll()));
-		tabSize.setText(Settings.getInstance().getProperty("workbench.editor.tabwidth", "2"));
-		hiliteCurrent.setSelected(Settings.getInstance().getHighlightCurrentStatement());
-		alwaysAllowExecSel.setSelected(!GuiSettings.getExecuteOnlySelected());
-		allowEditDuringExec.setSelected(!GuiSettings.getDisableEditorDuringExecution());
-		emptyLineDelimiter.setSelected(Settings.getInstance().getEmptyLineIsDelimiter());
-		hiliteError.setSelected(GuiSettings.getHighlightErrorStatement());
-		autoCloseBrackets.setText(Settings.getInstance().getProperty(GuiSettings.PROPERTY_COMPLETE_CHARS, ""));
-		int lines = GuiSettings.getWheelScrollLines();
-		if (lines <= 0)
-		{
-			wheelScrollLines.setText("");
-		}
-		else
-		{
-			wheelScrollLines.setText(Integer.toString(lines));
-		}
-		WbSwingUtilities.makeEqualWidth(externalLineEnding, internalLineEnding);
-	}
+    value = Settings.getInstance().getExternalLineEndingValue();
+    externalLineEnding.setSelectedIndex(lineEndingValueToIndex(value));
 
-	private String indexToLineEndingValue(int index)
-	{
-		if (index == 1) return Settings.DOS_LINE_TERMINATOR_PROP_VALUE;
-		if (index == 2) return Settings.UNIX_LINE_TERMINATOR_PROP_VALUE;
-		return Settings.DEFAULT_LINE_TERMINATOR_PROP_VALUE;
-	}
+    noWordSep.setText(Settings.getInstance().getEditorNoWordSep());
+    useTabs.setSelected(Settings.getInstance().getEditorUseTabCharacter());
+    followCurrentDir.setSelected(GuiSettings.getFollowFileDirectory());
+    storeDirInWksp.setSelected(Settings.getInstance().getStoreScriptDirInWksp());
+    File dir = GuiSettings.getDefaultFileDir();
+    if (dir != null) {
+      defaultDir.setFilename(dir.getAbsolutePath());
+    }
+    defaultDir.setEnabled(followCurrentDir.isSelected());
+    keepHilite.setSelected(GuiSettings.getKeepCurrentSqlHighlight());
+    historySizeField.setText(Integer.toString(Settings.getInstance().getMaxHistorySize()));
+    electricScroll.setText(Integer.toString(Settings.getInstance().getElectricScroll()));
+    tabSize.setText(Settings.getInstance().getProperty("workbench.editor.tabwidth", "2"));
+    hiliteCurrent.setSelected(Settings.getInstance().getHighlightCurrentStatement());
+    alwaysAllowExecSel.setSelected(!GuiSettings.getExecuteOnlySelected());
+    allowEditDuringExec.setSelected(!GuiSettings.getDisableEditorDuringExecution());
+    emptyLineDelimiter.setSelected(Settings.getInstance().getEmptyLineIsDelimiter());
+    hiliteError.setSelected(GuiSettings.getHighlightErrorStatement());
+    autoCloseBrackets.setText(Settings.getInstance().getProperty(GuiSettings.PROPERTY_COMPLETE_CHARS, ""));
+    int lines = GuiSettings.getWheelScrollLines();
+    if (lines <= 0) {
+      wheelScrollLines.setText("");
+    } else {
+      wheelScrollLines.setText(Integer.toString(lines));
+    }
+    WbSwingUtilities.makeEqualWidth(externalLineEnding, internalLineEnding);
+  }
 
-	private int lineEndingValueToIndex(String value)
-	{
-		if (Settings.DOS_LINE_TERMINATOR_PROP_VALUE.equals(value))
-		{
-			return 1;
-		}
-		else if (Settings.UNIX_LINE_TERMINATOR_PROP_VALUE.equals(value))
-		{
-			return 2;
-		}
-		return 0;
-	}
+  private String indexToLineEndingValue(int index) {
+    if (index == 1) return Settings.DOS_LINE_TERMINATOR_PROP_VALUE;
+    if (index == 2) return Settings.UNIX_LINE_TERMINATOR_PROP_VALUE;
+    return Settings.DEFAULT_LINE_TERMINATOR_PROP_VALUE;
+  }
 
-	@Override
-	public void saveSettings()
-	{
-		Settings set = Settings.getInstance();
-		set.setMaxHistorySize(((NumberField)this.historySizeField).getValue());
+  private int lineEndingValueToIndex(String value) {
+    if (Settings.DOS_LINE_TERMINATOR_PROP_VALUE.equals(value)) {
+      return 1;
+    } else if (Settings.UNIX_LINE_TERMINATOR_PROP_VALUE.equals(value)) {
+      return 2;
+    }
+    return 0;
+  }
 
-		// Synchronize current text with the corresponding item in the dropdown
-		DbDelimiter delim = (DbDelimiter)cbxDbName.getSelectedItem();
-		delim.setDelimiter(alternateDelimiter.getText());
+  @Override
+  public void saveSettings() {
+    Settings set = Settings.getInstance();
+    set.setMaxHistorySize(((NumberField) this.historySizeField).getValue());
 
-		DbDelimiter defDelim = (DbDelimiter)cbxDbName.getItemAt(0);
-		set.setAlternateDelimiter(defDelim.getDelimiter());
+    // Synchronize current text with the corresponding item in the dropdown
+    DbDelimiter delim = (DbDelimiter) cbxDbName.getSelectedItem();
+    delim.setDelimiter(alternateDelimiter.getText());
 
-		for (int i=1; i < cbxDbName.getItemCount(); i++)
-		{
-			DbDelimiter dbDelim = (DbDelimiter)cbxDbName.getItemAt(i);
-			set.setDbDelimiter(dbDelim.getDbid(), dbDelim.getDelimiter());
-		}
+    DbDelimiter defDelim = (DbDelimiter) cbxDbName.getItemAt(0);
+    set.setAlternateDelimiter(defDelim.getDelimiter());
 
-		set.setRightClickMovesCursor(rightClickMovesCursor.isSelected());
-		set.setAutoJumpNextStatement(this.autoAdvance.isSelected());
-		set.setEditorTabWidth(StringUtil.getIntValue(this.tabSize.getText(), 2));
-		set.setElectricScroll(StringUtil.getIntValue(electricScroll.getText(),-1));
-		set.setEditorNoWordSep(noWordSep.getText());
-		String value = indexToLineEndingValue(internalLineEnding.getSelectedIndex());
-		set.setInternalEditorLineEnding(value);
-		value = indexToLineEndingValue(externalLineEnding.getSelectedIndex());
-		set.setExternalEditorLineEnding(value);
-		set.setEditorUseTabCharacter(useTabs.isSelected());
-		set.setProperty(Settings.PROPERTY_HIGHLIGHT_CURRENT_STATEMENT, hiliteCurrent.isSelected());
-		set.setEmptyLineIsDelimiter(emptyLineDelimiter.isSelected());
-		set.setStoreScriptDirInWksp(storeDirInWksp.isSelected());
-		GuiSettings.setDefaultFileDir(defaultDir.getFilename());
-		GuiSettings.setFollowFileDirectory(followCurrentDir.isSelected());
-		GuiSettings.setKeepCurrentSqlHighlight(keepHilite.isSelected());
-		GuiSettings.setExecuteOnlySelected(!alwaysAllowExecSel.isSelected());
-		GuiSettings.setDisableEditorDuringExecution(!allowEditDuringExec.isSelected());
-		GuiSettings.setHighlightErrorStatement(hiliteError.isSelected());
-		set.setProperty(GuiSettings.PROPERTY_COMPLETE_CHARS, autoCloseBrackets.getText());
-		GuiSettings.setUseStatementInCurrentLine(useCurrentLineStmt.isSelected());
+    for (int i = 1; i < cbxDbName.getItemCount(); i++) {
+      DbDelimiter dbDelim = (DbDelimiter) cbxDbName.getItemAt(i);
+      set.setDbDelimiter(dbDelim.getDbid(), dbDelim.getDelimiter());
+    }
 
-		if (StringUtil.isNumber(wheelScrollLines.getText()))
-		{
-			int lines = StringUtil.getIntValue(wheelScrollLines.getText(), -1);
-			GuiSettings.setWheelScrollLines(lines);
-		}
+    set.setRightClickMovesCursor(rightClickMovesCursor.isSelected());
+    set.setAutoJumpNextStatement(this.autoAdvance.isSelected());
+    set.setEditorTabWidth(StringUtil.getIntValue(this.tabSize.getText(), 2));
+    set.setElectricScroll(StringUtil.getIntValue(electricScroll.getText(), -1));
+    set.setEditorNoWordSep(noWordSep.getText());
+    String value = indexToLineEndingValue(internalLineEnding.getSelectedIndex());
+    set.setInternalEditorLineEnding(value);
+    value = indexToLineEndingValue(externalLineEnding.getSelectedIndex());
+    set.setExternalEditorLineEnding(value);
+    set.setEditorUseTabCharacter(useTabs.isSelected());
+    set.setProperty(Settings.PROPERTY_HIGHLIGHT_CURRENT_STATEMENT, hiliteCurrent.isSelected());
+    set.setEmptyLineIsDelimiter(emptyLineDelimiter.isSelected());
+    set.setStoreScriptDirInWksp(storeDirInWksp.isSelected());
+    GuiSettings.setDefaultFileDir(defaultDir.getFilename());
+    GuiSettings.setFollowFileDirectory(followCurrentDir.isSelected());
+    GuiSettings.setKeepCurrentSqlHighlight(keepHilite.isSelected());
+    GuiSettings.setExecuteOnlySelected(!alwaysAllowExecSel.isSelected());
+    GuiSettings.setDisableEditorDuringExecution(!allowEditDuringExec.isSelected());
+    GuiSettings.setHighlightErrorStatement(hiliteError.isSelected());
+    set.setProperty(GuiSettings.PROPERTY_COMPLETE_CHARS, autoCloseBrackets.getText());
+    GuiSettings.setUseStatementInCurrentLine(useCurrentLineStmt.isSelected());
 
-		FileReloadType fileReloadType = (FileReloadType) this.reloadType.getSelectedItem();
-		GuiSettings.setReloadType(fileReloadType);
-	}
+    if (StringUtil.isNumber(wheelScrollLines.getText())) {
+      int lines = StringUtil.getIntValue(wheelScrollLines.getText(), -1);
+      GuiSettings.setWheelScrollLines(lines);
+    }
 
-	@Override
-	public void componentDisplayed()
-	{
-	}
+    FileReloadType fileReloadType = (FileReloadType) this.reloadType.getSelectedItem();
+    GuiSettings.setReloadType(fileReloadType);
+  }
 
-	@Override
-	public boolean validateInput()
-	{
-		if (BracketCompleter.isValidDefinition(autoCloseBrackets.getText()))
-		{
-			return true;
-		}
-		WbSwingUtilities.showErrorMessageKey(this, "ErrAutoClsBrkt");
-		EventQueue.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				autoCloseBrackets.requestFocusInWindow();
-			}
-		});
-		return false;
-	}
+  @Override
+  public void componentDisplayed() {
+  }
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  @Override
+  public boolean validateInput() {
+    if (BracketCompleter.isValidDefinition(autoCloseBrackets.getText())) {
+      return true;
+    }
+    WbSwingUtilities.showErrorMessageKey(this, "ErrAutoClsBrkt");
+    EventQueue.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        autoCloseBrackets.requestFocusInWindow();
+      }
+    });
+    return false;
+  }
+
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     GridBagConstraints gridBagConstraints;
 
     editorTabSizeLabel = new JLabel();
@@ -644,7 +653,7 @@ public class EditorOptionsPanel
     gridBagConstraints.insets = new Insets(3, 12, 0, 0);
     add(reloadLabel, gridBagConstraints);
 
-    reloadType.setModel(new DefaultComboBoxModel(new String[] { "Never", "Prompt", "Automatic" }));
+    reloadType.setModel(new DefaultComboBoxModel(new String[]{"Never", "Prompt", "Automatic"}));
     reloadType.setToolTipText(ResourceMgr.getString("d_LblRldBehaviour")); // NOI18N
     gridBagConstraints = new GridBagConstraints();
     gridBagConstraints.gridx = 1;
@@ -667,7 +676,7 @@ public class EditorOptionsPanel
     gridBagConstraints.insets = new Insets(0, 7, 0, 15);
     jPanel3.add(alternateDelimiter, gridBagConstraints);
 
-    cbxDbName.setModel(new DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+    cbxDbName.setModel(new DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
     cbxDbName.addItemListener(this);
     cbxDbName.addActionListener(this);
     gridBagConstraints = new GridBagConstraints();
@@ -685,88 +694,38 @@ public class EditorOptionsPanel
     add(jPanel3, gridBagConstraints);
   }
 
-  // Code for dispatching events from components to event handlers.
-
-  public void actionPerformed(ActionEvent evt)
-  {
-    if (evt.getSource() == followCurrentDir)
-    {
+  public void actionPerformed(ActionEvent evt) {
+    if (evt.getSource() == followCurrentDir) {
       EditorOptionsPanel.this.followCurrentDirActionPerformed(evt);
-    }
-    else if (evt.getSource() == cbxDbName)
-    {
+    } else if (evt.getSource() == cbxDbName) {
       EditorOptionsPanel.this.cbxDbNameActionPerformed(evt);
     }
   }
 
-  public void itemStateChanged(ItemEvent evt)
-  {
-    if (evt.getSource() == cbxDbName)
-    {
+  public void itemStateChanged(ItemEvent evt) {
+    if (evt.getSource() == cbxDbName) {
       EditorOptionsPanel.this.cbxDbNameItemStateChanged(evt);
     }
   }// </editor-fold>//GEN-END:initComponents
 
-	private void followCurrentDirActionPerformed(ActionEvent evt)//GEN-FIRST:event_followCurrentDirActionPerformed
-	{//GEN-HEADEREND:event_followCurrentDirActionPerformed
-		defaultDir.setEnabled(followCurrentDir.isSelected());
-	}//GEN-LAST:event_followCurrentDirActionPerformed
+  private void followCurrentDirActionPerformed(ActionEvent evt)//GEN-FIRST:event_followCurrentDirActionPerformed
+  {//GEN-HEADEREND:event_followCurrentDirActionPerformed
+    defaultDir.setEnabled(followCurrentDir.isSelected());
+  }//GEN-LAST:event_followCurrentDirActionPerformed
 
   private void cbxDbNameActionPerformed(ActionEvent evt)//GEN-FIRST:event_cbxDbNameActionPerformed
   {//GEN-HEADEREND:event_cbxDbNameActionPerformed
-		DbDelimiter delim = (DbDelimiter)cbxDbName.getSelectedItem();
-		alternateDelimiter.setText(delim.getDelimiter());
+    DbDelimiter delim = (DbDelimiter) cbxDbName.getSelectedItem();
+    alternateDelimiter.setText(delim.getDelimiter());
   }//GEN-LAST:event_cbxDbNameActionPerformed
 
   private void cbxDbNameItemStateChanged(ItemEvent evt)//GEN-FIRST:event_cbxDbNameItemStateChanged
   {//GEN-HEADEREND:event_cbxDbNameItemStateChanged
-		if (evt.getStateChange() == ItemEvent.DESELECTED)
-		{
-			DbDelimiter def = (DbDelimiter)evt.getItem();
-			def.setDelimiter(alternateDelimiter.getText());
-		}
+    if (evt.getStateChange() == ItemEvent.DESELECTED) {
+      DbDelimiter def = (DbDelimiter) evt.getItem();
+      def.setDelimiter(alternateDelimiter.getText());
+    }
   }//GEN-LAST:event_cbxDbNameItemStateChanged
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private JCheckBox allowEditDuringExec;
-  private JLabel altDelimLabel;
-  private JTextField alternateDelimiter;
-  private JCheckBox alwaysAllowExecSel;
-  private JCheckBox autoAdvance;
-  private JTextField autoCloseBrackets;
-  private JComboBox cbxDbName;
-  private WbFilePicker defaultDir;
-  private JLabel editorTabSizeLabel;
-  private JTextField electricScroll;
-  private JLabel electricScrollLabel;
-  private JCheckBox emptyLineDelimiter;
-  private JComboBox externalLineEnding;
-  private JLabel externalLineEndingLabel;
-  private JCheckBox followCurrentDir;
-  private JCheckBox hiliteCurrent;
-  private JCheckBox hiliteError;
-  private JTextField historySizeField;
-  private JLabel historySizeLabel;
-  private JCheckBox includeFilesInHistory;
-  private JComboBox internalLineEnding;
-  private JLabel internalLineEndingLabel;
-  private JLabel jLabel1;
-  private JLabel jLabel2;
-  private JPanel jPanel1;
-  private JPanel jPanel2;
-  private JPanel jPanel3;
-  private JCheckBox keepHilite;
-  private JTextField noWordSep;
-  private JLabel noWordSepLabel;
-  private JLabel reloadLabel;
-  private JComboBox reloadType;
-  private JCheckBox rightClickMovesCursor;
-  private JCheckBox storeDirInWksp;
-  private JTextField tabSize;
-  private JCheckBox useCurrentLineStmt;
-  private JCheckBox useTabs;
-  private JLabel wheelScrollLabel;
-  private JTextField wheelScrollLines;
   // End of variables declaration//GEN-END:variables
 
 }

@@ -33,70 +33,59 @@ import workbench.sql.parser.ScriptParser;
  *
  * @author Thomas Kellerer
  */
-public class InputBuffer
-{
-	private StringBuilder script;
-	private ScriptParser parser;
-	private ParserType parserType = ParserType.Standard;
+public class InputBuffer {
+  private StringBuilder script;
+  private ScriptParser parser;
+  private ParserType parserType = ParserType.Standard;
 
-	public InputBuffer()
-	{
-		script = new StringBuilder(1000);
-		parser = new ScriptParser(parserType);
-	}
+  public InputBuffer() {
+    script = new StringBuilder(1000);
+    parser = new ScriptParser(parserType);
+  }
 
-  public void setConnection(WbConnection conn)
-  {
+  public void setConnection(WbConnection conn) {
     if (conn == null) return;
     setDbId(conn.getDbId());
     parser.setAlternateDelimiter(conn.getAlternateDelimiter());
   }
-  
-	public void setDbId(String dbid)
-	{
-		ParserType type = ParserType.getTypeFromDBID(dbid);
-		if (type != this.parserType)
-		{
-			parser = new ScriptParser(type);
-			parserType = type;
-		}
-	}
 
-	public String getScript()
-	{
-		return script.toString();
-	}
+  public void setDbId(String dbid) {
+    ParserType type = ParserType.getTypeFromDBID(dbid);
+    if (type != this.parserType) {
+      parser = new ScriptParser(type);
+      parserType = type;
+    }
+  }
 
-	public int getLength()
-	{
-		return script.length();
-	}
+  public String getScript() {
+    return script.toString();
+  }
 
-	public void clear()
-	{
-		script.setLength(0);
-	}
+  public int getLength() {
+    return script.length();
+  }
 
-	public boolean addLine(String line)
-	{
-		script.append('\n');
-		script.append(line);
-		return isComplete();
-	}
+  public void clear() {
+    script.setLength(0);
+  }
 
-	public boolean isComplete()
-	{
-		String sql = script.toString();
-		parser.setScript(sql);
-		parser.startIterator();
+  public boolean addLine(String line) {
+    script.append('\n');
+    script.append(line);
+    return isComplete();
+  }
 
-		ScriptCommandDefinition cmd = parser.getNextCommandDefinition();
-		if (cmd == null) return false;
+  public boolean isComplete() {
+    String sql = script.toString();
+    parser.setScript(sql);
+    parser.startIterator();
 
-		if (cmd.getDelimiterNeeded())
-		{
-			return cmd.getDelimiterUsed() != null;
-		}
-		return true;
-	}
+    ScriptCommandDefinition cmd = parser.getNextCommandDefinition();
+    if (cmd == null) return false;
+
+    if (cmd.getDelimiterNeeded()) {
+      return cmd.getDelimiterUsed() != null;
+    }
+    return true;
+  }
 }

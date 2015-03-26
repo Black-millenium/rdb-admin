@@ -25,21 +25,17 @@ package workbench.gui.completion;
 import workbench.resource.ResourceMgr;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class SelectAllMarker
-{
-	private String display;
+public class SelectAllMarker {
+  private String display;
 
-	public SelectAllMarker()
-	{
-		display = ResourceMgr.getString("LblCompletionAllCols");
-	}
+  public SelectAllMarker() {
+    display = ResourceMgr.getString("LblCompletionAllCols");
+  }
 
-	@Override
-	public String toString()
-	{
-		return display;
-	}
+  @Override
+  public String toString() {
+    return display;
+  }
 }

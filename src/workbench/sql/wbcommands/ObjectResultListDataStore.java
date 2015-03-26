@@ -22,75 +22,65 @@
  */
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.List;
 import workbench.db.DbObject;
 import workbench.db.ProcedureDefinition;
 import workbench.db.WbConnection;
 import workbench.storage.DataStore;
 
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.List;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class ObjectResultListDataStore
-	extends DataStore
-{
-	public static final int COL_IDX_OBJECT_NAME = 0;
-	public static final int COL_IDX_OBJECT_TYPE = 1;
-	public static final int COL_IDX_SOURCE = 2;
+    extends DataStore {
+  public static final int COL_IDX_OBJECT_NAME = 0;
+  public static final int COL_IDX_OBJECT_TYPE = 1;
+  public static final int COL_IDX_SOURCE = 2;
 
-	private static final String[] colnames = new String[] { "NAME", "TYPE", "SOURCE" };
-	private static final int[] colTypes = new int[] { Types.VARCHAR, Types.VARCHAR, Types.CLOB };
-	private static final int[] colSizes = new int[] { 30, 30, 50 };
+  private static final String[] colnames = new String[]{"NAME", "TYPE", "SOURCE"};
+  private static final int[] colTypes = new int[]{Types.VARCHAR, Types.VARCHAR, Types.CLOB};
+  private static final int[] colSizes = new int[]{30, 30, 50};
 
-	public ObjectResultListDataStore()
-	{
-		super(colnames, colTypes, colSizes);
-	}
+  public ObjectResultListDataStore() {
+    super(colnames, colTypes, colSizes);
+  }
 
-	public ObjectResultListDataStore(WbConnection con, List<DbObject> resultList, boolean showFullname)
-		throws SQLException
-	{
-		super(colnames, colTypes, colSizes);
-		setResultList(con, resultList, showFullname);
-	}
+  public ObjectResultListDataStore(WbConnection con, List<DbObject> resultList, boolean showFullname)
+      throws SQLException {
+    super(colnames, colTypes, colSizes);
+    setResultList(con, resultList, showFullname);
+  }
 
-	public final void setResultList(WbConnection con, List<DbObject> resultList, boolean showFullname)
-		throws SQLException
-	{
-		if (resultList == null) return;
+  public final void setResultList(WbConnection con, List<DbObject> resultList, boolean showFullname)
+      throws SQLException {
+    if (resultList == null) return;
 
-		for (DbObject object : resultList)
-		{
-			int row = addRow();
-			String name = null;
-			String type = object.getObjectType();
+    for (DbObject object : resultList) {
+      int row = addRow();
+      String name = null;
+      String type = object.getObjectType();
 
-			if (showFullname)
-			{
-				name = object.getFullyQualifiedName(con);
-			}
-			else
-			{
-				name = object.getObjectName();
-			}
+      if (showFullname) {
+        name = object.getFullyQualifiedName(con);
+      } else {
+        name = object.getObjectName();
+      }
 
-			if (object instanceof ProcedureDefinition)
-			{
-				ProcedureDefinition def = (ProcedureDefinition)object;
-				if (def.isOraclePackage())
-				{
-					name = def.getPackageName();
-					type = "PACKAGE";
-				}
-			}
-			setValue(row, COL_IDX_OBJECT_NAME, name);
-			setValue(row, COL_IDX_OBJECT_TYPE, type);
-			setValue(row, COL_IDX_SOURCE, object.getSource(con));
-		}
-		resetStatus();
-	}
+      if (object instanceof ProcedureDefinition) {
+        ProcedureDefinition def = (ProcedureDefinition) object;
+        if (def.isOraclePackage()) {
+          name = def.getPackageName();
+          type = "PACKAGE";
+        }
+      }
+      setValue(row, COL_IDX_OBJECT_NAME, name);
+      setValue(row, COL_IDX_OBJECT_TYPE, type);
+      setValue(row, COL_IDX_SOURCE, object.getSource(con));
+    }
+    resetStatus();
+  }
 
 }

@@ -6,22 +6,22 @@
  */
 package jline;
 
-import java.util.*;
+import java.util.List;
 
 /**
- *  <p>
- *  A completor that does nothing. Useful as the last item in an
- *  {@link ArgumentCompletor}.
- *  </p>
+ * <p>
+ * A completor that does nothing. Useful as the last item in an
+ * {@link ArgumentCompletor}.
+ * </p>
  *
- *  @author  <a href="mailto:mwp1@cornell.edu">Marc Prud'hommeaux</a>
+ * @author <a href="mailto:mwp1@cornell.edu">Marc Prud'hommeaux</a>
  */
 public class NullCompletor implements Completor {
-    /**
-     *  Returns -1 always, indicating that the the buffer is never
-     *  handled.
-     */
-    public int complete(final String buffer, int cursor, List candidates) {
-        return -1;
-    }
+  /**
+   * Returns -1 always, indicating that the the buffer is never
+   * handled.
+   */
+  public int complete(final String buffer, int cursor, List candidates) {
+    return -1;
+  }
 }

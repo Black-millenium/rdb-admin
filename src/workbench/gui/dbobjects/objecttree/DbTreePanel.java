@@ -22,31 +22,9 @@
  */
 package workbench.gui.dbobjects.objecttree;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
-
-import workbench.interfaces.Reloadable;
-import workbench.log.LogMgr;
-import workbench.resource.ResourceMgr;
-
 import workbench.db.ConnectionMgr;
 import workbench.db.ConnectionProfile;
 import workbench.db.WbConnection;
-
 import workbench.gui.MainWindow;
 import workbench.gui.actions.CollapseTreeAction;
 import workbench.gui.actions.ExpandTreeAction;
@@ -55,23 +33,29 @@ import workbench.gui.components.MultiSelectComboBox;
 import workbench.gui.components.WbStatusLabel;
 import workbench.gui.components.WbToolbar;
 import workbench.gui.components.WbToolbarButton;
+import workbench.interfaces.Reloadable;
+import workbench.log.LogMgr;
 import workbench.resource.IconMgr;
-
+import workbench.resource.ResourceMgr;
 import workbench.util.CollectionUtil;
 import workbench.util.WbThread;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class DbTreePanel
-	extends JPanel
-  implements Reloadable, ActionListener
-{
+    extends JPanel
+    implements Reloadable, ActionListener {
   private static int instanceCount = 0;
-	private DbObjectsTree tree;
+  private DbObjectsTree tree;
   private int id;
   private WbConnection connection;
   private WbStatusLabel statusBar;
@@ -82,9 +66,8 @@ public class DbTreePanel
   // private WbAction closeAction;
   private WbToolbarButton closeButton;
 
-	public DbTreePanel()
-	{
-		super(new BorderLayout());
+  public DbTreePanel() {
+    super(new BorderLayout());
     id = ++instanceCount;
 
     tree = new DbObjectsTree();
@@ -97,10 +80,9 @@ public class DbTreePanel
     add(statusBar, BorderLayout.PAGE_END);
 
     selectedTypes = DbTreeSettings.getSelectedObjectTypes();
-	}
+  }
 
-  private void createToolbar()
-  {
+  private void createToolbar() {
     toolPanel = new JPanel(new GridBagLayout());
     typeFilter = new MultiSelectComboBox<>();
     GridBagConstraints gc = new GridBagConstraints();
@@ -120,7 +102,7 @@ public class DbTreePanel
     bar.add(expand);
     bar.add(new CollapseTreeAction(tree));
     bar.addSeparator();
-    gc.gridx ++;
+    gc.gridx++;
     gc.weightx = 1.0;
     gc.fill = GridBagConstraints.NONE;
     gc.anchor = GridBagConstraints.LINE_END;
@@ -136,161 +118,126 @@ public class DbTreePanel
     WbToolbarButton button = new WbToolbarButton(IconMgr.getInstance().getToolbarIcon("save"));
     Dimension bs = button.getPreferredSize();
 
-    int iconWidth = icon.getIconWidth()/2;
-    int iconHeight = icon.getIconHeight()/2;
-    int wmargin = (int)(bs.width/2) - iconWidth - 2;
-    int hmargin = (int)(bs.height/2) - iconHeight - 2;
+    int iconWidth = icon.getIconWidth() / 2;
+    int iconHeight = icon.getIconHeight() / 2;
+    int wmargin = (int) (bs.width / 2) - iconWidth - 2;
+    int hmargin = (int) (bs.height / 2) - iconHeight - 2;
     closeButton.setMargin(new Insets(hmargin, wmargin, hmargin, wmargin));
     bar.add(closeButton);
     typeFilter.addActionListener(this);
   }
 
   @Override
-  public void reload()
-  {
-    WbThread th = new WbThread(new Runnable()
-    {
+  public void reload() {
+    WbThread th = new WbThread(new Runnable() {
 
       @Override
-      public void run()
-      {
+      public void run() {
         tree.load();
       }
     }, "DbTree Load Thread");
     th.start();
   }
 
-  public void connect(final ConnectionProfile profile)
-  {
-    WbThread th = new WbThread(new Runnable()
-    {
+  public void connect(final ConnectionProfile profile) {
+    WbThread th = new WbThread(new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         doConnect(profile);
       }
     }, "DbTree Connect Thread");
     th.start();
   }
 
-  private void doConnect(ConnectionProfile profile)
-  {
+  private void doConnect(ConnectionProfile profile) {
     String cid = "DbTree-" + Integer.toString(id);
 
-  	statusBar.setStatusMessage(ResourceMgr.getString("MsgConnectingTo") + " " + profile.getName() + " ...");
+    statusBar.setStatusMessage(ResourceMgr.getString("MsgConnectingTo") + " " + profile.getName() + " ...");
 
-		ConnectionMgr mgr = ConnectionMgr.getInstance();
-		try
-		{
-			connection = mgr.getConnection(profile, cid);
+    ConnectionMgr mgr = ConnectionMgr.getInstance();
+    try {
+      connection = mgr.getConnection(profile, cid);
       tree.setConnection(connection);
       loadTypes();
       tree.load();
-		}
-    catch (Throwable th)
-    {
+    } catch (Throwable th) {
       LogMgr.logError("DbTreePanel.connect()", "Could not connect", th);
+    } finally {
+      statusBar.clearStatusMessage();
     }
-		finally
-		{
-			statusBar.clearStatusMessage();
-		}
   }
 
-  private void loadTypes()
-  {
-    try
-    {
+  private void loadTypes() {
+    try {
       typeFilter.removeActionListener(this);
       List<String> types = new ArrayList<>(connection.getMetadata().getObjectTypes());
       List<String> toSelect = selectedTypes;
-      if (CollectionUtil.isEmpty(toSelect))
-      {
+      if (CollectionUtil.isEmpty(toSelect)) {
         toSelect = types;
       }
       typeFilter.setItems(types, toSelect);
       typeFilter.setMaximumRowCount(Math.min(typeFilter.getItemCount() + 1, 25));
-    }
-    finally
-    {
+    } finally {
       typeFilter.addActionListener(this);
     }
   }
 
-  public void dispose()
-  {
+  public void dispose() {
     tree.clear();
   }
 
-	public void saveSettings()
-	{
-	}
-
-  public void restoreSettings()
-  {
+  public void saveSettings() {
   }
 
-  public void disconnect(boolean wait)
-  {
-    if (tree != null)
-    {
+  public void restoreSettings() {
+  }
+
+  public void disconnect(boolean wait) {
+    if (tree != null) {
       tree.setConnection(null);
     }
-    WbThread th = new WbThread(new Runnable()
-    {
+    WbThread th = new WbThread(new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         ConnectionMgr.getInstance().disconnect(connection);
       }
     }, "Disconnect");
 
     th.start();
-    if (wait)
-    {
-      try
-      {
+    if (wait) {
+      try {
         th.join();
-      }
-      catch (Exception ex)
-      {
+      } catch (Exception ex) {
         LogMgr.logWarning("DbTreePanel.disconnect()", "Error waiting for disconnect thread", ex);
       }
     }
   }
 
   @Override
-  public boolean requestFocusInWindow()
-  {
+  public boolean requestFocusInWindow() {
     return tree.requestFocusInWindow();
   }
 
-  private void closePanel()
-  {
+  private void closePanel() {
     Window frame = SwingUtilities.getWindowAncestor(this);
-    if (frame instanceof MainWindow)
-    {
+    if (frame instanceof MainWindow) {
       final MainWindow mainWin = (MainWindow) frame;
-      EventQueue.invokeLater(new Runnable()
-      {
+      EventQueue.invokeLater(new Runnable() {
         @Override
-        public void run()
-        {
+        public void run() {
           mainWin.closeDbTree();
         }
       });
     }
 
   }
+
   @Override
-  public void actionPerformed(ActionEvent evt)
-  {
-    if (evt.getSource() == closeButton)
-    {
+  public void actionPerformed(ActionEvent evt) {
+    if (evt.getSource() == closeButton) {
       closePanel();
     }
-    if (evt.getSource() == typeFilter)
-    {
+    if (evt.getSource() == typeFilter) {
       tree.setTypesToShow(typeFilter.getSelectedItems());
       reload();
     }

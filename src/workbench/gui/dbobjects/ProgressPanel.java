@@ -22,197 +22,157 @@
  */
 package workbench.gui.dbobjects;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FontMetrics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.components.WbButton;
 import workbench.interfaces.Interruptable;
 import workbench.interfaces.InterruptableJob;
 import workbench.resource.ResourceMgr;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.components.WbButton;
-
 import workbench.storage.RowActionMonitor;
-
 import workbench.util.NumberStringCache;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class ProgressPanel
-	extends JPanel
-	implements RowActionMonitor
-{
-	private Interruptable task;
+    extends JPanel
+    implements RowActionMonitor {
+  private Interruptable task;
 
-	private JDialog parent;
-	private int monitorType = RowActionMonitor.MONITOR_PLAIN;
+  private JDialog parent;
+  private int monitorType = RowActionMonitor.MONITOR_PLAIN;
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private JButton cancelButton;
+  private JTextField fileNameField;
+  private JPanel infoPanel;
+  private JTextField progressInfoText;
+  private JLabel rowInfo;
 
-	public ProgressPanel(Interruptable aWorker)
-	{
-		super();
-		this.task = aWorker;
-		initComponents();
-		setRowSize(20);
+  public ProgressPanel(Interruptable aWorker) {
+    super();
+    this.task = aWorker;
+    initComponents();
+    setRowSize(20);
     WbSwingUtilities.setMinimumSize(rowInfo, 20);
-	}
+  }
 
-	public void setParentDialog(JDialog d)
-	{
-		parent = d;
-	}
+  public void setParentDialog(JDialog d) {
+    parent = d;
+  }
 
-	public void setRowInfo(long aRow)
-	{
-		this.rowInfo.setText(Long.toString(aRow));
-	}
+  public void setRowInfo(long aRow) {
+    this.rowInfo.setText(Long.toString(aRow));
+  }
 
-	public void setInfoText(String aText)
-	{
-		this.progressInfoText.setText(aText);
-	}
+  public void setInfoText(String aText) {
+    this.progressInfoText.setText(aText);
+  }
 
-	public void setObject(String name)
-	{
-		this.fileNameField.setText(name);
-		updateLayout();
-	}
+  public void setObject(String name) {
+    this.fileNameField.setText(name);
+    updateLayout();
+  }
 
-	protected void updateLayout()
-	{
-		FontMetrics fm = this.getFontMetrics(fileNameField.getFont());
-		int width = fm.stringWidth(fileNameField.getText()) + 25;
-		int h = fm.getHeight() + 2;
-		Dimension d = new Dimension(width, h < 22 ? 22 : h);
-		this.fileNameField.setPreferredSize(d);
-		this.fileNameField.setMinimumSize(d);
+  protected void updateLayout() {
+    FontMetrics fm = this.getFontMetrics(fileNameField.getFont());
+    int width = fm.stringWidth(fileNameField.getText()) + 25;
+    int h = fm.getHeight() + 2;
+    Dimension d = new Dimension(width, h < 22 ? 22 : h);
+    this.fileNameField.setPreferredSize(d);
+    this.fileNameField.setMinimumSize(d);
 
-		if (parent != null)
-		{
-			parent.invalidate();
-		}
+    if (parent != null) {
+      parent.invalidate();
+    }
 
-		invalidate();
-		validate();
+    invalidate();
+    validate();
 
-		if (parent != null)
-		{
-			parent.validate();
-			parent.pack();
-		}
-	}
+    if (parent != null) {
+      parent.validate();
+      parent.pack();
+    }
+  }
 
-	public void setRowSize(int cols)
-	{
-		FontMetrics fm = this.getFontMetrics(this.getFont());
-		int w = fm.charWidth(' ');
-		int h = fm.getHeight() + 2;
-		Dimension d = new Dimension(w * cols, h < 22 ? 22 : h);
-		this.rowInfo.setPreferredSize(d);
-		this.rowInfo.setMinimumSize(d);
-		updateLayout();
-	}
+  public void setRowSize(int cols) {
+    FontMetrics fm = this.getFontMetrics(this.getFont());
+    int w = fm.charWidth(' ');
+    int h = fm.getHeight() + 2;
+    Dimension d = new Dimension(w * cols, h < 22 ? 22 : h);
+    this.rowInfo.setPreferredSize(d);
+    this.rowInfo.setMinimumSize(d);
+    updateLayout();
+  }
 
+  public void setInfoSize(int cols) {
+    this.progressInfoText.setColumns(cols);
+    this.updateLayout();
+  }
 
-	public void setInfoSize(int cols)
-	{
-		this.progressInfoText.setColumns(cols);
-		this.updateLayout();
-	}
+  @Override
+  public void jobFinished() {
+  }
 
-	@Override
-	public void jobFinished()
-	{
-	}
+  @Override
+  public void setCurrentObject(final String object, final long number, final long totalObjects) {
+    final String info = NumberStringCache.getNumberString(number) + "/" + NumberStringCache.getNumberString(totalObjects);
+    WbSwingUtilities.invoke(new Runnable() {
+      @Override
+      public void run() {
+        if (monitorType == RowActionMonitor.MONITOR_EXPORT) {
+          setRowInfo(0);
+          setInfoText(ResourceMgr.getString("MsgSpoolingRow"));
+          setObject(object + " [" + info + "]");
+        } else {
+          setInfoText(object);
+          rowInfo.setText(info);
+        }
+      }
+    });
+  }
 
-	@Override
-	public void setCurrentObject(final String object, final long number, final long totalObjects)
-	{
-		final String info = NumberStringCache.getNumberString(number) + "/"+  NumberStringCache.getNumberString(totalObjects);
-		WbSwingUtilities.invoke(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				if (monitorType == RowActionMonitor.MONITOR_EXPORT)
-				{
-					setRowInfo(0);
-					setInfoText(ResourceMgr.getString("MsgSpoolingRow"));
-					setObject(object + " [" + info + "]");
-				}
-				else
-				{
-					setInfoText(object);
-					rowInfo.setText(info);
-				}
-			}
-		});
-	}
+  @Override
+  public void setCurrentRow(long currentRow, long totalRows) {
+    if (currentRow > -1 && totalRows > -1) {
+      this.rowInfo.setText(NumberStringCache.getNumberString(currentRow) + "/" + NumberStringCache.getNumberString(totalRows));
+    }
+    if (currentRow > -1) {
+      this.rowInfo.setText(NumberStringCache.getNumberString(currentRow));
+    } else {
+      this.rowInfo.setText("");
+    }
+  }
 
-	@Override
-	public void setCurrentRow(long currentRow, long totalRows)
-	{
-		if (currentRow > -1 && totalRows > -1)
-		{
-			this.rowInfo.setText(NumberStringCache.getNumberString(currentRow) + "/"+  NumberStringCache.getNumberString(totalRows));
-		}
-		if (currentRow > -1)
-		{
-			this.rowInfo.setText(NumberStringCache.getNumberString(currentRow));
-		}
-		else
-		{
-			this.rowInfo.setText("");
-		}
-	}
+  @Override
+  public void saveCurrentType(String type) {
+  }
 
-	@Override
-	public void saveCurrentType(String type)
-	{
-	}
+  @Override
+  public void restoreType(String type) {
+  }
 
-	@Override
-	public void restoreType(String type)
-	{
-	}
+  @Override
+  public int getMonitorType() {
+    return monitorType;
+  }
 
-	@Override
-	public void setMonitorType(int aType)
-	{
-		monitorType = aType;
-	}
+  @Override
+  public void setMonitorType(int aType) {
+    monitorType = aType;
+  }
 
-	@Override
-	public int getMonitorType()
-	{
-		return monitorType;
-	}
-
-
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     GridBagConstraints gridBagConstraints;
 
     infoPanel = new JPanel();
@@ -246,10 +206,8 @@ public class ProgressPanel
     add(infoPanel, gridBagConstraints);
 
     cancelButton.setText(ResourceMgr.getString("LblCancel"));
-    cancelButton.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent evt)
-      {
+    cancelButton.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent evt) {
         cancelButtonActionPerformed(evt);
       }
     });
@@ -271,37 +229,23 @@ public class ProgressPanel
     add(fileNameField, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
 
-	private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_cancelButtonActionPerformed
-	{//GEN-HEADEREND:event_cancelButtonActionPerformed
-		if (this.task instanceof InterruptableJob)
-		{
-			String msg = ResourceMgr.getString("MsgCancelAllCurrent");
-			String current = ResourceMgr.getString("LblCancelCurrentExport");
-			String all = ResourceMgr.getString("LblCancelAllExports");
-			int answer = WbSwingUtilities.getYesNo(parent, msg, new String[] { current, all });
-			InterruptableJob job = (InterruptableJob)task;
-			if (answer == JOptionPane.YES_OPTION)
-			{
-				job.cancelCurrent();
-			}
-			else
-			{
-				job.cancelExecution();
-			}
-		}
-		else if (task != null)
-		{
-			task.cancelExecution();
-		}
-	}//GEN-LAST:event_cancelButtonActionPerformed
-
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private JButton cancelButton;
-  private JTextField fileNameField;
-  private JPanel infoPanel;
-  private JTextField progressInfoText;
-  private JLabel rowInfo;
+  private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_cancelButtonActionPerformed
+  {//GEN-HEADEREND:event_cancelButtonActionPerformed
+    if (this.task instanceof InterruptableJob) {
+      String msg = ResourceMgr.getString("MsgCancelAllCurrent");
+      String current = ResourceMgr.getString("LblCancelCurrentExport");
+      String all = ResourceMgr.getString("LblCancelAllExports");
+      int answer = WbSwingUtilities.getYesNo(parent, msg, new String[]{current, all});
+      InterruptableJob job = (InterruptableJob) task;
+      if (answer == JOptionPane.YES_OPTION) {
+        job.cancelCurrent();
+      } else {
+        job.cancelExecution();
+      }
+    } else if (task != null) {
+      task.cancelExecution();
+    }
+  }//GEN-LAST:event_cancelButtonActionPerformed
   // End of variables declaration//GEN-END:variables
 
 }

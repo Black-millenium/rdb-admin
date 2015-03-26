@@ -22,60 +22,49 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import workbench.resource.ResourceMgr;
-
 import workbench.db.ConnectionProfile;
-
 import workbench.gui.MainWindow;
-
+import workbench.resource.ResourceMgr;
 import workbench.util.StringUtil;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Action to (re)load the workspace assigned to the current connection profile
  *
+ * @author Thomas Kellerer
  * @see workbench.gui.MainWindow#assignWorkspace()
  * @see workbench.db.ConnectionProfile
  * @see workbench.util.WbWorkspace
- *
- * @author  Thomas Kellerer
  */
 public class ReloadProfileWkspAction
-	extends WbAction
-{
-	private MainWindow client;
+    extends WbAction {
+  private MainWindow client;
 
-	public ReloadProfileWkspAction(MainWindow aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtLoadProfileWksp", null);
-		this.setMenuItemName(ResourceMgr.MNU_TXT_WORKSPACE);
-		this.setIcon(null);
-	}
+  public ReloadProfileWkspAction(MainWindow aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtLoadProfileWksp", null);
+    this.setMenuItemName(ResourceMgr.MNU_TXT_WORKSPACE);
+    this.setIcon(null);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		String file = getWorkspace();
-		if (file != null)
-		{
-			this.client.loadCurrentProfileWorkspace();
-		}
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    String file = getWorkspace();
+    if (file != null) {
+      this.client.loadCurrentProfileWorkspace();
+    }
+  }
 
-	private String getWorkspace()
-	{
-		ConnectionProfile profile = this.client.getCurrentProfile();
-		if (profile != null)
-		{
-			String workspaceFile = profile.getWorkspaceFile();
-			if (StringUtil.isNonEmpty(workspaceFile))
-			{
-				return workspaceFile;
-			}
-		}
-		return null;
-	}
+  private String getWorkspace() {
+    ConnectionProfile profile = this.client.getCurrentProfile();
+    if (profile != null) {
+      String workspaceFile = profile.getWorkspaceFile();
+      if (StringUtil.isNonEmpty(workspaceFile)) {
+        return workspaceFile;
+      }
+    }
+    return null;
+  }
 }

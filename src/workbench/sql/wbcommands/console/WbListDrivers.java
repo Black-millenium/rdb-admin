@@ -20,21 +20,17 @@
  */
 package workbench.sql.wbcommands.console;
 
+import workbench.db.ConnectionMgr;
+import workbench.db.DbDriver;
+import workbench.resource.ResourceMgr;
+import workbench.sql.SqlCommand;
+import workbench.sql.StatementRunnerResult;
+import workbench.storage.DataStore;
+import workbench.util.StringUtil;
+
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
-
-import workbench.resource.ResourceMgr;
-
-import workbench.db.ConnectionMgr;
-import workbench.db.DbDriver;
-
-import workbench.storage.DataStore;
-
-import workbench.sql.SqlCommand;
-import workbench.sql.StatementRunnerResult;
-
-import workbench.util.StringUtil;
 
 /**
  * List all defined profiles
@@ -42,57 +38,50 @@ import workbench.util.StringUtil;
  * @author Thomas Kellerer
  */
 public class WbListDrivers
-	extends SqlCommand
-{
-	public static final String VERB = "WbListDrivers";
+    extends SqlCommand {
+  public static final String VERB = "WbListDrivers";
 
-	public WbListDrivers()
-	{
-		super();
-	}
+  public WbListDrivers() {
+    super();
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException, Exception
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException, Exception {
+    StatementRunnerResult result = new StatementRunnerResult();
 
-		List<DbDriver> drivers = ConnectionMgr.getInstance().getDrivers();
+    List<DbDriver> drivers = ConnectionMgr.getInstance().getDrivers();
 
-		String[] columns = new String[] { ResourceMgr.getString("LblDriver"), ResourceMgr.getString("LblDriverClass"), ResourceMgr.getString("LblDriverLibrary")};
-		int[] types = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR };
-		int[] sizes = new int[] { 30, 40, 40 };
-		DataStore ds = new DataStore(columns, types, sizes);
+    String[] columns = new String[]{ResourceMgr.getString("LblDriver"), ResourceMgr.getString("LblDriverClass"), ResourceMgr.getString("LblDriverLibrary")};
+    int[] types = new int[]{Types.VARCHAR, Types.VARCHAR, Types.VARCHAR};
+    int[] sizes = new int[]{30, 40, 40};
+    DataStore ds = new DataStore(columns, types, sizes);
 
-		for (DbDriver driver : drivers)
-		{
-			int row = ds.addRow();
-			ds.setValue(row, 0, driver.getName());
-			ds.setValue(row, 1, driver.getDriverClass());
-			ds.setValue(row, 2, StringUtil.listToString(driver.getLibraryList(), System.getProperty("path.separator"), false));
-		}
-		ds.resetStatus();
-		result.addDataStore(ds);
-		result.setSuccess();
-		return result;
-	}
+    for (DbDriver driver : drivers) {
+      int row = ds.addRow();
+      ds.setValue(row, 0, driver.getName());
+      ds.setValue(row, 1, driver.getDriverClass());
+      ds.setValue(row, 2, StringUtil.listToString(driver.getLibraryList(), System.getProperty("path.separator"), false));
+    }
+    ds.resetStatus();
+    result.addDataStore(ds);
+    result.setSuccess();
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 
 }

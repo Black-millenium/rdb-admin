@@ -22,216 +22,171 @@
  */
 package workbench.gui.sql;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.EventQueue;
-
-import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.border.Border;
-import javax.swing.table.TableCellEditor;
-
 import workbench.WbManager;
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.components.*;
+import workbench.gui.renderer.RendererSetup;
 import workbench.interfaces.ValidatingComponent;
 import workbench.log.LogMgr;
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.components.ColumnWidthOptimizer;
-import workbench.gui.components.DataStoreTableModel;
-import workbench.gui.components.ValidatingDialog;
-import workbench.gui.components.WbTable;
-import workbench.gui.components.WbTextCellEditor;
-import workbench.gui.renderer.RendererSetup;
-
+import workbench.sql.VariablePool;
 import workbench.storage.DataStore;
 
-import workbench.sql.VariablePool;
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.table.TableCellEditor;
+import java.awt.*;
 
 /**
  * A panel to enter the value for Workbench variables inside SQL statements
  *
+ * @author Thomas Kellerer
  * @see workbench.sql.VariablePool
- *
- * @author  Thomas Kellerer
  */
 public class VariablesEditor
-	extends JPanel
-	implements ValidatingComponent
-{
-	private DataStore varData;
-	private WbTable variablesTable;
-	private ValidatingDialog dialog;
-	private boolean autoAdvance;
-	private boolean autoCloseOnAdvance;
+    extends JPanel
+    implements ValidatingComponent {
+  private static boolean dialogResult;
+  private DataStore varData;
+  private WbTable variablesTable;
+  private ValidatingDialog dialog;
+  private boolean autoAdvance;
+  private boolean autoCloseOnAdvance;
 
-	public VariablesEditor(DataStore data)
-	{
-		super();
-		autoAdvance = Settings.getInstance().getBoolProperty("workbench.gui.variables.editor.autoadvance", true);
-		autoCloseOnAdvance = Settings.getInstance().getBoolProperty("workbench.gui.variables.editor.autoclose", autoAdvance);
+  public VariablesEditor(DataStore data) {
+    super();
+    autoAdvance = Settings.getInstance().getBoolProperty("workbench.gui.variables.editor.autoadvance", true);
+    autoCloseOnAdvance = Settings.getInstance().getBoolProperty("workbench.gui.variables.editor.autoclose", autoAdvance);
 
-		this.variablesTable = new VariablesTable()
-		{
-			@Override
-			public void userStoppedEditing(int row)
-			{
-				if (autoAdvance)
-				{
-					closeOrAdvance(row);
-				}
-			}
-		};
+    this.variablesTable = new VariablesTable() {
+      @Override
+      public void userStoppedEditing(int row) {
+        if (autoAdvance) {
+          closeOrAdvance(row);
+        }
+      }
+    };
 
-		this.variablesTable.setRendererSetup(new RendererSetup(false));
+    this.variablesTable.setRendererSetup(new RendererSetup(false));
 
-		this.variablesTable.setRowSelectionAllowed(false);
-		this.variablesTable.setColumnSelectionAllowed(false);
-		this.varData = data;
-		DataStoreTableModel model = new DataStoreTableModel(data);
-		model.setLockedColumn(0);
-		this.variablesTable.setModel(model);
-		this.variablesTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    this.variablesTable.setRowSelectionAllowed(false);
+    this.variablesTable.setColumnSelectionAllowed(false);
+    this.varData = data;
+    DataStoreTableModel model = new DataStoreTableModel(data);
+    model.setLockedColumn(0);
+    this.variablesTable.setModel(model);
+    this.variablesTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-		JLabel l = new JLabel(ResourceMgr.getString("TxtVariableInputText"));
-		Border b = BorderFactory.createEmptyBorder(5, 2, 5, 2);
-		l.setBorder(b);
-		l.setBackground(Color.WHITE);
-		l.setOpaque(true);
-		l.setHorizontalAlignment(SwingConstants.CENTER);
+    JLabel l = new JLabel(ResourceMgr.getString("TxtVariableInputText"));
+    Border b = BorderFactory.createEmptyBorder(5, 2, 5, 2);
+    l.setBorder(b);
+    l.setBackground(Color.WHITE);
+    l.setOpaque(true);
+    l.setHorizontalAlignment(SwingConstants.CENTER);
 
-		this.setLayout(new BorderLayout());
+    this.setLayout(new BorderLayout());
 
-		JScrollPane scroll = new JScrollPane(this.variablesTable);
-		b = BorderFactory.createEmptyBorder(5, 0, 0, 0);
-		Border b2 = BorderFactory.createCompoundBorder(b, scroll.getBorder());
-		scroll.setBorder(b2);
+    JScrollPane scroll = new JScrollPane(this.variablesTable);
+    b = BorderFactory.createEmptyBorder(5, 0, 0, 0);
+    Border b2 = BorderFactory.createCompoundBorder(b, scroll.getBorder());
+    scroll.setBorder(b2);
 
-		this.add(l, BorderLayout.NORTH);
-		this.add(scroll, BorderLayout.CENTER);
-	}
+    this.add(l, BorderLayout.NORTH);
+    this.add(scroll, BorderLayout.CENTER);
+  }
 
-	private void closeOrAdvance(final int editedRow)
-	{
-		if (editedRow == variablesTable.getRowCount() - 1 && autoCloseOnAdvance)
-		{
-			dialog.approveAndClose();
-		}
-		else if (editedRow >= 0)
-		{
-			EventQueue.invokeLater(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					startEditRow(editedRow + 1);
-				}
-			});
-		}
-	}
+  public static boolean showVariablesDialog(final DataStore vardata) {
 
-	@Override
-	public void componentDisplayed()
-	{
-		startEditRow(0);
-	}
+    WbSwingUtilities.invoke(new Runnable() {
+      @Override
+      public void run() {
+        VariablesEditor editor = new VariablesEditor(vardata);
 
-	private void startEditRow(int row)
-	{
-		this.variablesTable.setColumnSelectionInterval(1,1);
-		this.variablesTable.editCellAt(row, 1);
-		TableCellEditor editor = this.variablesTable.getCellEditor();
-		if (editor instanceof WbTextCellEditor)
-		{
-			WbTextCellEditor wbedit = (WbTextCellEditor)editor;
-			wbedit.selectAll();
-			wbedit.requestFocus();
-		}
-	}
+        String settingsId = "workbench.gui.variables.dialog";
+        JFrame window = WbManager.getInstance().getCurrentWindow();
 
-	@Override
-	public boolean validateInput()
-	{
-		this.variablesTable.stopEditing();
-		int rows = this.varData.getRowCount();
-		for (int i=0; i < rows; i++)
-		{
-			String varName = this.varData.getValueAsString(i, 0);
-			if (!VariablePool.getInstance().isValidVariableName(varName))
-			{
-				String msg = ResourceMgr.getString("ErrIllegalVariableName");
-				msg = msg.replace("%varname%", varName);
-				msg = msg + "\n" + ResourceMgr.getString("ErrVarDefWrongName");
-				WbSwingUtilities.showErrorMessage(this, msg);
-				return false;
-			}
-		}
-		return true;
-	}
+        editor.dialog = ValidatingDialog.createDialog(window, editor, ResourceMgr.getString("TxtEditVariablesWindowTitle"), null, 0, false);
+        int width = -1;
+        if (Settings.getInstance().restoreWindowSize(editor.dialog, settingsId)) {
+          editor.dialog.setLocationRelativeTo(window);
+          width = (int) (editor.dialog.getWidth() * 0.92);
+        } else {
+          width = (int) (editor.dialog.getPreferredSize().getWidth() * 0.92);
+        }
 
-	private static boolean dialogResult;
+        // make the first column use as much space as needed
+        // and the second one all the rest
+        ColumnWidthOptimizer optimizer = new ColumnWidthOptimizer(editor.variablesTable);
+        optimizer.optimizeColWidth(0, true);
 
-	public static boolean showVariablesDialog(final DataStore vardata)
-	{
+        int w1 = editor.variablesTable.getColumnModel().getColumn(0).getWidth();
+        int w2 = width - w1;
+        editor.variablesTable.getColumnModel().getColumn(1).setPreferredWidth(w2);
 
-		WbSwingUtilities.invoke(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				VariablesEditor editor = new VariablesEditor(vardata);
+        editor.dialog.setVisible(true);
+        dialogResult = !editor.dialog.isCancelled();
+        Settings.getInstance().storeWindowSize(editor.dialog, settingsId);
+      }
+    });
 
-				String settingsId = "workbench.gui.variables.dialog";
-				JFrame window = WbManager.getInstance().getCurrentWindow();
+    boolean result = false;
+    if (dialogResult) {
+      try {
+        vardata.updateDb(null, null);
+        result = true;
+      } catch (Exception e) {
+        LogMgr.logError("VariablesEditor.showVariablesDialog()", "Error when saving values", e);
+        result = false;
+      }
+    }
+    return result;
+  }
 
-				editor.dialog = ValidatingDialog.createDialog(window, editor, ResourceMgr.getString("TxtEditVariablesWindowTitle"), null, 0, false);
-				int width = -1;
-				if (Settings.getInstance().restoreWindowSize(editor.dialog, settingsId))
-				{
-					editor.dialog.setLocationRelativeTo(window);
-					width = (int)(editor.dialog.getWidth() * 0.92);
-				}
-				else
-				{
-					width = (int)(editor.dialog.getPreferredSize().getWidth() * 0.92);
-				}
+  private void closeOrAdvance(final int editedRow) {
+    if (editedRow == variablesTable.getRowCount() - 1 && autoCloseOnAdvance) {
+      dialog.approveAndClose();
+    } else if (editedRow >= 0) {
+      EventQueue.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          startEditRow(editedRow + 1);
+        }
+      });
+    }
+  }
 
-				// make the first column use as much space as needed
-				// and the second one all the rest
-				ColumnWidthOptimizer optimizer = new ColumnWidthOptimizer(editor.variablesTable);
-				optimizer.optimizeColWidth(0, true);
+  @Override
+  public void componentDisplayed() {
+    startEditRow(0);
+  }
 
-				int w1 = editor.variablesTable.getColumnModel().getColumn(0).getWidth();
-				int w2 = width - w1;
-				editor.variablesTable.getColumnModel().getColumn(1).setPreferredWidth(w2);
+  private void startEditRow(int row) {
+    this.variablesTable.setColumnSelectionInterval(1, 1);
+    this.variablesTable.editCellAt(row, 1);
+    TableCellEditor editor = this.variablesTable.getCellEditor();
+    if (editor instanceof WbTextCellEditor) {
+      WbTextCellEditor wbedit = (WbTextCellEditor) editor;
+      wbedit.selectAll();
+      wbedit.requestFocus();
+    }
+  }
 
-				editor.dialog.setVisible(true);
-				dialogResult = !editor.dialog.isCancelled();
-				Settings.getInstance().storeWindowSize(editor.dialog, settingsId);
-			}
-		});
-
-		boolean result = false;
-		if (dialogResult)
-		{
-			try
-			{
-				vardata.updateDb(null,null);
-				result = true;
-			}
-			catch (Exception e)
-			{
-				LogMgr.logError("VariablesEditor.showVariablesDialog()", "Error when saving values", e);
-				result = false;
-			}
-		}
-		return result;
-	}
+  @Override
+  public boolean validateInput() {
+    this.variablesTable.stopEditing();
+    int rows = this.varData.getRowCount();
+    for (int i = 0; i < rows; i++) {
+      String varName = this.varData.getValueAsString(i, 0);
+      if (!VariablePool.getInstance().isValidVariableName(varName)) {
+        String msg = ResourceMgr.getString("ErrIllegalVariableName");
+        msg = msg.replace("%varname%", varName);
+        msg = msg + "\n" + ResourceMgr.getString("ErrVarDefWrongName");
+        WbSwingUtilities.showErrorMessage(this, msg);
+        return false;
+      }
+    }
+    return true;
+  }
 
 }

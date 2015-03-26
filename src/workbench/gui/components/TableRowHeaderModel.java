@@ -22,73 +22,62 @@
  */
 package workbench.gui.components;
 
-import javax.swing.JTable;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableModel;
 import workbench.util.NumberStringCache;
 
+import javax.swing.*;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableModel;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class TableRowHeaderModel
-	implements TableModel
-{
-	private JTable table;
+    implements TableModel {
+  private JTable table;
 
-	public TableRowHeaderModel(JTable client)
-	{
-		this.table = client;
-	}
+  public TableRowHeaderModel(JTable client) {
+    this.table = client;
+  }
 
-	@Override
-	public int getRowCount()
-	{
-		return table.getRowCount();
-	}
+  @Override
+  public int getRowCount() {
+    return table.getRowCount();
+  }
 
-	@Override
-	public int getColumnCount()
-	{
-		return 1;
-	}
+  @Override
+  public int getColumnCount() {
+    return 1;
+  }
 
-	@Override
-	public Object getValueAt(int rowIndex, int columnIndex)
-	{
-		return NumberStringCache.getNumberString(rowIndex + 1);
-	}
+  @Override
+  public Object getValueAt(int rowIndex, int columnIndex) {
+    return NumberStringCache.getNumberString(rowIndex + 1);
+  }
 
-	@Override
-	public String getColumnName(int columnIndex)
-	{
-		return "";
-	}
+  @Override
+  public String getColumnName(int columnIndex) {
+    return "";
+  }
 
-	@Override
-	public Class<?> getColumnClass(int columnIndex)
-	{
-		return String.class;
-	}
+  @Override
+  public Class<?> getColumnClass(int columnIndex) {
+    return String.class;
+  }
 
-	@Override
-	public boolean isCellEditable(int rowIndex, int columnIndex)
-	{
-		return false;
-	}
+  @Override
+  public boolean isCellEditable(int rowIndex, int columnIndex) {
+    return false;
+  }
 
-	@Override
-	public void setValueAt(Object aValue, int rowIndex, int columnIndex)
-	{
-	}
+  @Override
+  public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+  }
 
-	@Override
-	public void addTableModelListener(TableModelListener l)
-	{
-	}
+  @Override
+  public void addTableModelListener(TableModelListener l) {
+  }
 
-	@Override
-	public void removeTableModelListener(TableModelListener l)
-	{
-	}
+  @Override
+  public void removeTableModelListener(TableModelListener l) {
+  }
 }

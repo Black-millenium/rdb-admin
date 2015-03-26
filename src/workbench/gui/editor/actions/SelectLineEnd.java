@@ -25,16 +25,13 @@ package workbench.gui.editor.actions;
 import workbench.resource.PlatformShortcuts;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class SelectLineEnd
-	extends LineEnd
-{
+    extends LineEnd {
 
-	public SelectLineEnd()
-	{
-		super("TxtEdLineEndSel", PlatformShortcuts.getDefaultEndOfLine(true));
-		select = true;
-	}
+  public SelectLineEnd() {
+    super("TxtEdLineEndSel", PlatformShortcuts.getDefaultEndOfLine(true));
+    select = true;
+  }
 }

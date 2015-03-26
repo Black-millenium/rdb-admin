@@ -22,8 +22,6 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.db.ConnectionProfile;
 import workbench.gui.MainWindow;
 import workbench.gui.WbSwingUtilities;
@@ -31,47 +29,42 @@ import workbench.gui.tools.DataPumper;
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
 
+import java.awt.event.ActionEvent;
+
 
 /**
  * Action to display the DataPumper window
+ *
+ * @author Thomas Kellerer
  * @see workbench.gui.tools.DataPumper
- * @author  Thomas Kellerer
  */
 public class DataPumperAction
-	extends WbAction
-{
-	private MainWindow parent;
+    extends WbAction {
+  private MainWindow parent;
 
-	public DataPumperAction(MainWindow win)
-	{
-		super();
-		this.initMenuDefinition("MnuTxtDataPumper");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_TOOLS);
-		this.setIcon("datapumper");
-		this.parent = win;
-	}
+  public DataPumperAction(MainWindow win) {
+    super();
+    this.initMenuDefinition("MnuTxtDataPumper");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_TOOLS);
+    this.setIcon("datapumper");
+    this.parent = win;
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		if (parent != null)
-		{
-			WbSwingUtilities.showWaitCursor(parent);
-		}
-		try
-		{
-			ConnectionProfile profile = null;
-			if (parent != null && Settings.getInstance().getAutoConnectDataPumper())
-			{
-				profile = parent.getCurrentProfile();
-			}
-			DataPumper p = new DataPumper(profile, null);
-			p.showWindow(parent);
-		}
-		finally
-		{
-			if (parent != null) WbSwingUtilities.showDefaultCursor(parent);
-		}
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    if (parent != null) {
+      WbSwingUtilities.showWaitCursor(parent);
+    }
+    try {
+      ConnectionProfile profile = null;
+      if (parent != null && Settings.getInstance().getAutoConnectDataPumper()) {
+        profile = parent.getCurrentProfile();
+      }
+      DataPumper p = new DataPumper(profile, null);
+      p.showWindow(parent);
+    } finally {
+      if (parent != null) WbSwingUtilities.showDefaultCursor(parent);
+    }
+  }
 
 }

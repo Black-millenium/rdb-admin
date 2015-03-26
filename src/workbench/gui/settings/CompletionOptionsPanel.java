@@ -22,126 +22,119 @@
  */
 package workbench.gui.settings;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-
+import workbench.db.objectcache.ObjectCacheStorage;
+import workbench.gui.WbSwingUtilities;
 import workbench.interfaces.Restoreable;
 import workbench.interfaces.ValidatingComponent;
-import workbench.resource.ColumnSortType;
-import workbench.resource.GeneratedIdentifierCase;
-import workbench.resource.GuiSettings;
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
-import workbench.db.objectcache.ObjectCacheStorage;
-
-import workbench.gui.WbSwingUtilities;
-
+import workbench.resource.*;
 import workbench.util.DurationNumber;
 
+import javax.swing.*;
+import java.awt.*;
+
 /**
- *
  * @author tkellerer
  */
 public class CompletionOptionsPanel
-	extends JPanel
-	implements Restoreable, ValidatingComponent
-{
-	public CompletionOptionsPanel()
-	{
-		initComponents();
+    extends JPanel
+    implements Restoreable, ValidatingComponent {
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private JCheckBox addParens;
+  private JCheckBox closePopup;
+  private JComboBox completionColumnSort;
+  private JComboBox completionPasteCase;
+  private JCheckBox cyleEntries;
+  private JCheckBox filterSearch;
+  private JPanel jPanel1;
+  private JLabel localStorageLabel;
+  private JComboBox localStorageType;
+  private JTextField maxAgeField;
+  private JLabel maxAgeLabel;
+  private JCheckBox partialMatch;
+  private JLabel pasteLabel;
+  private JLabel pasterOrderLabel;
+  private JCheckBox preferUSING;
+  private JCheckBox sortColumns;
+  public CompletionOptionsPanel() {
+    initComponents();
 
-		DefaultComboBoxModel model = new DefaultComboBoxModel(ObjectCacheStorage.values());
-		localStorageType.setModel(model);
+    DefaultComboBoxModel model = new DefaultComboBoxModel(ObjectCacheStorage.values());
+    localStorageType.setModel(model);
 
-		WbSwingUtilities.setMinimumSizeFromCols(maxAgeField);
-	}
+    WbSwingUtilities.setMinimumSizeFromCols(maxAgeField);
+  }
 
-	@Override
-	public void restoreSettings()
-	{
+  @Override
+  public void restoreSettings() {
 
-		completionPasteCase.setModel(new DefaultComboBoxModel(GeneratedIdentifierCase.values()));
-		GeneratedIdentifierCase idCase = Settings.getInstance().getAutoCompletionPasteCase();
-		completionPasteCase.setSelectedItem(idCase);
+    completionPasteCase.setModel(new DefaultComboBoxModel(GeneratedIdentifierCase.values()));
+    GeneratedIdentifierCase idCase = Settings.getInstance().getAutoCompletionPasteCase();
+    completionPasteCase.setSelectedItem(idCase);
 
-		completionColumnSort.setModel(new DefaultComboBoxModel(ColumnSortType.values()));
-		ColumnSortType sort = Settings.getInstance().getAutoCompletionColumnSortType();
-		this.completionColumnSort.setSelectedItem(sort);
+    completionColumnSort.setModel(new DefaultComboBoxModel(ColumnSortType.values()));
+    ColumnSortType sort = Settings.getInstance().getAutoCompletionColumnSortType();
+    this.completionColumnSort.setSelectedItem(sort);
 
-		closePopup.setSelected(Settings.getInstance().getCloseAutoCompletionWithSearch());
-		filterSearch.setSelected(GuiSettings.getFilterCompletionSearch());
-		partialMatch.setSelected(GuiSettings.getPartialCompletionSearch());
-		sortColumns.setSelected(GuiSettings.getSortCompletionColumns());
-		cyleEntries.setSelected(GuiSettings.getCycleCompletionPopup());
-		addParens.setSelected(Settings.getInstance().getJoinCompletionUseParens());
-		preferUSING.setSelected(Settings.getInstance().getJoinCompletionPreferUSING());
-		ObjectCacheStorage storage = GuiSettings.getLocalStorageForObjectCache();
-		localStorageType.setSelectedItem(storage);
-		localStorageType.doLayout();
+    closePopup.setSelected(Settings.getInstance().getCloseAutoCompletionWithSearch());
+    filterSearch.setSelected(GuiSettings.getFilterCompletionSearch());
+    partialMatch.setSelected(GuiSettings.getPartialCompletionSearch());
+    sortColumns.setSelected(GuiSettings.getSortCompletionColumns());
+    cyleEntries.setSelected(GuiSettings.getCycleCompletionPopup());
+    addParens.setSelected(Settings.getInstance().getJoinCompletionUseParens());
+    preferUSING.setSelected(Settings.getInstance().getJoinCompletionPreferUSING());
+    ObjectCacheStorage storage = GuiSettings.getLocalStorageForObjectCache();
+    localStorageType.setSelectedItem(storage);
+    localStorageType.doLayout();
 
-		maxAgeField.setText(GuiSettings.getLocalStorageMaxAge());
-		WbSwingUtilities.makeEqualWidth(completionColumnSort, completionPasteCase, localStorageType);
-	}
+    maxAgeField.setText(GuiSettings.getLocalStorageMaxAge());
+    WbSwingUtilities.makeEqualWidth(completionColumnSort, completionPasteCase, localStorageType);
+  }
 
-	@Override
-	public void saveSettings()
-	{
-		Settings config = Settings.getInstance();
-		GeneratedIdentifierCase genCase = (GeneratedIdentifierCase)this.completionPasteCase.getSelectedItem();
-		config.setAutoCompletionPasteCase(genCase);
-		config.setCloseAutoCompletionWithSearch(closePopup.isSelected());
-		ColumnSortType sort = (ColumnSortType)completionColumnSort.getSelectedItem();
-		config.setAutoCompletionColumnSort(sort);
-		config.setJoinCompletionPreferUSING(preferUSING.isSelected());
-		config.setJoinCompletionUseParens(addParens.isSelected());
-		GuiSettings.setFilterCompletionSearch(filterSearch.isSelected());
-		GuiSettings.setPartialCompletionSearch(partialMatch.isSelected());
-		GuiSettings.setSortCompletionColumns(sortColumns.isSelected());
-		GuiSettings.setCycleCompletionPopup(cyleEntries.isSelected());
-		ObjectCacheStorage storage = (ObjectCacheStorage)localStorageType.getSelectedItem();
-		GuiSettings.setLocalStorageForObjectCache(storage);
-		GuiSettings.setLocalStorageMaxAge(maxAgeField.getText().trim().toLowerCase());
-	}
+  @Override
+  public void saveSettings() {
+    Settings config = Settings.getInstance();
+    GeneratedIdentifierCase genCase = (GeneratedIdentifierCase) this.completionPasteCase.getSelectedItem();
+    config.setAutoCompletionPasteCase(genCase);
+    config.setCloseAutoCompletionWithSearch(closePopup.isSelected());
+    ColumnSortType sort = (ColumnSortType) completionColumnSort.getSelectedItem();
+    config.setAutoCompletionColumnSort(sort);
+    config.setJoinCompletionPreferUSING(preferUSING.isSelected());
+    config.setJoinCompletionUseParens(addParens.isSelected());
+    GuiSettings.setFilterCompletionSearch(filterSearch.isSelected());
+    GuiSettings.setPartialCompletionSearch(partialMatch.isSelected());
+    GuiSettings.setSortCompletionColumns(sortColumns.isSelected());
+    GuiSettings.setCycleCompletionPopup(cyleEntries.isSelected());
+    ObjectCacheStorage storage = (ObjectCacheStorage) localStorageType.getSelectedItem();
+    GuiSettings.setLocalStorageForObjectCache(storage);
+    GuiSettings.setLocalStorageMaxAge(maxAgeField.getText().trim().toLowerCase());
+  }
 
-	@Override
-	public boolean validateInput()
-	{
-		String duration = maxAgeField.getText();
-		DurationNumber n = new DurationNumber();
+  @Override
+  public boolean validateInput() {
+    String duration = maxAgeField.getText();
+    DurationNumber n = new DurationNumber();
 
-		if (n.isValid(duration)) return true;
+    if (n.isValid(duration)) return true;
 
-		WbSwingUtilities.showErrorMessageKey(this, "ErrInvalidAge");
-		maxAgeField.selectAll();
-		WbSwingUtilities.requestFocus(maxAgeField);
-		return false;
-	}
+    WbSwingUtilities.showErrorMessageKey(this, "ErrInvalidAge");
+    maxAgeField.selectAll();
+    WbSwingUtilities.requestFocus(maxAgeField);
+    return false;
+  }
 
-	@Override
-	public void componentDisplayed()
-	{
-	}
+  @Override
+  public void componentDisplayed() {
+  }
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
-	@SuppressWarnings("unchecked")
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
+  @SuppressWarnings("unchecked")
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     GridBagConstraints gridBagConstraints;
 
     pasteLabel = new JLabel();
@@ -173,7 +166,7 @@ public class CompletionOptionsPanel
     gridBagConstraints.insets = new Insets(11, 12, 0, 0);
     add(pasteLabel, gridBagConstraints);
 
-    completionPasteCase.setModel(new DefaultComboBoxModel(new String[] { "Lowercase", "Uppercase", "As is" }));
+    completionPasteCase.setModel(new DefaultComboBoxModel(new String[]{"Lowercase", "Uppercase", "As is"}));
     completionPasteCase.setToolTipText(ResourceMgr.getDescription("LblPasteCase"));
     gridBagConstraints = new GridBagConstraints();
     gridBagConstraints.gridx = 1;
@@ -319,22 +312,5 @@ public class CompletionOptionsPanel
     gridBagConstraints.insets = new Insets(12, 10, 0, 10);
     add(jPanel1, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private JCheckBox addParens;
-  private JCheckBox closePopup;
-  private JComboBox completionColumnSort;
-  private JComboBox completionPasteCase;
-  private JCheckBox cyleEntries;
-  private JCheckBox filterSearch;
-  private JPanel jPanel1;
-  private JLabel localStorageLabel;
-  private JComboBox localStorageType;
-  private JTextField maxAgeField;
-  private JLabel maxAgeLabel;
-  private JCheckBox partialMatch;
-  private JLabel pasteLabel;
-  private JLabel pasterOrderLabel;
-  private JCheckBox preferUSING;
-  private JCheckBox sortColumns;
   // End of variables declaration//GEN-END:variables
 }

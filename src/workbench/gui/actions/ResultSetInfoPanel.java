@@ -22,71 +22,61 @@
  */
 package workbench.gui.actions;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-
-import workbench.resource.GuiSettings;
-
 import workbench.db.WbConnection;
-
 import workbench.gui.components.ColumnWidthOptimizer;
 import workbench.gui.components.DataStoreTableModel;
 import workbench.gui.components.WbTable;
 import workbench.gui.renderer.RendererSetup;
 import workbench.gui.renderer.SqlTypeRenderer;
 import workbench.gui.sql.DwPanel;
-
+import workbench.resource.GuiSettings;
 import workbench.storage.DataStore;
 import workbench.storage.ResultInfo;
 import workbench.storage.ResultInfoDisplayBuilder;
 
+import javax.swing.*;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import java.awt.*;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class ResultSetInfoPanel
-	extends JPanel
-{
-	private WbTable display;
+    extends JPanel {
+  private WbTable display;
 
-	public ResultSetInfoPanel(DwPanel data)
-	{
-		super(new BorderLayout());
-		JScrollPane scroll = new javax.swing.JScrollPane();
-		display = new WbTable(false, false, false);
-		display.setRendererSetup(new RendererSetup(false));
-		scroll.setViewportView(display);
+  public ResultSetInfoPanel(DwPanel data) {
+    super(new BorderLayout());
+    JScrollPane scroll = new javax.swing.JScrollPane();
+    display = new WbTable(false, false, false);
+    display.setRendererSetup(new RendererSetup(false));
+    scroll.setViewportView(display);
 
-		add(scroll, BorderLayout.CENTER);
-		DataStore ds = data.getDataStore();
+    add(scroll, BorderLayout.CENTER);
+    DataStore ds = data.getDataStore();
 
-		if (ds != null)
-		{
-			ResultInfo info = ds.getResultInfo();
-			boolean showComments = GuiSettings.getRetrieveQueryComments();
-			WbConnection conn = ds.getOriginalConnection();
-			boolean showTablename = false;
-			if (conn != null)
-			{
-				showTablename = conn.getDbSettings().supportsResultMetaGetTable();
-			}
+    if (ds != null) {
+      ResultInfo info = ds.getResultInfo();
+      boolean showComments = GuiSettings.getRetrieveQueryComments();
+      WbConnection conn = ds.getOriginalConnection();
+      boolean showTablename = false;
+      if (conn != null) {
+        showTablename = conn.getDbSettings().supportsResultMetaGetTable();
+      }
 
-			DataStore infoDs = ResultInfoDisplayBuilder.getDataStore(info, showComments, showTablename);
-			DataStoreTableModel model = new DataStoreTableModel(infoDs);
-			display.setAutoCreateColumnsFromModel(true);
-			display.setModel(model);
+      DataStore infoDs = ResultInfoDisplayBuilder.getDataStore(info, showComments, showTablename);
+      DataStoreTableModel model = new DataStoreTableModel(infoDs);
+      display.setAutoCreateColumnsFromModel(true);
+      display.setModel(model);
 
-			TableColumnModel colmod = display.getColumnModel();
-			int index = colmod.getColumnIndex("JDBC Type");
-			TableColumn col = colmod.getColumn(index);
-			col.setCellRenderer(new SqlTypeRenderer(true));
+      TableColumnModel colmod = display.getColumnModel();
+      int index = colmod.getColumnIndex("JDBC Type");
+      TableColumn col = colmod.getColumn(index);
+      col.setCellRenderer(new SqlTypeRenderer(true));
 
-			ColumnWidthOptimizer optimizer = new ColumnWidthOptimizer(display);
-			optimizer.optimizeAllColWidth(true);
-		}
-	}
+      ColumnWidthOptimizer optimizer = new ColumnWidthOptimizer(display);
+      optimizer.optimizeAllColWidth(true);
+    }
+  }
 }

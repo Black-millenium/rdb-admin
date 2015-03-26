@@ -25,14 +25,11 @@ package workbench.db.importer;
 import java.sql.SQLException;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class ModeNotPossibleException
-	extends SQLException
-{
-	public ModeNotPossibleException(String msg)
-	{
-		super(msg);
-	}
+    extends SQLException {
+  public ModeNotPossibleException(String msg) {
+    super(msg);
+  }
 }

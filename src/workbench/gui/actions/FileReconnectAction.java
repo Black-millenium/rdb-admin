@@ -20,11 +20,10 @@
 
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.db.ConnectionProfile;
-
 import workbench.gui.MainWindow;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Re-Connect the current window.
@@ -32,29 +31,25 @@ import workbench.gui.MainWindow;
  * @author Charles (peacech@gmail.com)
  */
 public class FileReconnectAction
-	extends WbAction
-{
-	private MainWindow window;
+    extends WbAction {
+  private MainWindow window;
 
-	public FileReconnectAction(MainWindow aWindow)
-	{
-		super();
-		this.window = aWindow;
-		this.initMenuDefinition("MnuTxtReconnect");
-		setEnabled(false);
-	}
+  public FileReconnectAction(MainWindow aWindow) {
+    super();
+    this.window = aWindow;
+    this.initMenuDefinition("MnuTxtReconnect");
+    setEnabled(false);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		ConnectionProfile profile = window.getCurrentProfile();
-		boolean reloadWorkspace = false;
-		window.disconnect(false, false, true);
-		if (invokedByMouse(e) && isCtrlPressed(e))
-		{
-			reloadWorkspace = true;
-		}
-		window.connectTo(profile, false, reloadWorkspace);
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    ConnectionProfile profile = window.getCurrentProfile();
+    boolean reloadWorkspace = false;
+    window.disconnect(false, false, true);
+    if (invokedByMouse(e) && isCtrlPressed(e)) {
+      reloadWorkspace = true;
+    }
+    window.connectTo(profile, false, reloadWorkspace);
+  }
 
 }

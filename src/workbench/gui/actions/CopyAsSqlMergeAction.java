@@ -22,56 +22,49 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import workbench.resource.ResourceMgr;
-
 import workbench.db.exporter.ExportType;
-
 import workbench.gui.components.ClipBoardCopier;
 import workbench.gui.components.WbTable;
+import workbench.resource.ResourceMgr;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Action to copy the contents of a table to the clipboard as SQL INSERT statements
+ *
+ * @author Thomas Kellerer
  * @see workbench.gui.components.ClipBoardCopier
- * @author  Thomas Kellerer
  */
 public class CopyAsSqlMergeAction
-	extends WbAction
-{
-	private WbTable client;
+    extends WbAction {
+  private WbTable client;
 
-	public CopyAsSqlMergeAction(WbTable aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtCopyAsSqlMerge");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
-		this.setEnabled(false);
-	}
+  public CopyAsSqlMergeAction(WbTable aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtCopyAsSqlMerge");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
+    this.setEnabled(false);
+  }
 
-	@Override
-	public boolean hasCtrlModifier()
-	{
-		return true;
-	}
+  @Override
+  public boolean hasCtrlModifier() {
+    return true;
+  }
 
-	@Override
-	public boolean hasShiftModifier()
-	{
-		return true;
-	}
+  @Override
+  public boolean hasShiftModifier() {
+    return true;
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		ClipBoardCopier copier = new ClipBoardCopier(this.client);
-		boolean selectColumns = false;
-		if (invokedByMouse(e))
-		{
-			selectColumns = isCtrlPressed(e) ;
-		}
-		copier.copyAsSql(ExportType.SQL_MERGE, false, selectColumns);
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    ClipBoardCopier copier = new ClipBoardCopier(this.client);
+    boolean selectColumns = false;
+    if (invokedByMouse(e)) {
+      selectColumns = isCtrlPressed(e);
+    }
+    copier.copyAsSql(ExportType.SQL_MERGE, false, selectColumns);
+  }
 
 }

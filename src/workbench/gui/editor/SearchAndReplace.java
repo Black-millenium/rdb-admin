@@ -22,28 +22,21 @@
  */
 package workbench.gui.editor;
 
-import java.awt.Container;
-import java.awt.Toolkit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.actions.*;
+import workbench.gui.components.ReplacePanel;
+import workbench.gui.components.SearchCriteriaPanel;
 import workbench.interfaces.Replaceable;
 import workbench.interfaces.Searchable;
 import workbench.interfaces.TextContainer;
 import workbench.log.LogMgr;
 import workbench.resource.ResourceMgr;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.actions.FindAction;
-import workbench.gui.actions.FindNextAction;
-import workbench.gui.actions.FindPreviousAction;
-import workbench.gui.actions.ReplaceAction;
-import workbench.gui.actions.WbAction;
-import workbench.gui.components.ReplacePanel;
-import workbench.gui.components.SearchCriteriaPanel;
-
 import workbench.util.ExceptionUtil;
 import workbench.util.StringUtil;
+
+import java.awt.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class offeres Search & Replace for a TextContainer
@@ -51,462 +44,385 @@ import workbench.util.StringUtil;
  * @author Thomas Kellerer
  */
 public class SearchAndReplace
-	implements Replaceable, Searchable
-{
-	private String lastSearchExpression;
-	private String lastSearchCriteria;
-	private Pattern lastSearchPattern;
-	private int lastSearchPos;
-	private ReplacePanel replacePanel;
+    implements Replaceable, Searchable {
+  private String lastSearchExpression;
+  private String lastSearchCriteria;
+  private Pattern lastSearchPattern;
+  private int lastSearchPos;
+  private ReplacePanel replacePanel;
 
-	private TextContainer editor;
-	private Container parent;
+  private TextContainer editor;
+  private Container parent;
 
-	private FindAction findAction;
-	private FindPreviousAction findPreviousAction;
-	private FindNextAction findNextAction;
-	private ReplaceAction replaceAction;
+  private FindAction findAction;
+  private FindPreviousAction findPreviousAction;
+  private FindNextAction findNextAction;
+  private ReplaceAction replaceAction;
 
-	private boolean wrapSearch;
+  private boolean wrapSearch;
 
-	/**
-	 * Create a new SearchAndReplace support.
-	 *
-	 * @param parentContainer the parent of the textcontainer, needed for displaying dialogs
-	 * @param text the container holding the text
-	 */
-	public SearchAndReplace(Container parentContainer, TextContainer text)
-	{
-		this.editor = text;
-		this.parent = parentContainer;
-		this.findAction = new FindAction(this);
-		this.findPreviousAction = new FindPreviousAction(this);
-		this.findPreviousAction.setEnabled(false);
-		this.findAction.setEnabled(true);
-		this.findNextAction = new FindNextAction(this);
-		this.findNextAction.setEnabled(false);
-		this.replaceAction = new ReplaceAction(this);
-		this.replaceAction.setEnabled(true);
-	}
+  /**
+   * Create a new SearchAndReplace support.
+   *
+   * @param parentContainer the parent of the textcontainer, needed for displaying dialogs
+   * @param text            the container holding the text
+   */
+  public SearchAndReplace(Container parentContainer, TextContainer text) {
+    this.editor = text;
+    this.parent = parentContainer;
+    this.findAction = new FindAction(this);
+    this.findPreviousAction = new FindPreviousAction(this);
+    this.findPreviousAction.setEnabled(false);
+    this.findAction.setEnabled(true);
+    this.findNextAction = new FindNextAction(this);
+    this.findNextAction.setEnabled(false);
+    this.replaceAction = new ReplaceAction(this);
+    this.replaceAction.setEnabled(true);
+  }
 
-	public boolean getWrapSearch()
-	{
-		return wrapSearch;
-	}
+  /**
+   * Replace special characters in the input string so that it can be used
+   * as a replacement using regular expressions.
+   */
+  public static String fixSpecialReplacementChars(String input, boolean useRegex) {
+    if (!useRegex) {
+      return StringUtil.quoteRegexMeta(input);
+    }
 
-	@Override
-	public void setWrapSearch(boolean flag)
-	{
-		this.wrapSearch = flag;
-	}
+    String fixed = input.replaceAll("\\\\n", "\n");
+    fixed = fixed.replaceAll("\\\\r", "\r");
+    fixed = fixed.replaceAll("\\\\t", "\t");
+    return fixed;
+  }
 
-	public ReplaceAction getReplaceAction()
-	{
-		return this.replaceAction;
-	}
+  public static String getSearchExpression(String anExpression, boolean ignoreCase, boolean wholeWord, boolean useRegex) {
+    StringBuilder result = new StringBuilder(anExpression.length() + 10);
 
-	public FindPreviousAction getFindPreviousAction()
-	{
-		return this.findPreviousAction;
-	}
+    final String ignoreModifier = "(?i)";
 
-	public FindNextAction getFindNextAction()
-	{
-		return this.findNextAction;
-	}
+    if (ignoreCase) {
+      result.append(ignoreModifier);
+    }
 
-	public FindAction getFindAction()
-	{
-		return this.findAction;
-	}
+    if (!useRegex) {
+      result.append('(');
+      result.append(StringUtil.quoteRegexMeta(anExpression));
+      result.append(')');
+    } else {
+      result.append(anExpression);
+    }
 
-	private String getText()
-	{
-		return editor.getText();
-	}
+    if (wholeWord) {
+      char c = anExpression.charAt(0);
+      // word boundary dos not work if the expression starts with
+      // a special Regex character. So in that case, we'll just ignore it
+      if (StringUtil.REGEX_SPECIAL_CHARS.indexOf(c) == -1) {
+        if (ignoreCase) {
+          result.insert(ignoreModifier.length(), "\\b");
+        } else {
+          result.insert(0, "\\b");
+        }
+      }
+      c = anExpression.charAt(anExpression.length() - 1);
+      if (StringUtil.REGEX_SPECIAL_CHARS.indexOf(c) == -1) {
+        result.append("\\b");
+      }
+    }
+    return result.toString();
+  }
 
-	private String getSelectedText()
-	{
-		return editor.getSelectedText();
-	}
+  public boolean getWrapSearch() {
+    return wrapSearch;
+  }
 
-	private int getCaretPosition()
-	{
-		return editor.getCaretPosition();
-	}
+  @Override
+  public void setWrapSearch(boolean flag) {
+    this.wrapSearch = flag;
+  }
 
-	/**
-	 * Show the find dialog and start searching.
-	 * @return -1 if nothing was found,
-	 *            the position of the found text otherwise
-	 */
-	@Override
-	public int find()
-	{
-		boolean showDialog = true;
-		String crit = this.getSelectedText();
+  public ReplaceAction getReplaceAction() {
+    return this.replaceAction;
+  }
 
-		// Do not use multi-line selections as the default search criteria
-		if (crit != null && crit.indexOf('\n') > -1) crit = null;
+  public FindPreviousAction getFindPreviousAction() {
+    return this.findPreviousAction;
+  }
 
-		if (crit == null) crit = this.lastSearchCriteria;
-		SearchCriteriaPanel p = new SearchCriteriaPanel(crit);
+  public FindNextAction getFindNextAction() {
+    return this.findNextAction;
+  }
 
-		int pos = -1;
-		while (showDialog)
-		{
-			boolean doFind = p.showFindDialog(this.parent);
-			if (!doFind) return -1;
+  public FindAction getFindAction() {
+    return this.findAction;
+  }
 
-			String criteria = p.getCriteria();
-			boolean ignoreCase = p.getIgnoreCase();
-			boolean wholeWord = p.getWholeWordOnly();
-			boolean useRegex = p.getUseRegex();
-			setWrapSearch(p.getWrapSearch());
-			try
-			{
-				this.lastSearchCriteria = criteria;
-				this.findNextAction.setEnabled(false);
-				this.findPreviousAction.setEnabled(false);
-				pos = this.findText(criteria, ignoreCase, wholeWord, useRegex);
-				showDialog = false;
-				this.findNextAction.setEnabled(pos > -1 || wrapSearch);
-				this.findPreviousAction.setEnabled(pos > -1);
-			}
-			catch (Exception e)
-			{
-				pos = -1;
-				WbSwingUtilities.showErrorMessage(this.parent, ExceptionUtil.getDisplay(e));
-				showDialog = true;
-			}
-		}
-		return pos;
-	}
+  private String getText() {
+    return editor.getText();
+  }
 
-	@Override
-	public int findPrevious()
-	{
-		if (this.lastSearchPattern == null) return -1;
-		if (this.lastSearchPos == -1) return -1;
+  private String getSelectedText() {
+    return editor.getSelectedText();
+  }
 
-		Matcher m = this.lastSearchPattern.matcher(this.getText());
-		int startPos = 0;
-		int lastFound = -1;
-		int lastEnd = -1;
-		while (m.find(startPos))
-		{
-			int foundPos = m.start();
-			if (foundPos >= this.lastSearchPos)
-			{
-				if (lastFound == -1)
-				{
-					lastFound = foundPos;
-					lastEnd = m.end();
-					Toolkit.getDefaultToolkit().beep();
-				}
-				lastSearchPos = lastFound;
-				this.editor.select(this.lastSearchPos, lastEnd);
-				return lastFound;
-			}
-			lastFound = foundPos;
-			lastEnd = m.end();
-			startPos = m.end() + 1;
-		}
-		return -1;
-	}
+  private int getCaretPosition() {
+    return editor.getCaretPosition();
+  }
 
-	@Override
-	public int findNext()
-	{
-		if (this.lastSearchPattern == null) return -1;
-		if (this.lastSearchPos == -1 && !wrapSearch) return -1;
+  /**
+   * Show the find dialog and start searching.
+   *
+   * @return -1 if nothing was found,
+   * the position of the found text otherwise
+   */
+  @Override
+  public int find() {
+    boolean showDialog = true;
+    String crit = this.getSelectedText();
 
-		Matcher m = this.lastSearchPattern.matcher(this.getText());
+    // Do not use multi-line selections as the default search criteria
+    if (crit != null && crit.indexOf('\n') > -1) crit = null;
 
-		int startPos = this.getCaretPosition() + 1;
-		if (wrapSearch && lastSearchPos == -1)
-		{
-			startPos = 0;
-		}
+    if (crit == null) crit = this.lastSearchCriteria;
+    SearchCriteriaPanel p = new SearchCriteriaPanel(crit);
 
-		boolean found = m.find(startPos);
-		if (!found && wrapSearch)
-		{
-			found = m.find(0);
-		}
-		
-		if (found)
-		{
-			this.lastSearchPos = m.start();
-			int end = m.end();
-			this.editor.select(this.lastSearchPos, end);
-		}
-		else
-		{
-			this.lastSearchPos = -1;
-			Toolkit.getDefaultToolkit().beep();
-			String msg = ResourceMgr.getString("MsgEditorCriteriaNotFound");
-			msg = StringUtil.replace(msg, "%value%", this.lastSearchExpression);
-			WbSwingUtilities.showMessage(this.parent, msg);
-		}
-		findNextAction.setEnabled(this.lastSearchPos > -1);
-		return this.lastSearchPos;
-	}
+    int pos = -1;
+    while (showDialog) {
+      boolean doFind = p.showFindDialog(this.parent);
+      if (!doFind) return -1;
 
-	@Override
-	public int findFirst(String aValue, boolean ignoreCase, boolean wholeWord, boolean useRegex)
-	{
-		this.lastSearchPos = this.findText(aValue, ignoreCase, wholeWord, useRegex);
-		findNextAction.setEnabled(this.lastSearchPos > -1);
-		return lastSearchPos;
-	}
+      String criteria = p.getCriteria();
+      boolean ignoreCase = p.getIgnoreCase();
+      boolean wholeWord = p.getWholeWordOnly();
+      boolean useRegex = p.getUseRegex();
+      setWrapSearch(p.getWrapSearch());
+      try {
+        this.lastSearchCriteria = criteria;
+        this.findNextAction.setEnabled(false);
+        this.findPreviousAction.setEnabled(false);
+        pos = this.findText(criteria, ignoreCase, wholeWord, useRegex);
+        showDialog = false;
+        this.findNextAction.setEnabled(pos > -1 || wrapSearch);
+        this.findPreviousAction.setEnabled(pos > -1);
+      } catch (Exception e) {
+        pos = -1;
+        WbSwingUtilities.showErrorMessage(this.parent, ExceptionUtil.getDisplay(e));
+        showDialog = true;
+      }
+    }
+    return pos;
+  }
 
-	@Override
-	public void replace()
-	{
-		if (this.replacePanel == null)
-		{
-			this.replacePanel = new ReplacePanel(this);
-		}
-		this.replacePanel.showReplaceDialog(this.parent, this.editor.getSelectedText());
-	}
+  @Override
+  public int findPrevious() {
+    if (this.lastSearchPattern == null) return -1;
+    if (this.lastSearchPos == -1) return -1;
 
-	/**
-	 *	Find and replace the next occurance of the current search string
-	 */
-	@Override
-	public boolean replaceNext(String aReplacement, boolean useRegex)
-	{
-		try
-		{
-			int pos = this.findNext();
-			if (pos > -1)
-			{
-				String text = this.getSelectedText();
-				Matcher m = this.lastSearchPattern.matcher(text);
-				String newText = m.replaceAll(fixSpecialReplacementChars(aReplacement, useRegex));
-				this.editor.setSelectedText(newText);
-			}
+    Matcher m = this.lastSearchPattern.matcher(this.getText());
+    int startPos = 0;
+    int lastFound = -1;
+    int lastEnd = -1;
+    while (m.find(startPos)) {
+      int foundPos = m.start();
+      if (foundPos >= this.lastSearchPos) {
+        if (lastFound == -1) {
+          lastFound = foundPos;
+          lastEnd = m.end();
+          Toolkit.getDefaultToolkit().beep();
+        }
+        lastSearchPos = lastFound;
+        this.editor.select(this.lastSearchPos, lastEnd);
+        return lastFound;
+      }
+      lastFound = foundPos;
+      lastEnd = m.end();
+      startPos = m.end() + 1;
+    }
+    return -1;
+  }
 
-			return (pos > -1);
-		}
-		catch (Exception e)
-		{
-			LogMgr.logError("SearchAndReplace.replaceNext()", "Error replacing value", e);
-			WbSwingUtilities.showErrorMessage(e.getMessage());
-			return false;
-		}
-	}
+  @Override
+  public int findNext() {
+    if (this.lastSearchPattern == null) return -1;
+    if (this.lastSearchPos == -1 && !wrapSearch) return -1;
 
-	@Override
-	public boolean isTextSelected()
-	{
-		int selStart = this.editor.getSelectionStart();
-		int selEnd = this.editor.getSelectionEnd();
-		return (selStart > -1 && selEnd > selStart);
-	}
+    Matcher m = this.lastSearchPattern.matcher(this.getText());
 
-	/**
-	 * Replace special characters in the input string so that it can be used
-	 * as a replacement using regular expressions.
-	 */
-	public static String fixSpecialReplacementChars(String input, boolean useRegex)
-	{
-		if (!useRegex)
-		{
-			return StringUtil.quoteRegexMeta(input);
-		}
+    int startPos = this.getCaretPosition() + 1;
+    if (wrapSearch && lastSearchPos == -1) {
+      startPos = 0;
+    }
 
-		String fixed = input.replaceAll("\\\\n", "\n");
-		fixed = fixed.replaceAll("\\\\r", "\r");
-		fixed = fixed.replaceAll("\\\\t", "\t");
-		return fixed;
-	}
+    boolean found = m.find(startPos);
+    if (!found && wrapSearch) {
+      found = m.find(0);
+    }
 
-	@Override
-	public int replaceAll(String value, String replacement, boolean selectedText, boolean ignoreCase, boolean wholeWord, boolean useRegex)
-	{
-		String old = null;
-		if (selectedText)
-		{
-			old = this.getSelectedText();
-		}
-		else
-		{
-			old = this.getText();
-		}
-		int cursor = this.getCaretPosition();
-		int selStart = this.editor.getSelectionStart();
-		int selEnd = this.editor.getSelectionEnd();
-		int newLen = -1;
+    if (found) {
+      this.lastSearchPos = m.start();
+      int end = m.end();
+      this.editor.select(this.lastSearchPos, end);
+    } else {
+      this.lastSearchPos = -1;
+      Toolkit.getDefaultToolkit().beep();
+      String msg = ResourceMgr.getString("MsgEditorCriteriaNotFound");
+      msg = StringUtil.replace(msg, "%value%", this.lastSearchExpression);
+      WbSwingUtilities.showMessage(this.parent, msg);
+    }
+    findNextAction.setEnabled(this.lastSearchPos > -1);
+    return this.lastSearchPos;
+  }
 
-		String regex = getSearchExpression(value, ignoreCase, wholeWord, useRegex);
-		replacement = fixSpecialReplacementChars(replacement, useRegex);
+  @Override
+  public int findFirst(String aValue, boolean ignoreCase, boolean wholeWord, boolean useRegex) {
+    this.lastSearchPos = this.findText(aValue, ignoreCase, wholeWord, useRegex);
+    findNextAction.setEnabled(this.lastSearchPos > -1);
+    return lastSearchPos;
+  }
 
-		Pattern p = Pattern.compile(regex, Pattern.MULTILINE);
-		Matcher m = p.matcher(old);
-		String newText = m.replaceAll(replacement);
+  @Override
+  public void replace() {
+    if (this.replacePanel == null) {
+      this.replacePanel = new ReplacePanel(this);
+    }
+    this.replacePanel.showReplaceDialog(this.parent, this.editor.getSelectedText());
+  }
 
-		if (selectedText)
-		{
-			this.editor.setSelectedText(newText);
-			newLen = this.getText().length();
-			int delta = newText.length() - old.length();
-			selEnd += delta;
-			if (selStart < selEnd)
-			{
-				this.editor.select(selStart, selEnd);
-			}
-			else if (cursor < newLen)
-			{
-				this.editor.setCaretPosition(cursor);
-			}
-		}
-		else
-		{
-			this.editor.setText(newText);
-			newLen = this.getText().length();
-			if (cursor < newLen)
-			{
-				this.editor.setCaretPosition(cursor);
-			}
-			else
-			{
-				this.editor.setCaretPosition(0);
-			}
-		}
-		return 0;
-	}
+  /**
+   * Find and replace the next occurance of the current search string
+   */
+  @Override
+  public boolean replaceNext(String aReplacement, boolean useRegex) {
+    try {
+      int pos = this.findNext();
+      if (pos > -1) {
+        String text = this.getSelectedText();
+        Matcher m = this.lastSearchPattern.matcher(text);
+        String newText = m.replaceAll(fixSpecialReplacementChars(aReplacement, useRegex));
+        this.editor.setSelectedText(newText);
+      }
 
-	@Override
-	public boolean replaceCurrent(String replacement, boolean useRegex)
-	{
-		if (this.searchPatternMatchesSelectedText())
-		{
-			try
-			{
-				Matcher m = this.lastSearchPattern.matcher(this.getSelectedText());
-				String newText = m.replaceAll(fixSpecialReplacementChars(replacement, useRegex));
-				this.editor.setSelectedText(newText);
-				return true;
-			}
-			catch (Exception e)
-			{
-				LogMgr.logError("SearchAndReplace.replaceCurrent()", "Error replacing value", e);
-				WbSwingUtilities.showErrorMessage(e.getMessage());
-				return false;
-			}
-		}
-		else
-		{
-			return replaceNext(replacement, useRegex);
-		}
-	}
+      return (pos > -1);
+    } catch (Exception e) {
+      LogMgr.logError("SearchAndReplace.replaceNext()", "Error replacing value", e);
+      WbSwingUtilities.showErrorMessage(e.getMessage());
+      return false;
+    }
+  }
 
-	public int findText(String anExpression, boolean ignoreCase)
-	{
-		return this.findText(anExpression, ignoreCase, false, true);
-	}
+  @Override
+  public boolean isTextSelected() {
+    int selStart = this.editor.getSelectionStart();
+    int selEnd = this.editor.getSelectionEnd();
+    return (selStart > -1 && selEnd > selStart);
+  }
 
-	public static String getSearchExpression(String anExpression, boolean ignoreCase, boolean wholeWord, boolean useRegex)
-	{
-		StringBuilder result = new StringBuilder(anExpression.length() + 10);
+  @Override
+  public int replaceAll(String value, String replacement, boolean selectedText, boolean ignoreCase, boolean wholeWord, boolean useRegex) {
+    String old = null;
+    if (selectedText) {
+      old = this.getSelectedText();
+    } else {
+      old = this.getText();
+    }
+    int cursor = this.getCaretPosition();
+    int selStart = this.editor.getSelectionStart();
+    int selEnd = this.editor.getSelectionEnd();
+    int newLen = -1;
 
-		final String ignoreModifier = "(?i)";
+    String regex = getSearchExpression(value, ignoreCase, wholeWord, useRegex);
+    replacement = fixSpecialReplacementChars(replacement, useRegex);
 
-		if (ignoreCase)
-		{
-			result.append(ignoreModifier);
-		}
+    Pattern p = Pattern.compile(regex, Pattern.MULTILINE);
+    Matcher m = p.matcher(old);
+    String newText = m.replaceAll(replacement);
 
-		if (!useRegex)
-		{
-			result.append('(');
-			result.append(StringUtil.quoteRegexMeta(anExpression));
-			result.append(')');
-		}
-		else
-		{
-			result.append(anExpression);
-		}
+    if (selectedText) {
+      this.editor.setSelectedText(newText);
+      newLen = this.getText().length();
+      int delta = newText.length() - old.length();
+      selEnd += delta;
+      if (selStart < selEnd) {
+        this.editor.select(selStart, selEnd);
+      } else if (cursor < newLen) {
+        this.editor.setCaretPosition(cursor);
+      }
+    } else {
+      this.editor.setText(newText);
+      newLen = this.getText().length();
+      if (cursor < newLen) {
+        this.editor.setCaretPosition(cursor);
+      } else {
+        this.editor.setCaretPosition(0);
+      }
+    }
+    return 0;
+  }
 
-		if (wholeWord)
-		{
-			char c = anExpression.charAt(0);
-			// word boundary dos not work if the expression starts with
-			// a special Regex character. So in that case, we'll just ignore it
-			if (StringUtil.REGEX_SPECIAL_CHARS.indexOf(c) == -1)
-			{
-				if (ignoreCase)
-				{
-					result.insert(ignoreModifier.length(), "\\b");
-				}
-				else
-				{
-					result.insert(0, "\\b");
-				}
-			}
-			c = anExpression.charAt(anExpression.length() - 1);
-			if (StringUtil.REGEX_SPECIAL_CHARS.indexOf(c) == -1)
-			{
-				result.append("\\b");
-			}
-		}
-		return result.toString();
-	}
+  @Override
+  public boolean replaceCurrent(String replacement, boolean useRegex) {
+    if (this.searchPatternMatchesSelectedText()) {
+      try {
+        Matcher m = this.lastSearchPattern.matcher(this.getSelectedText());
+        String newText = m.replaceAll(fixSpecialReplacementChars(replacement, useRegex));
+        this.editor.setSelectedText(newText);
+        return true;
+      } catch (Exception e) {
+        LogMgr.logError("SearchAndReplace.replaceCurrent()", "Error replacing value", e);
+        WbSwingUtilities.showErrorMessage(e.getMessage());
+        return false;
+      }
+    } else {
+      return replaceNext(replacement, useRegex);
+    }
+  }
 
-	public boolean isCurrentSearchCriteria(String aValue, boolean ignoreCase, boolean wholeWord, boolean useRegex)
-	{
-		if (this.lastSearchExpression == null) return false;
-		if (aValue == null) return false;
-		String regex = getSearchExpression(aValue, ignoreCase, wholeWord, useRegex);
-		return regex.equals(this.lastSearchExpression);
-	}
+  public int findText(String anExpression, boolean ignoreCase) {
+    return this.findText(anExpression, ignoreCase, false, true);
+  }
 
-	public int findText(String anExpression, boolean ignoreCase, boolean wholeWord, boolean useRegex)
-	{
-		String regex = getSearchExpression(anExpression, ignoreCase, wholeWord, useRegex);
+  public boolean isCurrentSearchCriteria(String aValue, boolean ignoreCase, boolean wholeWord, boolean useRegex) {
+    if (this.lastSearchExpression == null) return false;
+    if (aValue == null) return false;
+    String regex = getSearchExpression(aValue, ignoreCase, wholeWord, useRegex);
+    return regex.equals(this.lastSearchExpression);
+  }
 
-		int end = -1;
-		this.lastSearchPattern = Pattern.compile(regex, Pattern.MULTILINE);
-		this.lastSearchExpression = anExpression;
-		Matcher m = this.lastSearchPattern.matcher(this.getText());
+  public int findText(String anExpression, boolean ignoreCase, boolean wholeWord, boolean useRegex) {
+    String regex = getSearchExpression(anExpression, ignoreCase, wholeWord, useRegex);
 
-		int startPos = this.isTextSelected() ? this.editor.getSelectionStart() : this.getCaretPosition();
-		if (m.find(startPos))
-		{
-			this.lastSearchPos = m.start();
-			end = m.end();
-			this.editor.select(this.lastSearchPos, end);
-		}
-		else
-		{
-			this.lastSearchPos = -1;
-			int pos = -1;
-			if (wrapSearch)
-			{
-				pos = findNext();
-			}
-			if (pos < 0)
-			{
-				Toolkit.getDefaultToolkit().beep();
-				String msg = ResourceMgr.getString("MsgEditorCriteriaNotFound");
-				msg = StringUtil.replace(msg, "%value%", anExpression);
-				WbSwingUtilities.showMessage(this.parent, msg);
-			}
-		}
-		return this.lastSearchPos;
-	}
+    int end = -1;
+    this.lastSearchPattern = Pattern.compile(regex, Pattern.MULTILINE);
+    this.lastSearchExpression = anExpression;
+    Matcher m = this.lastSearchPattern.matcher(this.getText());
 
-	public boolean searchPatternMatchesSelectedText()
-	{
-		if (this.lastSearchPattern == null) return false;
-		Matcher m = this.lastSearchPattern.matcher(this.getSelectedText());
-		return m.matches();
-	}
+    int startPos = this.isTextSelected() ? this.editor.getSelectionStart() : this.getCaretPosition();
+    if (m.find(startPos)) {
+      this.lastSearchPos = m.start();
+      end = m.end();
+      this.editor.select(this.lastSearchPos, end);
+    } else {
+      this.lastSearchPos = -1;
+      int pos = -1;
+      if (wrapSearch) {
+        pos = findNext();
+      }
+      if (pos < 0) {
+        Toolkit.getDefaultToolkit().beep();
+        String msg = ResourceMgr.getString("MsgEditorCriteriaNotFound");
+        msg = StringUtil.replace(msg, "%value%", anExpression);
+        WbSwingUtilities.showMessage(this.parent, msg);
+      }
+    }
+    return this.lastSearchPos;
+  }
 
-	public void dispose()
-	{
-		WbAction.dispose(findAction, findPreviousAction, findNextAction, replaceAction);
-	}
+  public boolean searchPatternMatchesSelectedText() {
+    if (this.lastSearchPattern == null) return false;
+    Matcher m = this.lastSearchPattern.matcher(this.getSelectedText());
+    return m.matches();
+  }
+
+  public void dispose() {
+    WbAction.dispose(findAction, findPreviousAction, findNextAction, replaceAction);
+  }
 }

@@ -22,32 +22,30 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
 import workbench.gui.help.HelpManager;
+
+import java.awt.event.ActionEvent;
 
 /**
  * @author Thomas Kellerer
  */
 public class WhatsNewAction
-	extends WbAction
-{
-	private static WhatsNewAction instance = new WhatsNewAction();
-	public static WhatsNewAction getInstance()
-	{
-		return instance;
-	}
-	
-	private WhatsNewAction()
-	{
-		super();
-		this.initMenuDefinition("MnuTxtWhatsNew");
-		this.removeIcon();
-	}
+    extends WbAction {
+  private static WhatsNewAction instance = new WhatsNewAction();
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		HelpManager.showHistory();
-	}
-	
+  private WhatsNewAction() {
+    super();
+    this.initMenuDefinition("MnuTxtWhatsNew");
+    this.removeIcon();
+  }
+
+  public static WhatsNewAction getInstance() {
+    return instance;
+  }
+
+  @Override
+  public void executeAction(ActionEvent e) {
+    HelpManager.showHistory();
+  }
+
 }

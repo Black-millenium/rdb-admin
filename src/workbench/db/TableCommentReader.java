@@ -22,133 +22,109 @@
  */
 package workbench.db;
 
-import java.util.List;
-
+import workbench.db.sqltemplates.ColumnChanger;
 import workbench.log.LogMgr;
 import workbench.resource.Settings;
-
-import workbench.db.sqltemplates.ColumnChanger;
-
 import workbench.util.StringUtil;
+
+import java.util.List;
 
 /**
  * @author Thomas Kellerer
  */
-public class TableCommentReader
-{
-	public TableCommentReader()
-	{
-	}
+public class TableCommentReader {
+  public TableCommentReader() {
+  }
 
-	/**
-	 * Return the SQL that is needed to re-create the comment on the given table.
-	 * The syntax to be used, can be configured in the workbench.settings file.
-	 */
-	public String getTableCommentSql(WbConnection dbConnection, TableIdentifier table)
-	{
-		return getTableCommentSql(dbConnection.getDbSettings().getDbId(), dbConnection, table);
-	}
+  /**
+   * Return the SQL that is needed to re-create the comment on the given table.
+   * The syntax to be used, can be configured in the workbench.settings file.
+   */
+  public String getTableCommentSql(WbConnection dbConnection, TableIdentifier table) {
+    return getTableCommentSql(dbConnection.getDbSettings().getDbId(), dbConnection, table);
+  }
 
-	String getTableCommentSql(String dbId, WbConnection dbConnection, TableIdentifier table)
-	{
-		CommentSqlManager mgr = new CommentSqlManager(dbConnection.getMetadata().getDbId());
+  String getTableCommentSql(String dbId, WbConnection dbConnection, TableIdentifier table) {
+    CommentSqlManager mgr = new CommentSqlManager(dbConnection.getMetadata().getDbId());
 
-		String commentStatement = mgr.getCommentSqlTemplate(table.getType(), CommentSqlManager.COMMENT_ACTION_SET);
+    String commentStatement = mgr.getCommentSqlTemplate(table.getType(), CommentSqlManager.COMMENT_ACTION_SET);
 
-		if (StringUtil.isBlank(commentStatement))
-		{
-			return null;
-		}
+    if (StringUtil.isBlank(commentStatement)) {
+      return null;
+    }
 
-		String comment = null;
+    String comment = null;
 
-		if (table.commentIsDefined())
-		{
-			comment = table.getComment();
-		}
-		else
-		{
-			comment = getTableComment(dbConnection, table);
-		}
+    if (table.commentIsDefined()) {
+      comment = table.getComment();
+    } else {
+      comment = getTableComment(dbConnection, table);
+    }
 
-		String result = null;
-		if (Settings.getInstance().getIncludeEmptyComments() || StringUtil.isNonBlank(comment))
-		{
-			if (commentStatement.contains(CommentSqlManager.COMMENT_FQ_OBJECT_NAME_PLACEHOLDER))
-			{
-				result = StringUtil.replace(commentStatement, CommentSqlManager.COMMENT_FQ_OBJECT_NAME_PLACEHOLDER, table.getTableExpression(dbConnection));
-			}
-			else
-			{
-				result = StringUtil.replace(commentStatement, CommentSqlManager.COMMENT_OBJECT_NAME_PLACEHOLDER, table.getTableName());
-				result = replaceObjectNamePlaceholder(result, TableSourceBuilder.SCHEMA_PLACEHOLDER, table.getSchema());
-				result = replaceObjectNamePlaceholder(result, TableSourceBuilder.CATALOG_PLACEHOLDER, table.getCatalog());
-			}
-			result = StringUtil.replace(result, CommentSqlManager.COMMENT_PLACEHOLDER, comment == null ? "" : comment.replace("'", "''"));
-			result += ";";
-		}
+    String result = null;
+    if (Settings.getInstance().getIncludeEmptyComments() || StringUtil.isNonBlank(comment)) {
+      if (commentStatement.contains(CommentSqlManager.COMMENT_FQ_OBJECT_NAME_PLACEHOLDER)) {
+        result = StringUtil.replace(commentStatement, CommentSqlManager.COMMENT_FQ_OBJECT_NAME_PLACEHOLDER, table.getTableExpression(dbConnection));
+      } else {
+        result = StringUtil.replace(commentStatement, CommentSqlManager.COMMENT_OBJECT_NAME_PLACEHOLDER, table.getTableName());
+        result = replaceObjectNamePlaceholder(result, TableSourceBuilder.SCHEMA_PLACEHOLDER, table.getSchema());
+        result = replaceObjectNamePlaceholder(result, TableSourceBuilder.CATALOG_PLACEHOLDER, table.getCatalog());
+      }
+      result = StringUtil.replace(result, CommentSqlManager.COMMENT_PLACEHOLDER, comment == null ? "" : comment.replace("'", "''"));
+      result += ";";
+    }
 
-		return result;
-	}
+    return result;
+  }
 
-	public String getTableComment(WbConnection dbConnection, TableIdentifier tbl)
-	{
-		TableIdentifier id = dbConnection.getMetadata().findObject(tbl);
-		if (id == null) return null;
-		return id.getComment();
-	}
+  public String getTableComment(WbConnection dbConnection, TableIdentifier tbl) {
+    TableIdentifier id = dbConnection.getMetadata().findObject(tbl);
+    if (id == null) return null;
+    return id.getComment();
+  }
 
-	/**
-	 * Return the SQL that is needed to re-create the comment on the given columns.
-	 *
-	 * The syntax to be used, can be configured in the workbench.settings file.
-	 * 
-	 * @see CommentSqlManager#getCommentSqlTemplate(java.lang.String, java.lang.String)
-	 */
-	public StringBuilder getTableColumnCommentsSql(WbConnection con, TableIdentifier table, List<ColumnIdentifier> columns)
-	{
-		return getTableColumnCommentsSql(con.getMetadata().getDbId(), con, table, columns);
-	}
+  /**
+   * Return the SQL that is needed to re-create the comment on the given columns.
+   * <p/>
+   * The syntax to be used, can be configured in the workbench.settings file.
+   *
+   * @see CommentSqlManager#getCommentSqlTemplate(java.lang.String, java.lang.String)
+   */
+  public StringBuilder getTableColumnCommentsSql(WbConnection con, TableIdentifier table, List<ColumnIdentifier> columns) {
+    return getTableColumnCommentsSql(con.getMetadata().getDbId(), con, table, columns);
+  }
 
-	/**
-	 * For Unit-Testing only
-	 */
-	StringBuilder getTableColumnCommentsSql(String dbId, WbConnection con, TableIdentifier table, List<ColumnIdentifier> columns)
-	{
-		CommentSqlManager mgr = new CommentSqlManager(dbId);
+  /**
+   * For Unit-Testing only
+   */
+  StringBuilder getTableColumnCommentsSql(String dbId, WbConnection con, TableIdentifier table, List<ColumnIdentifier> columns) {
+    CommentSqlManager mgr = new CommentSqlManager(dbId);
 
-		String columnStatement = mgr.getCommentSqlTemplate("column", CommentSqlManager.COMMENT_ACTION_SET);
-		if (StringUtil.isBlank(columnStatement)) return null;
-		StringBuilder result = new StringBuilder(columns.size() * 25);
-		ColumnChanger colChanger = new ColumnChanger(con);
+    String columnStatement = mgr.getCommentSqlTemplate("column", CommentSqlManager.COMMENT_ACTION_SET);
+    if (StringUtil.isBlank(columnStatement)) return null;
+    StringBuilder result = new StringBuilder(columns.size() * 25);
+    ColumnChanger colChanger = new ColumnChanger(con);
 
-		for (ColumnIdentifier col : columns)
-		{
-			String comment = col.getComment();
-			if (Settings.getInstance().getIncludeEmptyComments() || StringUtil.isNonBlank(comment))
-			{
-				try
-				{
-					String commentSql = colChanger.getColumnCommentSql(table, col);
-					result.append(commentSql);
-					result.append(";\n");
-				}
-				catch (Exception e)
-				{
-					LogMgr.logError("TableCommentReader.getTableColumnCommentsSql()", "Error creating comments SQL for remark=" + comment, e);
-				}
-			}
-		}
-		return result;
-	}
+    for (ColumnIdentifier col : columns) {
+      String comment = col.getComment();
+      if (Settings.getInstance().getIncludeEmptyComments() || StringUtil.isNonBlank(comment)) {
+        try {
+          String commentSql = colChanger.getColumnCommentSql(table, col);
+          result.append(commentSql);
+          result.append(";\n");
+        } catch (Exception e) {
+          LogMgr.logError("TableCommentReader.getTableColumnCommentsSql()", "Error creating comments SQL for remark=" + comment, e);
+        }
+      }
+    }
+    return result;
+  }
 
-	private String replaceObjectNamePlaceholder(String source, String placeHolder, String replacement)
-	{
-		if (StringUtil.isBlank(replacement))
-		{
-			return source.replace(placeHolder + ".", "");
-		}
-		return source.replace(placeHolder, replacement);
-	}
+  private String replaceObjectNamePlaceholder(String source, String placeHolder, String replacement) {
+    if (StringUtil.isBlank(replacement)) {
+      return source.replace(placeHolder + ".", "");
+    }
+    return source.replace(placeHolder, replacement);
+  }
 
 }

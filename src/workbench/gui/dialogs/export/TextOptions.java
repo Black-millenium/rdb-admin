@@ -22,38 +22,53 @@
  */
 package workbench.gui.dialogs.export;
 
-import java.util.Set;
-
 import workbench.db.exporter.BlobMode;
 import workbench.db.exporter.ControlFileFormat;
 import workbench.util.CharacterEscapeType;
-
 import workbench.util.CharacterRange;
 import workbench.util.QuoteEscapeType;
 
+import java.util.Set;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public interface TextOptions
-{
-	String getTextDelimiter();
-	void setTextDelimiter(String delim);
-	boolean getExportHeaders();
-	void setExportHeaders(boolean flag);
-	String getTextQuoteChar();
-	void setTextQuoteChar(String quote);
-	void setQuoteAlways(boolean flag);
-	boolean getQuoteAlways();
-	void setEscapeRange(CharacterRange range);
-	CharacterRange getEscapeRange();
-	void setEscapeType(CharacterEscapeType type);
-	CharacterEscapeType getEscapeType();
-	void setLineEnding(String ending);
-	String getLineEnding();
-	void setDecimalSymbol(String decimal);
-	String getDecimalSymbol();
-	QuoteEscapeType getQuoteEscaping();
-	Set<ControlFileFormat> getControlFiles();
-	BlobMode getBlobMode();
+public interface TextOptions {
+  String getTextDelimiter();
+
+  void setTextDelimiter(String delim);
+
+  boolean getExportHeaders();
+
+  void setExportHeaders(boolean flag);
+
+  String getTextQuoteChar();
+
+  void setTextQuoteChar(String quote);
+
+  boolean getQuoteAlways();
+
+  void setQuoteAlways(boolean flag);
+
+  CharacterRange getEscapeRange();
+
+  void setEscapeRange(CharacterRange range);
+
+  CharacterEscapeType getEscapeType();
+
+  void setEscapeType(CharacterEscapeType type);
+
+  String getLineEnding();
+
+  void setLineEnding(String ending);
+
+  String getDecimalSymbol();
+
+  void setDecimalSymbol(String decimal);
+
+  QuoteEscapeType getQuoteEscaping();
+
+  Set<ControlFileFormat> getControlFiles();
+
+  BlobMode getBlobMode();
 }

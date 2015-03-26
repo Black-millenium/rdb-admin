@@ -22,251 +22,264 @@
  */
 package workbench.gui.settings;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.SystemTray;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Collection;
-import java.util.Locale;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.border.EmptyBorder;
-
+import workbench.db.KeepAliveDaemon;
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.components.WbLabelField;
+import workbench.gui.sql.IconHandler;
 import workbench.interfaces.Restoreable;
 import workbench.log.LogMgr;
 import workbench.resource.GuiSettings;
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
-
-import workbench.db.KeepAliveDaemon;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.components.WbLabelField;
-import workbench.gui.sql.IconHandler;
-
 import workbench.util.MacOSHelper;
 import workbench.util.WbFile;
 import workbench.util.WbLocale;
 
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Collection;
+import java.util.Locale;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class GeneralOptionsPanel
-	extends JPanel
-	implements Restoreable, ActionListener, Disposable
-{
+    extends JPanel
+    implements Restoreable, ActionListener, Disposable {
 
-	public GeneralOptionsPanel()
-	{
-		super();
-		initComponents();
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JTextField alertDuration;
+  private javax.swing.JCheckBox autoConnect;
+  private javax.swing.JCheckBox autoSaveProfiles;
+  private javax.swing.JCheckBox brushedMetal;
+  private javax.swing.JLabel busyIconLabel;
+  private javax.swing.JComboBox cancelIconCombo;
 
-		brushedMetal.setVisible(MacOSHelper.isMacOS());
-		brushedMetal.setEnabled(MacOSHelper.isMacOS());
-		if (!brushedMetal.isVisible())
-		{
-			GridBagLayout layout = (GridBagLayout)jPanel2.getLayout();
-			GridBagConstraints constraints = layout.getConstraints(singlePageHelp);
-			constraints.weightx = 1.0;
-			layout.setConstraints(singlePageHelp, constraints);
-		}
+  // Code for dispatching events from components to event handlers.
+  private javax.swing.JLabel cancelIconLabel;
+  private javax.swing.JComboBox checkInterval;
+  private javax.swing.JLabel checkUpdatesLabel;
+  private javax.swing.JCheckBox closeButtonRightSide;
+  private javax.swing.JCheckBox confirmTabClose;
+  private javax.swing.JCheckBox consolidateLog;
+  private javax.swing.JCheckBox enableQuickFilter;
+  private javax.swing.JCheckBox exitOnConnectCancel;
+  private javax.swing.JComboBox iconCombobox;
+  private javax.swing.JPanel imagePanel;
+  private javax.swing.JLabel jLabel2;
+  private javax.swing.JPanel jPanel1;
+  private javax.swing.JPanel jPanel2;
+  private javax.swing.JPanel jPanel3;
+  private javax.swing.JPanel jPanel4;
+  private javax.swing.JPanel jPanel5;
+  private javax.swing.JSeparator jSeparator1;
+  private javax.swing.JSeparator jSeparator2;
+  private javax.swing.JSeparator jSeparator3;
+  private javax.swing.JSeparator jSeparator4;
+  private javax.swing.JSeparator jSeparator5;
+  private javax.swing.JLabel langLabel;
+  private javax.swing.JComboBox languageDropDown;
+  private javax.swing.JCheckBox logAllStatements;
+  private javax.swing.JComboBox logLevel;
+  private javax.swing.JLabel logLevelLabel;
+  private javax.swing.JTextField logfileLabel;
+  private javax.swing.JCheckBox onlyActiveTab;
+  private javax.swing.JCheckBox scrollTabs;
+  private javax.swing.JTextField settingsfilename;
+  private javax.swing.JCheckBox showFinishAlert;
+  private javax.swing.JCheckBox showResultTabClose;
+  private javax.swing.JCheckBox showTabCloseButton;
+  private javax.swing.JCheckBox showTabIndex;
+  private javax.swing.JCheckBox singlePageHelp;
+  private javax.swing.JCheckBox tabLRUclose;
+  private javax.swing.JCheckBox useEncryption;
+  private javax.swing.JCheckBox useSystemTray;
+  public GeneralOptionsPanel() {
+    super();
+    initComponents();
 
-		String[] updTypes = new String[] {
-			ResourceMgr.getString("LblUpdCheckNever"),
-			ResourceMgr.getString("LblUpdCheckDaily"),
-			ResourceMgr.getString("LblUpdCheck7"),
-			ResourceMgr.getString("LblUpdCheck14"),
-			ResourceMgr.getString("LblUpdCheck30")
-		};
-		checkInterval.setModel(new DefaultComboBoxModel(updTypes));
-		useSystemTray.setVisible(SystemTray.isSupported());
-		WbSwingUtilities.repaintLater(iconCombobox);
-		WbSwingUtilities.repaintLater(cancelIconCombo);
-		useSystemTray.setEnabled(SystemTray.isSupported());
-	}
+    brushedMetal.setVisible(MacOSHelper.isMacOS());
+    brushedMetal.setEnabled(MacOSHelper.isMacOS());
+    if (!brushedMetal.isVisible()) {
+      GridBagLayout layout = (GridBagLayout) jPanel2.getLayout();
+      GridBagConstraints constraints = layout.getConstraints(singlePageHelp);
+      constraints.weightx = 1.0;
+      layout.setConstraints(singlePageHelp, constraints);
+    }
 
-	@Override
-	public void restoreSettings()
-	{
-		logLevel.setSelectedItem(LogMgr.getLevel());
-		int days = Settings.getInstance().getUpdateCheckInterval();
-		if (days == 1)
-		{
-			checkInterval.setSelectedIndex(1);
-		}
-		else if (days == 7)
-		{
-			checkInterval.setSelectedIndex(2);
-		}
-		else if (days == 14)
-		{
-			checkInterval.setSelectedIndex(3);
-		}
-		else if (days == 30)
-		{
-			checkInterval.setSelectedIndex(4);
-		}
-		else
-		{
-			checkInterval.setSelectedIndex(0);
-		}
-		languageDropDown.removeAllItems();
-		String currentLang = Settings.getInstance().getLanguage().getLanguage();
+    String[] updTypes = new String[]{
+        ResourceMgr.getString("LblUpdCheckNever"),
+        ResourceMgr.getString("LblUpdCheckDaily"),
+        ResourceMgr.getString("LblUpdCheck7"),
+        ResourceMgr.getString("LblUpdCheck14"),
+        ResourceMgr.getString("LblUpdCheck30")
+    };
+    checkInterval.setModel(new DefaultComboBoxModel(updTypes));
+    useSystemTray.setVisible(SystemTray.isSupported());
+    WbSwingUtilities.repaintLater(iconCombobox);
+    WbSwingUtilities.repaintLater(cancelIconCombo);
+    useSystemTray.setEnabled(SystemTray.isSupported());
+  }
 
-		Collection<WbLocale> locales = Settings.getInstance().getLanguages();
-		int index = 0;
-		int currentIndex = -1;
-		for (WbLocale l : locales)
-		{
-			languageDropDown.addItem(l);
-			if (l.getLocale().getLanguage().equals(currentLang))
-			{
-				currentIndex = index;
-			}
-			index++;
-		}
-		if (currentIndex != -1)
-		{
-			languageDropDown.setSelectedIndex(currentIndex);
-		}
-		WbFile configFile = Settings.getInstance().getConfigFile();
-		String s = ResourceMgr.getFormattedString("LblSettingsLocation", configFile.getFullPath());
-		settingsfilename.setText(s);
-		settingsfilename.setBorder(new EmptyBorder(0,0,0,0));
+  @Override
+  public void restoreSettings() {
+    logLevel.setSelectedItem(LogMgr.getLevel());
+    int days = Settings.getInstance().getUpdateCheckInterval();
+    if (days == 1) {
+      checkInterval.setSelectedIndex(1);
+    } else if (days == 7) {
+      checkInterval.setSelectedIndex(2);
+    } else if (days == 14) {
+      checkInterval.setSelectedIndex(3);
+    } else if (days == 30) {
+      checkInterval.setSelectedIndex(4);
+    } else {
+      checkInterval.setSelectedIndex(0);
+    }
+    languageDropDown.removeAllItems();
+    String currentLang = Settings.getInstance().getLanguage().getLanguage();
 
-		WbFile logFile = LogMgr.getLogfile();
-		logfileLabel.setText(ResourceMgr.getFormattedString("LblLogLocation", logFile == null ? "": logFile.getFullPath()));
-		logfileLabel.setCaretPosition(0);
-		logfileLabel.setBorder(new EmptyBorder(1, 0, 1, 0));
+    Collection<WbLocale> locales = Settings.getInstance().getLanguages();
+    int index = 0;
+    int currentIndex = -1;
+    for (WbLocale l : locales) {
+      languageDropDown.addItem(l);
+      if (l.getLocale().getLanguage().equals(currentLang)) {
+        currentIndex = index;
+      }
+      index++;
+    }
+    if (currentIndex != -1) {
+      languageDropDown.setSelectedIndex(currentIndex);
+    }
+    WbFile configFile = Settings.getInstance().getConfigFile();
+    String s = ResourceMgr.getFormattedString("LblSettingsLocation", configFile.getFullPath());
+    settingsfilename.setText(s);
+    settingsfilename.setBorder(new EmptyBorder(0, 0, 0, 0));
 
-		singlePageHelp.setSelected(Settings.getInstance().useSinglePageHelp());
-		int tabPolicy = Settings.getInstance().getIntProperty(Settings.PROPERTY_TAB_POLICY, JTabbedPane.WRAP_TAB_LAYOUT);
-		scrollTabs.setSelected(tabPolicy == JTabbedPane.SCROLL_TAB_LAYOUT);
-		confirmTabClose.setSelected(GuiSettings.getConfirmTabClose());
-		brushedMetal.setSelected(GuiSettings.getUseBrushedMetal());
-		showTabCloseButton.setSelected(GuiSettings.getShowSqlTabCloseButton());
-		showResultTabClose.setSelected(GuiSettings.getShowResultTabCloseButton());
-		onlyActiveTab.setSelected(GuiSettings.getCloseActiveTabOnly());
-		closeButtonRightSide.setSelected(GuiSettings.getShowCloseButtonOnRightSide());
-		tabLRUclose.setSelected(GuiSettings.getUseLRUForTabs());
-		showFinishAlert.setSelected(GuiSettings.showScriptFinishedAlert());
-		useSystemTray.setEnabled(SystemTray.isSupported() && GuiSettings.showScriptFinishedAlert());
-		useSystemTray.setSelected(GuiSettings.useSystemTrayForAlert());
-		long duration = GuiSettings.getScriptFinishedAlertDuration();
-		String durationDisplay = KeepAliveDaemon.getTimeDisplay(duration);
-		alertDuration.setText(durationDisplay);
-		alertDuration.setEnabled(showFinishAlert.isSelected());
-		logAllStatements.setSelected(Settings.getInstance().getLogAllStatements());
-		autoSaveProfiles.setSelected(Settings.getInstance().getSaveProfilesImmediately());
-		enableQuickFilter.setSelected(GuiSettings.enableProfileQuickFilter());
+    WbFile logFile = LogMgr.getLogfile();
+    logfileLabel.setText(ResourceMgr.getFormattedString("LblLogLocation", logFile == null ? "" : logFile.getFullPath()));
+    logfileLabel.setCaretPosition(0);
+    logfileLabel.setBorder(new EmptyBorder(1, 0, 1, 0));
 
-		String iconName = Settings.getInstance().getProperty(IconHandler.PROP_LOADING_IMAGE, IconHandler.DEFAULT_BUSY_IMAGE);
-		LoadingImage img = new LoadingImage();
-		img.setName(iconName);
-		iconCombobox.setSelectedItem(img);
+    singlePageHelp.setSelected(Settings.getInstance().useSinglePageHelp());
+    int tabPolicy = Settings.getInstance().getIntProperty(Settings.PROPERTY_TAB_POLICY, JTabbedPane.WRAP_TAB_LAYOUT);
+    scrollTabs.setSelected(tabPolicy == JTabbedPane.SCROLL_TAB_LAYOUT);
+    confirmTabClose.setSelected(GuiSettings.getConfirmTabClose());
+    brushedMetal.setSelected(GuiSettings.getUseBrushedMetal());
+    showTabCloseButton.setSelected(GuiSettings.getShowSqlTabCloseButton());
+    showResultTabClose.setSelected(GuiSettings.getShowResultTabCloseButton());
+    onlyActiveTab.setSelected(GuiSettings.getCloseActiveTabOnly());
+    closeButtonRightSide.setSelected(GuiSettings.getShowCloseButtonOnRightSide());
+    tabLRUclose.setSelected(GuiSettings.getUseLRUForTabs());
+    showFinishAlert.setSelected(GuiSettings.showScriptFinishedAlert());
+    useSystemTray.setEnabled(SystemTray.isSupported() && GuiSettings.showScriptFinishedAlert());
+    useSystemTray.setSelected(GuiSettings.useSystemTrayForAlert());
+    long duration = GuiSettings.getScriptFinishedAlertDuration();
+    String durationDisplay = KeepAliveDaemon.getTimeDisplay(duration);
+    alertDuration.setText(durationDisplay);
+    alertDuration.setEnabled(showFinishAlert.isSelected());
+    logAllStatements.setSelected(Settings.getInstance().getLogAllStatements());
+    autoSaveProfiles.setSelected(Settings.getInstance().getSaveProfilesImmediately());
+    enableQuickFilter.setSelected(GuiSettings.enableProfileQuickFilter());
 
-		iconName = Settings.getInstance().getProperty(IconHandler.PROP_CANCEL_IMAGE, IconHandler.DEFAULT_CANCEL_IMAGE);
-		img = new LoadingImage();
-		img.setName(iconName);
-		cancelIconCombo.setSelectedItem(img);
-	}
+    String iconName = Settings.getInstance().getProperty(IconHandler.PROP_LOADING_IMAGE, IconHandler.DEFAULT_BUSY_IMAGE);
+    LoadingImage img = new LoadingImage();
+    img.setName(iconName);
+    iconCombobox.setSelectedItem(img);
 
-	@Override
-	public void saveSettings()
-	{
-		Settings set = Settings.getInstance();
+    iconName = Settings.getInstance().getProperty(IconHandler.PROP_CANCEL_IMAGE, IconHandler.DEFAULT_CANCEL_IMAGE);
+    img = new LoadingImage();
+    img.setName(iconName);
+    cancelIconCombo.setSelectedItem(img);
+  }
 
-		// General settings
-		GuiSettings.setShowCloseButtonOnRightSide(closeButtonRightSide.isSelected());
-		GuiSettings.setCloseActiveTabOnly(onlyActiveTab.isSelected());
-		GuiSettings.setShowTabCloseButton(showTabCloseButton.isSelected());
-		GuiSettings.setShowResultTabCloseButton(showResultTabClose.isSelected());
-		GuiSettings.setShowTabIndex(showTabIndex.isSelected());
-		GuiSettings.setConfirmTabClose(confirmTabClose.isSelected());
-		GuiSettings.setEnableProfileQuickFilter(enableQuickFilter.isSelected());
-		set.setUseEncryption(this.useEncryption.isSelected());
-		set.setConsolidateLogMsg(this.consolidateLog.isSelected());
-		set.setExitOnFirstConnectCancel(exitOnConnectCancel.isSelected());
-		set.setShowConnectDialogOnStartup(autoConnect.isSelected());
-		set.setLogAllStatements(logAllStatements.isSelected());
-		int index = checkInterval.getSelectedIndex();
-		switch (index)
-		{
-			case 1:
-				set.setUpdateCheckInterval(1);
-				break;
-			case 2:
-				set.setUpdateCheckInterval(7);
-				break;
-			case 3:
-				set.setUpdateCheckInterval(14);
-				break;
-			case 4:
-				set.setUpdateCheckInterval(30);
-				break;
-			default:
-				set.setUpdateCheckInterval(-1);
-				break;
-		}
-		String level = (String)logLevel.getSelectedItem();
-		LogMgr.setLevel(level);
-		set.setProperty("workbench.log.level", level);
-		set.setLanguage(getSelectedLanguage());
-		set.setUseSinglePageHelp(singlePageHelp.isSelected());
-		if (scrollTabs.isSelected())
-		{
-			set.setProperty(Settings.PROPERTY_TAB_POLICY, JTabbedPane.SCROLL_TAB_LAYOUT);
-		}
-		else
-		{
-			set.setProperty(Settings.PROPERTY_TAB_POLICY, JTabbedPane.WRAP_TAB_LAYOUT);
-		}
-		if (brushedMetal.isVisible())
-		{
-			GuiSettings.setUseBrushedMetal(brushedMetal.isSelected());
-		}
-		GuiSettings.setUseLRUForTabs(tabLRUclose.isSelected());
-		GuiSettings.setShowScriptFinishedAlert(showFinishAlert.isSelected());
-		String v = alertDuration.getText().trim();
-		long duration = KeepAliveDaemon.parseTimeInterval(v);
-		GuiSettings.setScriptFinishedAlertDuration(duration);
-		set.setSaveProfilesImmediately(autoSaveProfiles.isSelected());
-		if (SystemTray.isSupported())
-		{
-			GuiSettings.setUseSystemTrayForAlert(useSystemTray.isSelected());
-		}
-		LoadingImage img = (LoadingImage)iconCombobox.getSelectedItem();
-		Settings.getInstance().setProperty(IconHandler.PROP_LOADING_IMAGE, img.getName());
+  @Override
+  public void saveSettings() {
+    Settings set = Settings.getInstance();
 
-		LoadingImage cancelImg = (LoadingImage)cancelIconCombo.getSelectedItem();
-		Settings.getInstance().setProperty(IconHandler.PROP_CANCEL_IMAGE, cancelImg.getName());
-	}
+    // General settings
+    GuiSettings.setShowCloseButtonOnRightSide(closeButtonRightSide.isSelected());
+    GuiSettings.setCloseActiveTabOnly(onlyActiveTab.isSelected());
+    GuiSettings.setShowTabCloseButton(showTabCloseButton.isSelected());
+    GuiSettings.setShowResultTabCloseButton(showResultTabClose.isSelected());
+    GuiSettings.setShowTabIndex(showTabIndex.isSelected());
+    GuiSettings.setConfirmTabClose(confirmTabClose.isSelected());
+    GuiSettings.setEnableProfileQuickFilter(enableQuickFilter.isSelected());
+    set.setUseEncryption(this.useEncryption.isSelected());
+    set.setConsolidateLogMsg(this.consolidateLog.isSelected());
+    set.setExitOnFirstConnectCancel(exitOnConnectCancel.isSelected());
+    set.setShowConnectDialogOnStartup(autoConnect.isSelected());
+    set.setLogAllStatements(logAllStatements.isSelected());
+    int index = checkInterval.getSelectedIndex();
+    switch (index) {
+      case 1:
+        set.setUpdateCheckInterval(1);
+        break;
+      case 2:
+        set.setUpdateCheckInterval(7);
+        break;
+      case 3:
+        set.setUpdateCheckInterval(14);
+        break;
+      case 4:
+        set.setUpdateCheckInterval(30);
+        break;
+      default:
+        set.setUpdateCheckInterval(-1);
+        break;
+    }
+    String level = (String) logLevel.getSelectedItem();
+    LogMgr.setLevel(level);
+    set.setProperty("workbench.log.level", level);
+    set.setLanguage(getSelectedLanguage());
+    set.setUseSinglePageHelp(singlePageHelp.isSelected());
+    if (scrollTabs.isSelected()) {
+      set.setProperty(Settings.PROPERTY_TAB_POLICY, JTabbedPane.SCROLL_TAB_LAYOUT);
+    } else {
+      set.setProperty(Settings.PROPERTY_TAB_POLICY, JTabbedPane.WRAP_TAB_LAYOUT);
+    }
+    if (brushedMetal.isVisible()) {
+      GuiSettings.setUseBrushedMetal(brushedMetal.isSelected());
+    }
+    GuiSettings.setUseLRUForTabs(tabLRUclose.isSelected());
+    GuiSettings.setShowScriptFinishedAlert(showFinishAlert.isSelected());
+    String v = alertDuration.getText().trim();
+    long duration = KeepAliveDaemon.parseTimeInterval(v);
+    GuiSettings.setScriptFinishedAlertDuration(duration);
+    set.setSaveProfilesImmediately(autoSaveProfiles.isSelected());
+    if (SystemTray.isSupported()) {
+      GuiSettings.setUseSystemTrayForAlert(useSystemTray.isSelected());
+    }
+    LoadingImage img = (LoadingImage) iconCombobox.getSelectedItem();
+    Settings.getInstance().setProperty(IconHandler.PROP_LOADING_IMAGE, img.getName());
 
-	@Override
-	public void dispose()
-	{
-		((IconListCombobox)iconCombobox).done();
-		((IconListCombobox)cancelIconCombo).done();
-	}
+    LoadingImage cancelImg = (LoadingImage) cancelIconCombo.getSelectedItem();
+    Settings.getInstance().setProperty(IconHandler.PROP_CANCEL_IMAGE, cancelImg.getName());
+  }
 
-	private Locale getSelectedLanguage()
-	{
-		WbLocale wl = (WbLocale)languageDropDown.getSelectedItem();
-		return wl.getLocale();
-	}
+  @Override
+  public void dispose() {
+    ((IconListCombobox) iconCombobox).done();
+    ((IconListCombobox) cancelIconCombo).done();
+  }
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  private Locale getSelectedLanguage() {
+    WbLocale wl = (WbLocale) languageDropDown.getSelectedItem();
+    return wl.getLocale();
+  }
+
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
 
     jPanel2 = new javax.swing.JPanel();
@@ -627,7 +640,7 @@ public class GeneralOptionsPanel
     gridBagConstraints.insets = new java.awt.Insets(0, 11, 0, 0);
     add(logLevelLabel, gridBagConstraints);
 
-    logLevel.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "ERROR", "WARNING", "INFO", "DEBUG" }));
+    logLevel.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"ERROR", "WARNING", "INFO", "DEBUG"}));
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 12;
@@ -704,7 +717,7 @@ public class GeneralOptionsPanel
     gridBagConstraints.insets = new java.awt.Insets(10, 12, 0, 0);
     jPanel5.add(langLabel, gridBagConstraints);
 
-    languageDropDown.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "English", "German" }));
+    languageDropDown.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"English", "German"}));
     languageDropDown.setToolTipText(ResourceMgr.getDescription("LblLanguage"));
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
@@ -722,7 +735,7 @@ public class GeneralOptionsPanel
     gridBagConstraints.insets = new java.awt.Insets(6, 7, 0, 0);
     jPanel5.add(checkUpdatesLabel, gridBagConstraints);
 
-    checkInterval.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "never", "daily", "7 days", "14 days", "30 days" }));
+    checkInterval.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"never", "daily", "7 days", "14 days", "30 days"}));
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 3;
     gridBagConstraints.gridy = 1;
@@ -768,67 +781,17 @@ public class GeneralOptionsPanel
     add(logfileLabel, gridBagConstraints);
   }
 
-  // Code for dispatching events from components to event handlers.
-
-  public void actionPerformed(java.awt.event.ActionEvent evt)
-  {
-    if (evt.getSource() == showFinishAlert)
-    {
+  public void actionPerformed(java.awt.event.ActionEvent evt) {
+    if (evt.getSource() == showFinishAlert) {
       GeneralOptionsPanel.this.showFinishAlertActionPerformed(evt);
     }
   }// </editor-fold>//GEN-END:initComponents
 
-	private void showFinishAlertActionPerformed(ActionEvent evt)//GEN-FIRST:event_showFinishAlertActionPerformed
-	{//GEN-HEADEREND:event_showFinishAlertActionPerformed
-		this.alertDuration.setEnabled(showFinishAlert.isSelected());
-		this.useSystemTray.setEnabled(SystemTray.isSupported() && showFinishAlert.isSelected());
-	}//GEN-LAST:event_showFinishAlertActionPerformed
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JTextField alertDuration;
-  private javax.swing.JCheckBox autoConnect;
-  private javax.swing.JCheckBox autoSaveProfiles;
-  private javax.swing.JCheckBox brushedMetal;
-  private javax.swing.JLabel busyIconLabel;
-  private javax.swing.JComboBox cancelIconCombo;
-  private javax.swing.JLabel cancelIconLabel;
-  private javax.swing.JComboBox checkInterval;
-  private javax.swing.JLabel checkUpdatesLabel;
-  private javax.swing.JCheckBox closeButtonRightSide;
-  private javax.swing.JCheckBox confirmTabClose;
-  private javax.swing.JCheckBox consolidateLog;
-  private javax.swing.JCheckBox enableQuickFilter;
-  private javax.swing.JCheckBox exitOnConnectCancel;
-  private javax.swing.JComboBox iconCombobox;
-  private javax.swing.JPanel imagePanel;
-  private javax.swing.JLabel jLabel2;
-  private javax.swing.JPanel jPanel1;
-  private javax.swing.JPanel jPanel2;
-  private javax.swing.JPanel jPanel3;
-  private javax.swing.JPanel jPanel4;
-  private javax.swing.JPanel jPanel5;
-  private javax.swing.JSeparator jSeparator1;
-  private javax.swing.JSeparator jSeparator2;
-  private javax.swing.JSeparator jSeparator3;
-  private javax.swing.JSeparator jSeparator4;
-  private javax.swing.JSeparator jSeparator5;
-  private javax.swing.JLabel langLabel;
-  private javax.swing.JComboBox languageDropDown;
-  private javax.swing.JCheckBox logAllStatements;
-  private javax.swing.JComboBox logLevel;
-  private javax.swing.JLabel logLevelLabel;
-  private javax.swing.JTextField logfileLabel;
-  private javax.swing.JCheckBox onlyActiveTab;
-  private javax.swing.JCheckBox scrollTabs;
-  private javax.swing.JTextField settingsfilename;
-  private javax.swing.JCheckBox showFinishAlert;
-  private javax.swing.JCheckBox showResultTabClose;
-  private javax.swing.JCheckBox showTabCloseButton;
-  private javax.swing.JCheckBox showTabIndex;
-  private javax.swing.JCheckBox singlePageHelp;
-  private javax.swing.JCheckBox tabLRUclose;
-  private javax.swing.JCheckBox useEncryption;
-  private javax.swing.JCheckBox useSystemTray;
+  private void showFinishAlertActionPerformed(ActionEvent evt)//GEN-FIRST:event_showFinishAlertActionPerformed
+  {//GEN-HEADEREND:event_showFinishAlertActionPerformed
+    this.alertDuration.setEnabled(showFinishAlert.isSelected());
+    this.useSystemTray.setEnabled(SystemTray.isSupported() && showFinishAlert.isSelected());
+  }//GEN-LAST:event_showFinishAlertActionPerformed
   // End of variables declaration//GEN-END:variables
 
 }

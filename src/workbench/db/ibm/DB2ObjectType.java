@@ -26,94 +26,74 @@ import workbench.db.BaseObjectType;
 import workbench.db.WbConnection;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class DB2ObjectType
-	extends BaseObjectType
-{
-	private String baseType;
-	private MetaType metaType;
-	private int arrayLength;
+    extends BaseObjectType {
+  private String baseType;
+  private MetaType metaType;
+  private int arrayLength;
 
-	public DB2ObjectType(String schema, String objectName)
-	{
-		super(schema, objectName);
-	}
+  public DB2ObjectType(String schema, String objectName) {
+    super(schema, objectName);
+  }
 
-	public MetaType getMetaType()
-	{
-		return metaType;
-	}
+  public MetaType getMetaType() {
+    return metaType;
+  }
 
-	public int getArrayLength()
-	{
-		return arrayLength;
-	}
+  public void setMetaType(MetaType type) {
+    this.metaType = metaType;
+  }
 
-	public void setArrayLength(int length)
-	{
-		this.arrayLength = length;
-	}
+  public int getArrayLength() {
+    return arrayLength;
+  }
 
-	public void setMetaType(String meta)
-	{
-		// http://www-01.ibm.com/support/knowledgecenter/SSEPGG_9.7.0/com.ibm.db2.luw.sql.ref.doc/doc/r0001040.html?cp=SSEPGG_9.7.0%2F5-5-7-26&lang=en
-		//    A = User-defined array type
-		//    C = User-defined cursor type
-		//    F = User-defined row type
-		//    L = User-defined associative array type
-		//    R = User-defined structured type
-		//    S = System predefined type
-		//    T = User-defined distinct type
+  public void setArrayLength(int length) {
+    this.arrayLength = length;
+  }
 
-		if (meta == null) return;
-		if ("A".equals(meta))
-		{
-			this.metaType = MetaType.array;
-		}
-		else if ("T".equals(meta))
-		{
-			this.metaType = MetaType.distinct;
-		}
-		else if ("F".equals(meta))
-		{
-			this.metaType = MetaType.row;
-		}
-		else
-		{
-			this.metaType = MetaType.structured;
-		}
-	}
+  public void setMetaType(String meta) {
+    // http://www-01.ibm.com/support/knowledgecenter/SSEPGG_9.7.0/com.ibm.db2.luw.sql.ref.doc/doc/r0001040.html?cp=SSEPGG_9.7.0%2F5-5-7-26&lang=en
+    //    A = User-defined array type
+    //    C = User-defined cursor type
+    //    F = User-defined row type
+    //    L = User-defined associative array type
+    //    R = User-defined structured type
+    //    S = System predefined type
+    //    T = User-defined distinct type
 
-	public void setMetaType(MetaType type)
-	{
-		this.metaType = metaType;
-	}
+    if (meta == null) return;
+    if ("A".equals(meta)) {
+      this.metaType = MetaType.array;
+    } else if ("T".equals(meta)) {
+      this.metaType = MetaType.distinct;
+    } else if ("F".equals(meta)) {
+      this.metaType = MetaType.row;
+    } else {
+      this.metaType = MetaType.structured;
+    }
+  }
 
+  public String getBaseType() {
+    return baseType;
+  }
 
-	public String getBaseType()
-	{
-		return baseType;
-	}
+  public void setBaseType(String baseType) {
+    this.baseType = baseType;
+  }
 
-	public void setBaseType(String baseType)
-	{
-		this.baseType = baseType;
-	}
+  @Override
+  public String getDropStatement(WbConnection con, boolean cascade) {
+    return "DROP TYPE " + getSchema() + "." + getObjectName();
+  }
 
-	@Override
-	public String getDropStatement(WbConnection con, boolean cascade)
-	{
-		return "DROP TYPE " + getSchema() + "." + getObjectName();
-	}
-
-	public static enum MetaType
-	{
-		distinct,
-		array,
-		cursor,
-		row,
-		structured;
-	}
+  public static enum MetaType {
+    distinct,
+    array,
+    cursor,
+    row,
+    structured;
+  }
 }

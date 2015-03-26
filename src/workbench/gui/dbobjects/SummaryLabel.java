@@ -22,39 +22,31 @@
  */
 package workbench.gui.dbobjects;
 
-import workbench.resource.ResourceMgr;
-
 import workbench.gui.components.DataStoreTableModel;
 import workbench.gui.components.WbStatusLabel;
+import workbench.resource.ResourceMgr;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class SummaryLabel
-	extends WbStatusLabel
-{
-  
-	public SummaryLabel(String text)
-	{
-		super(text);
-	}
+    extends WbStatusLabel {
 
-	public void showObjectListInfo(DataStoreTableModel model)
-	{
-		int filteredCount = model.getFilteredCount();
-		int rowCount = model.getRowCount();
-		int totalCount = filteredCount + rowCount;
-		String info;
-		if (filteredCount == 0)
-		{
-			info = ResourceMgr.getFormattedString("TxtTableListObjects", rowCount);
-		}
-		else
-		{
-			info = ResourceMgr.getFormattedString("TxtTableListFiltered", rowCount, totalCount);
-		}
-		this.setText(info);
-	}
+  public SummaryLabel(String text) {
+    super(text);
+  }
+
+  public void showObjectListInfo(DataStoreTableModel model) {
+    int filteredCount = model.getFilteredCount();
+    int rowCount = model.getRowCount();
+    int totalCount = filteredCount + rowCount;
+    String info;
+    if (filteredCount == 0) {
+      info = ResourceMgr.getFormattedString("TxtTableListObjects", rowCount);
+    } else {
+      info = ResourceMgr.getFormattedString("TxtTableListFiltered", rowCount, totalCount);
+    }
+    this.setText(info);
+  }
 
 }

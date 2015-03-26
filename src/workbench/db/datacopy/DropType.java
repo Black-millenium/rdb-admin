@@ -23,12 +23,10 @@
 package workbench.db.datacopy;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum DropType
-{
-	none,
-	regular,
-	cascaded
+public enum DropType {
+  none,
+  regular,
+  cascaded
 }

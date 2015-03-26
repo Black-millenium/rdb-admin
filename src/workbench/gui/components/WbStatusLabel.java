@@ -19,56 +19,44 @@
  */
 package workbench.gui.components;
 
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
+import workbench.gui.WbSwingUtilities;
+import workbench.interfaces.StatusBar;
+import workbench.resource.IconMgr;
+import workbench.storage.RowActionMonitor;
 
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-
-import workbench.interfaces.StatusBar;
-import workbench.resource.IconMgr;
-
-import workbench.gui.WbSwingUtilities;
-
-import workbench.storage.RowActionMonitor;
+import java.awt.*;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class WbStatusLabel
-  extends JLabel
-  implements StatusBar
-{
-	private static final Border DEFAULT_BORDER = new CompoundBorder(new EmptyBorder(2, 0, 0, 0), new CompoundBorder(BorderFactory.createEtchedBorder(), new EmptyBorder(1, 1, 1, 0)));
+    extends JLabel
+    implements StatusBar {
+  private static final Border DEFAULT_BORDER = new CompoundBorder(new EmptyBorder(2, 0, 0, 0), new CompoundBorder(BorderFactory.createEtchedBorder(), new EmptyBorder(1, 1, 1, 0)));
 
-  public WbStatusLabel(String text)
-  {
+  public WbStatusLabel(String text) {
     super(text);
     setBorder(DEFAULT_BORDER);
     initSize();
   }
 
-  public WbStatusLabel()
-  {
+  public WbStatusLabel() {
     super();
     setBorder(DEFAULT_BORDER);
     initSize();
   }
 
   @Override
-  public void setFont(Font f)
-  {
+  public void setFont(Font f) {
     super.setFont(f);
     initSize();
   }
 
-  private void initSize()
-  {
+  private void initSize() {
     Font f = getFont();
     FontMetrics fm = null;
     if (f != null) fm = getFontMetrics(f);
@@ -77,16 +65,13 @@ public class WbStatusLabel
     int width;
     int borderHeight = 6;
 
-    if (fm != null)
-    {
-      height = (int)(fm.getHeight() * 1.2) + borderHeight;
+    if (fm != null) {
+      height = (int) (fm.getHeight() * 1.2) + borderHeight;
       width = fm.charWidth('W');
       height = Math.max(22, height);
       width = width * 10;
-    }
-    else
-    {
-      int size = (int)(IconMgr.getInstance().getSizeForLabel() * 1.2) + borderHeight;
+    } else {
+      int size = (int) (IconMgr.getInstance().getSizeForLabel() * 1.2) + borderHeight;
       width = size;
       height = size;
     }
@@ -95,44 +80,35 @@ public class WbStatusLabel
     setPreferredSize(d);
   }
 
-  public RowActionMonitor getMonitor()
-  {
+  public RowActionMonitor getMonitor() {
     return new GenericRowMonitor(this);
   }
 
   @Override
-  public void setStatusMessage(String message, int duration)
-  {
+  public void setStatusMessage(String message, int duration) {
     setStatusMessage(message);
   }
 
   @Override
-  public void doRepaint()
-  {
+  public void doRepaint() {
     repaint();
   }
 
   @Override
-  public void setStatusMessage(final String message)
-  {
-    WbSwingUtilities.invoke(new Runnable()
-    {
+  public void setStatusMessage(final String message) {
+    WbSwingUtilities.invoke(new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         setText(message);
       }
     });
   }
 
   @Override
-  public void clearStatusMessage()
-  {
-    WbSwingUtilities.invoke(new Runnable()
-    {
+  public void clearStatusMessage() {
+    WbSwingUtilities.invoke(new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         setText("");
       }
     });

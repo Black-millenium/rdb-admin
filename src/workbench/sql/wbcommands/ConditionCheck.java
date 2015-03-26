@@ -21,205 +21,167 @@
  */
 package workbench.sql.wbcommands;
 
-import java.util.List;
-
 import workbench.resource.ResourceMgr;
-
 import workbench.sql.StatementRunnerResult;
 import workbench.sql.VariablePool;
-
 import workbench.util.ArgumentParser;
 import workbench.util.CollectionUtil;
 import workbench.util.StringUtil;
 
+import java.util.List;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public class ConditionCheck
-{
-	private static final Result OK = new Result();
+public class ConditionCheck {
+  public static final String PARAM_IF_DEF = "ifDefined";
+  public static final String PARAM_IF_NOTDEF = "ifNotDefined";
+  public static final String PARAM_IF_EQUALS = "ifEquals";
+  public static final String PARAM_IF_NOTEQ = "ifNotEquals";
+  public static final String PARAM_IF_EMPTY = "ifEmpty";
+  public static final String PARAM_IF_NOTEMPTY = "ifNotEmpty";
+  private static final Result OK = new Result();
+  private static final List<String> arguments = CollectionUtil.arrayList(
+      PARAM_IF_DEF, PARAM_IF_NOTDEF, PARAM_IF_EQUALS, PARAM_IF_NOTEQ, PARAM_IF_EMPTY, PARAM_IF_NOTEMPTY);
 
-	public static final String PARAM_IF_DEF = "ifDefined";
-	public static final String PARAM_IF_NOTDEF = "ifNotDefined";
-	public static final String PARAM_IF_EQUALS = "ifEquals";
-	public static final String PARAM_IF_NOTEQ = "ifNotEquals";
-	public static final String PARAM_IF_EMPTY = "ifEmpty";
-	public static final String PARAM_IF_NOTEMPTY = "ifNotEmpty";
+  public static void addParameters(ArgumentParser cmdLine) {
+    for (String arg : arguments) {
+      cmdLine.addArgument(arg);
+    }
+  }
 
-	private static final List<String> arguments = CollectionUtil.arrayList(
-		PARAM_IF_DEF, PARAM_IF_NOTDEF, PARAM_IF_EQUALS, PARAM_IF_NOTEQ, PARAM_IF_EMPTY, PARAM_IF_NOTEMPTY);
+  public static boolean conditionSpecified(ArgumentParser cmdLine) {
+    for (String arg : arguments) {
+      if (cmdLine.isArgPresent(arg)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-	public static void addParameters(ArgumentParser cmdLine)
-	{
-		for (String arg : arguments)
-		{
-			cmdLine.addArgument(arg);
-		}
-	}
+  public static boolean isCommandLineOK(StatementRunnerResult result, ArgumentParser cmdLine) {
+    int count = 0;
+    for (String arg : arguments) {
+      if (cmdLine.isArgPresent(arg)) {
+        count++;
+      }
+    }
 
-	public static boolean conditionSpecified(ArgumentParser cmdLine)
-	{
-		for (String arg : arguments)
-		{
-			if (cmdLine.isArgPresent(arg))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
+    if (count <= 1) return true;
 
-	public static boolean isCommandLineOK(StatementRunnerResult result, ArgumentParser cmdLine)
-	{
-		int count = 0;
-		for (String arg : arguments)
-		{
-			if (cmdLine.isArgPresent(arg))
-			{
-				count ++;
-			}
-		}
+    // more than one argument specified, this is not allowed
+    result.addMessage(ResourceMgr.getFormattedString("ErrCondTooMany", StringUtil.listToString(arguments, ',')));
+    result.setFailure();
+    return false;
+  }
 
-		if (count <= 1) return true;
+  /**
+   * Check if the condition specified on the commandline is met.
+   *
+   * @param cmdLine the parameter to check
+   * @return null if the condition is met,
+   * the parameter where the check failed otherwise
+   */
+  public static Result checkConditions(ArgumentParser cmdLine) {
+    if (cmdLine.isArgPresent(PARAM_IF_DEF)) {
+      String var = cmdLine.getValue(PARAM_IF_DEF);
+      if (!VariablePool.getInstance().isDefined(var)) {
+        return new Result(PARAM_IF_DEF, var);
+      }
+    }
 
-		// more than one argument specified, this is not allowed
-		result.addMessage(ResourceMgr.getFormattedString("ErrCondTooMany", StringUtil.listToString(arguments, ',')));
-		result.setFailure();
-		return false;
-	}
+    if (cmdLine.isArgPresent(PARAM_IF_NOTDEF)) {
+      String var = cmdLine.getValue(PARAM_IF_NOTDEF);
+      if (VariablePool.getInstance().isDefined(var)) {
+        return new Result(PARAM_IF_NOTDEF, var);
+      }
+    }
 
-	/**
-	 * Check if the condition specified on the commandline is met.
-	 *
-	 * @param cmdLine the parameter to check
-	 * @return null if the condition is met,
-	 *         the parameter where the check failed otherwise
-	 */
-	public static Result checkConditions(ArgumentParser cmdLine)
-	{
-		if (cmdLine.isArgPresent(PARAM_IF_DEF))
-		{
-			String var = cmdLine.getValue(PARAM_IF_DEF);
-			if (!VariablePool.getInstance().isDefined(var))
-			{
-				return new Result(PARAM_IF_DEF, var);
-			}
-		}
+    if (cmdLine.isArgPresent(PARAM_IF_EMPTY)) {
+      String var = cmdLine.getValue(PARAM_IF_EMPTY);
+      String value = VariablePool.getInstance().getParameterValue(var);
+      if (StringUtil.isNonEmpty(value)) {
+        return new Result(PARAM_IF_EMPTY, var);
+      }
+    }
 
-		if (cmdLine.isArgPresent(PARAM_IF_NOTDEF))
-		{
-			String var = cmdLine.getValue(PARAM_IF_NOTDEF);
-			if (VariablePool.getInstance().isDefined(var))
-			{
-				return new Result(PARAM_IF_NOTDEF, var);
-			}
-		}
+    if (cmdLine.isArgPresent(PARAM_IF_NOTEMPTY)) {
+      String var = cmdLine.getValue(PARAM_IF_NOTEMPTY);
+      String value = VariablePool.getInstance().getParameterValue(var);
+      if (StringUtil.isEmptyString(value)) {
+        return new Result(PARAM_IF_NOTEMPTY, var);
+      }
+    }
 
-		if (cmdLine.isArgPresent(PARAM_IF_EMPTY))
-		{
-			String var = cmdLine.getValue(PARAM_IF_EMPTY);
-			String value = VariablePool.getInstance().getParameterValue(var);
-			if (StringUtil.isNonEmpty(value))
-			{
-				return new Result(PARAM_IF_EMPTY, var);
-			}
-		}
+    if (cmdLine.isArgPresent(PARAM_IF_EQUALS)) {
+      String var = cmdLine.getValue(PARAM_IF_EQUALS);
+      String[] elements = var.split("=");
+      if (elements.length == 2) {
+        String value = VariablePool.getInstance().getParameterValue(elements[0]);
+        if (value != null && value.equals(elements[1])) {
+          return OK;
+        }
+        return new Result(PARAM_IF_EQUALS, var);
+      }
+    }
 
-		if (cmdLine.isArgPresent(PARAM_IF_NOTEMPTY))
-		{
-			String var = cmdLine.getValue(PARAM_IF_NOTEMPTY);
-			String value = VariablePool.getInstance().getParameterValue(var);
-			if (StringUtil.isEmptyString(value))
-			{
-				return new Result(PARAM_IF_NOTEMPTY, var);
-			}
-		}
+    if (cmdLine.isArgPresent(PARAM_IF_NOTEQ)) {
+      String var = cmdLine.getValue(PARAM_IF_NOTEQ);
+      String[] elements = var.split("=");
+      if (elements.length == 2) {
+        String value = VariablePool.getInstance().getParameterValue(elements[0]);
+        if (value == null || !value.equals(elements[1])) {
+          return OK;
+        }
+        return new Result(PARAM_IF_NOTEQ, var);
+      }
+    }
+    return OK;
+  }
 
-		if (cmdLine.isArgPresent(PARAM_IF_EQUALS))
-		{
-			String var = cmdLine.getValue(PARAM_IF_EQUALS);
-			String[] elements = var.split("=");
-			if (elements.length == 2)
-			{
-				String value = VariablePool.getInstance().getParameterValue(elements[0]);
-				if (value != null && value.equals(elements[1]))
-				{
-					return OK;
-				}
-				return new Result(PARAM_IF_EQUALS, var);
-			}
-		}
+  public static String getMessage(String msgPrefix, Result check) {
+    String action = ResourceMgr.getString(msgPrefix + "Action");
+    return ResourceMgr.getFormattedString("Err_" + check.getFailedCondition(), action, check.getVariable(), check.getExpectedValue());
+  }
 
-		if (cmdLine.isArgPresent(PARAM_IF_NOTEQ))
-		{
-			String var = cmdLine.getValue(PARAM_IF_NOTEQ);
-			String[] elements = var.split("=");
-			if (elements.length == 2)
-			{
-				String value = VariablePool.getInstance().getParameterValue(elements[0]);
-				if (value == null || !value.equals(elements[1]))
-				{
-					return OK;
-				}
-				return new Result(PARAM_IF_NOTEQ, var);
-			}
-		}
-		return OK;
-	}
+  public static class Result {
+    private boolean conditionIsOK;
+    private String failedParameter;
+    private String variableName;
+    private String expectedValue;
 
-	public static String getMessage(String msgPrefix, Result check)
-	{
-		String action = ResourceMgr.getString(msgPrefix + "Action");
-		return ResourceMgr.getFormattedString("Err_" + check.getFailedCondition(), action, check.getVariable(), check.getExpectedValue());
-	}
+    public Result() {
+      conditionIsOK = true;
+    }
 
-	public static class Result
-	{
-		private boolean conditionIsOK;
-		private String failedParameter;
-		private String variableName;
-		private String expectedValue;
+    public Result(String param, String varName) {
+      this.conditionIsOK = false;
+      this.failedParameter = param;
+      this.variableName = varName;
+    }
 
-		public Result()
-		{
-			conditionIsOK = true;
-		}
+    public Result(String param, String varName, String value) {
+      this.conditionIsOK = false;
+      this.failedParameter = param;
+      this.variableName = varName;
+      this.expectedValue = value;
+    }
 
-		public Result(String param, String varName)
-		{
-			this.conditionIsOK = false;
-			this.failedParameter = param;
-			this.variableName = varName;
-		}
+    public boolean isOK() {
+      return conditionIsOK;
+    }
 
-		public Result(String param, String varName, String value)
-		{
-			this.conditionIsOK = false;
-			this.failedParameter = param;
-			this.variableName = varName;
-			this.expectedValue = value;
-		}
+    public String getExpectedValue() {
+      return this.expectedValue;
+    }
 
-		public boolean isOK()
-		{
-			return conditionIsOK;
-		}
+    public String getFailedCondition() {
+      return failedParameter;
+    }
 
-		public String getExpectedValue()
-		{
-			return this.expectedValue;
-		}
-
-		public String getFailedCondition()
-		{
-			return failedParameter;
-		}
-
-		public String getVariable()
-		{
-			return variableName;
-		}
-	}
+    public String getVariable() {
+      return variableName;
+    }
+  }
 }
 

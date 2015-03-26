@@ -22,409 +22,341 @@
  */
 package workbench.gui.sql;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.Timer;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-
-import workbench.interfaces.EditorStatusbar;
-import workbench.interfaces.StatusBar;
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
 import workbench.gui.WbSwingUtilities;
 import workbench.gui.components.DividerBorder;
 import workbench.gui.components.SelectionDisplay;
 import workbench.gui.components.TextComponentMouseListener;
 import workbench.gui.components.WbTextLabel;
-
+import workbench.interfaces.EditorStatusbar;
+import workbench.interfaces.StatusBar;
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
 import workbench.util.DurationFormatter;
 import workbench.util.NumberStringCache;
 import workbench.util.StringUtil;
 import workbench.util.WbThread;
 
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class DwStatusBar
-	extends JPanel
-	implements StatusBar, EditorStatusbar, ActionListener
-{
-	private final JTextField tfRowCount;
+    extends JPanel
+    implements StatusBar, EditorStatusbar, ActionListener {
+  public static final Border DEFAULT_BORDER = new CompoundBorder(new EmptyBorder(2, 1, 0, 1), BorderFactory.createEtchedBorder());
+  private static final int DEFAULT_FIELD_HEIGHT = 18;
+  private static final Border MAX_ROWS_BORDER = new EmptyBorder(0, 0, 0, 1);
+  private static final Insets MAX_ROWS_INSETS = new Insets(0, 2, 0, 2);
+  private final JTextField tfRowCount;
+  private final JTextField tfMaxRows;
+  private final WbTextLabel execTime;
+  private final JPanel infoPanel;
+  private final int timerInterval = Settings.getInstance().getIntProperty("workbench.gui.execution.timer.interval", 1000);
+  private final boolean showTimer = Settings.getInstance().getBoolProperty("workbench.gui.execution.timer.enabled", true);
+  private final DurationFormatter durationFormatter = new DurationFormatter();
+  protected WbTextLabel tfStatus;
+  private String readyMsg;
+  private JTextField tfTimeout;
+  private JLabel editorStatus;
+  private JLabel maxRowsLabel;
+  private long timerStarted;
+  private Timer executionTimer;
+  private boolean timerRunning;
+  private String editorLinePrefix;
+  private String editorColPrefix;
+  private SelectionDisplay selectionDisplay;
 
-	protected WbTextLabel tfStatus;
+  public DwStatusBar(boolean showTimeout, boolean showEditorStatus) {
+    super(new BorderLayout());
 
-	private final JTextField tfMaxRows;
-	private String readyMsg;
-	private JTextField tfTimeout;
-	private final WbTextLabel execTime;
-	private JLabel editorStatus;
-	private JLabel maxRowsLabel;
-	private final JPanel infoPanel;
+    this.tfRowCount = new JTextField();
+    this.tfMaxRows = new JTextField(6);
 
-	private static final int DEFAULT_FIELD_HEIGHT = 18;
-	private static final Border MAX_ROWS_BORDER = new EmptyBorder(0, 0, 0, 1);
-	private static final Insets MAX_ROWS_INSETS = new Insets(0, 2, 0, 2);
+    Font f = tfMaxRows.getFont();
+    FontMetrics fm = null;
+    if (f != null) fm = tfMaxRows.getFontMetrics(f);
 
-	private final int timerInterval = Settings.getInstance().getIntProperty("workbench.gui.execution.timer.interval", 1000);
-	private final boolean showTimer = Settings.getInstance().getBoolProperty("workbench.gui.execution.timer.enabled", true);
-	private long timerStarted;
-	private Timer executionTimer;
-	private boolean timerRunning;
-	private String editorLinePrefix;
-	private String editorColPrefix;
-	private SelectionDisplay selectionDisplay;
+    int fieldHeight = (fm == null ? 0 : fm.getHeight() + 2);
+    fieldHeight = Math.min(DEFAULT_FIELD_HEIGHT, fieldHeight);
+    int barHeight = fieldHeight + 4;
+    Dimension d = new Dimension(40, fieldHeight);
 
-	private final DurationFormatter durationFormatter = new DurationFormatter();
+    this.tfMaxRows.setEditable(true);
+    this.tfMaxRows.setMaximumSize(d);
+    this.tfMaxRows.setMargin(MAX_ROWS_INSETS);
+    this.tfMaxRows.setText("0");
+    this.tfMaxRows.setName("maxrows");
+    this.tfMaxRows.setToolTipText(ResourceMgr.getDescription("TxtMaxRows"));
+    this.tfMaxRows.setHorizontalAlignment(SwingConstants.RIGHT);
+    this.tfMaxRows.addMouseListener(new TextComponentMouseListener());
 
-	public static final Border DEFAULT_BORDER = new CompoundBorder(new EmptyBorder(2, 1, 0, 1), BorderFactory.createEtchedBorder());
+    Border b = BorderFactory.createCompoundBorder(new LineBorder(Color.LIGHT_GRAY, 1), new EmptyBorder(1, 1, 1, 1));
+    this.tfMaxRows.setBorder(b);
 
-	public DwStatusBar(boolean showTimeout, boolean showEditorStatus)
-	{
-		super(new BorderLayout());
+    this.setMaximumSize(new Dimension(32768, barHeight));
+    this.setMinimumSize(new Dimension(80, barHeight));
+    this.setPreferredSize(null);
+    tfRowCount.setEditable(false);
+    tfRowCount.setHorizontalAlignment(JTextField.RIGHT);
+    tfRowCount.setBorder(MAX_ROWS_BORDER);
+    tfRowCount.setDisabledTextColor(tfRowCount.getForeground());
+    tfRowCount.setMargin(new Insets(0, 15, 0, 10));
+    tfRowCount.setMinimumSize(d);
+    tfRowCount.setPreferredSize(null);
+    tfRowCount.setAutoscrolls(false);
+    tfRowCount.setEnabled(false);
 
-		this.tfRowCount = new JTextField();
-		this.tfMaxRows = new JTextField(6);
+    this.tfStatus = new WbTextLabel();
 
-		Font f = tfMaxRows.getFont();
-		FontMetrics fm = null;
-		if (f != null) fm = tfMaxRows.getFontMetrics(f);
+    this.add(tfStatus, BorderLayout.CENTER);
 
-		int fieldHeight = (fm == null ? 0 : fm.getHeight() + 2);
-		fieldHeight = Math.min(DEFAULT_FIELD_HEIGHT, fieldHeight);
-		int barHeight = fieldHeight + 4;
-		Dimension d = new Dimension(40, fieldHeight);
+    infoPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+    infoPanel.setBorder(WbSwingUtilities.EMPTY_BORDER);
+    infoPanel.setMaximumSize(new Dimension(300, fieldHeight));
 
-		this.tfMaxRows.setEditable(true);
-		this.tfMaxRows.setMaximumSize(d);
-		this.tfMaxRows.setMargin(MAX_ROWS_INSETS);
-		this.tfMaxRows.setText("0");
-		this.tfMaxRows.setName("maxrows");
-		this.tfMaxRows.setToolTipText(ResourceMgr.getDescription("TxtMaxRows"));
-		this.tfMaxRows.setHorizontalAlignment(SwingConstants.RIGHT);
-		this.tfMaxRows.addMouseListener(new TextComponentMouseListener());
+    setBorder(DEFAULT_BORDER);
 
-		Border b = BorderFactory.createCompoundBorder(new LineBorder(Color.LIGHT_GRAY, 1), new EmptyBorder(1,1,1,1));
-		this.tfMaxRows.setBorder(b);
+    execTime = new WbTextLabel();
+    execTime.setMininumCharacters(8);
+    execTime.setHorizontalAlignment(SwingConstants.RIGHT);
+    execTime.setToolTipText(ResourceMgr.getString("MsgTotalSqlTime"));
 
-		this.setMaximumSize(new Dimension(32768, barHeight));
-		this.setMinimumSize(new Dimension(80, barHeight));
-		this.setPreferredSize(null);
-		tfRowCount.setEditable(false);
-		tfRowCount.setHorizontalAlignment(JTextField.RIGHT);
-		tfRowCount.setBorder(MAX_ROWS_BORDER);
-		tfRowCount.setDisabledTextColor(tfRowCount.getForeground());
-		tfRowCount.setMargin(new Insets(0, 15, 0, 10));
-		tfRowCount.setMinimumSize(d);
-		tfRowCount.setPreferredSize(null);
-		tfRowCount.setAutoscrolls(false);
-		tfRowCount.setEnabled(false);
+    if (showTimer) {
+      this.executionTimer = new Timer(timerInterval, this);
+    }
 
-		this.tfStatus = new WbTextLabel();
+    if (showEditorStatus) {
+      this.editorStatus = new JLabel();
+      this.editorStatus.setHorizontalAlignment(SwingConstants.CENTER);
+      int ew = (fm == null ? 85 : fm.stringWidth("L:999 C:999"));
+      d = new Dimension(ew + 4, fieldHeight);
+      editorStatus.setMinimumSize(d);
+      this.editorStatus.setBorder(new CompoundBorder(new DividerBorder(DividerBorder.LEFT), new EmptyBorder(0, 3, 0, 3)));
+      this.editorStatus.setToolTipText(ResourceMgr.getDescription("LblEditorStatus"));
+      infoPanel.add(editorStatus);
+      this.editorColPrefix = ResourceMgr.getString("LblEditorPosCol");
+      this.editorLinePrefix = ResourceMgr.getString("LblEditorPosLine");
+    }
 
-		this.add(tfStatus, BorderLayout.CENTER);
+    b = new CompoundBorder(new DividerBorder(DividerBorder.LEFT_RIGHT), new EmptyBorder(0, 3, 0, 3));
+    execTime.setBorder(b);
+    infoPanel.add(execTime);
 
-		infoPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT,0,0));
-		infoPanel.setBorder(WbSwingUtilities.EMPTY_BORDER);
-		infoPanel.setMaximumSize(new Dimension(300, fieldHeight));
+    if (showTimeout) {
+      JLabel l = new JLabel(" " + ResourceMgr.getString("LblQueryTimeout") + " ");
+      infoPanel.add(l);
+      this.tfTimeout = new JTextField(3);
+      this.tfTimeout.setBorder(b);
+      this.tfTimeout.setMargin(new Insets(0, 2, 0, 2));
+      this.tfTimeout.setToolTipText(ResourceMgr.getDescription("LblQueryTimeout"));
+      this.tfTimeout.setHorizontalAlignment(SwingConstants.RIGHT);
+      this.tfTimeout.addMouseListener(new TextComponentMouseListener());
+      l.setToolTipText(this.tfTimeout.getToolTipText());
+      infoPanel.add(this.tfTimeout);
+    }
 
-		setBorder(DEFAULT_BORDER);
+    maxRowsLabel = new JLabel(" " + ResourceMgr.getString("LblMaxRows") + " ");
+    maxRowsLabel.setToolTipText(this.tfRowCount.getToolTipText());
+    infoPanel.add(maxRowsLabel);
+    infoPanel.add(tfMaxRows);
+    infoPanel.add(tfRowCount);
+    this.add(infoPanel, BorderLayout.EAST);
 
-		execTime = new WbTextLabel();
-		execTime.setMininumCharacters(8);
-		execTime.setHorizontalAlignment(SwingConstants.RIGHT);
-		execTime.setToolTipText(ResourceMgr.getString("MsgTotalSqlTime"));
+    this.readyMsg = ResourceMgr.getString("MsgReady");
+    this.clearStatusMessage();
+  }
 
-		if (showTimer)
-		{
-			this.executionTimer = new Timer(timerInterval, this);
-		}
+  public void removeMaxRows() {
+    if (this.tfMaxRows != null) {
+      infoPanel.remove(tfMaxRows);
+      infoPanel.remove(maxRowsLabel);
+    }
+  }
 
-		if (showEditorStatus)
-		{
-			this.editorStatus = new JLabel();
-			this.editorStatus.setHorizontalAlignment(SwingConstants.CENTER);
-			int ew = (fm == null ? 85 : fm.stringWidth("L:999 C:999"));
-			d = new Dimension(ew + 4, fieldHeight);
-			editorStatus.setMinimumSize(d);
-			this.editorStatus.setBorder(new CompoundBorder(new DividerBorder(DividerBorder.LEFT), new EmptyBorder(0, 3, 0, 3)));
-			this.editorStatus.setToolTipText(ResourceMgr.getDescription("LblEditorStatus"));
-			infoPanel.add(editorStatus);
-			this.editorColPrefix = ResourceMgr.getString("LblEditorPosCol");
-			this.editorLinePrefix = ResourceMgr.getString("LblEditorPosLine");
-		}
+  public void removeSelectionIndicator(JTable client) {
+    if (this.selectionDisplay == null) return;
+    this.selectionDisplay.removeClient(client);
+  }
 
-		b = new CompoundBorder(new DividerBorder(DividerBorder.LEFT_RIGHT), new EmptyBorder(0, 3, 0, 3));
-		execTime.setBorder(b);
-		infoPanel.add(execTime);
+  public void showSelectionIndicator(JTable client) {
+    if (this.selectionDisplay == null) {
+      this.selectionDisplay = new SelectionDisplay();
+    }
+    this.selectionDisplay.setClient(client);
+    this.infoPanel.add(this.selectionDisplay, 0);
+  }
 
-		if (showTimeout)
-		{
-			JLabel l = new JLabel(" " + ResourceMgr.getString("LblQueryTimeout") + " ");
-			infoPanel.add(l);
-			this.tfTimeout = new JTextField(3);
-			this.tfTimeout.setBorder(b);
-			this.tfTimeout.setMargin(new Insets(0, 2, 0, 2));
-			this.tfTimeout.setToolTipText(ResourceMgr.getDescription("LblQueryTimeout"));
-			this.tfTimeout.setHorizontalAlignment(SwingConstants.RIGHT);
-			this.tfTimeout.addMouseListener(new TextComponentMouseListener());
-			l.setToolTipText(this.tfTimeout.getToolTipText());
-			infoPanel.add(this.tfTimeout);
-		}
+  public void setReadyMsg(String aMsg) {
+    if (aMsg == null) {
+      this.readyMsg = StringUtil.EMPTY_STRING;
+    } else {
+      this.readyMsg = aMsg;
+    }
+  }
 
-		maxRowsLabel = new JLabel(" " + ResourceMgr.getString("LblMaxRows") + " ");
-		maxRowsLabel.setToolTipText(this.tfRowCount.getToolTipText());
-		infoPanel.add(maxRowsLabel);
-		infoPanel.add(tfMaxRows);
-		infoPanel.add(tfRowCount);
-		this.add(infoPanel, BorderLayout.EAST);
+  public void clearExecutionTime() {
+    execTime.setText("");
+    execTime.repaint();
+  }
 
-		this.readyMsg = ResourceMgr.getString("MsgReady");
-		this.clearStatusMessage();
-	}
+  @Override
+  public void setEditorLocation(int line, int column) {
+    if (this.editorStatus == null) return;
+    StringBuilder text = new StringBuilder(20);
+    text.append(editorLinePrefix);
+    text.append(NumberStringCache.getNumberString(line));
+    text.append(' ');
+    text.append(editorColPrefix);
+    text.append(NumberStringCache.getNumberString(column));
+    this.editorStatus.setText(text.toString());
+  }
 
-	public void removeMaxRows()
-	{
-		if (this.tfMaxRows != null)
-		{
-			infoPanel.remove(tfMaxRows);
-			infoPanel.remove(maxRowsLabel);
-		}
-	}
+  public void executionStart() {
+    if (!showTimer) return;
+    timerStarted = System.currentTimeMillis();
+    executionTimer.setInitialDelay(timerInterval);
+    executionTimer.setDelay(timerInterval);
+    timerRunning = true;
+    executionTimer.start();
+  }
 
-	public void removeSelectionIndicator(JTable client)
-	{
-		if (this.selectionDisplay == null) return;
-		this.selectionDisplay.removeClient(client);
-	}
+  public void executionEnd() {
+    if (!showTimer) return;
+    timerRunning = false;
+    executionTimer.stop();
+  }
 
-	public void showSelectionIndicator(JTable client)
-	{
-		if (this.selectionDisplay == null)
-		{
-			this.selectionDisplay = new SelectionDisplay();
-		}
-		this.selectionDisplay.setClient(client);
-		this.infoPanel.add(this.selectionDisplay, 0);
-	}
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    if (!timerRunning) return;
+    long time = System.currentTimeMillis() - timerStarted;
+    setExecTimeText(durationFormatter.formatDuration(time, false));
+  }
 
-	public void setReadyMsg(String aMsg)
-	{
-		if (aMsg == null)
-		{
-			this.readyMsg = StringUtil.EMPTY_STRING;
-		}
-		else
-		{
-			this.readyMsg = aMsg;
-		}
-	}
+  public void setExecutionTime(long millis) {
+    if (timerRunning) executionEnd();
+    boolean includeFraction = (millis < DurationFormatter.ONE_MINUTE);
+    setExecTimeText(durationFormatter.formatDuration(millis, includeFraction));
+  }
 
-	public void clearExecutionTime()
-	{
-		execTime.setText("");
-		execTime.repaint();
-	}
+  private void setExecTimeText(final String text) {
+    EventQueue.invokeLater(new Runnable() {
+                             @Override
+                             public void run() {
+                               execTime.setText(text);
+                             }
+                           }
+    );
+  }
 
-	@Override
-	public void setEditorLocation(int line, int column)
-	{
-		 if (this.editorStatus == null) return;
-		 StringBuilder text = new StringBuilder(20);
-		 text.append(editorLinePrefix);
-		 text.append(NumberStringCache.getNumberString(line));
-		 text.append(' ');
-		 text.append(editorColPrefix);
-		 text.append(NumberStringCache.getNumberString(column));
-		 this.editorStatus.setText(text.toString());
-	}
+  public void setRowcount(int start, int end, int count) {
+    final StringBuilder s = new StringBuilder(20);
+    if (count > 0) {
+      // for some reason the layout manager does not leave enough
+      // space to the left of the text, so we'll add some space here
+      s.append(' ');
+      s.append(NumberStringCache.getNumberString(start));
+      s.append('-');
+      s.append(NumberStringCache.getNumberString(end));
+      s.append('/');
+      s.append(NumberStringCache.getNumberString(count));
+    }
+    setRowcountText(s.toString());
+  }
 
-	public void executionStart()
-	{
-		if (!showTimer) return;
-		timerStarted = System.currentTimeMillis();
-		executionTimer.setInitialDelay(timerInterval);
-		executionTimer.setDelay(timerInterval);
-		timerRunning = true;
-		executionTimer.start();
-	}
+  private void setRowcountText(final String text) {
+    EventQueue.invokeLater(new Runnable() {
+                             @Override
+                             public void run() {
+                               tfRowCount.setText(text);
+                               validate();
+                             }
+                           }
+    );
+  }
 
-	public void executionEnd()
-	{
-		if (!showTimer) return;
-		timerRunning = false;
-		executionTimer.stop();
-	}
+  public void clearRowcount() {
+    setRowcountText("");
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		if (!timerRunning) return;
-		long time = System.currentTimeMillis() - timerStarted;
-		setExecTimeText(durationFormatter.formatDuration(time, false));
-	}
+  @Override
+  public String getText() {
+    return tfStatus.getText();
+  }
 
-	public void setExecutionTime(long millis)
-	{
-		if (timerRunning) executionEnd();
-		boolean includeFraction = (millis < DurationFormatter.ONE_MINUTE);
-		setExecTimeText(durationFormatter.formatDuration(millis, includeFraction));
-	}
+  @Override
+  public void setStatusMessage(final String message, final int duration) {
+    setStatusMessage(message);
+    if (duration > 0) {
+      WbThread t = new WbThread("ClearStatusMessage") {
+        @Override
+        public void run() {
+          WbThread.sleepSilently(duration);
+          String m = getText();
+          if (message.equals(m)) clearStatusMessage();
+        }
+      };
+      t.start();
+    }
+  }
 
-	private void setExecTimeText(final String text)
-	{
-		EventQueue.invokeLater(new Runnable()
-		{
-				@Override
-				public void run()
-				{
-					execTime.setText(text);
-				}
-			}
-		);
-	}
+  /**
+   * Display the status message
+   */
+  @Override
+  public void setStatusMessage(final String aMsg) {
+    if (aMsg == null) return;
+    tfStatus.setText(aMsg);
+  }
 
-	public void setRowcount(int start, int end, int count)
-	{
-		final StringBuilder s = new StringBuilder(20);
-		if (count > 0)
-		{
-			// for some reason the layout manager does not leave enough
-			// space to the left of the text, so we'll add some space here
-			s.append(' ');
-			s.append(NumberStringCache.getNumberString(start));
-			s.append('-');
-			s.append(NumberStringCache.getNumberString(end));
-			s.append('/');
-			s.append(NumberStringCache.getNumberString(count));
-		}
-		setRowcountText(s.toString());
-	}
+  public void forcePaint() {
+    tfStatus.forcePaint();
+  }
 
-	private void setRowcountText(final String text)
-	{
-		EventQueue.invokeLater(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					tfRowCount.setText(text);
-					validate();
-				}
-			}
-		);
-	}
+  /**
+   * Clears the status bar by displaying the default message.
+   */
+  @Override
+  public final void clearStatusMessage() {
+    this.setStatusMessage(this.readyMsg);
+  }
 
-	public void clearRowcount()
-	{
-		setRowcountText("");
-	}
+  public int getQueryTimeout() {
+    if (this.tfTimeout == null) return 0;
+    return StringUtil.getIntValue(this.tfTimeout.getText(), 0);
+  }
 
-	@Override
-	public String getText()
-	{
-		return tfStatus.getText();
-	}
+  public void setQueryTimeout(int timeout) {
+    if (this.tfTimeout != null) {
+      this.tfTimeout.setText(NumberStringCache.getNumberString(timeout));
+    }
+  }
 
-	@Override
-	public void setStatusMessage(final String message, final int duration)
-	{
-		setStatusMessage(message);
-		if (duration > 0)
-		{
-			WbThread t = new WbThread("ClearStatusMessage")
-			{
-				@Override
-				public void run()
-				{
-					WbThread.sleepSilently(duration);
-					String m = getText();
-					if (message.equals(m)) clearStatusMessage();
-				}
-			};
-			t.start();
-		}
-	}
+  public int getMaxRows() {
+    if (this.tfMaxRows == null) return 0;
+    return StringUtil.getIntValue(this.tfMaxRows.getText(), 0);
+  }
 
-	/**
-	 *	Display the status message
-	 *
-	 */
-	@Override
-	public void setStatusMessage(final String aMsg)
-	{
-		if (aMsg == null) return;
-		tfStatus.setText(aMsg);
-	}
+  public void setMaxRows(int max) {
+    this.tfMaxRows.setText(NumberStringCache.getNumberString(max));
+  }
 
-	public void forcePaint()
-	{
-		tfStatus.forcePaint();
-	}
+  public void selectMaxRowsField() {
+    this.tfMaxRows.selectAll();
+    this.tfMaxRows.requestFocusInWindow();
+  }
 
-	/**
-	 * Clears the status bar by displaying the default message.
-	 */
-	@Override
-	public final void clearStatusMessage()
-	{
-		this.setStatusMessage(this.readyMsg);
-	}
-
-	public void setQueryTimeout(int timeout)
-	{
-		if (this.tfTimeout != null)
-		{
-			this.tfTimeout.setText(NumberStringCache.getNumberString(timeout));
-		}
-	}
-
-	public int getQueryTimeout()
-	{
-		if (this.tfTimeout == null) return 0;
-		return StringUtil.getIntValue(this.tfTimeout.getText(), 0);
-	}
-
-	public void setMaxRows(int max)
-	{
-		this.tfMaxRows.setText(NumberStringCache.getNumberString(max));
-	}
-
-	public int getMaxRows()
-	{
-		if (this.tfMaxRows == null) return 0;
-		return StringUtil.getIntValue(this.tfMaxRows.getText(), 0);
-	}
-
-	public void selectMaxRowsField()
-	{
-		this.tfMaxRows.selectAll();
-		this.tfMaxRows.requestFocusInWindow();
-	}
-
-	@Override
-	public void doRepaint()
-	{
-		this.forcePaint();
-	}
+  @Override
+  public void doRepaint() {
+    this.forcePaint();
+  }
 }

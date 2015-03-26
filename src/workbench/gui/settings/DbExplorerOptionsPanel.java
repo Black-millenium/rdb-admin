@@ -22,96 +22,126 @@
  */
 package workbench.gui.settings;
 
-import java.awt.event.ActionListener;
-
-import javax.swing.JPanel;
-
 import workbench.interfaces.Restoreable;
 import workbench.resource.DbExplorerSettings;
 import workbench.resource.GuiSettings;
 import workbench.resource.ResourceMgr;
 
+import javax.swing.*;
+import java.awt.event.ActionListener;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class DbExplorerOptionsPanel
-	extends JPanel
-	implements Restoreable, ActionListener
-{
-	public DbExplorerOptionsPanel()
-	{
-		super();
-		initComponents();
-	}
+    extends JPanel
+    implements Restoreable, ActionListener {
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JCheckBox allowTableAlter;
+  private javax.swing.JCheckBox applySQLSort;
+  private javax.swing.JCheckBox autogeneratePK;
+  private javax.swing.JCheckBox autoselectDataPanel;
 
-	@Override
-	public void saveSettings()
-	{
-		DbExplorerSettings.setRetrieveDbExplorer(retrieveDbExplorer.isSelected());
-		DbExplorerSettings.setShowDbExplorerInMainWindow(this.showDbExplorer.isSelected());
-		DbExplorerSettings.setStoreExplorerObjectType(this.rememberObject.isSelected());
-		DbExplorerSettings.setAutoGeneratePKName(autogeneratePK.isSelected());
-		DbExplorerSettings.setShowTriggerPanel(showTriggerPanel.isSelected());
-		DbExplorerSettings.setSelectDataPanelAfterRetrieve(autoselectDataPanel.isSelected());
-		DbExplorerSettings.setSelectSourcePanelAfterRetrieve(selectSrcPanel.isSelected());
-		DbExplorerSettings.setRememberSortInDbExplorer(rememberSort.isSelected());
-		DbExplorerSettings.setRememberColumnOrder(rememberColOrder.isSelected());
-		DbExplorerSettings.setShowFocusInDbExplorer(showFocus.isSelected());
-		DbExplorerSettings.setDefaultExplorerObjectType(this.defTableType.getText());
-		DbExplorerSettings.setDbExpFilterDuringTyping(filterWhileTyping.isSelected());
-		DbExplorerSettings.setDbExpUsePartialMatch(partialMatchSearch.isSelected());
-		DbExplorerSettings.setGenerateTableGrants(generateTableGrants.isSelected());
-		DbExplorerSettings.setDbExpGenerateDrop(generateDrop.isSelected());
-		GuiSettings.setUseRegexInQuickFilter(useQuickFilterRegex.isSelected());
-		DbExplorerSettings.setAllowAlterInDbExplorer(allowTableAlter.isSelected());
-		DbExplorerSettings.setAutoRetrieveFKTree(retrieveFKTree.isSelected());
-		DbExplorerSettings.setApplySQLSortInDbExplorer(applySQLSort.isSelected());
-		DbExplorerSettings.setShowSynonymTargetInDbExplorer(showSynDetails.isSelected());
-		DbExplorerSettings.setDbExplorerShowTableHistory(showTableHistory.isSelected());
-		DbExplorerSettings.setGenerateColumnListInViews(generateViewColumns.isSelected());
-		DbExplorerSettings.setUseFilterForRetrieve(filterRetrieval.isSelected());
-		((PlacementChooser)tabPlacement).saveSelection();
-	}
+  // Code for dispatching events from components to event handlers.
+  private javax.swing.JTextField defTableType;
+  private javax.swing.JLabel defTableTypeLabel;
+  private javax.swing.JCheckBox filterRetrieval;
+  private javax.swing.JCheckBox filterWhileTyping;
+  private javax.swing.JCheckBox generateDrop;
+  private javax.swing.JCheckBox generateTableGrants;
+  private javax.swing.JCheckBox generateViewColumns;
+  private javax.swing.JLabel jLabel1;
+  private javax.swing.JPanel jPanel1;
+  private javax.swing.JPanel jPanel2;
+  private javax.swing.JPanel jPanel3;
+  private javax.swing.JPanel jPanel4;
+  private javax.swing.JPanel jPanel5;
+  private javax.swing.JPanel jPanel6;
+  private javax.swing.JPanel jPanel7;
+  private javax.swing.JCheckBox partialMatchSearch;
+  private javax.swing.JCheckBox rememberColOrder;
+  private javax.swing.JCheckBox rememberObject;
+  private javax.swing.JCheckBox rememberSort;
+  private javax.swing.JCheckBox retrieveDbExplorer;
+  private javax.swing.JCheckBox retrieveFKTree;
+  private javax.swing.JCheckBox selectSrcPanel;
+  private javax.swing.JCheckBox showDbExplorer;
+  private javax.swing.JCheckBox showFocus;
+  private javax.swing.JCheckBox showSynDetails;
+  private javax.swing.JCheckBox showTableHistory;
+  private javax.swing.JCheckBox showTriggerPanel;
+  private javax.swing.JComboBox tabPlacement;
+  private javax.swing.JCheckBox useQuickFilterRegex;
+  public DbExplorerOptionsPanel() {
+    super();
+    initComponents();
+  }
 
-	@Override
-	public void restoreSettings()
-	{
-		filterRetrieval.setSelected(DbExplorerSettings.getUseFilterForRetrieve());
-		autogeneratePK.setSelected(DbExplorerSettings.getAutoGeneratePKName());
-		partialMatchSearch.setSelected(DbExplorerSettings.getDbExpUsePartialMatch());
-		retrieveFKTree.setSelected(DbExplorerSettings.getAutoRetrieveFKTree());
-		allowTableAlter.setSelected(DbExplorerSettings.allowAlterInDbExplorer());
-		defTableType.setText(DbExplorerSettings.getDefaultExplorerObjectType());
-		rememberColOrder.setSelected(DbExplorerSettings.getRememberColumnOrder());
-		rememberSort.setSelected(DbExplorerSettings.getRememberSortInDbExplorer());
-		generateTableGrants.setSelected(DbExplorerSettings.getGenerateTableGrants());
-		generateDrop.setSelected(DbExplorerSettings.getDbExpGenerateDrop());
-		useQuickFilterRegex.setSelected(GuiSettings.getUseRegexInQuickFilter());
-		filterWhileTyping.setSelected(DbExplorerSettings.getDbExpFilterDuringTyping());
-		selectSrcPanel.setSelected(DbExplorerSettings.getSelectSourcePanelAfterRetrieve());
-		((PlacementChooser)tabPlacement).showPlacement();
-		partialMatchSearch.setEnabled(!useQuickFilterRegex.isSelected());
-		applySQLSort.setSelected(DbExplorerSettings.getApplySQLSortInDbExplorer());
-		showSynDetails.setSelected(GuiSettings.showSynonymTargetInDbExplorer());
-		showTableHistory.setSelected(DbExplorerSettings.getDbExplorerShowTableHistory());
-		generateViewColumns.setSelected(DbExplorerSettings.getGenerateColumnListInViews());
-		showDbExplorer.setSelected(DbExplorerSettings.getShowDbExplorerInMainWindow());
-		showTriggerPanel.setSelected(DbExplorerSettings.getShowTriggerPanel());
-		showFocus.setSelected(DbExplorerSettings.showFocusInDbExplorer());
+  @Override
+  public void saveSettings() {
+    DbExplorerSettings.setRetrieveDbExplorer(retrieveDbExplorer.isSelected());
+    DbExplorerSettings.setShowDbExplorerInMainWindow(this.showDbExplorer.isSelected());
+    DbExplorerSettings.setStoreExplorerObjectType(this.rememberObject.isSelected());
+    DbExplorerSettings.setAutoGeneratePKName(autogeneratePK.isSelected());
+    DbExplorerSettings.setShowTriggerPanel(showTriggerPanel.isSelected());
+    DbExplorerSettings.setSelectDataPanelAfterRetrieve(autoselectDataPanel.isSelected());
+    DbExplorerSettings.setSelectSourcePanelAfterRetrieve(selectSrcPanel.isSelected());
+    DbExplorerSettings.setRememberSortInDbExplorer(rememberSort.isSelected());
+    DbExplorerSettings.setRememberColumnOrder(rememberColOrder.isSelected());
+    DbExplorerSettings.setShowFocusInDbExplorer(showFocus.isSelected());
+    DbExplorerSettings.setDefaultExplorerObjectType(this.defTableType.getText());
+    DbExplorerSettings.setDbExpFilterDuringTyping(filterWhileTyping.isSelected());
+    DbExplorerSettings.setDbExpUsePartialMatch(partialMatchSearch.isSelected());
+    DbExplorerSettings.setGenerateTableGrants(generateTableGrants.isSelected());
+    DbExplorerSettings.setDbExpGenerateDrop(generateDrop.isSelected());
+    GuiSettings.setUseRegexInQuickFilter(useQuickFilterRegex.isSelected());
+    DbExplorerSettings.setAllowAlterInDbExplorer(allowTableAlter.isSelected());
+    DbExplorerSettings.setAutoRetrieveFKTree(retrieveFKTree.isSelected());
+    DbExplorerSettings.setApplySQLSortInDbExplorer(applySQLSort.isSelected());
+    DbExplorerSettings.setShowSynonymTargetInDbExplorer(showSynDetails.isSelected());
+    DbExplorerSettings.setDbExplorerShowTableHistory(showTableHistory.isSelected());
+    DbExplorerSettings.setGenerateColumnListInViews(generateViewColumns.isSelected());
+    DbExplorerSettings.setUseFilterForRetrieve(filterRetrieval.isSelected());
+    ((PlacementChooser) tabPlacement).saveSelection();
+  }
+
+  @Override
+  public void restoreSettings() {
+    filterRetrieval.setSelected(DbExplorerSettings.getUseFilterForRetrieve());
+    autogeneratePK.setSelected(DbExplorerSettings.getAutoGeneratePKName());
+    partialMatchSearch.setSelected(DbExplorerSettings.getDbExpUsePartialMatch());
+    retrieveFKTree.setSelected(DbExplorerSettings.getAutoRetrieveFKTree());
+    allowTableAlter.setSelected(DbExplorerSettings.allowAlterInDbExplorer());
+    defTableType.setText(DbExplorerSettings.getDefaultExplorerObjectType());
+    rememberColOrder.setSelected(DbExplorerSettings.getRememberColumnOrder());
+    rememberSort.setSelected(DbExplorerSettings.getRememberSortInDbExplorer());
+    generateTableGrants.setSelected(DbExplorerSettings.getGenerateTableGrants());
+    generateDrop.setSelected(DbExplorerSettings.getDbExpGenerateDrop());
+    useQuickFilterRegex.setSelected(GuiSettings.getUseRegexInQuickFilter());
+    filterWhileTyping.setSelected(DbExplorerSettings.getDbExpFilterDuringTyping());
+    selectSrcPanel.setSelected(DbExplorerSettings.getSelectSourcePanelAfterRetrieve());
+    ((PlacementChooser) tabPlacement).showPlacement();
+    partialMatchSearch.setEnabled(!useQuickFilterRegex.isSelected());
+    applySQLSort.setSelected(DbExplorerSettings.getApplySQLSortInDbExplorer());
+    showSynDetails.setSelected(GuiSettings.showSynonymTargetInDbExplorer());
+    showTableHistory.setSelected(DbExplorerSettings.getDbExplorerShowTableHistory());
+    generateViewColumns.setSelected(DbExplorerSettings.getGenerateColumnListInViews());
+    showDbExplorer.setSelected(DbExplorerSettings.getShowDbExplorerInMainWindow());
+    showTriggerPanel.setSelected(DbExplorerSettings.getShowTriggerPanel());
+    showFocus.setSelected(DbExplorerSettings.showFocusInDbExplorer());
     retrieveDbExplorer.setSelected(DbExplorerSettings.getRetrieveDbExplorer());
     rememberObject.setSelected(DbExplorerSettings.getStoreExplorerObjectType());
     applySQLSort.setSelected(DbExplorerSettings.getRememberSortInDbExplorer());
-	}
+  }
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
 
     showDbExplorer = new javax.swing.JCheckBox();
@@ -207,7 +237,7 @@ public class DbExplorerOptionsPanel
 
     jPanel2.setLayout(new java.awt.GridBagLayout());
 
-    tabPlacement.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Top", "Bottom", "Left", "Right" }));
+    tabPlacement.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Top", "Bottom", "Left", "Right"}));
     tabPlacement.setToolTipText(ResourceMgr.getString("d_LblObjTabPos")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
@@ -512,12 +542,8 @@ public class DbExplorerOptionsPanel
     add(jPanel6, gridBagConstraints);
   }
 
-  // Code for dispatching events from components to event handlers.
-
-  public void actionPerformed(java.awt.event.ActionEvent evt)
-  {
-    if (evt.getSource() == useQuickFilterRegex)
-    {
+  public void actionPerformed(java.awt.event.ActionEvent evt) {
+    if (evt.getSource() == useQuickFilterRegex) {
       DbExplorerOptionsPanel.this.useQuickFilterRegexActionPerformed(evt);
     }
   }// </editor-fold>//GEN-END:initComponents
@@ -526,42 +552,6 @@ public class DbExplorerOptionsPanel
   {//GEN-HEADEREND:event_useQuickFilterRegexActionPerformed
     partialMatchSearch.setEnabled(!useQuickFilterRegex.isSelected());
   }//GEN-LAST:event_useQuickFilterRegexActionPerformed
-
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JCheckBox allowTableAlter;
-  private javax.swing.JCheckBox applySQLSort;
-  private javax.swing.JCheckBox autogeneratePK;
-  private javax.swing.JCheckBox autoselectDataPanel;
-  private javax.swing.JTextField defTableType;
-  private javax.swing.JLabel defTableTypeLabel;
-  private javax.swing.JCheckBox filterRetrieval;
-  private javax.swing.JCheckBox filterWhileTyping;
-  private javax.swing.JCheckBox generateDrop;
-  private javax.swing.JCheckBox generateTableGrants;
-  private javax.swing.JCheckBox generateViewColumns;
-  private javax.swing.JLabel jLabel1;
-  private javax.swing.JPanel jPanel1;
-  private javax.swing.JPanel jPanel2;
-  private javax.swing.JPanel jPanel3;
-  private javax.swing.JPanel jPanel4;
-  private javax.swing.JPanel jPanel5;
-  private javax.swing.JPanel jPanel6;
-  private javax.swing.JPanel jPanel7;
-  private javax.swing.JCheckBox partialMatchSearch;
-  private javax.swing.JCheckBox rememberColOrder;
-  private javax.swing.JCheckBox rememberObject;
-  private javax.swing.JCheckBox rememberSort;
-  private javax.swing.JCheckBox retrieveDbExplorer;
-  private javax.swing.JCheckBox retrieveFKTree;
-  private javax.swing.JCheckBox selectSrcPanel;
-  private javax.swing.JCheckBox showDbExplorer;
-  private javax.swing.JCheckBox showFocus;
-  private javax.swing.JCheckBox showSynDetails;
-  private javax.swing.JCheckBox showTableHistory;
-  private javax.swing.JCheckBox showTriggerPanel;
-  private javax.swing.JComboBox tabPlacement;
-  private javax.swing.JCheckBox useQuickFilterRegex;
   // End of variables declaration//GEN-END:variables
 
 }

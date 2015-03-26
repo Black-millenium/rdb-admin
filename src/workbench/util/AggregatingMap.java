@@ -22,113 +22,86 @@
 
 package workbench.util;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class AggregatingMap<K extends Object, V extends Object>
-{
-	private final Map<K, Set<V>> content;
-	private final boolean sorted;
+public class AggregatingMap<K extends Object, V extends Object> {
+  private final Map<K, Set<V>> content;
+  private final boolean sorted;
 
-	public AggregatingMap(boolean sorted)
-	{
-		this.sorted = sorted;
-		if (sorted)
-		{
-			content = new TreeMap<>();
-		}
-		else
-		{
-			content = new HashMap<>();
-		}
-	}
+  public AggregatingMap(boolean sorted) {
+    this.sorted = sorted;
+    if (sorted) {
+      content = new TreeMap<>();
+    } else {
+      content = new HashMap<>();
+    }
+  }
 
-	public AggregatingMap(Map<K, Set<V>> map)
-	{
-		if (map == null) throw new NullPointerException("Content cannot be null");
-		content = map;
-		sorted = false;
-	}
+  public AggregatingMap(Map<K, Set<V>> map) {
+    if (map == null) throw new NullPointerException("Content cannot be null");
+    content = map;
+    sorted = false;
+  }
 
-	public Set<V> addValue(K key, Set<V> values)
-	{
-		Set<V> current = content.get(key);
-		if (current == null)
-		{
-			current = createValueSet();
-			content.put(key, current);
-		}
-		current.addAll(values);
-		return current;
-	}
+  public Set<V> addValue(K key, Set<V> values) {
+    Set<V> current = content.get(key);
+    if (current == null) {
+      current = createValueSet();
+      content.put(key, current);
+    }
+    current.addAll(values);
+    return current;
+  }
 
-	private Set<V> createValueSet()
-	{
-		if (sorted)
-		{
-			return new TreeSet<>();
-		}
-		return new HashSet<>();
-	}
-	public Set<V> addValue(K key, V value)
-	{
-		Set<V> current = content.get(key);
-		if (current == null)
-		{
-			current = createValueSet();
-			content.put(key, current);
-		}
-		current.add(value);
-		return current;
-	}
+  private Set<V> createValueSet() {
+    if (sorted) {
+      return new TreeSet<>();
+    }
+    return new HashSet<>();
+  }
 
-	public Set<V> get(K key)
-	{
-		Set<V> result = content.get(key);
-		if (result == null)
-		{
-			return Collections.emptySet();
-		}
-		return result;
-	}
+  public Set<V> addValue(K key, V value) {
+    Set<V> current = content.get(key);
+    if (current == null) {
+      current = createValueSet();
+      content.put(key, current);
+    }
+    current.add(value);
+    return current;
+  }
 
-	public Map<K, Set<V>> getMap()
-	{
-		return content;
-	}
+  public Set<V> get(K key) {
+    Set<V> result = content.get(key);
+    if (result == null) {
+      return Collections.emptySet();
+    }
+    return result;
+  }
 
-	public Set<Map.Entry<K, Set<V>>> entrySet()
-	{
-		return content.entrySet();
-	}
+  public Map<K, Set<V>> getMap() {
+    return content;
+  }
 
-	public void addAllValues(Map<K, Set<V>> data)
-	{
-		for (Map.Entry<K, Set<V>> entry : data.entrySet())
-		{
-			addValue(entry.getKey(), entry.getValue());
-		}
-	}
+  public Set<Map.Entry<K, Set<V>>> entrySet() {
+    return content.entrySet();
+  }
 
-	public void addAll(Map<K, V> data)
-	{
-		for (Map.Entry<K, V> entry : data.entrySet())
-		{
-			addValue(entry.getKey(), entry.getValue());
-		}
-	}
+  public void addAllValues(Map<K, Set<V>> data) {
+    for (Map.Entry<K, Set<V>> entry : data.entrySet()) {
+      addValue(entry.getKey(), entry.getValue());
+    }
+  }
 
-	public int size()
-	{
-		return content.size();
-	}
+  public void addAll(Map<K, V> data) {
+    for (Map.Entry<K, V> entry : data.entrySet()) {
+      addValue(entry.getKey(), entry.getValue());
+    }
+  }
+
+  public int size() {
+    return content.size();
+  }
 }

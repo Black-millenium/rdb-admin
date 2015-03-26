@@ -22,33 +22,30 @@
  */
 package workbench.gui.editor.actions;
 
-import java.awt.event.ActionEvent;
 import workbench.gui.actions.WbAction;
 import workbench.gui.editor.JEditTextArea;
 import workbench.gui.editor.TextIndenter;
 import workbench.resource.ResourceMgr;
 
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class UnIndentSelection
-	extends WbAction
-{
-	private JEditTextArea area;
+    extends WbAction {
+  private JEditTextArea area;
 
-	public UnIndentSelection(JEditTextArea edit)
-	{
-		super();
-		initMenuDefinition("MnuTxtUnIndent");
-		setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
-		area = edit;
-	}
+  public UnIndentSelection(JEditTextArea edit) {
+    super();
+    initMenuDefinition("MnuTxtUnIndent");
+    setMenuItemName(ResourceMgr.MNU_TXT_EDIT);
+    area = edit;
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		TextIndenter indenter = new TextIndenter(area);
-		indenter.unIndentSelection();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    TextIndenter indenter = new TextIndenter(area);
+    indenter.unIndentSelection();
+  }
 }

@@ -23,15 +23,18 @@
 package workbench.gui.dialogs.export;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface HtmlOptions
-{
-	String getPageTitle();
-	void setPageTitle(String title);
-	boolean getCreateFullPage();
-	void setCreateFullPage(boolean flag);
-	boolean getEscapeHtml();
-	void setEscapeHtml(boolean flag);
+public interface HtmlOptions {
+  String getPageTitle();
+
+  void setPageTitle(String title);
+
+  boolean getCreateFullPage();
+
+  void setCreateFullPage(boolean flag);
+
+  boolean getEscapeHtml();
+
+  void setEscapeHtml(boolean flag);
 }

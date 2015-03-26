@@ -22,107 +22,89 @@
  */
 package workbench.gui.components;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import workbench.gui.WbSwingUtilities;
 
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.JPopupMenu;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
-
-import workbench.gui.WbSwingUtilities;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * @author Thomas Kellerer
  */
 public class DropDownButton
-	extends WbButton
-	implements ActionListener, PopupMenuListener
-{
-	private JPopupMenu popup;
-	private boolean popupVisible;
-	private Border menuBorder = BorderFactory.createLineBorder(Color.GRAY, 1);
+    extends WbButton
+    implements ActionListener, PopupMenuListener {
+  private JPopupMenu popup;
+  private boolean popupVisible;
+  private Border menuBorder = BorderFactory.createLineBorder(Color.GRAY, 1);
 
-	public DropDownButton(String label)
-	{
-		super(label);
-		init();
-	}
+  public DropDownButton(String label) {
+    super(label);
+    init();
+  }
 
-	public DropDownButton(Icon i)
-	{
-		super(i);
-		init();
-	}
+  public DropDownButton(Icon i) {
+    super(i);
+    init();
+  }
 
-	private void init()
-	{
-		setFocusable(false);
-		addActionListener(this);
-		setMargin(WbSwingUtilities.EMPTY_INSETS);
-		setBorderPainted(false);
-		enableToolbarRollover();
-	}
+  private void init() {
+    setFocusable(false);
+    addActionListener(this);
+    setMargin(WbSwingUtilities.EMPTY_INSETS);
+    setBorderPainted(false);
+    enableToolbarRollover();
+  }
 
-	public void dispose()
-	{
-		if (this.popup != null)
-		{
-			this.popup.removePopupMenuListener(this);
-			this.popup.setVisible(false);
-			this.popup.removeAll();
-			this.popup = null;
-		}
-	}
+  public void dispose() {
+    if (this.popup != null) {
+      this.popup.removePopupMenuListener(this);
+      this.popup.setVisible(false);
+      this.popup.removeAll();
+      this.popup = null;
+    }
+  }
 
-	public void setDropDownMenu(JPopupMenu menu)
-	{
-		if (this.popup != null)
-		{
-			this.popup.removePopupMenuListener(this);
-			this.popup.setVisible(false);
-			this.popup.removeAll();
-		}
-		popup = menu;
-		popup.setBorder(this.menuBorder);
-		popup.addPopupMenuListener(this);
-	}
+  public void setDropDownMenu(JPopupMenu menu) {
+    if (this.popup != null) {
+      this.popup.removePopupMenuListener(this);
+      this.popup.setVisible(false);
+      this.popup.removeAll();
+    }
+    popup = menu;
+    popup.setBorder(this.menuBorder);
+    popup.addPopupMenuListener(this);
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt)
-	{
-		if (this.popup == null) return;
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    if (this.popup == null) return;
 
-		if (popupVisible)
-		{
-			popup.setVisible(false);
-			popupVisible = false;
-		}
-		else
-		{
-			popup.show(this, 0, getHeight() - 2);
-			popupVisible = true;
-		}
-	}
+    if (popupVisible) {
+      popup.setVisible(false);
+      popupVisible = false;
+    } else {
+      popup.show(this, 0, getHeight() - 2);
+      popupVisible = true;
+    }
+  }
 
-	@Override
-	public void popupMenuWillBecomeVisible(PopupMenuEvent e)
-	{
-		popupVisible = true;
-	}
+  @Override
+  public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+    popupVisible = true;
+  }
 
-	@Override
-	public void popupMenuWillBecomeInvisible(PopupMenuEvent e)
-	{
-		popupVisible = false;
-	}
+  @Override
+  public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+    popupVisible = false;
+  }
 
-	@Override
-	public void popupMenuCanceled(PopupMenuEvent e)
-	{
-		popupVisible = false;
-	}
+  @Override
+  public void popupMenuCanceled(PopupMenuEvent e) {
+    popupVisible = false;
+  }
 }

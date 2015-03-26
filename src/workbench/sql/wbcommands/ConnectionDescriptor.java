@@ -19,191 +19,162 @@
  */
 package workbench.sql.wbcommands;
 
-import java.io.File;
-import java.util.List;
-
 import workbench.AppArguments;
-import workbench.resource.ResourceMgr;
-
 import workbench.db.ConnectionMgr;
 import workbench.db.ConnectionProfile;
 import workbench.db.DbDriver;
-
+import workbench.resource.ResourceMgr;
 import workbench.util.StringUtil;
 import workbench.util.WbFile;
 
+import java.io.File;
+import java.util.List;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public class ConnectionDescriptor
-{
-	private File baseDir;
-	private String jarfile;
-	private int instance;
-	private static int instanceCounter;
+public class ConnectionDescriptor {
+  private static int instanceCounter;
+  private File baseDir;
+  private String jarfile;
+  private int instance;
 
-	public ConnectionDescriptor()
-	{
-		this(null);
-	}
+  public ConnectionDescriptor() {
+    this(null);
+  }
 
-	public ConnectionDescriptor(String dirName)
-	{
-		baseDir = new File(StringUtil.isBlank(dirName) ? System.getProperty("user.dir") : dirName);
-		instance = ++instanceCounter;
-	}
+  public ConnectionDescriptor(String dirName) {
+    baseDir = new File(StringUtil.isBlank(dirName) ? System.getProperty("user.dir") : dirName);
+    instance = ++instanceCounter;
+  }
 
-	/**
-	 * Parses a compact connection string in the format username=foo,pwd=bar,url=...,driver=com...,jar=
-	 *
-	 * @param connectionString  the connection string to parse
-	 * @param driverString      the driver string to parse {@link #parseDriver(java.lang.String) }
-	 * @return a connection profile to be used
-	 */
-	public ConnectionProfile parseDefinition(String connectionString)
-		throws InvalidConnectionDescriptor
-	{
-		if (StringUtil.isBlank(connectionString)) return null;
+  protected static String getUrlPrefix(String url) {
+    if (StringUtil.isEmptyString(url)) return null;
+    int pos = url.indexOf(':');
+    if (pos == -1) return null;
+    int pos2 = url.indexOf(':', pos + 1);
+    if (pos2 == -1) return null;
+    return url.substring(0, pos2 + 1);
+  }
 
-		List<String> elements = StringUtil.stringToList(connectionString, ",", true, true, false, false);
-		String url = null;
-		String user = null;
-		String pwd = null;
-		String driverClass = null;
-		jarfile = null;
-		
-		for (String element : elements)
-		{
-			String lower = element.toLowerCase();
-			if (lower.startsWith(AppArguments.ARG_CONN_USER + "=") || lower.startsWith("user="))
-			{
-				user = getValue(element);
-			}
-			if (lower.startsWith(AppArguments.ARG_CONN_PWD + "="))
-			{
-				pwd = getValue(element);
-			}
-			if (lower.startsWith(AppArguments.ARG_CONN_URL + "="))
-			{
-				url = getValue(element);
-			}
-			if (lower.startsWith(AppArguments.ARG_CONN_DRIVER + "=") || lower.startsWith(AppArguments.ARG_CONN_DRIVER_CLASS + "="))
-			{
-				driverClass = getValue(element);
-			}
-			if (lower.startsWith("jar") || lower.startsWith(AppArguments.ARG_CONN_JAR + "="))
-			{
-				jarfile = getValue(element);
-			}
-		}
+  public static String findDriverClassFromUrl(String url) {
+    String prefix = getUrlPrefix(url);
+    if (prefix == null) return null;
 
-		if (StringUtil.isBlank(url))
-		{
-			throw new InvalidConnectionDescriptor("No JDBC URL specified in connection specification", ResourceMgr.getString("ErrConnectURLMissing"));
-		}
+    List<DbDriver> templates = ConnectionMgr.getInstance().getDriverTemplates();
 
-		if (StringUtil.isEmptyString(driverClass))
-		{
-			driverClass = findDriverClassFromUrl(url);
-		}
+    for (DbDriver drv : templates) {
+      String tempUrl = drv.getSampleUrl();
+      if (tempUrl == null) continue;
 
-		if (StringUtil.isEmptyString(driverClass))
-		{
-			throw new InvalidConnectionDescriptor("No JDBC URL specified in connection specification", ResourceMgr.getFormattedString("ErrConnectDrvNotFound", url));
-		}
+      String pref = getUrlPrefix(tempUrl);
+      if (prefix.equals(pref)) return drv.getDriverClass();
+    }
+    return null;
+  }
 
-		DbDriver driver = getDriver(driverClass, jarfile);
+  /**
+   * Parses a compact connection string in the format username=foo,pwd=bar,url=...,driver=com...,jar=
+   *
+   * @param connectionString the connection string to parse
+   * @param driverString     the driver string to parse {@link #parseDriver(java.lang.String) }
+   * @return a connection profile to be used
+   */
+  public ConnectionProfile parseDefinition(String connectionString)
+      throws InvalidConnectionDescriptor {
+    if (StringUtil.isBlank(connectionString)) return null;
 
-		ConnectionProfile result = new ConnectionProfile();
-		result.setTemporaryProfile(true);
-		result.setName("temp-profile-"+instance);
-		result.setDriver(driver);
-		result.setStoreExplorerSchema(false);
-		result.setUrl(url);
+    List<String> elements = StringUtil.stringToList(connectionString, ",", true, true, false, false);
+    String url = null;
+    String user = null;
+    String pwd = null;
+    String driverClass = null;
+    jarfile = null;
 
-		result.setPassword(pwd);
-		result.setStorePassword(true);
+    for (String element : elements) {
+      String lower = element.toLowerCase();
+      if (lower.startsWith(AppArguments.ARG_CONN_USER + "=") || lower.startsWith("user=")) {
+        user = getValue(element);
+      }
+      if (lower.startsWith(AppArguments.ARG_CONN_PWD + "=")) {
+        pwd = getValue(element);
+      }
+      if (lower.startsWith(AppArguments.ARG_CONN_URL + "=")) {
+        url = getValue(element);
+      }
+      if (lower.startsWith(AppArguments.ARG_CONN_DRIVER + "=") || lower.startsWith(AppArguments.ARG_CONN_DRIVER_CLASS + "=")) {
+        driverClass = getValue(element);
+      }
+      if (lower.startsWith("jar") || lower.startsWith(AppArguments.ARG_CONN_JAR + "=")) {
+        jarfile = getValue(element);
+      }
+    }
 
-		result.setUsername(user);
-		result.setRollbackBeforeDisconnect(true);
-		result.setReadOnly(false);
-		result.reset();
-		return result;
-	}
+    if (StringUtil.isBlank(url)) {
+      throw new InvalidConnectionDescriptor("No JDBC URL specified in connection specification", ResourceMgr.getString("ErrConnectURLMissing"));
+    }
 
-	private String getValue(String parameter)
-	{
-		if (StringUtil.isEmptyString(parameter)) return null;
-		int pos = parameter.indexOf('=');
-		if (pos == -1) return null;
-		return StringUtil.trimQuotes(parameter.substring(pos + 1).trim());
-	}
+    if (StringUtil.isEmptyString(driverClass)) {
+      driverClass = findDriverClassFromUrl(url);
+    }
 
-	protected static String getUrlPrefix(String url)
-	{
-		if (StringUtil.isEmptyString(url)) return null;
-		int pos = url.indexOf(':');
-		if (pos == -1) return null;
-		int pos2 = url.indexOf(':', pos + 1);
-		if (pos2 == -1) return null;
-		return url.substring(0, pos2 + 1);
-	}
+    if (StringUtil.isEmptyString(driverClass)) {
+      throw new InvalidConnectionDescriptor("No JDBC URL specified in connection specification", ResourceMgr.getFormattedString("ErrConnectDrvNotFound", url));
+    }
 
-	public static String findDriverClassFromUrl(String url)
-	{
-		String prefix = getUrlPrefix(url);
-		if (prefix == null) return null;
+    DbDriver driver = getDriver(driverClass, jarfile);
 
-		List<DbDriver> templates = ConnectionMgr.getInstance().getDriverTemplates();
+    ConnectionProfile result = new ConnectionProfile();
+    result.setTemporaryProfile(true);
+    result.setName("temp-profile-" + instance);
+    result.setDriver(driver);
+    result.setStoreExplorerSchema(false);
+    result.setUrl(url);
 
-		for (DbDriver drv : templates)
-		{
-			String tempUrl = drv.getSampleUrl();
-			if (tempUrl == null) continue;
+    result.setPassword(pwd);
+    result.setStorePassword(true);
 
-			String pref = getUrlPrefix(tempUrl);
-			if (prefix.equals(pref)) return drv.getDriverClass();
-		}
-		return null;
-	}
+    result.setUsername(user);
+    result.setRollbackBeforeDisconnect(true);
+    result.setReadOnly(false);
+    result.reset();
+    return result;
+  }
 
-	/**
-	 * For testing purposes.
-	 */
-	public String getJarPath()
-	{
-		return getJarPath(this.jarfile);
-	}
+  private String getValue(String parameter) {
+    if (StringUtil.isEmptyString(parameter)) return null;
+    int pos = parameter.indexOf('=');
+    if (pos == -1) return null;
+    return StringUtil.trimQuotes(parameter.substring(pos + 1).trim());
+  }
 
-	private String getJarPath(String jarFile)
-	{
-		String jarPath = null;
-		WbFile df = new WbFile(jarFile == null ? "" : jarFile);
-		if (df.isAbsolute() || baseDir == null)
-		{
-			jarPath = df.getFullPath();
-		}
-		else
-		{
-			df = new WbFile(baseDir, jarFile);
-			jarPath = df.getFullPath();
-		}
-		return jarPath;
-	}
+  /**
+   * For testing purposes.
+   */
+  public String getJarPath() {
+    return getJarPath(this.jarfile);
+  }
 
-	private DbDriver getDriver(String className, String jarFile)
-	{
-		DbDriver drv = null;
-		if (jarFile == null)
-		{
-			drv = ConnectionMgr.getInstance().findDriver(className);
-		}
-		else
-		{
-			String jarPath = getJarPath(jarFile);
-			drv = ConnectionMgr.getInstance().registerDriver(className, jarPath);
-		}
-		return drv;
-	}
+  private String getJarPath(String jarFile) {
+    String jarPath = null;
+    WbFile df = new WbFile(jarFile == null ? "" : jarFile);
+    if (df.isAbsolute() || baseDir == null) {
+      jarPath = df.getFullPath();
+    } else {
+      df = new WbFile(baseDir, jarFile);
+      jarPath = df.getFullPath();
+    }
+    return jarPath;
+  }
+
+  private DbDriver getDriver(String className, String jarFile) {
+    DbDriver drv = null;
+    if (jarFile == null) {
+      drv = ConnectionMgr.getInstance().findDriver(className);
+    } else {
+      String jarPath = getJarPath(jarFile);
+      drv = ConnectionMgr.getInstance().registerDriver(className, jarPath);
+    }
+    return drv;
+  }
 }

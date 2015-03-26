@@ -22,41 +22,35 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
 import workbench.interfaces.NullableEditor;
 
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class RestoreDataAction
-	extends WbAction
-{
-	private NullableEditor client;
+    extends WbAction {
+  private NullableEditor client;
 
-	public RestoreDataAction(NullableEditor editor)
-	{
-		initMenuDefinition("MnuTxtRestoreOrgValue");
-		client = editor;
-		if (client != null && client.getEditor() != null)
-		{
-			addToInputMap(client.getEditor());
-		}
-	}
+  public RestoreDataAction(NullableEditor editor) {
+    initMenuDefinition("MnuTxtRestoreOrgValue");
+    client = editor;
+    if (client != null && client.getEditor() != null) {
+      addToInputMap(client.getEditor());
+    }
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		if (client != null)
-		{
-			client.restoreOriginal();
-		}
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    if (client != null) {
+      client.restoreOriginal();
+    }
+  }
 
-	@Override
-	public boolean allowDuplicate()
-	{
-		return true;
-	}
+  @Override
+  public boolean allowDuplicate() {
+    return true;
+  }
 
 }

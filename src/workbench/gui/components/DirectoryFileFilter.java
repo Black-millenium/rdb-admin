@@ -22,33 +22,28 @@
  */
 package workbench.gui.components;
 
+import javax.swing.filechooser.FileFilter;
 import java.io.File;
 
-import javax.swing.filechooser.FileFilter;
-
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class DirectoryFileFilter
-	extends FileFilter
-{
-	private final String desc;
-	public DirectoryFileFilter(String aDesc)
-	{
-		super();
-		this.desc = aDesc;
-	}
+    extends FileFilter {
+  private final String desc;
 
-	@Override
-	public boolean accept(File f)
-	{
-		return f.isDirectory();
-	}
+  public DirectoryFileFilter(String aDesc) {
+    super();
+    this.desc = aDesc;
+  }
 
-	@Override
-	public String getDescription()
-	{
-		return this.desc;
-	}
+  @Override
+  public boolean accept(File f) {
+    return f.isDirectory();
+  }
+
+  @Override
+  public String getDescription() {
+    return this.desc;
+  }
 }

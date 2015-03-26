@@ -25,11 +25,10 @@ package workbench.interfaces;
 import workbench.util.NotifierEvent;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface EventDisplay 
-{
-	void showAlert(NotifierEvent event);
-	void removeAlert();
+public interface EventDisplay {
+  void showAlert(NotifierEvent event);
+
+  void removeAlert();
 }

@@ -22,38 +22,34 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
 import workbench.interfaces.Searchable;
 import workbench.resource.PlatformShortcuts;
 import workbench.resource.ResourceMgr;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+
 /**
- *	Search inside the result set
+ * Search inside the result set
  *
- *	@author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public class FindDataAction extends WbAction
-{
-	private Searchable client;
+public class FindDataAction extends WbAction {
+  private Searchable client;
 
-	public FindDataAction(Searchable aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtFindInTableData", KeyStroke.getKeyStroke(KeyEvent.VK_F, PlatformShortcuts.getDefaultModifier() | InputEvent.SHIFT_MASK));
-		this.setIcon("find-data");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
-		this.setCreateToolbarSeparator(true);
-	}
+  public FindDataAction(Searchable aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtFindInTableData", KeyStroke.getKeyStroke(KeyEvent.VK_F, PlatformShortcuts.getDefaultModifier() | InputEvent.SHIFT_MASK));
+    this.setIcon("find-data");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_DATA);
+    this.setCreateToolbarSeparator(true);
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		this.client.find();
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    this.client.find();
+  }
 }

@@ -22,13 +22,12 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import workbench.resource.ResourceMgr;
-
 import workbench.gui.MainWindow;
 import workbench.gui.WbSwingUtilities;
 import workbench.gui.tools.ObjectSourceSearchPanel;
+import workbench.resource.ResourceMgr;
+
+import java.awt.event.ActionEvent;
 
 
 /**
@@ -37,35 +36,28 @@ import workbench.gui.tools.ObjectSourceSearchPanel;
  * @author Thomas Kellerer
  */
 public class ObjectSearchAction
-	extends WbAction
-{
-	private MainWindow parent;
+    extends WbAction {
+  private MainWindow parent;
 
-	public ObjectSearchAction(MainWindow win)
-	{
-		super();
-		this.initMenuDefinition("MnuTxtObjectSearch");
-		this.setMenuItemName(ResourceMgr.MNU_TXT_TOOLS);
-		this.setIcon("searchsource");
-		this.parent = win;
-	}
+  public ObjectSearchAction(MainWindow win) {
+    super();
+    this.initMenuDefinition("MnuTxtObjectSearch");
+    this.setMenuItemName(ResourceMgr.MNU_TXT_TOOLS);
+    this.setIcon("searchsource");
+    this.parent = win;
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		if (parent != null)
-		{
-			WbSwingUtilities.showWaitCursor(parent);
-		}
-		try
-		{
-			ObjectSourceSearchPanel panel = new ObjectSourceSearchPanel();
-			panel.showWindow(parent);
-		}
-		finally
-		{
-			if (parent != null) WbSwingUtilities.showDefaultCursor(parent);
-		}
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    if (parent != null) {
+      WbSwingUtilities.showWaitCursor(parent);
+    }
+    try {
+      ObjectSourceSearchPanel panel = new ObjectSourceSearchPanel();
+      panel.showWindow(parent);
+    } finally {
+      if (parent != null) WbSwingUtilities.showDefaultCursor(parent);
+    }
+  }
 
 }

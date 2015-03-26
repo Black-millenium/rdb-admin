@@ -22,41 +22,35 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.WbManager;
 import workbench.db.ConnectionMgr;
-import workbench.util.ExceptionUtil;
 import workbench.gui.WbSwingUtilities;
 import workbench.log.LogMgr;
 import workbench.resource.ResourceMgr;
+import workbench.util.ExceptionUtil;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Saves the connection profiles
- *  
- * @author Thomas Kellerer  
+ *
+ * @author Thomas Kellerer
  */
-public class FileSaveProfiles 
-	extends WbAction
-{
-	public FileSaveProfiles()
-	{
-		super();
-		this.initMenuDefinition("MnuTxtFilesSaveProfiles");
-	}
+public class FileSaveProfiles
+    extends WbAction {
+  public FileSaveProfiles() {
+    super();
+    this.initMenuDefinition("MnuTxtFilesSaveProfiles");
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		try
-		{
-			ConnectionMgr.getInstance().saveProfiles();
-			WbSwingUtilities.showMessage(WbManager.getInstance().getCurrentWindow(), ResourceMgr.getString("MsgProfilesSaved"));
-		}
-		catch (Exception ex)
-		{
-			LogMgr.logError("FileSaveProfiles.executeAction()", "Error saving profiles", ex);
-			WbSwingUtilities.showMessage(WbManager.getInstance().getCurrentWindow(), ResourceMgr.getString("ErrSavingProfiles") + "\n" + ExceptionUtil.getDisplay(ex));
-		}
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    try {
+      ConnectionMgr.getInstance().saveProfiles();
+      WbSwingUtilities.showMessage(WbManager.getInstance().getCurrentWindow(), ResourceMgr.getString("MsgProfilesSaved"));
+    } catch (Exception ex) {
+      LogMgr.logError("FileSaveProfiles.executeAction()", "Error saving profiles", ex);
+      WbSwingUtilities.showMessage(WbManager.getInstance().getCurrentWindow(), ResourceMgr.getString("ErrSavingProfiles") + "\n" + ExceptionUtil.getDisplay(ex));
+    }
+  }
 }

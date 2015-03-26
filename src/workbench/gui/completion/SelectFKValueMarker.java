@@ -22,46 +22,38 @@
  */
 package workbench.gui.completion;
 
+import workbench.db.TableIdentifier;
 import workbench.resource.ResourceMgr;
 
-import workbench.db.TableIdentifier;
-
 /**
- *
  * @author Thomas Kellerer
  */
-public class SelectFKValueMarker
-{
-	private final String columnName;
-	private final TableIdentifier table;
-	private final boolean allowMultiSelect;
-	
-	public SelectFKValueMarker(String column, TableIdentifier baseTable, boolean multiSelectAllowed)
-	{
-		this.columnName = column;
-		this.table = baseTable;
-		this.allowMultiSelect = multiSelectAllowed;
-	}
+public class SelectFKValueMarker {
+  private final String columnName;
+  private final TableIdentifier table;
+  private final boolean allowMultiSelect;
 
-	public boolean getAllowMultiSelect()
-	{
-		return allowMultiSelect;
-	}
+  public SelectFKValueMarker(String column, TableIdentifier baseTable, boolean multiSelectAllowed) {
+    this.columnName = column;
+    this.table = baseTable;
+    this.allowMultiSelect = multiSelectAllowed;
+  }
 
-	public String getColumnName()
-	{
-		return columnName;
-	}
+  public boolean getAllowMultiSelect() {
+    return allowMultiSelect;
+  }
 
-	public TableIdentifier getTable()
-	{
-		return table;
-	}
+  public String getColumnName() {
+    return columnName;
+  }
 
-	@Override
-	public String toString()
-	{
-		return "(" + ResourceMgr.getString("MnuTxtSelectFkValue") + ")";
-	}
+  public TableIdentifier getTable() {
+    return table;
+  }
+
+  @Override
+  public String toString() {
+    return "(" + ResourceMgr.getString("MnuTxtSelectFkValue") + ")";
+  }
 
 }

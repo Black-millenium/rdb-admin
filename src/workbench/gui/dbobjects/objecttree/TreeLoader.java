@@ -19,32 +19,20 @@
  */
 package workbench.gui.dbobjects.objecttree;
 
+import workbench.db.*;
+import workbench.resource.ResourceMgr;
+import workbench.util.CollectionUtil;
+
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import workbench.resource.ResourceMgr;
-
-import workbench.db.ColumnIdentifier;
-import workbench.db.DbMetadata;
-import workbench.db.DbObject;
-import workbench.db.DependencyNode;
-import workbench.db.IndexColumn;
-import workbench.db.IndexDefinition;
-import workbench.db.TableDefinition;
-import workbench.db.TableDependency;
-import workbench.db.TableIdentifier;
-import workbench.db.WbConnection;
-import workbench.util.CollectionUtil;
-
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class TreeLoader
-{
+public class TreeLoader {
   /**
    * The node type for schema elements.
    */
@@ -100,82 +88,59 @@ public class TreeLoader
   public static final String TYPE_DBO_TYPE_NODE = "dbobject-type";
 
   public static final String TYPE_FK_DEF = "fk-definition";
-
+  private final Set<String> typesToShow = CollectionUtil.caseInsensitiveSet();
   private WbConnection connection;
   private DbObjectTreeModel model;
   private ObjectTreeNode root;
   private Collection<String> availableTypes;
-  private final Set<String> typesToShow = CollectionUtil.caseInsensitiveSet();
 
 
-  public TreeLoader(String name)
-  {
+  public TreeLoader(String name) {
     root = new ObjectTreeNode(name, "database");
     root.setAllowsChildren(true);
     model = new DbObjectTreeModel(root);
   }
 
-  public void setConnection(WbConnection conn)
-  {
-    connection = conn;
-    if (connection != null)
-    {
-      availableTypes = connection.getMetadata().getObjectTypes();
-    }
-  }
-
-  private void removeAllChildren(ObjectTreeNode node)
-  {
+  private void removeAllChildren(ObjectTreeNode node) {
     int count = node.getChildCount();
-    for (int i=0; i < count; i++)
-    {
-      ObjectTreeNode child = (ObjectTreeNode)node.getChildAt(i);
+    for (int i = 0; i < count; i++) {
+      ObjectTreeNode child = (ObjectTreeNode) node.getChildAt(i);
       removeAllChildren(child);
     }
     node.removeAllChildren();
   }
 
-  public void setSelectedTypes(List<String> types)
-  {
+  public void setSelectedTypes(List<String> types) {
     typesToShow.clear();
-    if (types != null)
-    {
+    if (types != null) {
       typesToShow.addAll(types);
     }
   }
-  
-  public void clear()
-  {
+
+  public void clear() {
     removeAllChildren(root);
   }
 
-  public DbObjectTreeModel getModel()
-  {
+  public DbObjectTreeModel getModel() {
     return model;
   }
 
   public void load()
-    throws SQLException
-  {
+      throws SQLException {
     loadSchemas(root);
   }
 
   public void loadSchemas(ObjectTreeNode parentNode)
-    throws SQLException
-  {
-    if (DbTreeSettings.showOnlyCurrentSchema(connection.getDbId()))
-    {
+      throws SQLException {
+    if (DbTreeSettings.showOnlyCurrentSchema(connection.getDbId())) {
       String schema = connection.getCurrentSchema();
       parentNode.setNameAndType(schema, TYPE_SCHEMA);
       parentNode.setAllowsChildren(true);
       parentNode.setChildrenLoaded(false);
       addTypeNodes(parentNode);
-    }
-    else
-    {
+    } else {
       List<String> schemas = connection.getMetadata().getSchemas(connection.getSchemaFilter());
-      for (String schema : schemas)
-      {
+      for (String schema : schemas) {
         ObjectTreeNode node = new ObjectTreeNode(schema, TYPE_SCHEMA);
         node.setAllowsChildren(true);
         parentNode.add(node);
@@ -187,29 +152,23 @@ public class TreeLoader
   }
 
   public void loadCatalogs(ObjectTreeNode parentNode)
-    throws SQLException
-  {
+      throws SQLException {
     List<String> catalogs = connection.getMetadata().getCatalogInformation(connection.getCatalogFilter());
-    for (String cat : catalogs)
-    {
+    for (String cat : catalogs) {
       ObjectTreeNode node = new ObjectTreeNode(cat, TYPE_CATALOG);
       node.setAllowsChildren(true);
       parentNode.add(node);
-      if (!connection.getDbSettings().supportsSchemas())
-      {
+      if (!connection.getDbSettings().supportsSchemas()) {
         addTypeNodes(node);
       }
     }
     model.nodeStructureChanged(parentNode);
   }
 
-  public void addTypeNodes(ObjectTreeNode schemaNode)
-  {
+  public void addTypeNodes(ObjectTreeNode schemaNode) {
     if (schemaNode == null) return;
-    for (String type : availableTypes)
-    {
-      if (typesToShow.isEmpty() || typesToShow.contains(type))
-      {
+    for (String type : availableTypes) {
+      if (typesToShow.isEmpty() || typesToShow.contains(type)) {
         ObjectTreeNode node = new ObjectTreeNode(type, TYPE_DBO_TYPE_NODE);
         node.setAllowsChildren(true);
         schemaNode.add(node);
@@ -220,22 +179,18 @@ public class TreeLoader
   }
 
   public void loadObjectsByType(ObjectTreeNode typeNode)
-    throws SQLException
-  {
+      throws SQLException {
     if (typeNode == null) return;
     ObjectTreeNode parent = typeNode.getParent();
 
-    List<TableIdentifier> objects = connection.getMetadata().getObjectList(parent.getName(), new String[] { typeNode.getName() });
-    for (TableIdentifier tbl : objects)
-    {
+    List<TableIdentifier> objects = connection.getMetadata().getObjectList(parent.getName(), new String[]{typeNode.getName()});
+    for (TableIdentifier tbl : objects) {
       ObjectTreeNode node = new ObjectTreeNode(tbl);
       node.setAllowsChildren(true);
-      if (hasColumns(tbl))
-      {
+      if (hasColumns(tbl)) {
         addColumnsNode(node);
       }
-      if (isTable(tbl))
-      {
+      if (isTable(tbl)) {
         addTableNodes(node);
         connection.getObjectCache().addTable(new TableDefinition(tbl));
       }
@@ -246,15 +201,13 @@ public class TreeLoader
     typeNode.setChildrenLoaded(true);
   }
 
-  private void addColumnsNode(ObjectTreeNode node)
-  {
+  private void addColumnsNode(ObjectTreeNode node) {
     ObjectTreeNode cols = new ObjectTreeNode(ResourceMgr.getString("TxtDbExplorerTableDefinition"), TYPE_COLUMN_LIST);
     cols.setAllowsChildren(true);
     node.add(cols);
   }
 
-  private void addTableNodes(ObjectTreeNode node)
-  {
+  private void addTableNodes(ObjectTreeNode node) {
     ObjectTreeNode idx = new ObjectTreeNode(ResourceMgr.getString("TxtDbExplorerIndexes"), TYPE_INDEX_LIST);
     idx.setAllowsChildren(true);
     node.add(idx);
@@ -269,11 +222,9 @@ public class TreeLoader
   }
 
   public void loadTableIndexes(DbObject dbo, ObjectTreeNode indexNode)
-    throws SQLException
-  {
+      throws SQLException {
     if (indexNode == null) return;
-    if (dbo == null)
-    {
+    if (dbo == null) {
       indexNode.setAllowsChildren(false);
       return;
     }
@@ -281,19 +232,17 @@ public class TreeLoader
     DbMetadata meta = connection.getMetadata();
     if (!meta.isTableType(dbo.getObjectType())) return;
 
-    TableIdentifier tbl = (TableIdentifier)dbo;
+    TableIdentifier tbl = (TableIdentifier) dbo;
     List<IndexDefinition> indexes = meta.getIndexReader().getTableIndexList(tbl);
-    for (IndexDefinition idx : indexes)
-    {
+    for (IndexDefinition idx : indexes) {
       ObjectTreeNode node = new ObjectTreeNode(idx);
       node.setAllowsChildren(true);
       node.setChildrenLoaded(true);
-      for (IndexColumn col : idx.getColumns())
-      {
-         ObjectTreeNode idxCol = new ObjectTreeNode(col.getExpression(), TYPE_IDX_COL);
-         idxCol.setAllowsChildren(false);
-         idxCol.setChildrenLoaded(true);
-         node.add(idxCol);
+      for (IndexColumn col : idx.getColumns()) {
+        ObjectTreeNode idxCol = new ObjectTreeNode(col.getExpression(), TYPE_IDX_COL);
+        idxCol.setAllowsChildren(false);
+        idxCol.setChildrenLoaded(true);
+        node.add(idxCol);
       }
       indexNode.add(node);
     }
@@ -302,26 +251,23 @@ public class TreeLoader
   }
 
   public void loadTableColumns(DbObject dbo, ObjectTreeNode columnsNode)
-    throws SQLException
-  {
+      throws SQLException {
     if (columnsNode == null) return;
-    if (dbo == null)
-    {
+    if (dbo == null) {
       columnsNode.setAllowsChildren(false);
       return;
     }
 
     if (!(dbo instanceof TableIdentifier)) return;
 
-    TableIdentifier tbl = (TableIdentifier)dbo;
+    TableIdentifier tbl = (TableIdentifier) dbo;
     DbMetadata meta = connection.getMetadata();
 
     if (!hasColumns(tbl)) return;
 
     List<ColumnIdentifier> columns = meta.getTableColumns(tbl);
     connection.getObjectCache().addTable(new TableDefinition(tbl, columns));
-    for (ColumnIdentifier col : columns)
-    {
+    for (ColumnIdentifier col : columns) {
       ObjectTreeNode node = new ObjectTreeNode(col);
       node.setAllowsChildren(false);
       columnsNode.add(node);
@@ -331,11 +277,9 @@ public class TreeLoader
   }
 
   public void loadForeignKeys(DbObject dbo, ObjectTreeNode fkNode, boolean showIncoming)
-    throws SQLException
-  {
+      throws SQLException {
     if (fkNode == null) return;
-    if (dbo == null)
-    {
+    if (dbo == null) {
       fkNode.setAllowsChildren(false);
       return;
     }
@@ -343,22 +287,18 @@ public class TreeLoader
     DbMetadata meta = connection.getMetadata();
     if (!meta.isTableType(dbo.getObjectType())) return;
 
-    TableIdentifier tbl = (TableIdentifier)dbo;
+    TableIdentifier tbl = (TableIdentifier) dbo;
     TableDependency deps = new TableDependency(connection, tbl);
 
     List<DependencyNode> fklist = null;
 
-    if (showIncoming)
-    {
+    if (showIncoming) {
       fklist = deps.getIncomingForeignKeys();
-    }
-    else
-    {
+    } else {
       fklist = deps.getOutgoingForeignKeys();
     }
 
-    for (DependencyNode fk : fklist)
-    {
+    for (DependencyNode fk : fklist) {
       TableIdentifier table = fk.getTable();
       ObjectTreeNode tblNode = new ObjectTreeNode(table);
       tblNode.setAllowsChildren(true);
@@ -367,15 +307,12 @@ public class TreeLoader
 
       String colDisplay = "<html><b>" + fk.getFkName() + "</b>: ";
 
-      if (showIncoming)
-      {
+      if (showIncoming) {
         colDisplay += fk.getTable().getTableExpression(connection) + "(" + fk.getSourceColumnsList() + ") REFERENCES  " +
-        tbl.getTableExpression(connection) + "(" + fk.getTargetColumnsList();
-      }
-      else
-      {
+            tbl.getTableExpression(connection) + "(" + fk.getTargetColumnsList();
+      } else {
         colDisplay += tbl.getTableExpression(connection) + "(" + fk.getTargetColumnsList() + ") REFERENCES  " +
-        fk.getTable().getTableExpression(connection) + "(" + fk.getSourceColumnsList();
+            fk.getTable().getTableExpression(connection) + "(" + fk.getSourceColumnsList();
 
       }
       colDisplay += ")</html>";
@@ -389,16 +326,13 @@ public class TreeLoader
     fkNode.setChildrenLoaded(true);
   }
 
-
-  private boolean isTable(DbObject dbo)
-  {
+  private boolean isTable(DbObject dbo) {
     if (dbo == null) return false;
     DbMetadata meta = connection.getMetadata();
     return meta.isExtendedTableType(dbo.getObjectType());
   }
 
-  private boolean hasColumns(TableIdentifier tbl)
-  {
+  private boolean hasColumns(TableIdentifier tbl) {
     if (tbl == null) return false;
     if (isTable(tbl)) return true;
     DbMetadata meta = connection.getMetadata();
@@ -406,60 +340,50 @@ public class TreeLoader
     return meta.getViewTypeName().equalsIgnoreCase(tbl.getType());
   }
 
-  public WbConnection getConnection()
-  {
+  public WbConnection getConnection() {
     return connection;
   }
 
+  public void setConnection(WbConnection conn) {
+    connection = conn;
+    if (connection != null) {
+      availableTypes = connection.getMetadata().getObjectTypes();
+    }
+  }
+
   public void loadChildren(ObjectTreeNode node)
-    throws SQLException
-  {
+      throws SQLException {
     if (node == null) return;
 
-    try
-    {
+    try {
       this.connection.setBusy(true);
       String type = node.getType();
 
-      if (TYPE_CATALOG.equals(type) && connection.getDbSettings().supportsSchemas())
-      {
+      if (TYPE_CATALOG.equals(type) && connection.getDbSettings().supportsSchemas()) {
         loadSchemas(node);
       }
-      if (TYPE_DBO_TYPE_NODE.equals(type))
-      {
+      if (TYPE_DBO_TYPE_NODE.equals(type)) {
         loadObjectsByType(node);
-      }
-      else if (TYPE_COLUMN_LIST.equals(type))
-      {
+      } else if (TYPE_COLUMN_LIST.equals(type)) {
         ObjectTreeNode parent = node.getParent();
         DbObject dbo = parent.getDbObject();
         loadTableColumns(dbo, node);
-      }
-      else if (TYPE_INDEX_LIST.equals(type))
-      {
+      } else if (TYPE_INDEX_LIST.equals(type)) {
         ObjectTreeNode parent = node.getParent();
         DbObject dbo = parent.getDbObject();
         loadTableIndexes(dbo, node);
-      }
-      else if (TYPE_FK_LIST.equals(type))
-      {
+      } else if (TYPE_FK_LIST.equals(type)) {
         ObjectTreeNode parent = node.getParent();
         DbObject dbo = parent.getDbObject();
         loadForeignKeys(dbo, node, false);
-      }
-      else if (TYPE_REF_LIST.equals(type))
-      {
+      } else if (TYPE_REF_LIST.equals(type)) {
         ObjectTreeNode parent = node.getParent();
         DbObject dbo = parent.getDbObject();
         loadForeignKeys(dbo, node, true);
-      }
-      else
-      {
+      } else {
         node.setAllowsChildren(false);
       }
-    }
-    finally
-    {
+    } finally {
       this.connection.setBusy(false);
     }
   }

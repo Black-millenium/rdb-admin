@@ -25,15 +25,18 @@ package workbench.interfaces;
 import workbench.db.WbConnection;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface Scripter
-{
-	CharSequence getScript();
-	void generateScript();
-	void setProgressMonitor(ScriptGenerationMonitor monitor);
-	void cancel();
-	boolean isCancelled();
-	WbConnection getCurrentConnection();
+public interface Scripter {
+  CharSequence getScript();
+
+  void generateScript();
+
+  void setProgressMonitor(ScriptGenerationMonitor monitor);
+
+  void cancel();
+
+  boolean isCancelled();
+
+  WbConnection getCurrentConnection();
 }

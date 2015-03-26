@@ -23,111 +23,91 @@
 package workbench.db.exporter;
 
 
-import java.text.SimpleDateFormat;
-
 import workbench.db.TableIdentifier;
-
 import workbench.storage.RowData;
+import workbench.util.*;
 
-import workbench.util.CharacterRange;
-import workbench.util.SqlUtil;
-import workbench.util.StringUtil;
-import workbench.util.WbDateFormatter;
-import workbench.util.WbFile;
-import workbench.util.WbNumberFormatter;
+import java.text.SimpleDateFormat;
 
 /**
  * Converts data from the database into JSON format.
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class JsonRowDataConverter
-	extends RowDataConverter
-{
-	public JsonRowDataConverter()
-	{
-		defaultDateFormatter = new WbDateFormatter(StringUtil.ISO_DATE_FORMAT);
-		defaultTimestampFormatter = new WbDateFormatter(StringUtil.ISO_TIMESTAMP_FORMAT);
-		defaultNumberFormatter = new WbNumberFormatter(-1, '.');
-		defaultTimeFormatter = new SimpleDateFormat("HH:mm:ss");
-	}
+    extends RowDataConverter {
+  public JsonRowDataConverter() {
+    defaultDateFormatter = new WbDateFormatter(StringUtil.ISO_DATE_FORMAT);
+    defaultTimestampFormatter = new WbDateFormatter(StringUtil.ISO_TIMESTAMP_FORMAT);
+    defaultNumberFormatter = new WbNumberFormatter(-1, '.');
+    defaultTimeFormatter = new SimpleDateFormat("HH:mm:ss");
+  }
 
-	@Override
-	public StringBuilder getStart()
-	{
-		String resultName;
-		TableIdentifier updateTable = this.metaData.getUpdateTable();
-		if (updateTable != null)
-		{
-			resultName = updateTable.getRawTableName();
-		}
-		else
-		{
-			WbFile f = new WbFile(getOutputFile());
-			resultName = f.getFileName();
-		}
+  @Override
+  public StringBuilder getStart() {
+    String resultName;
+    TableIdentifier updateTable = this.metaData.getUpdateTable();
+    if (updateTable != null) {
+      resultName = updateTable.getRawTableName();
+    } else {
+      WbFile f = new WbFile(getOutputFile());
+      resultName = f.getFileName();
+    }
 
-		StringBuilder header = new StringBuilder(20);
-		header.append("{\n  \"");
-		header.append(resultName.toLowerCase());
-		header.append("\":\n  [\n");
-		return header;
-	}
+    StringBuilder header = new StringBuilder(20);
+    header.append("{\n  \"");
+    header.append(resultName.toLowerCase());
+    header.append("\":\n  [\n");
+    return header;
+  }
 
-	@Override
-	public StringBuilder getEnd(long totalRows)
-	{
-		return new StringBuilder("\n  ]\n}");
-	}
+  @Override
+  public StringBuilder getEnd(long totalRows) {
+    return new StringBuilder("\n  ]\n}");
+  }
 
-	@Override
-	public StringBuilder convertRowData(RowData row, long rowIndex)
-	{
-		int count = this.metaData.getColumnCount();
+  @Override
+  public StringBuilder convertRowData(RowData row, long rowIndex) {
+    int count = this.metaData.getColumnCount();
 
-		StringBuilder result = new StringBuilder(count * 30);
+    StringBuilder result = new StringBuilder(count * 30);
 
-		int currentColIndex = 0;
+    int currentColIndex = 0;
 
-		if (rowIndex > 0)
-		{
-			result.append(",\n");
-		}
-		result.append("    {");
-		for (int c=0; c < count; c++)
-		{
-			if (!this.includeColumnInExport(c)) continue;
+    if (rowIndex > 0) {
+      result.append(",\n");
+    }
+    result.append("    {");
+    for (int c = 0; c < count; c++) {
+      if (!this.includeColumnInExport(c)) continue;
 
-			if (currentColIndex > 0)
-			{
-				result.append(", ");
-			}
+      if (currentColIndex > 0) {
+        result.append(", ");
+      }
 
-			int colType = this.metaData.getColumnType(c);
+      int colType = this.metaData.getColumnType(c);
 
-			String value = this.getValueAsFormattedString(row, c);
+      String value = this.getValueAsFormattedString(row, c);
 
-			boolean isNull = (value == null);
-			if (value == null)
-			{
-				value = getNullDisplay();
-			}
+      boolean isNull = (value == null);
+      if (value == null) {
+        value = getNullDisplay();
+      }
 
-			if (SqlUtil.isCharacterType(colType) && !isNull)
-			{
-				value = StringUtil.escapeText(value, CharacterRange.RANGE_CONTROL, "");
-			}
+      if (SqlUtil.isCharacterType(colType) && !isNull) {
+        value = StringUtil.escapeText(value, CharacterRange.RANGE_CONTROL, "");
+      }
 
-			result.append("\"");
-			result.append(this.metaData.getColumnName(c));
-			result.append("\": \"");
-			result.append(value);
-			result.append('"');
+      result.append("\"");
+      result.append(this.metaData.getColumnName(c));
+      result.append("\": \"");
+      result.append(value);
+      result.append('"');
 
-			currentColIndex ++;
-		}
-		result.append("}");
-		return result;
-	}
+      currentColIndex++;
+    }
+    result.append("}");
+    return result;
+  }
 
 }

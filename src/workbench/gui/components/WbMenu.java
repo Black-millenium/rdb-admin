@@ -22,125 +22,97 @@
  */
 package workbench.gui.components;
 
-import java.awt.Component;
-import java.awt.Container;
-
-import javax.swing.Action;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-
 import workbench.gui.WbSwingUtilities;
 import workbench.gui.actions.WbAction;
-
 import workbench.util.NumberStringCache;
 
+import javax.swing.*;
+import java.awt.*;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class WbMenu
-	extends JMenu
-{
-	private String parentMenuId;
-	private boolean createSeparator;
+    extends JMenu {
+  private String parentMenuId;
+  private boolean createSeparator;
 
-	public WbMenu(String aText)
-	{
-		super(aText);
-	}
+  public WbMenu(String aText) {
+    super(aText);
+  }
 
-	public WbMenu(String aText, int index)
-	{
-		super();
-		String title = aText;
-		if (index < 10)
-		{
-			title = "&" + NumberStringCache.getNumberString(index) + " - " + aText;
-		}
-		setText(title);
-	}
+  public WbMenu(String aText, int index) {
+    super();
+    String title = aText;
+    if (index < 10) {
+      title = "&" + NumberStringCache.getNumberString(index) + " - " + aText;
+    }
+    setText(title);
+  }
 
-	public void setParentMenuId(String id)
-	{
-		this.parentMenuId = id;
-	}
+  public static void disposeMenu(JPopupMenu menu) {
+    if (menu == null) return;
 
-	public String getParentMenuId()
-	{
-		return this.parentMenuId;
-	}
+    for (Component comp : menu.getComponents()) {
+      if (comp instanceof JMenuItem) {
+        JMenuItem item = (JMenuItem) comp;
+        Action action = item.getAction();
+        if (action instanceof WbAction) {
+          ((WbAction) action).dispose();
+        }
+      } else if (comp instanceof Container) {
+        ((Container) comp).removeAll();
+      }
+    }
+    menu.removeAll();
+  }
 
-	public void setCreateMenuSeparator(boolean aFlag)
-	{
-		this.createSeparator = aFlag;
-	}
+  public String getParentMenuId() {
+    return this.parentMenuId;
+  }
 
-	public boolean getCreateMenuSeparator()
-	{
-		return this.createSeparator;
-	}
+  public void setParentMenuId(String id) {
+    this.parentMenuId = id;
+  }
 
-	@Override
-	public void setText(String aText)
-	{
-		int pos = aText.indexOf('&');
-		if (pos > -1)
-		{
-			char mnemonic = aText.charAt(pos + 1);
-			aText = aText.substring(0, pos) + aText.substring(pos + 1);
-			this.setMnemonic(mnemonic);
-		}
-		super.setText(aText);
-	}
+  public boolean getCreateMenuSeparator() {
+    return this.createSeparator;
+  }
 
-	@Override
-	public void removeAll()
-	{
-		for (int i = 0; i < this.getItemCount(); i++)
-		{
-			JMenuItem item = this.getItem(i);
-			if (item != null)
-			{
-				if (item instanceof WbMenuItem)
-				{
-					((WbMenuItem)item).dispose();
-				}
-				item.removeAll();
-			}
-		}
-		super.removeAll();
-	}
+  public void setCreateMenuSeparator(boolean aFlag) {
+    this.createSeparator = aFlag;
+  }
 
-	public void dispose()
-	{
-		WbSwingUtilities.removeAllListeners(this);
-		this.itemListener = null;
-		this.actionListener = null;
-		this.changeListener = null;
-		this.removeAll();
-	}
+  @Override
+  public void setText(String aText) {
+    int pos = aText.indexOf('&');
+    if (pos > -1) {
+      char mnemonic = aText.charAt(pos + 1);
+      aText = aText.substring(0, pos) + aText.substring(pos + 1);
+      this.setMnemonic(mnemonic);
+    }
+    super.setText(aText);
+  }
 
-	public static void disposeMenu(JPopupMenu menu)
-	{
-		if (menu == null) return;
+  @Override
+  public void removeAll() {
+    for (int i = 0; i < this.getItemCount(); i++) {
+      JMenuItem item = this.getItem(i);
+      if (item != null) {
+        if (item instanceof WbMenuItem) {
+          ((WbMenuItem) item).dispose();
+        }
+        item.removeAll();
+      }
+    }
+    super.removeAll();
+  }
 
-		for (Component comp : menu.getComponents())
-		{
-			if (comp instanceof JMenuItem)
-			{
-				JMenuItem item = (JMenuItem) comp;
-				Action action = item.getAction();
-				if (action instanceof WbAction)
-				{
-					((WbAction) action).dispose();
-				}
-			}
-			else if (comp instanceof Container)
-			{
-				((Container)comp).removeAll();
-			}
-		}
-		menu.removeAll();
-	}
+  public void dispose() {
+    WbSwingUtilities.removeAllListeners(this);
+    this.itemListener = null;
+    this.actionListener = null;
+    this.changeListener = null;
+    this.removeAll();
+  }
 }

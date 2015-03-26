@@ -25,14 +25,11 @@ package workbench.gui.sql;
 import workbench.gui.editor.AnsiSQLTokenMarker;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class SqlEditor 
-	extends EditorPanel
-{
-	public SqlEditor()
-	{
-		super(new AnsiSQLTokenMarker());
-	}
+public class SqlEditor
+    extends EditorPanel {
+  public SqlEditor() {
+    super(new AnsiSQLTokenMarker());
+  }
 }

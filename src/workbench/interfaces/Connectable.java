@@ -26,16 +26,20 @@ import workbench.db.ConnectionProfile;
 import workbench.db.WbConnection;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
-public interface Connectable
-{
-	void connectCancelled();
-	boolean connectBegin(ConnectionProfile profile, StatusBar info, boolean loadWorkspace);
-	String getConnectionId(ConnectionProfile profile);
-	void connectFailed(String error);
-	void connected(WbConnection conn);
-	void connectEnded();
-	String getDefaultIconName();
+public interface Connectable {
+  void connectCancelled();
+
+  boolean connectBegin(ConnectionProfile profile, StatusBar info, boolean loadWorkspace);
+
+  String getConnectionId(ConnectionProfile profile);
+
+  void connectFailed(String error);
+
+  void connected(WbConnection conn);
+
+  void connectEnded();
+
+  String getDefaultIconName();
 }

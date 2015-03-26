@@ -16,7 +16,7 @@ public class RdbConstraintReader
           "  and trg.rdb$trigger_type = 1 \n";
 
   public RdbConstraintReader() {
-    super(DbMetadata.DBID_FIREBIRD);
+    super(DbMetadata.DBID_RDB);
   }
 
   @Override

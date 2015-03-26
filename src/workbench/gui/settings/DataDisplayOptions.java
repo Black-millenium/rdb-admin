@@ -22,201 +22,220 @@
  */
 package workbench.gui.settings;
 
-import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Locale;
-
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.components.NumberField;
 import workbench.interfaces.Restoreable;
 import workbench.interfaces.ValidatingComponent;
 import workbench.log.LogMgr;
 import workbench.resource.GuiSettings;
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.components.NumberField;
-
 import workbench.util.DisplayLocale;
 import workbench.util.StringUtil;
 import workbench.util.WbLocale;
 
+import javax.swing.*;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Locale;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class DataDisplayOptions
-	extends JPanel
-	implements Restoreable, ValidatingComponent, ActionListener
-{
+    extends JPanel
+    implements Restoreable, ValidatingComponent, ActionListener {
 
-	public DataDisplayOptions()
-	{
-		super();
-		initComponents();
-		ComboBoxModel model = new DefaultComboBoxModel(new String[] {ResourceMgr.getString("TxtTabRight"), ResourceMgr.getString("TxtTabLeft") });
-		alignmentDropDown.setModel(model);
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JLabel alignLabel;
+  private javax.swing.JComboBox alignmentDropDown;
+  private javax.swing.JCheckBox appendResults;
+  private javax.swing.JCheckBox autoColWidth;
+  private javax.swing.JCheckBox autoRowHeight;
+  private javax.swing.JCheckBox boldHeader;
+  private javax.swing.JPanel colWidthPanel;
+  private javax.swing.JTextField defMaxRows;
 
-		WbSwingUtilities.setMinimumSizeFromCols(defMaxRows);
-		WbSwingUtilities.setMinimumSizeFromCols(nullString);
-		WbSwingUtilities.setMinimumSizeFromCols(maxRowHeight);
-		WbSwingUtilities.setMinimumSizeFromCols(multiLineThreshold);
-		WbSwingUtilities.setMinimumSizeFromCols(minColSizeField);
-		WbSwingUtilities.setMinimumSizeFromCols(maxColSizeField);
-		WbSwingUtilities.makeEqualWidth(nullString, defMaxRows, alignmentDropDown);
-	}
+  // Code for dispatching events from components to event handlers.
+  private javax.swing.JPanel generalPanel;
+  private javax.swing.JCheckBox ignoreEmptyRows;
+  private javax.swing.JCheckBox includeHeaderWidth;
+  private javax.swing.JLabel jLabel1;
+  private javax.swing.JLabel jLabel4;
+  private javax.swing.JLabel jLabel5;
+  private javax.swing.JLabel jLabel6;
+  private javax.swing.JPanel jPanel3;
+  private javax.swing.JPanel jPanel4;
+  private javax.swing.JComboBox localeDropDown;
+  private javax.swing.JTextField maxColSizeField;
+  private javax.swing.JLabel maxColSizeLabel;
+  private javax.swing.JTextField maxRowHeight;
+  private javax.swing.JLabel maxRowHeightLabel;
+  private javax.swing.JTextField minColSizeField;
+  private javax.swing.JLabel minColSizeLabel;
+  private javax.swing.JPanel multiLinePanel;
+  private javax.swing.JTextField multiLineThreshold;
+  private javax.swing.JLabel multilineThresholLabel;
+  private javax.swing.JTextField nullString;
+  private javax.swing.JLabel nullStringLabel;
+  private javax.swing.JCheckBox retrieveComments;
+  private javax.swing.JPanel rowHeightPanel;
+  private javax.swing.JCheckBox rowHeightResize;
+  private javax.swing.JCheckBox selectSummary;
+  private javax.swing.JCheckBox showGeneratingSQL;
+  private javax.swing.JCheckBox showMaxRowsTooltip;
+  private javax.swing.JCheckBox showMaxRowsWarn;
+  private javax.swing.JCheckBox showRowNumbers;
+  private javax.swing.JCheckBox useTableName;
+  private javax.swing.JCheckBox wrapMultineRender;
+  private javax.swing.JCheckBox wrapMultlineEdit;
+  public DataDisplayOptions() {
+    super();
+    initComponents();
+    ComboBoxModel model = new DefaultComboBoxModel(new String[]{ResourceMgr.getString("TxtTabRight"), ResourceMgr.getString("TxtTabLeft")});
+    alignmentDropDown.setModel(model);
 
-	@Override
-	public void restoreSettings()
-	{
-		appendResults.setSelected(GuiSettings.getDefaultAppendResults());
-		rowHeightResize.setSelected(GuiSettings.getAllowRowHeightResizing());
-		autoRowHeight.setSelected(GuiSettings.getAutomaticOptimalRowHeight());
-		maxRowHeight.setText(Integer.toString(GuiSettings.getAutRowHeightMaxLines()));
-		autoColWidth.setSelected(GuiSettings.getAutomaticOptimalWidth());
-		includeHeaderWidth.setSelected(GuiSettings.getIncludeHeaderInOptimalWidth());
-		ignoreEmptyRows.setSelected(GuiSettings.getIgnoreWhitespaceForAutoRowHeight());
-		minColSizeField.setText(Integer.toString(GuiSettings.getMinColumnWidth()));
-		maxColSizeField.setText(Integer.toString(GuiSettings.getMaxColumnWidth()));
-		selectSummary.setSelected(GuiSettings.getShowSelectionSummary());
-		multiLineThreshold.setText(Integer.toString(GuiSettings.getMultiLineThreshold()));
-		wrapMultineRender.setSelected(GuiSettings.getWrapMultilineRenderer());
-		wrapMultlineEdit.setSelected(GuiSettings.getWrapMultilineEditor());
+    WbSwingUtilities.setMinimumSizeFromCols(defMaxRows);
+    WbSwingUtilities.setMinimumSizeFromCols(nullString);
+    WbSwingUtilities.setMinimumSizeFromCols(maxRowHeight);
+    WbSwingUtilities.setMinimumSizeFromCols(multiLineThreshold);
+    WbSwingUtilities.setMinimumSizeFromCols(minColSizeField);
+    WbSwingUtilities.setMinimumSizeFromCols(maxColSizeField);
+    WbSwingUtilities.makeEqualWidth(nullString, defMaxRows, alignmentDropDown);
+  }
 
-		defMaxRows.setText(Integer.toString(GuiSettings.getDefaultMaxRows()));
-		retrieveComments.setSelected(GuiSettings.getRetrieveQueryComments());
-		showRowNumbers.setSelected(GuiSettings.getShowTableRowNumbers());
-		showMaxRowsWarn.setSelected(GuiSettings.getShowMaxRowsReached());
-		showMaxRowsTooltip.setSelected(GuiSettings.getShowMaxRowsTooltip());
-		nullString.setText(GuiSettings.getDisplayNullString());
-		showGeneratingSQL.setSelected(GuiSettings.getShowResultSQL());
-		useTableName.setSelected(GuiSettings.getUseTablenameAsResultName());
-		int align = GuiSettings.getNumberDataAlignment();
-		if (align == SwingConstants.LEFT)
-		{
-			alignmentDropDown.setSelectedIndex(1);
-		}
-		else
-		{
-			alignmentDropDown.setSelectedIndex(0);
-		}
-		boldHeader.setSelected(GuiSettings.showTableHeaderInBold());
-		fillLanguageDropDown();
-	}
+  @Override
+  public void restoreSettings() {
+    appendResults.setSelected(GuiSettings.getDefaultAppendResults());
+    rowHeightResize.setSelected(GuiSettings.getAllowRowHeightResizing());
+    autoRowHeight.setSelected(GuiSettings.getAutomaticOptimalRowHeight());
+    maxRowHeight.setText(Integer.toString(GuiSettings.getAutRowHeightMaxLines()));
+    autoColWidth.setSelected(GuiSettings.getAutomaticOptimalWidth());
+    includeHeaderWidth.setSelected(GuiSettings.getIncludeHeaderInOptimalWidth());
+    ignoreEmptyRows.setSelected(GuiSettings.getIgnoreWhitespaceForAutoRowHeight());
+    minColSizeField.setText(Integer.toString(GuiSettings.getMinColumnWidth()));
+    maxColSizeField.setText(Integer.toString(GuiSettings.getMaxColumnWidth()));
+    selectSummary.setSelected(GuiSettings.getShowSelectionSummary());
+    multiLineThreshold.setText(Integer.toString(GuiSettings.getMultiLineThreshold()));
+    wrapMultineRender.setSelected(GuiSettings.getWrapMultilineRenderer());
+    wrapMultlineEdit.setSelected(GuiSettings.getWrapMultilineEditor());
 
-	@Override
-	public void saveSettings()
-	{
-		int value = StringUtil.getIntValue(multiLineThreshold.getText(), -1);
-		if (value > 0) GuiSettings.setMultiLineThreshold(value);
-		GuiSettings.setAllowRowHeightResizing(rowHeightResize.isSelected());
-		GuiSettings.setMaxColumnWidth(((NumberField)this.maxColSizeField).getValue());
-		GuiSettings.setMinColumnWidth(((NumberField)this.minColSizeField).getValue());
-		GuiSettings.setAutomaticOptimalWidth(autoColWidth.isSelected());
-		GuiSettings.setIncludeHeaderInOptimalWidth(includeHeaderWidth.isSelected());
-		GuiSettings.setAutomaticOptimalRowHeight(autoRowHeight.isSelected());
-		GuiSettings.setAutRowHeightMaxLines(((NumberField)this.maxRowHeight).getValue());
-		GuiSettings.setIgnoreWhitespaceForAutoRowHeight(ignoreEmptyRows.isSelected());
-		GuiSettings.setShowSelectionSummary(selectSummary.isSelected());
-		GuiSettings.setDefaultMaxRows(StringUtil.getIntValue(defMaxRows.getText(), 0));
-		GuiSettings.setRetrieveQueryComments(retrieveComments.isSelected());
-		GuiSettings.setShowTableRowNumbers(showRowNumbers.isSelected());
-		GuiSettings.setShowMaxRowsReached(showMaxRowsWarn.isSelected());
-		GuiSettings.setDisplayNullString(nullString.getText());
-		GuiSettings.setShowResultSQL(showGeneratingSQL.isSelected());
-		GuiSettings.setShowTableHeaderInBold(boldHeader.isSelected());
-		GuiSettings.setWrapMultilineEditor(wrapMultlineEdit.isSelected());
-		GuiSettings.setWrapMultilineRenderer(wrapMultineRender.isSelected());
-		GuiSettings.setShowMaxRowsTooltip(showMaxRowsTooltip.isSelected());
-		GuiSettings.setDefaultAppendResults(appendResults.isSelected());
-		GuiSettings.setUseTablenameAsResultName(useTableName.isSelected());
-		DisplayLocale dl = (DisplayLocale)localeDropDown.getSelectedItem();
-		Settings.getInstance().setSortLocale(dl.getLocale());
-		if (alignmentDropDown.getSelectedIndex() == 1)
-		{
-			GuiSettings.setNumberDataAlignment("left");
-		}
-		else
-		{
-			GuiSettings.setNumberDataAlignment("right");
-		}
-	}
+    defMaxRows.setText(Integer.toString(GuiSettings.getDefaultMaxRows()));
+    retrieveComments.setSelected(GuiSettings.getRetrieveQueryComments());
+    showRowNumbers.setSelected(GuiSettings.getShowTableRowNumbers());
+    showMaxRowsWarn.setSelected(GuiSettings.getShowMaxRowsReached());
+    showMaxRowsTooltip.setSelected(GuiSettings.getShowMaxRowsTooltip());
+    nullString.setText(GuiSettings.getDisplayNullString());
+    showGeneratingSQL.setSelected(GuiSettings.getShowResultSQL());
+    useTableName.setSelected(GuiSettings.getUseTablenameAsResultName());
+    int align = GuiSettings.getNumberDataAlignment();
+    if (align == SwingConstants.LEFT) {
+      alignmentDropDown.setSelectedIndex(1);
+    } else {
+      alignmentDropDown.setSelectedIndex(0);
+    }
+    boldHeader.setSelected(GuiSettings.showTableHeaderInBold());
+    fillLanguageDropDown();
+  }
 
-	@Override
-	public void componentDisplayed()
-	{
-	}
+  @Override
+  public void saveSettings() {
+    int value = StringUtil.getIntValue(multiLineThreshold.getText(), -1);
+    if (value > 0) GuiSettings.setMultiLineThreshold(value);
+    GuiSettings.setAllowRowHeightResizing(rowHeightResize.isSelected());
+    GuiSettings.setMaxColumnWidth(((NumberField) this.maxColSizeField).getValue());
+    GuiSettings.setMinColumnWidth(((NumberField) this.minColSizeField).getValue());
+    GuiSettings.setAutomaticOptimalWidth(autoColWidth.isSelected());
+    GuiSettings.setIncludeHeaderInOptimalWidth(includeHeaderWidth.isSelected());
+    GuiSettings.setAutomaticOptimalRowHeight(autoRowHeight.isSelected());
+    GuiSettings.setAutRowHeightMaxLines(((NumberField) this.maxRowHeight).getValue());
+    GuiSettings.setIgnoreWhitespaceForAutoRowHeight(ignoreEmptyRows.isSelected());
+    GuiSettings.setShowSelectionSummary(selectSummary.isSelected());
+    GuiSettings.setDefaultMaxRows(StringUtil.getIntValue(defMaxRows.getText(), 0));
+    GuiSettings.setRetrieveQueryComments(retrieveComments.isSelected());
+    GuiSettings.setShowTableRowNumbers(showRowNumbers.isSelected());
+    GuiSettings.setShowMaxRowsReached(showMaxRowsWarn.isSelected());
+    GuiSettings.setDisplayNullString(nullString.getText());
+    GuiSettings.setShowResultSQL(showGeneratingSQL.isSelected());
+    GuiSettings.setShowTableHeaderInBold(boldHeader.isSelected());
+    GuiSettings.setWrapMultilineEditor(wrapMultlineEdit.isSelected());
+    GuiSettings.setWrapMultilineRenderer(wrapMultineRender.isSelected());
+    GuiSettings.setShowMaxRowsTooltip(showMaxRowsTooltip.isSelected());
+    GuiSettings.setDefaultAppendResults(appendResults.isSelected());
+    GuiSettings.setUseTablenameAsResultName(useTableName.isSelected());
+    DisplayLocale dl = (DisplayLocale) localeDropDown.getSelectedItem();
+    Settings.getInstance().setSortLocale(dl.getLocale());
+    if (alignmentDropDown.getSelectedIndex() == 1) {
+      GuiSettings.setNumberDataAlignment("left");
+    } else {
+      GuiSettings.setNumberDataAlignment("right");
+    }
+  }
 
-	@Override
-	public boolean validateInput()
-	{
-		return true;
-	}
+  @Override
+  public void componentDisplayed() {
+  }
 
-	private Locale[] readLocales()
-	{
-		long start = System.currentTimeMillis();
-		Locale[] locales = Locale.getAvailableLocales();
-		long duration = System.currentTimeMillis() - start;
-		LogMgr.logDebug("DataDisplayOptions.readLocales()", "Reading " + locales.length + " locales took: " + duration + "ms");
+  @Override
+  public boolean validateInput() {
+    return true;
+  }
 
-		start = System.currentTimeMillis();
-		Comparator<Locale> localeComp = new Comparator<Locale>()
-		{
-			private Locale l = Settings.getInstance().getLanguage();
-			@Override
-			public int compare(Locale o1, Locale o2)
-			{
-				return o1.getDisplayLanguage(l).compareTo(o2.getDisplayLanguage(l));
-			}
-		};
-		Arrays.sort(locales, localeComp);
-		duration = System.currentTimeMillis() - start;
-		LogMgr.logDebug("DataDisplayOptions.readLocales()", "Sorting locales took: " + duration + "ms");
-		return locales;
-	}
+  private Locale[] readLocales() {
+    long start = System.currentTimeMillis();
+    Locale[] locales = Locale.getAvailableLocales();
+    long duration = System.currentTimeMillis() - start;
+    LogMgr.logDebug("DataDisplayOptions.readLocales()", "Reading " + locales.length + " locales took: " + duration + "ms");
 
-	private void fillLanguageDropDown()
-	{
-		Locale guiLocale = Settings.getInstance().getLanguage();
-		DisplayLocale currentSortLocale = new DisplayLocale(new WbLocale(Settings.getInstance().getSortLocale()));
+    start = System.currentTimeMillis();
+    Comparator<Locale> localeComp = new Comparator<Locale>() {
+      private Locale l = Settings.getInstance().getLanguage();
 
-		Locale[] locales = readLocales();
+      @Override
+      public int compare(Locale o1, Locale o2) {
+        return o1.getDisplayLanguage(l).compareTo(o2.getDisplayLanguage(l));
+      }
+    };
+    Arrays.sort(locales, localeComp);
+    duration = System.currentTimeMillis() - start;
+    LogMgr.logDebug("DataDisplayOptions.readLocales()", "Sorting locales took: " + duration + "ms");
+    return locales;
+  }
 
-		localeDropDown.removeAllItems();
-		localeDropDown.addItem(new DisplayLocale(null));
+  private void fillLanguageDropDown() {
+    Locale guiLocale = Settings.getInstance().getLanguage();
+    DisplayLocale currentSortLocale = new DisplayLocale(new WbLocale(Settings.getInstance().getSortLocale()));
 
-		int index = 1; // 1 because we have already added a locale
-		int currentIndex = -1;
+    Locale[] locales = readLocales();
 
-		for (Locale ls : locales)
-		{
-			DisplayLocale wl = new DisplayLocale(new WbLocale(ls));
-			wl.setDisplayLocale(guiLocale);
-			localeDropDown.addItem(wl);
-			if (wl.equals(currentSortLocale)) currentIndex = index;
-			index ++;
-		}
+    localeDropDown.removeAllItems();
+    localeDropDown.addItem(new DisplayLocale(null));
 
-		if (currentIndex != -1)
-		{
-			localeDropDown.setSelectedIndex(currentIndex);
-		}
-	}
+    int index = 1; // 1 because we have already added a locale
+    int currentIndex = -1;
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+    for (Locale ls : locales) {
+      DisplayLocale wl = new DisplayLocale(new WbLocale(ls));
+      wl.setDisplayLocale(guiLocale);
+      localeDropDown.addItem(wl);
+      if (wl.equals(currentSortLocale)) currentIndex = index;
+      index++;
+    }
+
+    if (currentIndex != -1) {
+      localeDropDown.setSelectedIndex(currentIndex);
+    }
+  }
+
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
 
     jLabel1 = new javax.swing.JLabel();
@@ -271,7 +290,7 @@ public class DataDisplayOptions
     gridBagConstraints.insets = new java.awt.Insets(10, 12, 0, 0);
     add(jLabel1, gridBagConstraints);
 
-    localeDropDown.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+    localeDropDown.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 0;
@@ -376,7 +395,7 @@ public class DataDisplayOptions
     gridBagConstraints.insets = new java.awt.Insets(2, 16, 0, 0);
     generalPanel.add(alignLabel, gridBagConstraints);
 
-    alignmentDropDown.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Left", "Right" }));
+    alignmentDropDown.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Left", "Right"}));
     alignmentDropDown.setSelectedItem("Right");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
@@ -654,12 +673,8 @@ public class DataDisplayOptions
     add(multiLinePanel, gridBagConstraints);
   }
 
-  // Code for dispatching events from components to event handlers.
-
-  public void actionPerformed(java.awt.event.ActionEvent evt)
-  {
-    if (evt.getSource() == showMaxRowsWarn)
-    {
+  public void actionPerformed(java.awt.event.ActionEvent evt) {
+    if (evt.getSource() == showMaxRowsWarn) {
       DataDisplayOptions.this.showMaxRowsWarnActionPerformed(evt);
     }
   }// </editor-fold>//GEN-END:initComponents
@@ -668,49 +683,6 @@ public class DataDisplayOptions
   {//GEN-HEADEREND:event_showMaxRowsWarnActionPerformed
     showMaxRowsTooltip.setEnabled(showMaxRowsWarn.isSelected());
   }//GEN-LAST:event_showMaxRowsWarnActionPerformed
-
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JLabel alignLabel;
-  private javax.swing.JComboBox alignmentDropDown;
-  private javax.swing.JCheckBox appendResults;
-  private javax.swing.JCheckBox autoColWidth;
-  private javax.swing.JCheckBox autoRowHeight;
-  private javax.swing.JCheckBox boldHeader;
-  private javax.swing.JPanel colWidthPanel;
-  private javax.swing.JTextField defMaxRows;
-  private javax.swing.JPanel generalPanel;
-  private javax.swing.JCheckBox ignoreEmptyRows;
-  private javax.swing.JCheckBox includeHeaderWidth;
-  private javax.swing.JLabel jLabel1;
-  private javax.swing.JLabel jLabel4;
-  private javax.swing.JLabel jLabel5;
-  private javax.swing.JLabel jLabel6;
-  private javax.swing.JPanel jPanel3;
-  private javax.swing.JPanel jPanel4;
-  private javax.swing.JComboBox localeDropDown;
-  private javax.swing.JTextField maxColSizeField;
-  private javax.swing.JLabel maxColSizeLabel;
-  private javax.swing.JTextField maxRowHeight;
-  private javax.swing.JLabel maxRowHeightLabel;
-  private javax.swing.JTextField minColSizeField;
-  private javax.swing.JLabel minColSizeLabel;
-  private javax.swing.JPanel multiLinePanel;
-  private javax.swing.JTextField multiLineThreshold;
-  private javax.swing.JLabel multilineThresholLabel;
-  private javax.swing.JTextField nullString;
-  private javax.swing.JLabel nullStringLabel;
-  private javax.swing.JCheckBox retrieveComments;
-  private javax.swing.JPanel rowHeightPanel;
-  private javax.swing.JCheckBox rowHeightResize;
-  private javax.swing.JCheckBox selectSummary;
-  private javax.swing.JCheckBox showGeneratingSQL;
-  private javax.swing.JCheckBox showMaxRowsTooltip;
-  private javax.swing.JCheckBox showMaxRowsWarn;
-  private javax.swing.JCheckBox showRowNumbers;
-  private javax.swing.JCheckBox useTableName;
-  private javax.swing.JCheckBox wrapMultineRender;
-  private javax.swing.JCheckBox wrapMultlineEdit;
   // End of variables declaration//GEN-END:variables
 
 }

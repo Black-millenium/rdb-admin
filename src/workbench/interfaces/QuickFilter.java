@@ -25,7 +25,6 @@ package workbench.interfaces;
 /**
  * @author Thomas Kellerer
  */
-public interface QuickFilter
-{
-	void applyQuickFilter();
+public interface QuickFilter {
+  void applyQuickFilter();
 }

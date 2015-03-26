@@ -22,66 +22,58 @@
  */
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-
 import workbench.console.ConsoleSettings;
 import workbench.console.RowDisplay;
 import workbench.resource.ResourceMgr;
-
-import workbench.storage.DataStore;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
 import workbench.sql.VariablePool;
+import workbench.storage.DataStore;
+
+import java.sql.SQLException;
 
 /**
  * Display all variables defined through {@link WbDefineVar}
  *
  * @author Thomas Kellerer
  */
-public class WbListVars extends SqlCommand
-{
-	public static final String VERB = "WbVarList";
-	public static final String VERB_ALTERNATE = "WbListVars";
+public class WbListVars extends SqlCommand {
+  public static final String VERB = "WbVarList";
+  public static final String VERB_ALTERNATE = "WbListVars";
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	public String getAlternateVerb()
-	{
-		return VERB_ALTERNATE;
-	}
+  @Override
+  public String getAlternateVerb() {
+    return VERB_ALTERNATE;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String aSql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
-		ConsoleSettings.getInstance().setNextRowDisplay(RowDisplay.SingleLine);
+  @Override
+  public StatementRunnerResult execute(String aSql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult();
+    ConsoleSettings.getInstance().setNextRowDisplay(RowDisplay.SingleLine);
 
-		DataStore ds = VariablePool.getInstance().getVariablesDataStore();
-		ds.setResultName(ResourceMgr.getString("TxtVariables"));
-		CommandTester ct = new CommandTester();
-		ds.setGeneratingSql(ct.formatVerb(getVerb()));
-		result.addDataStore(ds);
-		result.setSuccess();
-		return result;
-	}
+    DataStore ds = VariablePool.getInstance().getVariablesDataStore();
+    ds.setResultName(ResourceMgr.getString("TxtVariables"));
+    CommandTester ct = new CommandTester();
+    ds.setGeneratingSql(ct.formatVerb(getVerb()));
+    result.addDataStore(ds);
+    result.setSuccess();
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 
 }

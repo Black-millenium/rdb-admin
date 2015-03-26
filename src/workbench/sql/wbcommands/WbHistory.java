@@ -20,101 +20,86 @@
 
 package workbench.sql.wbcommands;
 
+import workbench.interfaces.SqlHistoryProvider;
+import workbench.sql.ScrollAnnotation;
+import workbench.sql.SqlCommand;
+import workbench.sql.StatementRunnerResult;
+import workbench.storage.DataStore;
+import workbench.util.SqlUtil;
+import workbench.util.StringUtil;
+
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Collections;
 import java.util.List;
 
-import workbench.interfaces.SqlHistoryProvider;
-
-import workbench.storage.DataStore;
-
-import workbench.sql.ScrollAnnotation;
-import workbench.sql.SqlCommand;
-import workbench.sql.StatementRunnerResult;
-
-import workbench.util.SqlUtil;
-import workbench.util.StringUtil;
-
 /**
- *
  * @author Thomas Kellerer
  */
 public class WbHistory
-	extends SqlCommand
-{
-	public static final String VERB = "WbHistory";
-	public static final String SHORT_VERB = "WbHist";
+    extends SqlCommand {
+  public static final String VERB = "WbHistory";
+  public static final String SHORT_VERB = "WbHist";
 
-	private int maxLength = -1;
+  private int maxLength = -1;
 
-	public WbHistory()
-	{
-	}
+  public WbHistory() {
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return false;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return false;
+  }
 
-	public void setMaxDisplayLength(int length)
-	{
-		maxLength = length;
-	}
+  public void setMaxDisplayLength(int length) {
+    maxLength = length;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult();
 
-		SqlHistoryProvider provider = this.runner.getHistoryProvider();
-		List<String> history = Collections.emptyList();
-		if (provider != null)
-		{
-			history = provider.getHistoryEntries();
-		}
+    SqlHistoryProvider provider = this.runner.getHistoryProvider();
+    List<String> history = Collections.emptyList();
+    if (provider != null) {
+      history = provider.getHistoryEntries();
+    }
 
-		String parameter = this.getCommandLine(sql);
-		if (StringUtil.isNonBlank(parameter)) return result;
+    String parameter = this.getCommandLine(sql);
+    if (StringUtil.isNonBlank(parameter)) return result;
 
-		DataStore ds = new DataStore(new String[] {"NR", "SQL"}, new int[] { Types.INTEGER, Types.VARCHAR} );
-		int index = 1;
-		for (String entry : history)
-		{
-			int row = ds.addRow();
-			ds.setValue(row, 0, Integer.valueOf(index));
-			ds.setValue(row, 1, getDisplayString(entry));
-			index ++;
-		}
-		ds.resetStatus();
-		ds.setResultName(VERB);
-		ds.setGeneratingSql(ScrollAnnotation.getScrollToEndAnnotation() + "\n" + VERB);
-		result.addDataStore(ds);
-		return result;
-	}
+    DataStore ds = new DataStore(new String[]{"NR", "SQL"}, new int[]{Types.INTEGER, Types.VARCHAR});
+    int index = 1;
+    for (String entry : history) {
+      int row = ds.addRow();
+      ds.setValue(row, 0, Integer.valueOf(index));
+      ds.setValue(row, 1, getDisplayString(entry));
+      index++;
+    }
+    ds.resetStatus();
+    ds.setResultName(VERB);
+    ds.setGeneratingSql(ScrollAnnotation.getScrollToEndAnnotation() + "\n" + VERB);
+    result.addDataStore(ds);
+    return result;
+  }
 
-	private String getDisplayString(String sql)
-	{
-		boolean isMySQL = (this.currentConnection != null ? currentConnection.getMetadata().isMySql() : false);
-		String display = SqlUtil.makeCleanSql(sql, false, false, isMySQL, true);
-		if (maxLength > -1)
-		{
-			display = StringUtil.getMaxSubstring(display, maxLength - 10);
-		}
-		return display;
-	}
+  private String getDisplayString(String sql) {
+    boolean isMySQL = (this.currentConnection != null ? currentConnection.getMetadata().isMySql() : false);
+    String display = SqlUtil.makeCleanSql(sql, false, false, isMySQL, true);
+    if (maxLength > -1) {
+      display = StringUtil.getMaxSubstring(display, maxLength - 10);
+    }
+    return display;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 }

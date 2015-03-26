@@ -20,31 +20,30 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import workbench.gui.MainWindow;
 import workbench.gui.bookmarks.BookmarkSelector;
 
+import java.awt.event.ActionEvent;
+
 /**
  * Action to display program version information
- * @see workbench.gui.dialogs.WbAboutDialog
+ *
  * @author Thomas Kellerer
+ * @see workbench.gui.dialogs.WbAboutDialog
  */
 public class BookmarksAction
-	extends WbAction
-{
-	private MainWindow parent;
-	public BookmarksAction(MainWindow window)
-	{
-		super();
-		initMenuDefinition("MnuTxtBookmarks");
-		setIcon("bookmark");
-		parent = window;
-	}
+    extends WbAction {
+  private MainWindow parent;
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		BookmarkSelector.selectBookmark(parent);
-	}
+  public BookmarksAction(MainWindow window) {
+    super();
+    initMenuDefinition("MnuTxtBookmarks");
+    setIcon("bookmark");
+    parent = window;
+  }
+
+  @Override
+  public void executeAction(ActionEvent e) {
+    BookmarkSelector.selectBookmark(parent);
+  }
 }

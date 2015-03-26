@@ -22,54 +22,43 @@
  */
 package workbench.gui.macros;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Insets;
-
 import javax.swing.border.AbstractBorder;
+import java.awt.*;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class ReorderBorder
-	extends AbstractBorder
-{
-	private final int thickness = 2;
-	private Color color = Color.DARK_GRAY;
+    extends AbstractBorder {
+  private final int thickness = 2;
+  private Color color = Color.DARK_GRAY;
 
-	public ReorderBorder()
-	{
-		super();
-	}
+  public ReorderBorder() {
+    super();
+  }
 
-	@Override
-	public void paintBorder(Component c, Graphics g, int x, int y, int width, int height)
-	{
-		Color oldColor = g.getColor();
-		g.setColor(color);
-		final int arrowLen = 4;
-		for (int i=0; i < arrowLen; i++)
-		{
-			g.drawLine(x + i, y, x + i, y + (arrowLen-i));
-		}
-		g.fillRect(x, y, width, thickness);
-		g.setColor(oldColor);
-	}
+  @Override
+  public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+    Color oldColor = g.getColor();
+    g.setColor(color);
+    final int arrowLen = 4;
+    for (int i = 0; i < arrowLen; i++) {
+      g.drawLine(x + i, y, x + i, y + (arrowLen - i));
+    }
+    g.fillRect(x, y, width, thickness);
+    g.setColor(oldColor);
+  }
 
-	@Override
-	public Insets getBorderInsets(Component c)
-	{
-		return new Insets(2, 2, 2, 2);
-	}
+  @Override
+  public Insets getBorderInsets(Component c) {
+    return new Insets(2, 2, 2, 2);
+  }
 
-	@Override
-	public Insets getBorderInsets(Component c, Insets insets)
-	{
-		insets.left = insets.top = insets.right = insets.bottom = 2;
-		return insets;
-	}
+  @Override
+  public Insets getBorderInsets(Component c, Insets insets) {
+    insets.left = insets.top = insets.right = insets.bottom = 2;
+    return insets;
+  }
 
 }
 

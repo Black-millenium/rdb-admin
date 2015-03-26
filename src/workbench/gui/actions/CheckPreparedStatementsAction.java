@@ -22,43 +22,38 @@
  */
 package workbench.gui.actions;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * Action to toggle the detection of prepared statements during SQL execution
  *
+ * @author Thomas Kellerer
  * @see workbench.resource.Settings#setCheckPreparedStatements(boolean)
- *
- * @author  Thomas Kellerer
  */
 public class CheckPreparedStatementsAction
-	extends CheckBoxAction
-	implements PropertyChangeListener
-{
-	private static final String PROPERTY = "workbench.sql.checkprepared";
+    extends CheckBoxAction
+    implements PropertyChangeListener {
+  private static final String PROPERTY = "workbench.sql.checkprepared";
 
-	public CheckPreparedStatementsAction()
-	{
-		super("MnuTxtCheckPrepared", PROPERTY);
-		this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
-		Settings.getInstance().addPropertyChangeListener(this, PROPERTY);
-	}
+  public CheckPreparedStatementsAction() {
+    super("MnuTxtCheckPrepared", PROPERTY);
+    this.setMenuItemName(ResourceMgr.MNU_TXT_SQL);
+    Settings.getInstance().addPropertyChangeListener(this, PROPERTY);
+  }
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt)
-	{
-		setSwitchedOn(Settings.getInstance().getCheckPreparedStatements());
-	}
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+    setSwitchedOn(Settings.getInstance().getCheckPreparedStatements());
+  }
 
-	@Override
-	public void dispose()
-	{
-		super.dispose();
-		Settings.getInstance().removePropertyChangeListener(this);
-	}
+  @Override
+  public void dispose() {
+    super.dispose();
+    Settings.getInstance().removePropertyChangeListener(this);
+  }
 
 }

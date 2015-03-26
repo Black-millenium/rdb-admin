@@ -23,12 +23,10 @@
 package workbench.db.importer;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum DeleteType
-{
-	none,
-	delete,
-	truncate;
+public enum DeleteType {
+  none,
+  delete,
+  truncate;
 }

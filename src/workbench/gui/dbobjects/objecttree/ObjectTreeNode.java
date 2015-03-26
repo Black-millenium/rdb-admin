@@ -19,125 +19,103 @@
  */
 package workbench.gui.dbobjects.objecttree;
 
-import java.io.Serializable;
-import java.util.Set;
-
-import javax.swing.tree.DefaultMutableTreeNode;
-
 import workbench.db.ColumnIdentifier;
 import workbench.db.DbObject;
-
 import workbench.util.CollectionUtil;
 import workbench.util.StringUtil;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.Serializable;
+import java.util.Set;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class ObjectTreeNode
-  extends DefaultMutableTreeNode
-  implements Serializable
-{
+    extends DefaultMutableTreeNode
+    implements Serializable {
   private Set<String> typesWithChildren = CollectionUtil.caseInsensitiveSet(
-    "database", "catalog", "schema", "table", "view", "materialized view", "type", "package", "enum");
+      "database", "catalog", "schema", "table", "view", "materialized view", "type", "package", "enum");
   private String nodeType;
   private String nodeName;
   private boolean isLoaded;
 
-  public ObjectTreeNode(DbObject dbo)
-  {
+  public ObjectTreeNode(DbObject dbo) {
     super(dbo);
     nodeType = dbo.getObjectType();
     nodeName = dbo.getObjectName();
     allowsChildren = false;
   }
 
-  public ObjectTreeNode(String name, String type)
-  {
+  public ObjectTreeNode(String name, String type) {
     super();
     nodeType = type;
     nodeName = name;
   }
 
-  public void setNameAndType(String name, String type)
-  {
+  public void setNameAndType(String name, String type) {
     nodeType = type;
     nodeName = name;
   }
-  
-  public void setChildrenLoaded(boolean flag)
-  {
+
+  public void setChildrenLoaded(boolean flag) {
     isLoaded = flag;
   }
 
-  public boolean isLoaded()
-  {
+  public boolean isLoaded() {
     return isLoaded;
   }
 
-  public boolean canHaveChildren()
-  {
+  public boolean canHaveChildren() {
     if (getType() == null) return false;
     return typesWithChildren.contains(getType());
   }
 
   @Override
-  public ObjectTreeNode getParent()
-  {
-    return (ObjectTreeNode)super.getParent();
+  public ObjectTreeNode getParent() {
+    return (ObjectTreeNode) super.getParent();
   }
 
   @Override
-  public boolean isLeaf()
-  {
+  public boolean isLeaf() {
     return !allowsChildren;
   }
 
-  public DbObject getDbObject()
-  {
-    return (DbObject)getUserObject();
+  public DbObject getDbObject() {
+    return (DbObject) getUserObject();
   }
 
-  public String getType()
-  {
-    if (getDbObject() == null)
-    {
+  public String getType() {
+    if (getDbObject() == null) {
       return nodeType;
     }
     return getDbObject().getObjectType();
   }
 
-  public String getName()
-  {
+  public String getName() {
     DbObject db = getDbObject();
-    if (db == null)
-    {
+    if (db == null) {
       return nodeName;
     }
     return db.getObjectName();
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     DbObject dbo = getDbObject();
-    if (dbo == null)
-    {
+    if (dbo == null) {
       return nodeName;
     }
-    if (dbo instanceof ColumnIdentifier)
-    {
-      ColumnIdentifier col = (ColumnIdentifier)dbo;
+    if (dbo instanceof ColumnIdentifier) {
+      ColumnIdentifier col = (ColumnIdentifier) dbo;
       return col.getColumnName() + " - " + col.getDbmsType();
     }
     return dbo.getObjectName();
   }
 
-  public String getTooltip()
-  {
+  public String getTooltip() {
     DbObject dbo = getDbObject();
-    if (dbo == null)
-    {
+    if (dbo == null) {
       return null;
     }
     String remarks = dbo.getComment();

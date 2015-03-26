@@ -22,97 +22,83 @@
  */
 package workbench.sql.wbcommands;
 
+import workbench.console.ConsoleSettings;
+import workbench.console.RowDisplay;
+import workbench.resource.ResourceMgr;
+import workbench.sql.SqlCommand;
+import workbench.sql.StatementRunnerResult;
+import workbench.storage.DataStore;
+import workbench.util.SqlUtil;
+import workbench.util.StringUtil;
+
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 
-import workbench.console.ConsoleSettings;
-import workbench.console.RowDisplay;
-import workbench.resource.ResourceMgr;
-
-import workbench.storage.DataStore;
-
-import workbench.sql.SqlCommand;
-import workbench.sql.StatementRunnerResult;
-
-import workbench.util.SqlUtil;
-import workbench.util.StringUtil;
-
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class WbListSchemas
-	extends SqlCommand
-{
-	public static final String VERB = "WbListSchemas";
+    extends SqlCommand {
+  public static final String VERB = "WbListSchemas";
 
-	public WbListSchemas()
-	{
-		super();
-	}
+  public WbListSchemas() {
+    super();
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String aSql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
-		ConsoleSettings.getInstance().setNextRowDisplay(RowDisplay.SingleLine);
+  @Override
+  public StatementRunnerResult execute(String aSql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult();
+    ConsoleSettings.getInstance().setNextRowDisplay(RowDisplay.SingleLine);
 
-		List<String> schemas = currentConnection.getMetadata().getSchemas();
+    List<String> schemas = currentConnection.getMetadata().getSchemas();
 
-		DataStore ds = null;
-		if (currentConnection.getMetadata().isPostgres())
-		{
-			ds = listPgSchemas();
-		}
-		else
-		{
-			String schemaName = StringUtil.capitalize(currentConnection.getMetadata().getSchemaTerm());
-			String[] cols = { schemaName };
-			int[] types = { Types.VARCHAR };
-			int[] sizes = { 10 };
+    DataStore ds = null;
+    if (currentConnection.getMetadata().isPostgres()) {
+      ds = listPgSchemas();
+    } else {
+      String schemaName = StringUtil.capitalize(currentConnection.getMetadata().getSchemaTerm());
+      String[] cols = {schemaName};
+      int[] types = {Types.VARCHAR};
+      int[] sizes = {10};
 
-			ds = new DataStore(cols, types, sizes);
-			for (String cat : schemas)
-			{
-				int row = ds.addRow();
-				ds.setValue(row, 0, cat);
-			}
-		}
-		ds.setResultName(ResourceMgr.getString("TxtSchemaList"));
-		ds.setGeneratingSql(VERB);
-		ds.resetStatus();
-		result.addDataStore(ds);
-		result.setSuccess();
-		return result;
-	}
+      ds = new DataStore(cols, types, sizes);
+      for (String cat : schemas) {
+        int row = ds.addRow();
+        ds.setValue(row, 0, cat);
+      }
+    }
+    ds.setResultName(ResourceMgr.getString("TxtSchemaList"));
+    ds.setGeneratingSql(VERB);
+    ds.resetStatus();
+    result.addDataStore(ds);
+    result.setSuccess();
+    return result;
+  }
 
-	private DataStore listPgSchemas()
-	{
-		String sql =
-			"SELECT n.nspname AS \"Schema\",\n" +
-			"       pg_catalog.pg_get_userbyid(n.nspowner) AS \"Owner\", \n" +
-			"				pg_catalog.array_to_string(n.nspacl, ', ') as \"Access privileges\", " +
-			"       pg_catalog.obj_description(n.oid, 'pg_namespace') AS \"Description\" " +
-			"FROM pg_catalog.pg_namespace n\n" +
-			"WHERE n.nspname !~ '^pg_' AND n.nspname <> 'information_schema'\n" +
-			"ORDER BY 1";
+  private DataStore listPgSchemas() {
+    String sql =
+        "SELECT n.nspname AS \"Schema\",\n" +
+            "       pg_catalog.pg_get_userbyid(n.nspowner) AS \"Owner\", \n" +
+            "				pg_catalog.array_to_string(n.nspacl, ', ') as \"Access privileges\", " +
+            "       pg_catalog.obj_description(n.oid, 'pg_namespace') AS \"Description\" " +
+            "FROM pg_catalog.pg_namespace n\n" +
+            "WHERE n.nspname !~ '^pg_' AND n.nspname <> 'information_schema'\n" +
+            "ORDER BY 1";
 
-		DataStore ds = SqlUtil.getResult(currentConnection, sql, true);
-		ds.setGeneratingSql(sql);
-		return ds;
-	}
+    DataStore ds = SqlUtil.getResult(currentConnection, sql, true);
+    ds.setGeneratingSql(sql);
+    return ds;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 }

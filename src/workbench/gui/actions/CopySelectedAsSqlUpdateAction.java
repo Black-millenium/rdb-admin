@@ -22,54 +22,48 @@
  */
 package workbench.gui.actions;
 
-import java.awt.event.ActionEvent;
 import workbench.db.exporter.ExportType;
 import workbench.gui.components.ClipBoardCopier;
-
 import workbench.gui.components.WbTable;
 import workbench.resource.ResourceMgr;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Action to copy the selected content of the data as SQL update statements into the clipboard
  *
- * @see workbench.gui.components.ClipBoardCopier
  * @author Thomas Kellerer
+ * @see workbench.gui.components.ClipBoardCopier
  */
 public class CopySelectedAsSqlUpdateAction
-	extends WbAction
-{
-	private WbTable client;
+    extends WbAction {
+  private WbTable client;
 
-	public CopySelectedAsSqlUpdateAction(WbTable aClient)
-	{
-		super();
-		this.client = aClient;
-		this.initMenuDefinition("MnuTxtCopySelectedAsSqlUpdate", null);
-		this.setMenuItemName(ResourceMgr.MNU_TXT_COPY_SELECTED);
-		this.setEnabled(false);
-	}
+  public CopySelectedAsSqlUpdateAction(WbTable aClient) {
+    super();
+    this.client = aClient;
+    this.initMenuDefinition("MnuTxtCopySelectedAsSqlUpdate", null);
+    this.setMenuItemName(ResourceMgr.MNU_TXT_COPY_SELECTED);
+    this.setEnabled(false);
+  }
 
-	@Override
-	public boolean hasCtrlModifier()
-	{
-		return true;
-	}
+  @Override
+  public boolean hasCtrlModifier() {
+    return true;
+  }
 
-	@Override
-	public boolean hasShiftModifier()
-	{
-		return false;
-	}
+  @Override
+  public boolean hasShiftModifier() {
+    return false;
+  }
 
-	@Override
-	public void executeAction(ActionEvent e)
-	{
-		ClipBoardCopier copier = new ClipBoardCopier(this.client);
-		boolean selectColumns = false;
-		if (invokedByMouse(e))
-		{
-			selectColumns = isCtrlPressed(e);
-		}
-		copier.copyAsSql(ExportType.SQL_UPDATE, true, selectColumns);
-	}
+  @Override
+  public void executeAction(ActionEvent e) {
+    ClipBoardCopier copier = new ClipBoardCopier(this.client);
+    boolean selectColumns = false;
+    if (invokedByMouse(e)) {
+      selectColumns = isCtrlPressed(e);
+    }
+    copier.copyAsSql(ExportType.SQL_UPDATE, true, selectColumns);
+  }
 }

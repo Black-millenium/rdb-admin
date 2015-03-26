@@ -22,55 +22,79 @@
  */
 package workbench.interfaces;
 
-import java.awt.Font;
-import java.io.IOException;
-import java.util.List;
-
-import javax.swing.JTabbedPane;
-
 import workbench.db.WbConnection;
-
 import workbench.gui.actions.WbAction;
 import workbench.gui.bookmarks.NamedScriptLocation;
 import workbench.gui.components.WbToolbar;
-
 import workbench.util.WbWorkspace;
 
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.util.List;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public interface MainPanel
-	extends ResultLogger
-{
-	List getMenuItems();
-	WbToolbar getToolbar();
-	void showLogPanel();
-	void showResultPanel();
-	void setConnectionClient(Connectable client);
-	void setConnection(WbConnection aConnection);
-	WbConnection getConnection();
-	void addToToolbar(WbAction anAction, boolean aFlag);
-	void setFont(Font aFont);
-	void disconnect();
-	String getTabTitle();
-	void setTabTitle(JTabbedPane tab, int index);
-	void setTabName(String name);
-	String getId();
-	boolean isConnected();
-	boolean isBusy();
-	boolean isCancelling();
-	void dispose();
-	void panelSelected();
-	void readFromWorkspace(WbWorkspace w, int index) throws IOException;
-	void saveToWorkspace(WbWorkspace w, int index) throws IOException;
-	boolean canClosePanel(boolean checkTransactions);
-	boolean isModified();
-	void reset();
-	boolean isLocked();
-	void setLocked(boolean flag);
-	List<NamedScriptLocation> getBookmarks();
-	boolean isModifiedAfter(long time);
-	void jumpToBookmark(NamedScriptLocation bookmark);
-	boolean supportsBookmarks();
+    extends ResultLogger {
+  List getMenuItems();
+
+  WbToolbar getToolbar();
+
+  void showLogPanel();
+
+  void showResultPanel();
+
+  void setConnectionClient(Connectable client);
+
+  WbConnection getConnection();
+
+  void setConnection(WbConnection aConnection);
+
+  void addToToolbar(WbAction anAction, boolean aFlag);
+
+  void setFont(Font aFont);
+
+  void disconnect();
+
+  String getTabTitle();
+
+  void setTabTitle(JTabbedPane tab, int index);
+
+  void setTabName(String name);
+
+  String getId();
+
+  boolean isConnected();
+
+  boolean isBusy();
+
+  boolean isCancelling();
+
+  void dispose();
+
+  void panelSelected();
+
+  void readFromWorkspace(WbWorkspace w, int index) throws IOException;
+
+  void saveToWorkspace(WbWorkspace w, int index) throws IOException;
+
+  boolean canClosePanel(boolean checkTransactions);
+
+  boolean isModified();
+
+  void reset();
+
+  boolean isLocked();
+
+  void setLocked(boolean flag);
+
+  List<NamedScriptLocation> getBookmarks();
+
+  boolean isModifiedAfter(long time);
+
+  void jumpToBookmark(NamedScriptLocation bookmark);
+
+  boolean supportsBookmarks();
 }

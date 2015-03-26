@@ -22,116 +22,116 @@
  */
 package workbench.gui.settings;
 
-import java.awt.event.MouseListener;
-
-import javax.swing.JPanel;
-
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.components.NumberField;
+import workbench.gui.help.HelpManager;
 import workbench.interfaces.Restoreable;
 import workbench.interfaces.ValidatingComponent;
 import workbench.resource.ResourceMgr;
 import workbench.resource.Settings;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.components.NumberField;
-import workbench.gui.help.HelpManager;
-
 import workbench.util.StringUtil;
 
+import javax.swing.*;
+import java.awt.event.MouseListener;
+
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class DataFormattingOptionsPanel
-	extends JPanel
-	implements Restoreable, ValidatingComponent, MouseListener
-{
-	public DataFormattingOptionsPanel()
-	{
-		super();
-		initComponents();
-	}
+    extends JPanel
+    implements Restoreable, ValidatingComponent, MouseListener {
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JLabel dateFormatLabel;
+  private javax.swing.JTextField dateFormatTextField;
+  private javax.swing.JTextField decimalField;
+  private javax.swing.JLabel decimalLabel;
+  private javax.swing.JLabel helpLabel;
+  private javax.swing.JTextField maxDigitsField;
 
-	@Override
-	public void restoreSettings()
-	{
-		dateFormatTextField.setText(Settings.getInstance().getDefaultDateFormat());
-		dateFormatTextField.setCaretPosition(0);
-		timestampFormatTextField.setText(Settings.getInstance().getDefaultTimestampFormat());
-		timestampFormatTextField.setCaretPosition(0);
-		decimalField.setText(Settings.getInstance().getDecimalSymbol());
-		timeFormat.setText(Settings.getInstance().getDefaultTimeFormat());
-		maxDigitsField.setText(Integer.toString(Settings.getInstance().getMaxFractionDigits()));
-		oraDateFix.setSelected(Settings.getInstance().fixOracleDateType());
-	}
-
-	@Override
-	public void saveSettings()
-	{
-		Settings.getInstance().setDefaultDateFormat(this.dateFormatTextField.getText());
-		Settings.getInstance().setDefaultTimeFormat(this.timeFormat.getText());
-		Settings.getInstance().setDefaultTimestampFormat(this.timestampFormatTextField.getText());
-		Settings.getInstance().setMaxFractionDigits(((NumberField)this.maxDigitsField).getValue());
-		Settings.getInstance().setDecimalSymbol(this.decimalField.getText());
-		Settings.getInstance().setFixOracleDateType(oraDateFix.isSelected());
-	}
+  // Code for dispatching events from components to event handlers.
+  private javax.swing.JLabel maxDigitsLabel;
+  private javax.swing.JCheckBox oraDateFix;
+  private javax.swing.JTextField timeFormat;
+  private javax.swing.JLabel timeFormatLabel;
+  private javax.swing.JLabel timestampFormatLabel;
+  private javax.swing.JTextField timestampFormatTextField;
 
 
-	@Override
-	public boolean validateInput()
-	{
-		String format = dateFormatTextField.getText();
+  public DataFormattingOptionsPanel() {
+    super();
+    initComponents();
+  }
 
-		if (StringUtil.isNonBlank(format))
-		{
-			String err = StringUtil.isDatePatternValid(format);
-			if (err != null)
-			{
-				String msg = ResourceMgr.getFormattedString("ErrInvalidInput", dateFormatLabel.getText(), err);
-				WbSwingUtilities.showErrorMessage(this, ResourceMgr.getString("TxtError"), msg);
-				return false;
-			}
-		}
+  @Override
+  public void restoreSettings() {
+    dateFormatTextField.setText(Settings.getInstance().getDefaultDateFormat());
+    dateFormatTextField.setCaretPosition(0);
+    timestampFormatTextField.setText(Settings.getInstance().getDefaultTimestampFormat());
+    timestampFormatTextField.setCaretPosition(0);
+    decimalField.setText(Settings.getInstance().getDecimalSymbol());
+    timeFormat.setText(Settings.getInstance().getDefaultTimeFormat());
+    maxDigitsField.setText(Integer.toString(Settings.getInstance().getMaxFractionDigits()));
+    oraDateFix.setSelected(Settings.getInstance().fixOracleDateType());
+  }
 
-		format = timestampFormatTextField.getText();
-		if (StringUtil.isNonBlank(format))
-		{
-			String err = StringUtil.isDatePatternValid(format);
-			if (err != null)
-			{
-				String msg = ResourceMgr.getFormattedString("ErrInvalidInput", timestampFormatLabel.getText(), err);
-				WbSwingUtilities.showErrorMessage(this, ResourceMgr.getString("TxtError"), msg);
-				return false;
-			}
-		}
+  @Override
+  public void saveSettings() {
+    Settings.getInstance().setDefaultDateFormat(this.dateFormatTextField.getText());
+    Settings.getInstance().setDefaultTimeFormat(this.timeFormat.getText());
+    Settings.getInstance().setDefaultTimestampFormat(this.timestampFormatTextField.getText());
+    Settings.getInstance().setMaxFractionDigits(((NumberField) this.maxDigitsField).getValue());
+    Settings.getInstance().setDecimalSymbol(this.decimalField.getText());
+    Settings.getInstance().setFixOracleDateType(oraDateFix.isSelected());
+  }
 
-		format = timeFormat.getText();
-		if (StringUtil.isNonBlank(format))
-		{
-			String err = StringUtil.isDatePatternValid(format);
-			if (err != null)
-			{
-				String msg = ResourceMgr.getFormattedString("ErrInvalidInput", timeFormatLabel.getText(), err);
-				WbSwingUtilities.showErrorMessage(this, ResourceMgr.getString("TxtError"), msg);
-				return false;
-			}
-		}
+  @Override
+  public boolean validateInput() {
+    String format = dateFormatTextField.getText();
 
-		return true;
-	}
+    if (StringUtil.isNonBlank(format)) {
+      String err = StringUtil.isDatePatternValid(format);
+      if (err != null) {
+        String msg = ResourceMgr.getFormattedString("ErrInvalidInput", dateFormatLabel.getText(), err);
+        WbSwingUtilities.showErrorMessage(this, ResourceMgr.getString("TxtError"), msg);
+        return false;
+      }
+    }
 
-	@Override
-	public void componentDisplayed()
-	{
-	}
+    format = timestampFormatTextField.getText();
+    if (StringUtil.isNonBlank(format)) {
+      String err = StringUtil.isDatePatternValid(format);
+      if (err != null) {
+        String msg = ResourceMgr.getFormattedString("ErrInvalidInput", timestampFormatLabel.getText(), err);
+        WbSwingUtilities.showErrorMessage(this, ResourceMgr.getString("TxtError"), msg);
+        return false;
+      }
+    }
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+    format = timeFormat.getText();
+    if (StringUtil.isNonBlank(format)) {
+      String err = StringUtil.isDatePatternValid(format);
+      if (err != null) {
+        String msg = ResourceMgr.getFormattedString("ErrInvalidInput", timeFormatLabel.getText(), err);
+        WbSwingUtilities.showErrorMessage(this, ResourceMgr.getString("TxtError"), msg);
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  @Override
+  public void componentDisplayed() {
+  }
+
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
 
     dateFormatLabel = new javax.swing.JLabel();
@@ -258,51 +258,28 @@ public class DataFormattingOptionsPanel
     add(helpLabel, gridBagConstraints);
   }
 
-  // Code for dispatching events from components to event handlers.
-
-  public void mouseClicked(java.awt.event.MouseEvent evt)
-  {
-    if (evt.getSource() == helpLabel)
-    {
+  public void mouseClicked(java.awt.event.MouseEvent evt) {
+    if (evt.getSource() == helpLabel) {
       DataFormattingOptionsPanel.this.helpLabelMouseClicked(evt);
     }
   }
 
-  public void mouseEntered(java.awt.event.MouseEvent evt)
-  {
+  public void mouseEntered(java.awt.event.MouseEvent evt) {
   }
 
-  public void mouseExited(java.awt.event.MouseEvent evt)
-  {
+  public void mouseExited(java.awt.event.MouseEvent evt) {
   }
 
-  public void mousePressed(java.awt.event.MouseEvent evt)
-  {
+  public void mousePressed(java.awt.event.MouseEvent evt) {
   }
 
-  public void mouseReleased(java.awt.event.MouseEvent evt)
-  {
+  public void mouseReleased(java.awt.event.MouseEvent evt) {
   }// </editor-fold>//GEN-END:initComponents
 
   private void helpLabelMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_helpLabelMouseClicked
   {//GEN-HEADEREND:event_helpLabelMouseClicked
     HelpManager.showDateFormatHelp();
   }//GEN-LAST:event_helpLabelMouseClicked
-
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JLabel dateFormatLabel;
-  private javax.swing.JTextField dateFormatTextField;
-  private javax.swing.JTextField decimalField;
-  private javax.swing.JLabel decimalLabel;
-  private javax.swing.JLabel helpLabel;
-  private javax.swing.JTextField maxDigitsField;
-  private javax.swing.JLabel maxDigitsLabel;
-  private javax.swing.JCheckBox oraDateFix;
-  private javax.swing.JTextField timeFormat;
-  private javax.swing.JLabel timeFormatLabel;
-  private javax.swing.JLabel timestampFormatLabel;
-  private javax.swing.JTextField timestampFormatTextField;
   // End of variables declaration//GEN-END:variables
 
 }

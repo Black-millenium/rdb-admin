@@ -28,23 +28,19 @@ import java.util.List;
  * @author Thomas Kellerer
  */
 public class DummyUpdate
-	extends DummyDML
-	implements DbObject
-{
-	public DummyUpdate(TableIdentifier tbl)
-	{
-		super(tbl, true);
-	}
+    extends DummyDML
+    implements DbObject {
+  public DummyUpdate(TableIdentifier tbl) {
+    super(tbl, true);
+  }
 
-	public DummyUpdate(TableIdentifier tbl, List<ColumnIdentifier> cols)
-	{
-		super(tbl, cols, true);
-	}
+  public DummyUpdate(TableIdentifier tbl, List<ColumnIdentifier> cols) {
+    super(tbl, cols, true);
+  }
 
-	@Override
-	public String getObjectType()
-	{
-		return "UPDATE";
-	}
+  @Override
+  public String getObjectType() {
+    return "UPDATE";
+  }
 
 }

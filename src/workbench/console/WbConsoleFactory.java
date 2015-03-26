@@ -22,54 +22,43 @@
  */
 package workbench.console;
 
-import java.io.IOException;
-
 import workbench.log.LogMgr;
 import workbench.resource.Settings;
 
+import java.io.IOException;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public class WbConsoleFactory
-{
-	private static WbConsole instance;
+public class WbConsoleFactory {
+  private static WbConsole instance;
 
-	public synchronized static WbConsole getConsole()
-	{
-		if (instance == null)
-		{
-			if (useJLine())
-			{
-				try
-				{
-					instance = new JLineWrapper();
-					LogMgr.logDebug("ConsoleReaderFactory", "Using JLine");
-					return instance;
-				}
-				catch (IOException io)
-				{
-					instance = null;
-				}
-			}
+  public synchronized static WbConsole getConsole() {
+    if (instance == null) {
+      if (useJLine()) {
+        try {
+          instance = new JLineWrapper();
+          LogMgr.logDebug("ConsoleReaderFactory", "Using JLine");
+          return instance;
+        } catch (IOException io) {
+          instance = null;
+        }
+      }
 
-			if (System.console() != null)
-			{
-				instance = new SystemConsole();
-				LogMgr.logDebug("ConsoleReaderFactory", "Using System.console()");
-			}
+      if (System.console() != null) {
+        instance = new SystemConsole();
+        LogMgr.logDebug("ConsoleReaderFactory", "Using System.console()");
+      }
 
-			if (instance == null)
-			{
-				instance = new SimpleConsole();
-			}
-		}
-		return instance;
-	}
+      if (instance == null) {
+        instance = new SimpleConsole();
+      }
+    }
+    return instance;
+  }
 
-	private static boolean useJLine()
-	{
-		return Settings.getInstance().getBoolProperty("workbench.console.use.jline", true);
-	}
+  private static boolean useJLine() {
+    return Settings.getInstance().getBoolProperty("workbench.console.use.jline", true);
+  }
 
 }

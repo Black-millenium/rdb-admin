@@ -20,11 +20,9 @@
 package workbench.console;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum HandlerState
-{
+public enum HandlerState {
   handled,
   notHandled;
 }

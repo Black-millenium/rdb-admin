@@ -22,28 +22,25 @@
  */
 package workbench.gui.editor.actions;
 
-import java.awt.event.ActionEvent;
 import workbench.gui.editor.InputHandler;
 import workbench.gui.editor.JEditTextArea;
 import workbench.resource.PlatformShortcuts;
 
+import java.awt.event.ActionEvent;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class SelectDocumentHome
-	extends EditorAction
-{
+    extends EditorAction {
 
-	public SelectDocumentHome()
-	{
-		super("TxtEdDocHomeSel", PlatformShortcuts.getDefaultStartOfDoc(true));
-	}
+  public SelectDocumentHome() {
+    super("TxtEdDocHomeSel", PlatformShortcuts.getDefaultStartOfDoc(true));
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt)
-	{
-		JEditTextArea textArea = InputHandler.getTextArea(evt);
-		textArea.select(textArea.getMarkPosition(), 0);
-	}
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    JEditTextArea textArea = InputHandler.getTextArea(evt);
+    textArea.select(textArea.getMarkPosition(), 0);
+  }
 }

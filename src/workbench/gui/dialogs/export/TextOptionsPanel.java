@@ -22,349 +22,300 @@
  */
 package workbench.gui.dialogs.export;
 
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-import workbench.resource.ResourceMgr;
-import workbench.resource.Settings;
-
 import workbench.db.exporter.BlobMode;
 import workbench.db.exporter.ControlFileFormat;
 import workbench.db.exporter.WrongFormatFileException;
-
 import workbench.gui.WbSwingUtilities;
 import workbench.gui.components.FoldingPanel;
 import workbench.gui.components.WbComboBox;
 import workbench.gui.dialogs.QuoteEscapeSelector;
 import workbench.gui.dialogs.QuoteSettingVerifier;
-import workbench.util.CharacterEscapeType;
+import workbench.resource.ResourceMgr;
+import workbench.resource.Settings;
+import workbench.util.*;
 
-import workbench.util.CharacterRange;
-import workbench.util.CollectionUtil;
-import workbench.util.QuoteEscapeType;
-import workbench.util.StringUtil;
+import javax.swing.*;
+import java.awt.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
- *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class TextOptionsPanel
-	extends JPanel
-	implements TextOptions
-{
-	public TextOptionsPanel()
-	{
-		super();
-		initComponents();
-		populateEscapeRange((WbComboBox)escapeRange);
+    extends JPanel
+    implements TextOptions {
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private JComboBox blobTypes;
+  private JLabel blobTypesLabel;
+  private JTextField controlFiles;
+  private JLabel ctrlFileLabel;
+  private JTextField decimalChar;
+  private JLabel decimalLabel;
+  private JTextField delimiter;
+  private JLabel delimiterLabel;
+  private JLabel escapeLabel;
+  private JComboBox escapeRange;
+  private JComboBox escapeSelect;
+  private JCheckBox exportHeaders;
+  private JPanel extOptionsPanel;
+  private JLabel jLabel1;
+  private JComboBox lineEnding;
+  private JLabel lineEndingLabel;
+  private JCheckBox quoteAlways;
+  private JTextField quoteChar;
+  private JLabel quoteCharLabel;
 
-		// The constructor will setup the necessary actions
-		new QuoteSettingVerifier((QuoteEscapeSelector)escapeSelect, quoteAlways);
+  public TextOptionsPanel() {
+    super();
+    initComponents();
+    populateEscapeRange((WbComboBox) escapeRange);
 
-		StringBuilder formatList = new StringBuilder(20);
-		boolean first = true;
-		for (ControlFileFormat format : ControlFileFormat.values())
-		{
-			if (format == ControlFileFormat.none) continue;
-			if (first)
-			{
-				first = false;
-			}
-			else
-			{
-				formatList.append(',');
-			}
-			formatList.append(format.toString());
-		}
-		String tip = ResourceMgr.getFormattedString("d_LblFmtFiles", formatList.toString());
-		controlFiles.setToolTipText(tip);
-		ctrlFileLabel.setToolTipText(tip);
+    // The constructor will setup the necessary actions
+    new QuoteSettingVerifier((QuoteEscapeSelector) escapeSelect, quoteAlways);
 
-		List<String> bTypes = CollectionUtil.arrayList(
-			BlobMode.AnsiLiteral.getTypeString(),
-			BlobMode.SaveToFile.getTypeString(),
-			BlobMode.Base64.getTypeString(),
-			BlobMode.DbmsLiteral.getTypeString());
+    StringBuilder formatList = new StringBuilder(20);
+    boolean first = true;
+    for (ControlFileFormat format : ControlFileFormat.values()) {
+      if (format == ControlFileFormat.none) continue;
+      if (first) {
+        first = false;
+      } else {
+        formatList.append(',');
+      }
+      formatList.append(format.toString());
+    }
+    String tip = ResourceMgr.getFormattedString("d_LblFmtFiles", formatList.toString());
+    controlFiles.setToolTipText(tip);
+    ctrlFileLabel.setToolTipText(tip);
 
-		ComboBoxModel blobModel = new DefaultComboBoxModel(bTypes.toArray());
-		blobTypes.setModel(blobModel);
-		blobTypes.setSelectedItem(BlobMode.SaveToFile.toString());
+    List<String> bTypes = CollectionUtil.arrayList(
+        BlobMode.AnsiLiteral.getTypeString(),
+        BlobMode.SaveToFile.getTypeString(),
+        BlobMode.Base64.getTypeString(),
+        BlobMode.DbmsLiteral.getTypeString());
 
-		GridBagLayout layout = (GridBagLayout)getLayout();
-		GridBagConstraints c = layout.getConstraints(extOptionsPanel);
-		remove(extOptionsPanel);
-		FoldingPanel p = new FoldingPanel(extOptionsPanel);
-		add(p, c);
-		invalidate();
-	}
+    ComboBoxModel blobModel = new DefaultComboBoxModel(bTypes.toArray());
+    blobTypes.setModel(blobModel);
+    blobTypes.setSelectedItem(BlobMode.SaveToFile.toString());
 
-	public static void populateEscapeRange(WbComboBox combo)
-	{
-		CharacterRange[] ranges = CharacterRange.getRanges();
+    GridBagLayout layout = (GridBagLayout) getLayout();
+    GridBagConstraints c = layout.getConstraints(extOptionsPanel);
+    remove(extOptionsPanel);
+    FoldingPanel p = new FoldingPanel(extOptionsPanel);
+    add(p, c);
+    invalidate();
+  }
 
-		Font f = combo.getFont();
+  public static void populateEscapeRange(WbComboBox combo) {
+    CharacterRange[] ranges = CharacterRange.getRanges();
 
-		int width = 0;
-		int maxwidth = 0;
+    Font f = combo.getFont();
 
-		for (int i = 0; i < ranges.length; i++)
-		{
-			combo.addItem(ranges[i]);
-			if (f != null)
-			{
-				FontMetrics fm = combo.getFontMetrics(f);
-				if (fm != null)
-				{
-					int w = fm.stringWidth(ranges[i].toString());
-					if (i == 0)
-					{
-						width = w;
-					}
-					if (w > maxwidth)
-					{
-						maxwidth = w;
-					}
-				}
-			}
-		}
+    int width = 0;
+    int maxwidth = 0;
 
-		if (width == 0)
-		{
-			width = 50;
-		}
+    for (int i = 0; i < ranges.length; i++) {
+      combo.addItem(ranges[i]);
+      if (f != null) {
+        FontMetrics fm = combo.getFontMetrics(f);
+        if (fm != null) {
+          int w = fm.stringWidth(ranges[i].toString());
+          if (i == 0) {
+            width = w;
+          }
+          if (w > maxwidth) {
+            maxwidth = w;
+          }
+        }
+      }
+    }
 
-		Dimension pref = combo.getPreferredSize();
-		int prefWidth = (int) pref.getWidth();
+    if (width == 0) {
+      width = 50;
+    }
 
-		int add = prefWidth - maxwidth;
-		width += add;
+    Dimension pref = combo.getPreferredSize();
+    int prefWidth = (int) pref.getWidth();
 
-		Dimension max = new Dimension(width, (int) pref.getHeight());
-		combo.setMaximumSize(max);
-		combo.setPreferredSize(max);
-		combo.setPopupWidth(prefWidth);
-	}
+    int add = prefWidth - maxwidth;
+    width += add;
 
-	public void saveSettings()
-	{
-		Settings s = Settings.getInstance();
-		//s.setProperty("workbench.export.text.cleanup", this.getCleanupCarriageReturns());
-		s.setProperty("workbench.export.text.includeheader", this.getExportHeaders());
-		s.setProperty("workbench.export.text.quotealways", this.getQuoteAlways());
-		s.setProperty("workbench.export.text.escaperange", this.getEscapeRange().getId());
-		s.setProperty("workbench.export.text.lineending", (String)this.lineEnding.getSelectedItem());
-		s.setProperty("workbench.export.text.decimal", getDecimalSymbol());
-		s.setDefaultTextDelimiter(this.getTextDelimiter());
-		s.setQuoteChar(this.getTextQuoteChar());
-		s.setProperty("workbench.export.text.quote.escape", getQuoteEscaping().toString());
-		s.setProperty("workbench.export.text.formatfiles", controlFiles.getText());
-		s.setProperty("workbench.export.text.blobmode", this.getBlobMode().getTypeString());
+    Dimension max = new Dimension(width, (int) pref.getHeight());
+    combo.setMaximumSize(max);
+    combo.setPreferredSize(max);
+    combo.setPopupWidth(prefWidth);
+  }
 
-	}
+  public void saveSettings() {
+    Settings s = Settings.getInstance();
+    //s.setProperty("workbench.export.text.cleanup", this.getCleanupCarriageReturns());
+    s.setProperty("workbench.export.text.includeheader", this.getExportHeaders());
+    s.setProperty("workbench.export.text.quotealways", this.getQuoteAlways());
+    s.setProperty("workbench.export.text.escaperange", this.getEscapeRange().getId());
+    s.setProperty("workbench.export.text.lineending", (String) this.lineEnding.getSelectedItem());
+    s.setProperty("workbench.export.text.decimal", getDecimalSymbol());
+    s.setDefaultTextDelimiter(this.getTextDelimiter());
+    s.setQuoteChar(this.getTextQuoteChar());
+    s.setProperty("workbench.export.text.quote.escape", getQuoteEscaping().toString());
+    s.setProperty("workbench.export.text.formatfiles", controlFiles.getText());
+    s.setProperty("workbench.export.text.blobmode", this.getBlobMode().getTypeString());
 
-	public void restoreSettings()
-	{
-		Settings s = Settings.getInstance();
-		//this.setCleanupCarriageReturns(s.getBoolProperty("workbench.export.text.cleanup"));
-		this.setExportHeaders(s.getBoolProperty("workbench.export.text.includeheader"));
-		this.setQuoteAlways(s.getBoolProperty("workbench.export.text.quotealways"));
-		int id = s.getIntProperty("workbench.export.text.escaperange", CharacterRange.RANGE_NONE.getId());
-		CharacterRange range = CharacterRange.getRangeById(id);
-		this.setEscapeRange(range);
-		this.setLineEnding(s.getProperty("workbench.export.text.lineending", "LF"));
-		this.setTextQuoteChar(s.getQuoteChar());
-		this.setTextDelimiter(s.getDefaultTextDelimiter(true));
-		setDecimalSymbol(s.getProperty("workbench.export.text.decimal", s.getDecimalSymbol()));
-		String quote = s.getProperty("workbench.export.text.quote.escape", "none");
-		QuoteEscapeType escape = null;
-		try
-		{
-			escape = QuoteEscapeType.valueOf(quote);
-		}
-		catch (Exception e)
-		{
-			escape = QuoteEscapeType.none;
-		}
-		((QuoteEscapeSelector)escapeSelect).setEscapeType(escape);
-		controlFiles.setText(s.getProperty("workbench.export.text.formatfiles", ""));
-		String type = s.getProperty("workbench.export.text.blobmode", BlobMode.SaveToFile.getTypeString());
-		this.blobTypes.setSelectedItem(type);
-	}
+  }
 
-	@Override
-	public BlobMode getBlobMode()
-	{
-		String type = (String)blobTypes.getSelectedItem();
-		BlobMode mode = BlobMode.getMode(type);
-		return mode;
-	}
+  public void restoreSettings() {
+    Settings s = Settings.getInstance();
+    //this.setCleanupCarriageReturns(s.getBoolProperty("workbench.export.text.cleanup"));
+    this.setExportHeaders(s.getBoolProperty("workbench.export.text.includeheader"));
+    this.setQuoteAlways(s.getBoolProperty("workbench.export.text.quotealways"));
+    int id = s.getIntProperty("workbench.export.text.escaperange", CharacterRange.RANGE_NONE.getId());
+    CharacterRange range = CharacterRange.getRangeById(id);
+    this.setEscapeRange(range);
+    this.setLineEnding(s.getProperty("workbench.export.text.lineending", "LF"));
+    this.setTextQuoteChar(s.getQuoteChar());
+    this.setTextDelimiter(s.getDefaultTextDelimiter(true));
+    setDecimalSymbol(s.getProperty("workbench.export.text.decimal", s.getDecimalSymbol()));
+    String quote = s.getProperty("workbench.export.text.quote.escape", "none");
+    QuoteEscapeType escape = null;
+    try {
+      escape = QuoteEscapeType.valueOf(quote);
+    } catch (Exception e) {
+      escape = QuoteEscapeType.none;
+    }
+    ((QuoteEscapeSelector) escapeSelect).setEscapeType(escape);
+    controlFiles.setText(s.getProperty("workbench.export.text.formatfiles", ""));
+    String type = s.getProperty("workbench.export.text.blobmode", BlobMode.SaveToFile.getTypeString());
+    this.blobTypes.setSelectedItem(type);
+  }
 
-	@Override
-	public QuoteEscapeType getQuoteEscaping()
-	{
-		return ((QuoteEscapeSelector)escapeSelect).getEscapeType();
-	}
+  @Override
+  public BlobMode getBlobMode() {
+    String type = (String) blobTypes.getSelectedItem();
+    BlobMode mode = BlobMode.getMode(type);
+    return mode;
+  }
 
-	@Override
-	public void setDecimalSymbol(String symbol)
-	{
-		this.decimalChar.setText(symbol);
-	}
+  @Override
+  public QuoteEscapeType getQuoteEscaping() {
+    return ((QuoteEscapeSelector) escapeSelect).getEscapeType();
+  }
 
-	@Override
-	public String getDecimalSymbol()
-	{
-		return decimalChar.getText();
-	}
+  @Override
+  public String getDecimalSymbol() {
+    return decimalChar.getText();
+  }
 
-	@Override
-	public boolean getExportHeaders()
-	{
-		return this.exportHeaders.isSelected();
-	}
+  @Override
+  public void setDecimalSymbol(String symbol) {
+    this.decimalChar.setText(symbol);
+  }
 
-	@Override
-	public String getTextDelimiter()
-	{
-		return this.delimiter.getText();
-	}
+  @Override
+  public boolean getExportHeaders() {
+    return this.exportHeaders.isSelected();
+  }
 
-	@Override
-	public String getTextQuoteChar()
-	{
-		return this.quoteChar.getText();
-	}
+  @Override
+  public void setExportHeaders(boolean flag) {
+    this.exportHeaders.setSelected(flag);
+  }
 
-	@Override
-	public void setExportHeaders(boolean flag)
-	{
-		this.exportHeaders.setSelected(flag);
-	}
+  @Override
+  public String getTextDelimiter() {
+    return this.delimiter.getText();
+  }
 
-	@Override
-	public void setTextDelimiter(String delim)
-	{
-		this.delimiter.setText(delim);
-	}
+  @Override
+  public void setTextDelimiter(String delim) {
+    this.delimiter.setText(delim);
+  }
 
-	@Override
-	public void setTextQuoteChar(String quote)
-	{
-		this.quoteChar.setText(quote);
-	}
+  @Override
+  public String getTextQuoteChar() {
+    return this.quoteChar.getText();
+  }
 
-	@Override
-	public boolean getQuoteAlways()
-	{
-		if (!quoteAlways.isEnabled()) return false;
-		return this.quoteAlways.isSelected();
-	}
+  @Override
+  public void setTextQuoteChar(String quote) {
+    this.quoteChar.setText(quote);
+  }
 
-	@Override
-	public void setQuoteAlways(boolean flag)
-	{
-		this.quoteAlways.setSelected(flag);
-	}
+  @Override
+  public boolean getQuoteAlways() {
+    if (!quoteAlways.isEnabled()) return false;
+    return this.quoteAlways.isSelected();
+  }
 
-	@Override
-	public void setEscapeType(CharacterEscapeType type)
-	{
-	}
+  @Override
+  public void setQuoteAlways(boolean flag) {
+    this.quoteAlways.setSelected(flag);
+  }
 
-	@Override
-	public CharacterEscapeType getEscapeType()
-	{
-		return CharacterEscapeType.unicode;
-	}
+  @Override
+  public CharacterEscapeType getEscapeType() {
+    return CharacterEscapeType.unicode;
+  }
 
-	@Override
-	public void setEscapeRange(CharacterRange range)
-	{
-		this.escapeRange.setSelectedItem(range);
-	}
+  @Override
+  public void setEscapeType(CharacterEscapeType type) {
+  }
 
-	@Override
-	public CharacterRange getEscapeRange()
-	{
-		return (CharacterRange)this.escapeRange.getSelectedItem();
-	}
+  @Override
+  public CharacterRange getEscapeRange() {
+    return (CharacterRange) this.escapeRange.getSelectedItem();
+  }
 
-	@Override
-	public String getLineEnding()
-	{
-		String s = (String)lineEnding.getSelectedItem();
-		if ("LF".equals(s))
-		{
-			return "\n";
-		}
-		else if ("CRLF".equals(s))
-		{
-			return "\r\n";
-		}
-		else
-		{
-			return StringUtil.LINE_TERMINATOR;
-		}
-	}
+  @Override
+  public void setEscapeRange(CharacterRange range) {
+    this.escapeRange.setSelectedItem(range);
+  }
 
-	@Override
-	public void setLineEnding(String ending)
-	{
-		if (ending == null) return;
-		if ("\n".equals(ending))
-		{
-			lineEnding.setSelectedItem("LF");
-		}
-		else if ("\r\n".equals(ending))
-		{
-			lineEnding.setSelectedItem("CRLF");
-		}
-		else
-		{
-			lineEnding.setSelectedItem(ending.toUpperCase());
-		}
-	}
+  @Override
+  public String getLineEnding() {
+    String s = (String) lineEnding.getSelectedItem();
+    if ("LF".equals(s)) {
+      return "\n";
+    } else if ("CRLF".equals(s)) {
+      return "\r\n";
+    } else {
+      return StringUtil.LINE_TERMINATOR;
+    }
+  }
 
-	@Override
-	public Set<ControlFileFormat> getControlFiles()
-	{
-		String values = controlFiles.getText();
-		try
-		{
-			Set<ControlFileFormat> formats = ControlFileFormat.parseCommandLine(values);
-			return formats;
-		}
-		catch (WrongFormatFileException wf)
-		{
-			String error = ResourceMgr.getFormattedString("ErrExpWrongCtl", wf.getFormat());
-			WbSwingUtilities.showErrorMessage(error);
-		}
-		return Collections.emptySet();
-	}
+  @Override
+  public void setLineEnding(String ending) {
+    if (ending == null) return;
+    if ("\n".equals(ending)) {
+      lineEnding.setSelectedItem("LF");
+    } else if ("\r\n".equals(ending)) {
+      lineEnding.setSelectedItem("CRLF");
+    } else {
+      lineEnding.setSelectedItem(ending.toUpperCase());
+    }
+  }
 
-	/** This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
+  @Override
+  public Set<ControlFileFormat> getControlFiles() {
+    String values = controlFiles.getText();
+    try {
+      Set<ControlFileFormat> formats = ControlFileFormat.parseCommandLine(values);
+      return formats;
+    } catch (WrongFormatFileException wf) {
+      String error = ResourceMgr.getFormattedString("ErrExpWrongCtl", wf.getFormat());
+      WbSwingUtilities.showErrorMessage(error);
+    }
+    return Collections.emptySet();
+  }
+
+  /**
+   * This method is called from within the constructor to
+   * initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is
+   * always regenerated by the Form Editor.
+   */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents()
-  {
+  private void initComponents() {
     GridBagConstraints gridBagConstraints;
 
     delimiterLabel = new JLabel();
@@ -446,7 +397,7 @@ public class TextOptionsPanel
     gridBagConstraints.insets = new Insets(1, 4, 0, 4);
     add(lineEndingLabel, gridBagConstraints);
 
-    lineEnding.setModel(new DefaultComboBoxModel(new String[] { "LF", "CRLF" }));
+    lineEnding.setModel(new DefaultComboBoxModel(new String[]{"LF", "CRLF"}));
     gridBagConstraints = new GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 2;
@@ -550,28 +501,6 @@ public class TextOptionsPanel
     gridBagConstraints.weighty = 1.0;
     add(extOptionsPanel, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
-
-
-  // Variables declaration - do not modify//GEN-BEGIN:variables
-  private JComboBox blobTypes;
-  private JLabel blobTypesLabel;
-  private JTextField controlFiles;
-  private JLabel ctrlFileLabel;
-  private JTextField decimalChar;
-  private JLabel decimalLabel;
-  private JTextField delimiter;
-  private JLabel delimiterLabel;
-  private JLabel escapeLabel;
-  private JComboBox escapeRange;
-  private JComboBox escapeSelect;
-  private JCheckBox exportHeaders;
-  private JPanel extOptionsPanel;
-  private JLabel jLabel1;
-  private JComboBox lineEnding;
-  private JLabel lineEndingLabel;
-  private JCheckBox quoteAlways;
-  private JTextField quoteChar;
-  private JLabel quoteCharLabel;
   // End of variables declaration//GEN-END:variables
 
 

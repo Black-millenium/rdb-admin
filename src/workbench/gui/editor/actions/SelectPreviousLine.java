@@ -25,17 +25,14 @@ package workbench.gui.editor.actions;
 import java.awt.event.KeyEvent;
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class SelectPreviousLine
-	extends PreviousLine
-{
+    extends PreviousLine {
 
-	public SelectPreviousLine()
-	{
-		super("TxtEdPrvLineSel", KeyEvent.VK_UP, KeyEvent.SHIFT_MASK);
-		select = true;
-	}
+  public SelectPreviousLine() {
+    super("TxtEdPrvLineSel", KeyEvent.VK_UP, KeyEvent.SHIFT_MASK);
+    select = true;
+  }
 
 }

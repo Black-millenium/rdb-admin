@@ -22,15 +22,14 @@
  */
 package workbench.db.shutdown;
 
-import java.sql.SQLException;
 import workbench.db.WbConnection;
 
+import java.sql.SQLException;
+
 /**
- *
  * @author Thomas Kellerer
  */
-public interface DbShutdownHook
-{
-	void shutdown(WbConnection con)
-		throws SQLException;
+public interface DbShutdownHook {
+  void shutdown(WbConnection con)
+      throws SQLException;
 }

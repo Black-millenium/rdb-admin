@@ -22,193 +22,159 @@
  */
 package workbench.sql.wbcommands;
 
+import workbench.liquibase.ChangeSetIdentifier;
+import workbench.liquibase.LiquibaseParser;
+import workbench.resource.ResourceMgr;
+import workbench.sql.SqlCommand;
+import workbench.sql.StatementRunnerResult;
+import workbench.sql.parser.ParserType;
+import workbench.storage.RowActionMonitor;
+import workbench.util.*;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import workbench.liquibase.ChangeSetIdentifier;
-import workbench.liquibase.LiquibaseParser;
-import workbench.resource.ResourceMgr;
-
-import workbench.storage.RowActionMonitor;
-
-import workbench.sql.parser.ParserType;
-import workbench.sql.SqlCommand;
-import workbench.sql.StatementRunnerResult;
-
-import workbench.util.ArgumentParser;
-import workbench.util.ArgumentType;
-import workbench.util.CollectionUtil;
-import workbench.util.ExceptionUtil;
-import workbench.util.MessageBuffer;
-import workbench.util.WbFile;
-
 /**
  * A command to run/include the SQL (<sql> or <createProcedure> tag) of a single Liquibase changeset
  *
- * @author  Thomas Kellerer
+ * @author Thomas Kellerer
  */
 public class WbRunLB
-	extends SqlCommand
-{
-	public static final String VERB = "WbRunLB";
+    extends SqlCommand {
+  public static final String VERB = "WbRunLB";
 
-	public static final String ARG_CHANGESET = "changeSet";
+  public static final String ARG_CHANGESET = "changeSet";
 
-	public WbRunLB()
-	{
-		super();
-		cmdLine = new ArgumentParser();
-		cmdLine.addArgument(CommonArgs.ARG_FILE, ArgumentType.Filename);
-		cmdLine.addArgument(CommonArgs.ARG_CONTINUE, ArgumentType.BoolArgument);
-		cmdLine.addArgument(ARG_CHANGESET, ArgumentType.Repeatable);
-		cmdLine.addArgument(CommonArgs.ARG_VERBOSE, ArgumentType.BoolSwitch);
-		CommonArgs.addEncodingParameter(cmdLine);
-		isUpdatingCommand = true;
-	}
+  public WbRunLB() {
+    super();
+    cmdLine = new ArgumentParser();
+    cmdLine.addArgument(CommonArgs.ARG_FILE, ArgumentType.Filename);
+    cmdLine.addArgument(CommonArgs.ARG_CONTINUE, ArgumentType.BoolArgument);
+    cmdLine.addArgument(ARG_CHANGESET, ArgumentType.Repeatable);
+    cmdLine.addArgument(CommonArgs.ARG_VERBOSE, ArgumentType.BoolSwitch);
+    CommonArgs.addEncodingParameter(cmdLine);
+    isUpdatingCommand = true;
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	protected boolean isConnectionRequired()
-	{
-		return true;
-	}
+  @Override
+  protected boolean isConnectionRequired() {
+    return true;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String aSql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult(aSql);
-		result.setSuccess();
+  @Override
+  public StatementRunnerResult execute(String aSql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult(aSql);
+    result.setSuccess();
 
-		boolean checkParameters = true;
+    boolean checkParameters = true;
 
-		cmdLine.parse(getCommandLine(aSql));
-		WbFile file = null;
-		if (cmdLine.hasArguments())
-		{
-			file = evaluateFileArgument(cmdLine.getValue(CommonArgs.ARG_FILE));
-		}
-		else
-		{
-			file = evaluateFileArgument(getCommandLine(aSql));
-			checkParameters = false;
-		}
+    cmdLine.parse(getCommandLine(aSql));
+    WbFile file = null;
+    if (cmdLine.hasArguments()) {
+      file = evaluateFileArgument(cmdLine.getValue(CommonArgs.ARG_FILE));
+    } else {
+      file = evaluateFileArgument(getCommandLine(aSql));
+      checkParameters = false;
+    }
 
-		if (file == null)
-		{
-			String msg = ResourceMgr.getString("ErrLBWrongParameter");
-			result.addMessage(msg);
-			result.setFailure();
-			return result;
-		}
+    if (file == null) {
+      String msg = ResourceMgr.getString("ErrLBWrongParameter");
+      result.addMessage(msg);
+      result.setFailure();
+      return result;
+    }
 
-		if (!file.exists())
-		{
-			result.setFailure();
-			String msg = ResourceMgr.getFormattedString("ErrFileNotFound", file.getFullPath());
-			result.addMessage(msg);
-			return result;
-		}
+    if (!file.exists()) {
+      result.setFailure();
+      String msg = ResourceMgr.getFormattedString("ErrFileNotFound", file.getFullPath());
+      result.addMessage(msg);
+      return result;
+    }
 
-		boolean continueOnError = checkParameters ? cmdLine.getBoolean(CommonArgs.ARG_CONTINUE, false) : false;
-		boolean verbose = checkParameters ? cmdLine.getBoolean(CommonArgs.ARG_VERBOSE, false) : false;
+    boolean continueOnError = checkParameters ? cmdLine.getBoolean(CommonArgs.ARG_CONTINUE, false) : false;
+    boolean verbose = checkParameters ? cmdLine.getBoolean(CommonArgs.ARG_VERBOSE, false) : false;
 
-		List<String> idStrings = checkParameters ? cmdLine.getListValue(ARG_CHANGESET) : null;
-		List<ChangeSetIdentifier> ids = null;
+    List<String> idStrings = checkParameters ? cmdLine.getListValue(ARG_CHANGESET) : null;
+    List<ChangeSetIdentifier> ids = null;
 
-		if (CollectionUtil.isNonEmpty(idStrings))
-		{
-			ids = new ArrayList<>(idStrings.size());
-			for (String param : idStrings)
-			{
-				ChangeSetIdentifier id = new ChangeSetIdentifier(param);
-				ids.add(id);
-			}
-		}
+    if (CollectionUtil.isNonEmpty(idStrings)) {
+      ids = new ArrayList<>(idStrings.size());
+      for (String param : idStrings) {
+        ChangeSetIdentifier id = new ChangeSetIdentifier(param);
+        ids.add(id);
+      }
+    }
 
-		String encoding = checkParameters ? cmdLine.getValue(CommonArgs.ARG_ENCODING, "UTF-8") : "UTF-8";
+    String encoding = checkParameters ? cmdLine.getValue(CommonArgs.ARG_ENCODING, "UTF-8") : "UTF-8";
 
-		if (checkParameters)
-		{
-			setUnknownMessage(result, cmdLine, null);
-		}
+    if (checkParameters) {
+      setUnknownMessage(result, cmdLine, null);
+    }
 
 
-		boolean oldVerbose = runner.getVerboseLogging();
-		try
-		{
-			runner.setVerboseLogging(verbose);
-			MessageBuffer messages = new MessageBuffer();
-			ParserType parserType = ParserType.getTypeFromConnection(currentConnection);
-			LiquibaseParser lb = new LiquibaseParser(file, encoding, messages, parserType);
+    boolean oldVerbose = runner.getVerboseLogging();
+    try {
+      runner.setVerboseLogging(verbose);
+      MessageBuffer messages = new MessageBuffer();
+      ParserType parserType = ParserType.getTypeFromConnection(currentConnection);
+      LiquibaseParser lb = new LiquibaseParser(file, encoding, messages, parserType);
 
-			List<String> statements = lb.getContentFromChangeSet(ids);
-			rowMonitor.setMonitorType(RowActionMonitor.MONITOR_PLAIN);
+      List<String> statements = lb.getContentFromChangeSet(ids);
+      rowMonitor.setMonitorType(RowActionMonitor.MONITOR_PLAIN);
 
-			for (int i=0; i < statements.size(); i++)
-			{
-				String sql = statements.get(i);
-				rowMonitor.setCurrentRow(i, statements.size());
-				runner.runStatement(sql);
-				StatementRunnerResult stmtResult = runner.getResult();
-				result.addMessage(stmtResult.getMessageBuffer());
-				result.addMessageNewLine();
+      for (int i = 0; i < statements.size(); i++) {
+        String sql = statements.get(i);
+        rowMonitor.setCurrentRow(i, statements.size());
+        runner.runStatement(sql);
+        StatementRunnerResult stmtResult = runner.getResult();
+        result.addMessage(stmtResult.getMessageBuffer());
+        result.addMessageNewLine();
 
-				if (!stmtResult.isSuccess() && !continueOnError)
-				{
-					result.setFailure();
-					break;
-				}
-			}
+        if (!stmtResult.isSuccess() && !continueOnError) {
+          result.setFailure();
+          break;
+        }
+      }
 
-			if (this.rowMonitor != null)
-			{
-				this.rowMonitor.jobFinished();
-			}
+      if (this.rowMonitor != null) {
+        this.rowMonitor.jobFinished();
+      }
 
-			if (messages.getLength() > 0)
-			{
-				result.addMessage(messages);
-				result.setWarning(true);
-			}
-		}
-		catch (Exception th)
-		{
-			result.setFailure();
-			result.addMessage(ExceptionUtil.getDisplay(th));
-		}
-		finally
-		{
-			runner.setVerboseLogging(oldVerbose);
-		}
-		return result;
-	}
+      if (messages.getLength() > 0) {
+        result.addMessage(messages);
+        result.setWarning(true);
+      }
+    } catch (Exception th) {
+      result.setFailure();
+      result.addMessage(ExceptionUtil.getDisplay(th));
+    } finally {
+      runner.setVerboseLogging(oldVerbose);
+    }
+    return result;
+  }
 
-	@Override
-	public void done()
-	{
-		// nothing to do
-	}
+  @Override
+  public void done() {
+    // nothing to do
+  }
 
-	@Override
-	public void cancel()
-		throws SQLException
-	{
-		if (runner != null)
-		{
-			runner.cancel();
-		}
-	}
+  @Override
+  public void cancel()
+      throws SQLException {
+    if (runner != null) {
+      runner.cancel();
+    }
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 }

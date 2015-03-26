@@ -22,87 +22,78 @@
  */
 package workbench.db;
 
+import workbench.resource.Settings;
+import workbench.util.StringUtil;
+
 import java.util.Set;
 import java.util.TreeSet;
 
-import workbench.resource.Settings;
-
-import workbench.util.StringUtil;
-
 /**
- *
  * @author Thomas Kellerer
  */
-public interface TransactionChecker
-{
-	boolean hasUncommittedChanges(WbConnection con);
+public interface TransactionChecker {
+  /**
+   * Dummy implementation that does no checking at all.
+   */
+  TransactionChecker NO_CHECK = new TransactionChecker() {
+    /**
+     * Always returns false.
+     * @return false
+     */
+    @Override
+    public boolean hasUncommittedChanges(WbConnection con) {
+      return false;
+    }
+  };
 
-	/**
-	 * Dummy implementation that does no checking at all.
-	 */
-	TransactionChecker NO_CHECK = new TransactionChecker()
-	{
-		/**
-		 * Always returns false.
-		 * @return false
-		 */
-		@Override
-		public boolean hasUncommittedChanges(WbConnection con)
-		{
-			return false;
-		}
-	};
+  boolean hasUncommittedChanges(WbConnection con);
 
-	/**
-	 * Factory for creating a DBMS specific TransactionChecker instance.
-	 *
-	 * Currently only one implementation is available which takes a SQL query defined
-	 * in workbench.settings to count the number of open transactions.
-	 *
-	 * @see DbSettings#checkOpenTransactionsQuery()
-	 * @see DefaultTransactionChecker
-	 * @see ConnectionProfile#getDetectOpenTransaction()
-	 */
-	class Factory
-	{
-		/**
-		 * Returns a TransactionChecker for the given connection.
-		 *
-		 * @param con the connection
-		 * @return the TransactionChecker, never null
-		 */
-		public static TransactionChecker createChecker(WbConnection con)
-		{
-			if (con == null) return NO_CHECK;
-			DbSettings db = con.getDbSettings();
-			if (db == null) return NO_CHECK;
+  /**
+   * Factory for creating a DBMS specific TransactionChecker instance.
+   * <p/>
+   * Currently only one implementation is available which takes a SQL query defined
+   * in workbench.settings to count the number of open transactions.
+   *
+   * @see DbSettings#checkOpenTransactionsQuery()
+   * @see DefaultTransactionChecker
+   * @see ConnectionProfile#getDetectOpenTransaction()
+   */
+  class Factory {
+    /**
+     * Returns a TransactionChecker for the given connection.
+     *
+     * @param con the connection
+     * @return the TransactionChecker, never null
+     */
+    public static TransactionChecker createChecker(WbConnection con) {
+      if (con == null) return NO_CHECK;
+      DbSettings db = con.getDbSettings();
+      if (db == null) return NO_CHECK;
 
-			String sql = db.checkOpenTransactionsQuery();
+      String sql = db.checkOpenTransactionsQuery();
 
-			if (sql != null)
-			{
-				return new DefaultTransactionChecker(sql);
-			}
-			return NO_CHECK;
-		}
+      if (sql != null) {
+        return new DefaultTransactionChecker(sql);
+      }
+      return NO_CHECK;
+    }
 
-		/**
-		 * Checks if the given DriverClass supports detecting uncommitted changes.
-		 *
-		 * This is used to hide/show the profile checkbox in the connection dialog.
-		 * Before a connection is made no DbSettings are available, therefor
-		 * the presence of the configured SQL statement cannot be checked.
-		 *
-		 * @param driverClass the driver to check
-		 * @return true if detecting uncommitted changes is supported.
-		 */
-		public static boolean supportsTransactionCheck(String driverClass)
-		{
-			if (StringUtil.isBlank(driverClass)) return false;
-			Set<String> drivers = new TreeSet<>();
-			drivers.addAll(Settings.getInstance().getListProperty("workbench.db.drivers.opentransaction.check.builtin", false));
-			drivers.addAll(Settings.getInstance().getListProperty("workbench.db.drivers.opentransaction.check", false));
-			return drivers.contains(driverClass);
-		}
-	}
+    /**
+     * Checks if the given DriverClass supports detecting uncommitted changes.
+     * <p/>
+     * This is used to hide/show the profile checkbox in the connection dialog.
+     * Before a connection is made no DbSettings are available, therefor
+     * the presence of the configured SQL statement cannot be checked.
+     *
+     * @param driverClass the driver to check
+     * @return true if detecting uncommitted changes is supported.
+     */
+    public static boolean supportsTransactionCheck(String driverClass) {
+      if (StringUtil.isBlank(driverClass)) return false;
+      Set<String> drivers = new TreeSet<>();
+      drivers.addAll(Settings.getInstance().getListProperty("workbench.db.drivers.opentransaction.check.builtin", false));
+      drivers.addAll(Settings.getInstance().getListProperty("workbench.db.drivers.opentransaction.check", false));
+      return drivers.contains(driverClass);
+    }
+  }
 }

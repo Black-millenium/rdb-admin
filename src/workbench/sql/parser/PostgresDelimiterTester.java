@@ -20,90 +20,75 @@
 package workbench.sql.parser;
 
 
-
 import workbench.sql.DelimiterDefinition;
 import workbench.sql.lexer.SQLToken;
 
 
 /**
- *
  * @author Thomas Kellerer
  */
 public class PostgresDelimiterTester
-	implements DelimiterTester
-{
-	private SQLToken firstToken;
-	private DelimiterDefinition defaultDelimiter = DelimiterDefinition.STANDARD_DELIMITER;
+    implements DelimiterTester {
+  private SQLToken firstToken;
+  private DelimiterDefinition defaultDelimiter = DelimiterDefinition.STANDARD_DELIMITER;
 
-	public PostgresDelimiterTester()
-	{
-	}
+  public PostgresDelimiterTester() {
+  }
 
-	@Override
-	public void setDelimiter(DelimiterDefinition delim)
-	{
-		this.defaultDelimiter = delim;
-	}
+  @Override
+  public void setDelimiter(DelimiterDefinition delim) {
+    this.defaultDelimiter = delim;
+  }
 
-	@Override
-	public boolean supportsMixedDelimiters()
-	{
-		return false;
-	}
+  @Override
+  public boolean supportsMixedDelimiters() {
+    return false;
+  }
 
-	@Override
-	public void setAlternateDelimiter(DelimiterDefinition delimiter)
-	{
-	}
+  @Override
+  public void setAlternateDelimiter(DelimiterDefinition delimiter) {
+  }
 
-	@Override
-	public void currentToken(SQLToken token, boolean isStartOfStatement)
-	{
-		if (token == null) return;
-		if (token.isComment() || token.isWhiteSpace()) return;
+  @Override
+  public void currentToken(SQLToken token, boolean isStartOfStatement) {
+    if (token == null) return;
+    if (token.isComment() || token.isWhiteSpace()) return;
 
-		if (firstToken == null)
-		{
-			firstToken = token;
-		}
-	}
+    if (firstToken == null) {
+      firstToken = token;
+    }
+  }
 
-	@Override
-	public DelimiterDefinition getCurrentDelimiter()
-	{
-		if (defaultDelimiter != null) return defaultDelimiter;
-		return DelimiterDefinition.STANDARD_DELIMITER;
-	}
+  @Override
+  public DelimiterDefinition getCurrentDelimiter() {
+    if (defaultDelimiter != null) return defaultDelimiter;
+    return DelimiterDefinition.STANDARD_DELIMITER;
+  }
 
-	@Override
-	public void statementFinished()
-	{
-		firstToken = null;
-	}
+  @Override
+  public void statementFinished() {
+    firstToken = null;
+  }
 
-	@Override
-	public boolean supportsSingleLineStatements()
-	{
-		return true;
-	}
+  @Override
+  public boolean supportsSingleLineStatements() {
+    return true;
+  }
 
-	@Override
-	public boolean isSingleLineStatement(SQLToken token, boolean isStartOfLine)
-	{
-		if (token == null) return false;
+  @Override
+  public boolean isSingleLineStatement(SQLToken token, boolean isStartOfLine) {
+    if (token == null) return false;
 
-		if (isStartOfLine && !token.isWhiteSpace())
-		{
-			String text = token.getText();
-			char c = text.charAt(0);
-			return c == '\\' || c == '@';
-		}
-		return false;
-	}
+    if (isStartOfLine && !token.isWhiteSpace()) {
+      String text = token.getText();
+      char c = text.charAt(0);
+      return c == '\\' || c == '@';
+    }
+    return false;
+  }
 
-	@Override
-	public void lineEnd()
-	{
-	}
+  @Override
+  public void lineEnd() {
+  }
 
 }

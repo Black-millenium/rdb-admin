@@ -22,65 +22,54 @@
  */
 package workbench.sql.wbcommands.console;
 
-import java.sql.SQLException;
-
 import workbench.RunMode;
 import workbench.resource.ResourceMgr;
-
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
 
+import java.sql.SQLException;
+
 /**
- *
  * @author Thomas Kellerer
  */
 public class WbDisconnect
-	extends SqlCommand
-{
-	public static final String VERB = "WbDisconnect";
+    extends SqlCommand {
+  public static final String VERB = "WbDisconnect";
 
-	public WbDisconnect()
-	{
-		super();
-	}
+  public WbDisconnect() {
+    super();
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String aSql)
-		throws SQLException, Exception
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
-		if (this.currentConnection != null)
-		{
-			//this.currentConnection.disconnect();
-			// setConnection will call disconnect() on the "old" connection
-			this.runner.setConnection(null);
-			result.addMessage(ResourceMgr.getString("MsgDisconnected"));
-			result.setSuccess();
-		}
-		else
-		{
-			result.addMessage(ResourceMgr.getString("TxtNotConnected"));
-			result.setFailure();
-		}
-		return result;
-	}
+  @Override
+  public StatementRunnerResult execute(String aSql)
+      throws SQLException, Exception {
+    StatementRunnerResult result = new StatementRunnerResult();
+    if (this.currentConnection != null) {
+      //this.currentConnection.disconnect();
+      // setConnection will call disconnect() on the "old" connection
+      this.runner.setConnection(null);
+      result.addMessage(ResourceMgr.getString("MsgDisconnected"));
+      result.setSuccess();
+    } else {
+      result.addMessage(ResourceMgr.getString("TxtNotConnected"));
+      result.setFailure();
+    }
+    return result;
+  }
 
-	@Override
-	public boolean isModeSupported(RunMode mode)
-	{
-		return mode == RunMode.Console;
-	}
+  @Override
+  public boolean isModeSupported(RunMode mode) {
+    return mode == RunMode.Console;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 
 }

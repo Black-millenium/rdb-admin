@@ -22,24 +22,21 @@
  */
 package workbench.db;
 
+import workbench.log.LogMgr;
+import workbench.resource.Settings;
+import workbench.sql.DelimiterDefinition;
+import workbench.storage.DataStore;
+import workbench.util.CollectionUtil;
+import workbench.util.ExceptionUtil;
+import workbench.util.SqlUtil;
+import workbench.util.StringUtil;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
-
-import workbench.log.LogMgr;
-import workbench.resource.Settings;
-
-import workbench.storage.DataStore;
-
-import workbench.sql.DelimiterDefinition;
-
-import workbench.util.CollectionUtil;
-import workbench.util.ExceptionUtil;
-import workbench.util.SqlUtil;
-import workbench.util.StringUtil;
 
 /**
  * A class to read triggers from the database.
@@ -49,321 +46,281 @@ import workbench.util.StringUtil;
  * @see MetaDataSqlManager
  */
 public class DefaultTriggerReader
-	implements TriggerReader
-{
-	protected WbConnection dbConnection;
-	protected DbMetadata dbMeta;
+    implements TriggerReader {
+  protected WbConnection dbConnection;
+  protected DbMetadata dbMeta;
 
-	public DefaultTriggerReader(WbConnection conn)
-	{
-		this.dbMeta = conn.getMetadata();
-		this.dbConnection = conn;
-	}
+  public DefaultTriggerReader(WbConnection conn) {
+    this.dbMeta = conn.getMetadata();
+    this.dbConnection = conn;
+  }
 
-	/**
-	 * Return a list of triggers available in the given schema.
-	 */
-	@Override
-	public DataStore getTriggers(String catalog, String schema)
-		throws SQLException
-	{
-		return getTriggers(catalog, schema, null);
-	}
+  /**
+   * Return a list of triggers available in the given schema.
+   */
+  @Override
+  public DataStore getTriggers(String catalog, String schema)
+      throws SQLException {
+    return getTriggers(catalog, schema, null);
+  }
 
-	@Override
-	public List<TriggerDefinition> getTriggerList(String catalog, String schema, String baseTable)
-		throws SQLException
-	{
-		DataStore triggers = getTriggers(catalog, schema, baseTable);
-		List<TriggerDefinition> result = new ArrayList<>(triggers.getRowCount());
-		for (int row = 0; row < triggers.getRowCount(); row ++)
-		{
-			String trgName = triggers.getValueAsString(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_NAME);
-			String trgType = triggers.getValueAsString(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_TYPE);
-			String trgEvent = triggers.getValueAsString(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_EVENT);
-			String tableName = triggers.getValueAsString(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_TABLE);
-			String comment = triggers.getValueAsString(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_COMMENT);
-			String status = triggers.getValueAsString(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_STATUS);
-			TriggerDefinition trg = new TriggerDefinition(catalog, schema, trgName);
-			trg.setTriggerType(trgType);
-			trg.setTriggerEvent(trgEvent);
-			trg.setComment(comment);
-			trg.setStatus(status);
+  @Override
+  public List<TriggerDefinition> getTriggerList(String catalog, String schema, String baseTable)
+      throws SQLException {
+    DataStore triggers = getTriggers(catalog, schema, baseTable);
+    List<TriggerDefinition> result = new ArrayList<>(triggers.getRowCount());
+    for (int row = 0; row < triggers.getRowCount(); row++) {
+      String trgName = triggers.getValueAsString(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_NAME);
+      String trgType = triggers.getValueAsString(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_TYPE);
+      String trgEvent = triggers.getValueAsString(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_EVENT);
+      String tableName = triggers.getValueAsString(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_TABLE);
+      String comment = triggers.getValueAsString(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_COMMENT);
+      String status = triggers.getValueAsString(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_STATUS);
+      TriggerDefinition trg = new TriggerDefinition(catalog, schema, trgName);
+      trg.setTriggerType(trgType);
+      trg.setTriggerEvent(trgEvent);
+      trg.setComment(comment);
+      trg.setStatus(status);
 
-			if (tableName != null)
-			{
-				TableIdentifier tbl = new TableIdentifier(tableName);
-				trg.setRelatedTable(tbl);
-			}
-			result.add(trg);
-		}
-		return result;
-	}
-	/**
-	 *	Return the list of defined triggers for the given table.
-	 */
-	@Override
-	public DataStore getTableTriggers(TableIdentifier table)
-		throws SQLException
-	{
-		TableIdentifier tbl = table.createCopy();
-		tbl.adjustCase(this.dbConnection);
-		return getTriggers(tbl.getCatalog(), tbl.getSchema(), tbl.getTableName());
-	}
+      if (tableName != null) {
+        TableIdentifier tbl = new TableIdentifier(tableName);
+        trg.setRelatedTable(tbl);
+      }
+      result.add(trg);
+    }
+    return result;
+  }
 
-	protected DataStore getTriggers(String catalog, String schema, String tableName)
-		throws SQLException
-	{
-		final int[] types =   {Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR};
-		final int[] sizes =   {30, 30, 20, 20, 20, 10};
+  /**
+   * Return the list of defined triggers for the given table.
+   */
+  @Override
+  public DataStore getTableTriggers(TableIdentifier table)
+      throws SQLException {
+    TableIdentifier tbl = table.createCopy();
+    tbl.adjustCase(this.dbConnection);
+    return getTriggers(tbl.getCatalog(), tbl.getSchema(), tbl.getTableName());
+  }
 
-		DataStore result = new DataStore(LIST_COLUMNS, types, sizes);
+  protected DataStore getTriggers(String catalog, String schema, String tableName)
+      throws SQLException {
+    final int[] types = {Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR};
+    final int[] sizes = {30, 30, 20, 20, 20, 10};
 
-		GetMetaDataSql sql = dbMeta.getMetaDataSQLMgr().getListTriggerSql();
-		if (sql == null)
-		{
-			LogMgr.logWarning("DefaultTriggerReader.getTriggers()", "getTriggers() called but no SQL configured");
-			return result;
-		}
+    DataStore result = new DataStore(LIST_COLUMNS, types, sizes);
 
-		if ("*".equals(schema))
-		{
-			schema = null;
-		}
-		if ("*".equals(catalog))
-		{
-			catalog = null;
-		}
+    GetMetaDataSql sql = dbMeta.getMetaDataSQLMgr().getListTriggerSql();
+    if (sql == null) {
+      LogMgr.logWarning("DefaultTriggerReader.getTriggers()", "getTriggers() called but no SQL configured");
+      return result;
+    }
 
-		sql.setSchema(schema);
-		sql.setCatalog(catalog);
-		sql.setObjectName(tableName);
+    if ("*".equals(schema)) {
+      schema = null;
+    }
+    if ("*".equals(catalog)) {
+      catalog = null;
+    }
 
-		Statement stmt = this.dbConnection.createStatementForQuery();
-		String query = sql.getSql();
+    sql.setSchema(schema);
+    sql.setCatalog(catalog);
+    sql.setObjectName(tableName);
 
-		if (Settings.getInstance().getDebugMetadataSql())
-		{
-			LogMgr.logInfo("DefaultTriggerReader.getTableTriggers()", "Using query=\n" + query);
-		}
+    Statement stmt = this.dbConnection.createStatementForQuery();
+    String query = sql.getSql();
 
-		ResultSet rs = stmt.executeQuery(query);
-		try
-		{
-			int colCount = rs.getMetaData().getColumnCount();
-			boolean hasTableName =  colCount >= 4;
-			boolean hasComment = colCount >= 5;
-			boolean hasStatus = colCount >= 6;
+    if (Settings.getInstance().getDebugMetadataSql()) {
+      LogMgr.logInfo("DefaultTriggerReader.getTableTriggers()", "Using query=\n" + query);
+    }
 
-			while (rs.next())
-			{
-				int row = result.addRow();
-				String value = rs.getString(1);
-				if (!rs.wasNull() && value != null) value = value.trim();
-				result.setValue(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_NAME, value);
+    ResultSet rs = stmt.executeQuery(query);
+    try {
+      int colCount = rs.getMetaData().getColumnCount();
+      boolean hasTableName = colCount >= 4;
+      boolean hasComment = colCount >= 5;
+      boolean hasStatus = colCount >= 6;
 
-				value = rs.getString(2);
-				if (!rs.wasNull() && value != null) value = value.trim();
-				result.setValue(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_TYPE, value);
+      while (rs.next()) {
+        int row = result.addRow();
+        String value = rs.getString(1);
+        if (!rs.wasNull() && value != null) value = value.trim();
+        result.setValue(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_NAME, value);
 
-				value = rs.getString(3);
-				if (!rs.wasNull() && value != null) value = value.trim();
-				result.setValue(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_EVENT, value);
+        value = rs.getString(2);
+        if (!rs.wasNull() && value != null) value = value.trim();
+        result.setValue(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_TYPE, value);
 
-				if (hasTableName)
-				{
-					value = rs.getString(4);
-					if (!rs.wasNull() && value != null) value = value.trim();
-					result.setValue(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_TABLE, value);
-				}
+        value = rs.getString(3);
+        if (!rs.wasNull() && value != null) value = value.trim();
+        result.setValue(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_EVENT, value);
 
-				if (hasComment)
-				{
-					value = rs.getString(5);
-					if (!rs.wasNull() && value != null) value = value.trim();
-					result.setValue(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_COMMENT, value);
-				}
+        if (hasTableName) {
+          value = rs.getString(4);
+          if (!rs.wasNull() && value != null) value = value.trim();
+          result.setValue(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_TABLE, value);
+        }
 
-				if (hasStatus)
-				{
-					value = rs.getString(6);
-					if (!rs.wasNull() && value != null) value = value.trim();
-					result.setValue(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_STATUS, value);
-				}
-			}
-			result.resetStatus();
-		}
-		finally
-		{
-			SqlUtil.closeAll(rs, stmt);
-		}
-		return result;
-	}
+        if (hasComment) {
+          value = rs.getString(5);
+          if (!rs.wasNull() && value != null) value = value.trim();
+          result.setValue(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_COMMENT, value);
+        }
 
-	@Override
-	public TriggerDefinition findTrigger(String catalog, String schema, String name)
-		throws SQLException
-	{
-		List<TriggerDefinition> triggers = getTriggerList(catalog, schema, null);
-		if (CollectionUtil.isEmpty(triggers)) return null;
-		for (TriggerDefinition trg : triggers)
-		{
-			if (trg.getObjectName().equalsIgnoreCase(name))
-			{
-				return trg;
-			}
-		}
-		return null;
-	}
+        if (hasStatus) {
+          value = rs.getString(6);
+          if (!rs.wasNull() && value != null) value = value.trim();
+          result.setValue(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_STATUS, value);
+        }
+      }
+      result.resetStatus();
+    } finally {
+      SqlUtil.closeAll(rs, stmt);
+    }
+    return result;
+  }
 
-	@Override
-	public String getTriggerSource(TriggerDefinition trigger, boolean includeDependencies)
-		throws SQLException
-	{
-		return getTriggerSource(trigger.getCatalog(), trigger.getSchema(), trigger.getObjectName(), trigger.getRelatedTable(), trigger.getComment(), includeDependencies);
-	}
+  @Override
+  public TriggerDefinition findTrigger(String catalog, String schema, String name)
+      throws SQLException {
+    List<TriggerDefinition> triggers = getTriggerList(catalog, schema, null);
+    if (CollectionUtil.isEmpty(triggers)) return null;
+    for (TriggerDefinition trg : triggers) {
+      if (trg.getObjectName().equalsIgnoreCase(name)) {
+        return trg;
+      }
+    }
+    return null;
+  }
 
-	/**
-	 * Retrieve the SQL Source of the given trigger.
-	 *
-	 * @param triggerCatalog The catalog in which the trigger is defined. This should be null if the DBMS does not support catalogs
-	 * @param triggerSchema The schema in which the trigger is defined. This should be null if the DBMS does not support schemas
-	 * @param triggerName
-	 * @param triggerTable the table for which the trigger is defined
-	 * @throws SQLException
-	 * @return the trigger source
-	 */
-	@Override
-	public String getTriggerSource(String triggerCatalog, String triggerSchema, String triggerName, TableIdentifier triggerTable, String trgComment, boolean includeDependencies)
-		throws SQLException
-	{
-		StringBuilder result = new StringBuilder(500);
+  @Override
+  public String getTriggerSource(TriggerDefinition trigger, boolean includeDependencies)
+      throws SQLException {
+    return getTriggerSource(trigger.getCatalog(), trigger.getSchema(), trigger.getObjectName(), trigger.getRelatedTable(), trigger.getComment(), includeDependencies);
+  }
 
-		if ("*".equals(triggerCatalog)) triggerCatalog = null;
-		if ("*".equals(triggerSchema)) triggerSchema = null;
+  /**
+   * Retrieve the SQL Source of the given trigger.
+   *
+   * @param triggerCatalog The catalog in which the trigger is defined. This should be null if the DBMS does not support catalogs
+   * @param triggerSchema  The schema in which the trigger is defined. This should be null if the DBMS does not support schemas
+   * @param triggerName
+   * @param triggerTable   the table for which the trigger is defined
+   * @return the trigger source
+   * @throws SQLException
+   */
+  @Override
+  public String getTriggerSource(String triggerCatalog, String triggerSchema, String triggerName, TableIdentifier triggerTable, String trgComment, boolean includeDependencies)
+      throws SQLException {
+    StringBuilder result = new StringBuilder(500);
 
-		GetMetaDataSql sql = dbMeta.getMetaDataSQLMgr().getTriggerSourceSql();
-		if (sql == null) return StringUtil.EMPTY_STRING;
+    if ("*".equals(triggerCatalog)) triggerCatalog = null;
+    if ("*".equals(triggerSchema)) triggerSchema = null;
 
-		sql.setSchema(triggerSchema);
-		sql.setCatalog(triggerCatalog);
-		sql.setObjectName(triggerName);
+    GetMetaDataSql sql = dbMeta.getMetaDataSQLMgr().getTriggerSourceSql();
+    if (sql == null) return StringUtil.EMPTY_STRING;
 
-		if (triggerTable != null)
-		{
-			sql.setBaseObjectName(triggerTable.getTableName());
-		}
-		Statement stmt = this.dbConnection.createStatementForQuery();
-		String query = sql.getSql();
+    sql.setSchema(triggerSchema);
+    sql.setCatalog(triggerCatalog);
+    sql.setObjectName(triggerName);
 
-		if (Settings.getInstance().getDebugMetadataSql())
-		{
-			LogMgr.logInfo("DefaultTriggerReader.getTriggerSource()", "Using query=\n" + query);
-		}
+    if (triggerTable != null) {
+      sql.setBaseObjectName(triggerTable.getTableName());
+    }
+    Statement stmt = this.dbConnection.createStatementForQuery();
+    String query = sql.getSql();
 
-		String nl = Settings.getInstance().getInternalEditorLineEnding();
+    if (Settings.getInstance().getDebugMetadataSql()) {
+      LogMgr.logInfo("DefaultTriggerReader.getTriggerSource()", "Using query=\n" + query);
+    }
 
-		ResultSet rs = null;
-		try
-		{
-			stmt.execute(query);
-			rs = stmt.getResultSet();
+    String nl = Settings.getInstance().getInternalEditorLineEnding();
 
-			if (rs != null)
-			{
-				int colCount = rs.getMetaData().getColumnCount();
-				while (rs.next())
-				{
-					for (int i=1; i <= colCount; i++)
-					{
-						String line = rs.getString(i);
-						result.append(line);
-					}
-				}
-			}
+    ResultSet rs = null;
+    try {
+      stmt.execute(query);
+      rs = stmt.getResultSet();
 
-			CharSequence warn = SqlUtil.getWarnings(this.dbConnection, stmt).allWarnings;
-			if (warn != null)
-			{
-				if (result.length() > 0)
-				{
-					result.append(nl);
-					result.append(nl);
-				}
-				result.append(warn);
-			}
+      if (rs != null) {
+        int colCount = rs.getMetaData().getColumnCount();
+        while (rs.next()) {
+          for (int i = 1; i <= colCount; i++) {
+            String line = rs.getString(i);
+            result.append(line);
+          }
+        }
+      }
 
-			if (includeDependencies)
-			{
-				if (dbConnection.getDbSettings().createTriggerNeedsAlternateDelimiter())
-				{
-					DelimiterDefinition delim = dbConnection.getAlternateDelimiter();
+      CharSequence warn = SqlUtil.getWarnings(this.dbConnection, stmt).allWarnings;
+      if (warn != null) {
+        if (result.length() > 0) {
+          result.append(nl);
+          result.append(nl);
+        }
+        result.append(warn);
+      }
 
-					if (result.length() > 0 && delim != null && !delim.isStandard())
-					{
-						result.append(nl);
-						result.append(delim.getDelimiter());
-					}
-				}
+      if (includeDependencies) {
+        if (dbConnection.getDbSettings().createTriggerNeedsAlternateDelimiter()) {
+          DelimiterDefinition delim = dbConnection.getAlternateDelimiter();
 
-				CommentSqlManager mgr = new CommentSqlManager(this.dbConnection.getMetadata().getDbId());
-				String ddl = mgr.getCommentSqlTemplate("trigger", CommentSqlManager.COMMENT_ACTION_SET);
-				if (result.length() > 0 && StringUtil.isNonBlank(ddl) && StringUtil.isNonBlank(trgComment))
-				{
-					result.append(nl);
-					String commentSql = ddl.replace(TriggerDefinition.PLACEHOLDER_TRIGGER_NAME, triggerName);
-					commentSql = commentSql.replace(TriggerDefinition.PLACEHOLDER_TRIGGER_SCHEMA, triggerSchema);
-					commentSql = commentSql.replace(TriggerDefinition.PLACEHOLDER_TRIGGER_TABLE, triggerTable.getTableExpression(dbConnection));
-					commentSql = commentSql.replace(CommentSqlManager.COMMENT_PLACEHOLDER, SqlUtil.escapeQuotes(trgComment));
-					result.append(nl);
-					result.append(commentSql);
-					result.append(';');
-					result.append(nl);
-				}
+          if (result.length() > 0 && delim != null && !delim.isStandard()) {
+            result.append(nl);
+            result.append(delim.getDelimiter());
+          }
+        }
 
-				CharSequence dependent = getDependentSource(triggerCatalog, triggerSchema, triggerName, triggerTable);
-				if (dependent != null)
-				{
-					result.append(nl);
-					result.append(dependent);
-				}
-			}
-		}
-		catch (SQLException e)
-		{
-			LogMgr.logError("DefaultTriggerReader.getTriggerSource()", "Error reading trigger source using query:\n" + query, e);
-			if (this.dbMeta.isPostgres()) try { this.dbConnection.rollback(); } catch (Throwable th) {}
-			result.append(ExceptionUtil.getDisplay(e));
-			SqlUtil.closeAll(rs, stmt);
-			return result.toString();
-		}
-		finally
-		{
-			SqlUtil.closeAll(rs, stmt);
-		}
+        CommentSqlManager mgr = new CommentSqlManager(this.dbConnection.getMetadata().getDbId());
+        String ddl = mgr.getCommentSqlTemplate("trigger", CommentSqlManager.COMMENT_ACTION_SET);
+        if (result.length() > 0 && StringUtil.isNonBlank(ddl) && StringUtil.isNonBlank(trgComment)) {
+          result.append(nl);
+          String commentSql = ddl.replace(TriggerDefinition.PLACEHOLDER_TRIGGER_NAME, triggerName);
+          commentSql = commentSql.replace(TriggerDefinition.PLACEHOLDER_TRIGGER_SCHEMA, triggerSchema);
+          commentSql = commentSql.replace(TriggerDefinition.PLACEHOLDER_TRIGGER_TABLE, triggerTable.getTableExpression(dbConnection));
+          commentSql = commentSql.replace(CommentSqlManager.COMMENT_PLACEHOLDER, SqlUtil.escapeQuotes(trgComment));
+          result.append(nl);
+          result.append(commentSql);
+          result.append(';');
+          result.append(nl);
+        }
 
-		boolean replaceNL = Settings.getInstance().getBoolProperty("workbench.db." + dbMeta.getDbId() + ".replacenl.triggersource", false);
+        CharSequence dependent = getDependentSource(triggerCatalog, triggerSchema, triggerName, triggerTable);
+        if (dependent != null) {
+          result.append(nl);
+          result.append(dependent);
+        }
+      }
+    } catch (SQLException e) {
+      LogMgr.logError("DefaultTriggerReader.getTriggerSource()", "Error reading trigger source using query:\n" + query, e);
+      if (this.dbMeta.isPostgres()) try {
+        this.dbConnection.rollback();
+      } catch (Throwable th) {
+      }
+      result.append(ExceptionUtil.getDisplay(e));
+      SqlUtil.closeAll(rs, stmt);
+      return result.toString();
+    } finally {
+      SqlUtil.closeAll(rs, stmt);
+    }
 
-		String source = result.toString();
-		if (replaceNL && source.length() > 0)
-		{
-			source = StringUtil.replace(source, "\\n", nl);
-		}
-		return source;
-	}
+    boolean replaceNL = Settings.getInstance().getBoolProperty("workbench.db." + dbMeta.getDbId() + ".replacenl.triggersource", false);
 
-	@Override
-	public CharSequence getDependentSource(String triggerCatalog, String triggerSchema, String triggerName, TableIdentifier triggerTable)
-		throws SQLException
-	{
-		return null;
-	}
+    String source = result.toString();
+    if (replaceNL && source.length() > 0) {
+      source = StringUtil.replace(source, "\\n", nl);
+    }
+    return source;
+  }
 
-	@Override
-	public boolean supportsTriggersOnViews()
-	{
-		if (dbConnection == null) return false;
-		return dbConnection.getDbSettings().supportsTriggersOnViews();
-	}
+  @Override
+  public CharSequence getDependentSource(String triggerCatalog, String triggerSchema, String triggerName, TableIdentifier triggerTable)
+      throws SQLException {
+    return null;
+  }
+
+  @Override
+  public boolean supportsTriggersOnViews() {
+    if (dbConnection == null) return false;
+    return dbConnection.getDbSettings().supportsTriggersOnViews();
+  }
 
 }

@@ -20,17 +20,15 @@
  */
 package workbench.sql.wbcommands;
 
-import java.sql.SQLException;
-
-import workbench.resource.ResourceMgr;
-
 import workbench.db.TableDefinition;
 import workbench.db.TableIdentifier;
 import workbench.db.TableSourceBuilder;
 import workbench.db.TableSourceBuilderFactory;
-
+import workbench.resource.ResourceMgr;
 import workbench.sql.SqlCommand;
 import workbench.sql.StatementRunnerResult;
+
+import java.sql.SQLException;
 
 /**
  * Display the source code of a table.
@@ -38,51 +36,44 @@ import workbench.sql.StatementRunnerResult;
  * @author Thomas Kellerer
  */
 public class WbTableSource
-	extends SqlCommand
-{
-	public static final String VERB = "WbTableSource";
+    extends SqlCommand {
+  public static final String VERB = "WbTableSource";
 
-	public WbTableSource()
-	{
-		super();
-	}
+  public WbTableSource() {
+    super();
+  }
 
-	@Override
-	public String getVerb()
-	{
-		return VERB;
-	}
+  @Override
+  public String getVerb() {
+    return VERB;
+  }
 
-	@Override
-	public StatementRunnerResult execute(String sql)
-		throws SQLException
-	{
-		StatementRunnerResult result = new StatementRunnerResult();
-		String args = getCommandLine(sql);
+  @Override
+  public StatementRunnerResult execute(String sql)
+      throws SQLException {
+    StatementRunnerResult result = new StatementRunnerResult();
+    String args = getCommandLine(sql);
 
-		TableIdentifier object = new TableIdentifier(args, currentConnection);
+    TableIdentifier object = new TableIdentifier(args, currentConnection);
 
-		TableDefinition tableDef = currentConnection.getMetadata().getTableDefinition(object);
-		if (tableDef == null || tableDef.getColumnCount() == 0)
-		{
-			result.addMessage(ResourceMgr.getFormattedString("ErrTableNotFound", object.getObjectExpression(currentConnection)));
-			result.setFailure();
-			return result;
-		}
+    TableDefinition tableDef = currentConnection.getMetadata().getTableDefinition(object);
+    if (tableDef == null || tableDef.getColumnCount() == 0) {
+      result.addMessage(ResourceMgr.getFormattedString("ErrTableNotFound", object.getObjectExpression(currentConnection)));
+      result.setFailure();
+      return result;
+    }
 
-		TableSourceBuilder reader = TableSourceBuilderFactory.getBuilder(currentConnection);
-		String source = reader.getTableSource(tableDef.getTable(), tableDef.getColumns());
-		if (source != null)
-		{
-			result.addMessage(source);
-			result.setSuccess();
-		}
-		return result;
-	}
+    TableSourceBuilder reader = TableSourceBuilderFactory.getBuilder(currentConnection);
+    String source = reader.getTableSource(tableDef.getTable(), tableDef.getColumns());
+    if (source != null) {
+      result.addMessage(source);
+      result.setSuccess();
+    }
+    return result;
+  }
 
-	@Override
-	public boolean isWbCommand()
-	{
-		return true;
-	}
+  @Override
+  public boolean isWbCommand() {
+    return true;
+  }
 }

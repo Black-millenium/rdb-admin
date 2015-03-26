@@ -26,18 +26,15 @@ package workbench.sql;
  * @author Thomas Kellerer
  */
 public class UseTabAnnotation
-	extends WbAnnotation
-{
-	public static final String ANNOTATION = "WbUseTab";
+    extends WbAnnotation {
+  public static final String ANNOTATION = "WbUseTab";
 
-	public UseTabAnnotation()
-	{
-		super(ANNOTATION);
-	}
+  public UseTabAnnotation() {
+    super(ANNOTATION);
+  }
 
-	public String getResultName(String sql)
-	{
-		return getAnnotationValue(sql);
-	}
+  public String getResultName(String sql) {
+    return getAnnotationValue(sql);
+  }
 
 }

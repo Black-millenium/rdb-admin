@@ -22,23 +22,18 @@
  */
 package workbench.gui.sql;
 
-import java.awt.Component;
-import java.awt.event.ActionListener;
-import java.util.EventObject;
-import java.util.List;
+import workbench.gui.WbSwingUtilities;
+import workbench.gui.components.WbTable;
+import workbench.resource.GuiSettings;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JTable;
+import javax.swing.*;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableCellEditor;
-
-import workbench.resource.GuiSettings;
-
-import workbench.gui.WbSwingUtilities;
-import workbench.gui.components.WbTable;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.util.EventObject;
+import java.util.List;
 
 
 /**
@@ -47,96 +42,79 @@ import workbench.gui.components.WbTable;
  * @author Thomas Kellerer
  */
 public class DropDownCellEditor
-	implements TableCellEditor
-{
-	private JComboBox input;
-	private WbTable table;
+    implements TableCellEditor {
+  private JComboBox input;
+  private WbTable table;
 
-	public DropDownCellEditor(WbTable dataTable)
-	{
-		table = dataTable;
-		input = new JComboBox();
-		input.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);
-		input.setEditable(GuiSettings.getVariablesDDEditable());
-	}
+  public DropDownCellEditor(WbTable dataTable) {
+    table = dataTable;
+    input = new JComboBox();
+    input.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);
+    input.setEditable(GuiSettings.getVariablesDDEditable());
+  }
 
-	public void setValues(List<String> values)
-	{
-		input.setModel(new DefaultComboBoxModel(values.toArray()));
-	}
+  public void setValues(List<String> values) {
+    input.setModel(new DefaultComboBoxModel(values.toArray()));
+  }
 
-	public String getText()
-	{
-		Object o = input.getSelectedItem();
-		if (o == null)
-		{
-			o = input.getEditor().getItem();
-		}
-		if (o instanceof String)
-		{
-			return (String)o;
-		}
-		return null;
-	}
+  public String getText() {
+    Object o = input.getSelectedItem();
+    if (o == null) {
+      o = input.getEditor().getItem();
+    }
+    if (o instanceof String) {
+      return (String) o;
+    }
+    return null;
+  }
 
-	@Override
-	public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,int row, int column)
-	{
-		input.setSelectedItem(value);
-		WbSwingUtilities.requestFocus((JComponent)input.getEditor().getEditorComponent());
-		return input;
-	}
+  @Override
+  public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+    input.setSelectedItem(value);
+    WbSwingUtilities.requestFocus((JComponent) input.getEditor().getEditorComponent());
+    return input;
+  }
 
-	@Override
-	public Object getCellEditorValue()
-	{
-		return getText();
-	}
+  @Override
+  public Object getCellEditorValue() {
+    return getText();
+  }
 
-	@Override
-	public boolean isCellEditable(EventObject anEvent)
-	{
-		return true;
-	}
+  @Override
+  public boolean isCellEditable(EventObject anEvent) {
+    return true;
+  }
 
-	@Override
-	public boolean shouldSelectCell(EventObject anEvent)
-	{
-		return true;
-	}
+  @Override
+  public boolean shouldSelectCell(EventObject anEvent) {
+    return true;
+  }
 
-	@Override
-	public boolean stopCellEditing()
-	{
-		if (table != null)
-		{
-			table.editingStopped(new ChangeEvent(this));
-		}
-		return true;
-	}
+  @Override
+  public boolean stopCellEditing() {
+    if (table != null) {
+      table.editingStopped(new ChangeEvent(this));
+    }
+    return true;
+  }
 
-	@Override
-	public void cancelCellEditing()
-	{
-		if (table != null)
-		{
-			table.editingCanceled(new ChangeEvent(this));
-		}
-	}
+  @Override
+  public void cancelCellEditing() {
+    if (table != null) {
+      table.editingCanceled(new ChangeEvent(this));
+    }
+  }
 
-	@Override
-	public void addCellEditorListener(CellEditorListener l)
-	{
-	}
+  @Override
+  public void addCellEditorListener(CellEditorListener l) {
+  }
 
-	@Override
-	public void removeCellEditorListener(CellEditorListener l)
-	{
-	}
+  @Override
+  public void removeCellEditorListener(CellEditorListener l) {
+  }
 
-	public void addActionListener(ActionListener l)
-	{
-		input.addActionListener(l);
-	}
+  public void addActionListener(ActionListener l) {
+    input.addActionListener(l);
+  }
 
 }

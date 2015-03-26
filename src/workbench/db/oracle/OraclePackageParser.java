@@ -22,312 +22,250 @@
  */
 package workbench.db.oracle;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import workbench.log.LogMgr;
-
 import workbench.db.ProcedureDefinition;
-
+import workbench.log.LogMgr;
 import workbench.sql.lexer.SQLLexer;
 import workbench.sql.lexer.SQLLexerFactory;
 import workbench.sql.lexer.SQLToken;
 import workbench.sql.parser.ParserType;
-
 import workbench.util.CollectionUtil;
 import workbench.util.StringUtil;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Thomas Kellerer
  */
-public class OraclePackageParser
-{
-	private String packageDeclaration;
-	private String packageBody;
-	private String packageName;
+public class OraclePackageParser {
+  private String packageDeclaration;
+  private String packageBody;
+  private String packageName;
 
-	public OraclePackageParser(String sql)
-	{
-		try
-		{
-			parse(sql);
-		}
-		catch (Exception e)
-		{
-			LogMgr.logError("OraclePackageParser.<init>", "Could not parse SQL", e);
-		}
-	}
+  public OraclePackageParser(String sql) {
+    try {
+      parse(sql);
+    } catch (Exception e) {
+      LogMgr.logError("OraclePackageParser.<init>", "Could not parse SQL", e);
+    }
+  }
 
-	public String getPackageDeclaration()
-	{
-		return this.packageDeclaration;
-	}
+  public static CharSequence getProcedureSource(CharSequence source, ProcedureDefinition def, List<String> parameters) {
+    CodeArea bounds = findProcedureArea(source, def, parameters);
+    if (bounds.startPos > -1 && bounds.endPos > -1) {
+      return source.subSequence(bounds.startPos, bounds.endPos);
+    }
+    return null;
+  }
 
-	public String getPackageBody()
-	{
-		return this.packageBody;
-	}
+  private static boolean isCreate(String text) {
+    return text.equals("CREATE") || text.equals("CREATE OR REPLACE");
+  }
 
-	public String getPackageName()
-	{
-		return this.packageName;
-	}
+  public static int findProcedurePosition(CharSequence source, ProcedureDefinition def, List<String> parameters) {
+    CodeArea area = findProcedureArea(source, def, parameters);
+    return area.startPos;
+  }
 
-	public static CharSequence getProcedureSource(CharSequence source, ProcedureDefinition def, List<String> parameters)
-	{
-		CodeArea bounds = findProcedureArea(source, def, parameters);
-		if (bounds.startPos > -1 && bounds.endPos > -1)
-		{
-			return source.subSequence(bounds.startPos, bounds.endPos);
-		}
-		return null;
-	}
+  private static CodeArea findProcedureArea(CharSequence source, ProcedureDefinition def, List<String> parameters) {
+    int procPos = -1;
 
-	private void parse(String sql)
-		throws IOException
-	{
-		SQLLexer lexer = SQLLexerFactory.createLexer(ParserType.Oracle, sql);
-		SQLToken t = lexer.getNextToken(false, false);
+    SQLLexer lexer = SQLLexerFactory.createLexer(source);
+    SQLToken t = lexer.getNextToken(false, false);
+    CodeArea result = new CodeArea();
 
-		int defBegin = -1;
-		int defEnd = -1;
-		int bodyBegin = -1;
-		int bodyEnd = -1;
-		int lastCreateStart = -1;
+    boolean packageHeaderFound = false;
+    String procType = def.isFunction() ? "FUNCTION" : "PROCEDURE";
 
-		while (t != null)
-		{
-			String text = t.getContents();
+    // Find the start of the package body
+    while (t != null) {
+      if (t.getContents().equals("PACKAGE") || t.getContents().equals("TYPE")) {
+        packageHeaderFound = true;
+      }
+      if (t.getContents().equals("PACKAGE BODY")) break;
+      if (t.getContents().equals("TYPE BODY")) break;
+      t = lexer.getNextToken(false, false);
+    }
 
-			if (isCreate(text))
-			{
-				lastCreateStart = t.getCharBegin();
-			}
-			else if (text.equals("PACKAGE"))
-			{
-				defBegin = lastCreateStart;
-				t = lexer.getNextToken(false, false);
-				if (t == null) continue;
+    if (t == null && !packageHeaderFound) return result;
+    if (packageHeaderFound && t == null) {
+      // apparently only the defintion but not the body is available
+      // so try to find the procedure in the header
+      lexer = SQLLexerFactory.createLexer(source);
+      t = lexer.getNextToken(false, false);
+    }
 
-				if (t.isIdentifier())
-				{
-					this.packageName = t.getContents();
-					t = findEnd(lexer, this.packageName);
-					if (t != null)
-					{
-						defEnd = t.getCharEnd();
-					}
-				}
-			}
-			else if (text.equals("PACKAGE BODY"))
-			{
-				bodyBegin = lastCreateStart;
+    // Now we have reached the package or type body, let's find the the actual procedure or function
+    int lastKeywordPos = -1;
 
-				t = lexer.getNextToken(false, false);
-				if (t == null) continue;
+    while (t != null) {
+      String text = t.getContents();
+      if (lastKeywordPos > -1 && text.equalsIgnoreCase(def.getProcedureName())) {
+        procPos = lastKeywordPos;
+        t = lexer.getNextToken(false, false);
+        if (t != null && t.getContents().equals("(")) {
+          List<String> params = getParameters(lexer);
+          if (compareArguments(params, parameters)) {
+            break;
+          }
+        } else if (CollectionUtil.isEmpty(parameters)) {
+          break;
+        } else {
+          lastKeywordPos = -1;
+          continue;
+        }
+      }
 
-				String name = t.getContents();
-				t = findEnd(lexer, name);
-				if (t != null)
-				{
-					bodyEnd = t.getCharEnd();
-					break;
-				}
-			}
-			t = lexer.getNextToken(false, false);
-		}
-		if (defBegin > -1 && defEnd > defBegin)
-		{
-			this.packageDeclaration = sql.substring(defBegin, defEnd);
-		}
-		if (bodyBegin > -1 && bodyEnd > bodyBegin)
-		{
-			this.packageBody = sql.substring(bodyBegin, bodyEnd);
-		}
-	}
+      if (text.equals(procType)) {
+        lastKeywordPos = t.getCharBegin();
+      } else {
+        lastKeywordPos = -1;
+      }
+      t = lexer.getNextToken(false, false);
+    }
+    result.startPos = procPos;
 
-	private static boolean isCreate(String text)
-	{
-		return text.equals("CREATE") || text.equals("CREATE OR REPLACE");
-	}
+    // now find the end of the procedure/function
+    SQLToken lastToken = t;
+    SQLToken lastEnd = null;
 
-	private SQLToken findEnd(SQLLexer lexer, String name)
-		throws IOException
-	{
-		SQLToken t = lexer.getNextToken(false, false);
-		boolean lastWasEnd = false;
+    while (t != null) {
+      String text = t.getContents();
+      if (text.equals("PROCEDURE") || text.equals("FUNCTION")) {
+        result.endPos = lastToken == null ? t.getCharBegin() - 1 : lastToken.getCharEnd();
+        break;
+      }
+      if (text.equals("END")) {
+        lastEnd = t;
+      }
+      lastToken = t;
+      t = lexer.getNextToken(false, false);
+    }
+    if (result.endPos == -1 && lastEnd != null) {
+      result.endPos = lastEnd.getCharBegin() - 1;
+    }
+    return result;
+  }
 
-		while (t != null)
-		{
-			String v = t.getContents();
-			if (v.equalsIgnoreCase("END"))
-			{
-				lastWasEnd = true;
-			}
-			else if (lastWasEnd && name.equalsIgnoreCase(v))
-			{
-				SQLToken t2 = lexer.getNextToken(false, false);
-				if (t2 != null) return t2;
-				else return t;
-			}
-			else
-			{
-				lastWasEnd = false;
-			}
-			t = lexer.getNextToken(false, false);
-		}
-		return null;
-	}
+  private static List<String> getParameters(SQLLexer lexer) {
+    List<String> params = new ArrayList<>();
+    SQLToken t = lexer.getNextToken(false, false);
+    boolean nextIsName = true;
+    while (t != null) {
+      if (t.getText().equals(")")) {
+        break;
+      }
 
-	public static int findProcedurePosition(CharSequence source, ProcedureDefinition def, List<String> parameters)
-	{
-		CodeArea area = findProcedureArea(source, def, parameters);
-		return area.startPos;
-	}
+      if (nextIsName) {
+        params.add(t.getText());
+        nextIsName = false;
+      } else {
+        nextIsName = t.getText().equals(",");
+      }
+      t = lexer.getNextToken(false, false);
+    }
+    return params;
+  }
 
-	private static CodeArea findProcedureArea(CharSequence source, ProcedureDefinition def, List<String> parameters)
-	{
-		int procPos = -1;
+  private static boolean compareArguments(List<String> list1, List<String> list2) {
+    if (CollectionUtil.isEmpty(list1) && CollectionUtil.isEmpty(list2)) return true;
+    if (CollectionUtil.isEmpty(list1) && CollectionUtil.isNonEmpty(list2)) return false;
+    if (CollectionUtil.isNonEmpty(list1) && CollectionUtil.isEmpty(list2)) return false;
+    if (list1.size() != list2.size()) return false;
+    for (int i = 0; i < list1.size(); i++) {
+      if (!StringUtil.equalStringIgnoreCase(list1.get(i), list2.get(i))) return false;
+    }
+    return true;
+  }
 
-		SQLLexer lexer = SQLLexerFactory.createLexer(source);
-		SQLToken t = lexer.getNextToken(false, false);
-		CodeArea result = new CodeArea();
+  public String getPackageDeclaration() {
+    return this.packageDeclaration;
+  }
 
-		boolean packageHeaderFound = false;
-		String procType = def.isFunction() ? "FUNCTION" : "PROCEDURE";
+  public String getPackageBody() {
+    return this.packageBody;
+  }
 
-		// Find the start of the package body
- 		while (t != null)
-		{
-			if (t.getContents().equals("PACKAGE") || t.getContents().equals("TYPE"))
-			{
-				packageHeaderFound = true;
-			}
-			if (t.getContents().equals("PACKAGE BODY")) break;
-			if (t.getContents().equals("TYPE BODY")) break;
-			t = lexer.getNextToken(false, false);
-		}
+  public String getPackageName() {
+    return this.packageName;
+  }
 
-		if (t == null && !packageHeaderFound) return result;
-		if (packageHeaderFound && t == null)
-		{
-			// apparently only the defintion but not the body is available
-			// so try to find the procedure in the header
-			lexer = SQLLexerFactory.createLexer(source);
-			t = lexer.getNextToken(false, false);
-		}
+  private void parse(String sql)
+      throws IOException {
+    SQLLexer lexer = SQLLexerFactory.createLexer(ParserType.Oracle, sql);
+    SQLToken t = lexer.getNextToken(false, false);
 
-		// Now we have reached the package or type body, let's find the the actual procedure or function
-		int lastKeywordPos = -1;
+    int defBegin = -1;
+    int defEnd = -1;
+    int bodyBegin = -1;
+    int bodyEnd = -1;
+    int lastCreateStart = -1;
 
-		while (t != null)
-		{
-			String text = t.getContents();
-			if (lastKeywordPos > -1 && text.equalsIgnoreCase(def.getProcedureName()))
-			{
-				procPos = lastKeywordPos;
-				t = lexer.getNextToken(false, false);
-				if (t != null && t.getContents().equals("("))
-				{
-					List<String> params = getParameters(lexer);
-					if (compareArguments(params, parameters))
-					{
-						break;
-					}
-				}
-				else if (CollectionUtil.isEmpty(parameters))
-				{
-					break;
-				}
-				else
-				{
-					lastKeywordPos = -1;
-					continue;
-				}
-			}
+    while (t != null) {
+      String text = t.getContents();
 
-			if (text.equals(procType))
-			{
-				lastKeywordPos = t.getCharBegin();
-			}
-			else
-			{
-				lastKeywordPos = -1;
-			}
-			t = lexer.getNextToken(false, false);
-		}
-		result.startPos = procPos;
+      if (isCreate(text)) {
+        lastCreateStart = t.getCharBegin();
+      } else if (text.equals("PACKAGE")) {
+        defBegin = lastCreateStart;
+        t = lexer.getNextToken(false, false);
+        if (t == null) continue;
 
-		// now find the end of the procedure/function
-		SQLToken lastToken = t;
-		SQLToken lastEnd = null;
+        if (t.isIdentifier()) {
+          this.packageName = t.getContents();
+          t = findEnd(lexer, this.packageName);
+          if (t != null) {
+            defEnd = t.getCharEnd();
+          }
+        }
+      } else if (text.equals("PACKAGE BODY")) {
+        bodyBegin = lastCreateStart;
 
-		while (t != null)
-		{
-			String text = t.getContents();
-			if (text.equals("PROCEDURE") || text.equals("FUNCTION"))
-			{
-				result.endPos = lastToken == null ? t.getCharBegin() - 1 : lastToken.getCharEnd();
-				break;
-			}
-			if (text.equals("END"))
-			{
-				lastEnd = t;
-			}
-			lastToken = t;
-			t = lexer.getNextToken(false, false);
-		}
-		if (result.endPos == -1 && lastEnd != null)
-		{
-			result.endPos = lastEnd.getCharBegin() - 1;
-		}
-		return result;
-	}
+        t = lexer.getNextToken(false, false);
+        if (t == null) continue;
 
-	private static List<String> getParameters(SQLLexer lexer)
-	{
-		List<String> params = new ArrayList<>();
-		SQLToken t = lexer.getNextToken(false, false);
-		boolean nextIsName = true;
-		while (t != null)
-		{
-			if (t.getText().equals(")"))
-			{
-				break;
-			}
+        String name = t.getContents();
+        t = findEnd(lexer, name);
+        if (t != null) {
+          bodyEnd = t.getCharEnd();
+          break;
+        }
+      }
+      t = lexer.getNextToken(false, false);
+    }
+    if (defBegin > -1 && defEnd > defBegin) {
+      this.packageDeclaration = sql.substring(defBegin, defEnd);
+    }
+    if (bodyBegin > -1 && bodyEnd > bodyBegin) {
+      this.packageBody = sql.substring(bodyBegin, bodyEnd);
+    }
+  }
 
-			if (nextIsName)
-			{
-				params.add(t.getText());
-				nextIsName = false;
-			}
-			else
-			{
-				nextIsName = t.getText().equals(",");
-			}
-			t = lexer.getNextToken(false, false);
-		}
-		return params;
-	}
+  private SQLToken findEnd(SQLLexer lexer, String name)
+      throws IOException {
+    SQLToken t = lexer.getNextToken(false, false);
+    boolean lastWasEnd = false;
 
-	private static boolean compareArguments(List<String> list1, List<String> list2)
-	{
-		if (CollectionUtil.isEmpty(list1) && CollectionUtil.isEmpty(list2)) return true;
-		if (CollectionUtil.isEmpty(list1) && CollectionUtil.isNonEmpty(list2)) return false;
-		if (CollectionUtil.isNonEmpty(list1) && CollectionUtil.isEmpty(list2)) return false;
-		if (list1.size() != list2.size()) return false;
-		for (int i=0; i < list1.size(); i++)
-		{
-			if (!StringUtil.equalStringIgnoreCase(list1.get(i), list2.get(i))) return false;
-		}
-		return true;
-	}
+    while (t != null) {
+      String v = t.getContents();
+      if (v.equalsIgnoreCase("END")) {
+        lastWasEnd = true;
+      } else if (lastWasEnd && name.equalsIgnoreCase(v)) {
+        SQLToken t2 = lexer.getNextToken(false, false);
+        if (t2 != null) return t2;
+        else return t;
+      } else {
+        lastWasEnd = false;
+      }
+      t = lexer.getNextToken(false, false);
+    }
+    return null;
+  }
 
-	private static class CodeArea
-	{
-		int startPos = -1;
-		int endPos = -1;
-	}
+  private static class CodeArea {
+    int startPos = -1;
+    int endPos = -1;
+  }
 
 }

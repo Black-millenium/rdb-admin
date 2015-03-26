@@ -23,21 +23,30 @@
 package workbench.gui.dialogs.export;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface SpreadSheetOptions
-{
-	String getPageTitle();
-	void setPageTitle(String title);
-	boolean getExportHeaders();
-	void setExportHeaders(boolean flag);
-	boolean getCreateInfoSheet();
-	void setCreateInfoSheet(boolean flag);
-	boolean getCreateFixedHeaders();
-	void setCreateFixedHeaders(boolean flag);
-	boolean getCreateAutoFilter();
-	void setCreateAutoFilter(boolean flag);
-	boolean getOptimizeColumns();
-	void setOptimizeColumns(boolean flag);
+public interface SpreadSheetOptions {
+  String getPageTitle();
+
+  void setPageTitle(String title);
+
+  boolean getExportHeaders();
+
+  void setExportHeaders(boolean flag);
+
+  boolean getCreateInfoSheet();
+
+  void setCreateInfoSheet(boolean flag);
+
+  boolean getCreateFixedHeaders();
+
+  void setCreateFixedHeaders(boolean flag);
+
+  boolean getCreateAutoFilter();
+
+  void setCreateAutoFilter(boolean flag);
+
+  boolean getOptimizeColumns();
+
+  void setOptimizeColumns(boolean flag);
 }

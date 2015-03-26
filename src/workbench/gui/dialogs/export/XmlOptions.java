@@ -23,14 +23,16 @@
 package workbench.gui.dialogs.export;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface XmlOptions
-{
-	String getXMLVersion();
-	boolean getUseCDATA();
-	void setUseCDATA(boolean flag);
-	boolean getUseVerboseXml();
-	void setUseVerboseXml(boolean flag);
+public interface XmlOptions {
+  String getXMLVersion();
+
+  boolean getUseCDATA();
+
+  void setUseCDATA(boolean flag);
+
+  boolean getUseVerboseXml();
+
+  void setUseVerboseXml(boolean flag);
 }

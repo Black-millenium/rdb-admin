@@ -23,15 +23,15 @@
 package workbench.db;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum ConstraintType
-{
-	Check,
-	Unique,
-	ForeignKey,
-	PrimaryKey,
-	/** Postgres only */
-	Exclusion;
+public enum ConstraintType {
+  Check,
+  Unique,
+  ForeignKey,
+  PrimaryKey,
+  /**
+   * Postgres only
+   */
+  Exclusion;
 }

@@ -23,10 +23,8 @@
 package workbench.gui.renderer;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface WrapEnabledEditor
-{
-	void setWordwrap(boolean flag);
+public interface WrapEnabledEditor {
+  void setWordwrap(boolean flag);
 }

@@ -20,23 +20,19 @@
 package workbench.sql.parser;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public class DelimiterTesterFactory
-{
-	public static DelimiterTester getDelimiterTester(ParserType type)
-	{
-		switch (type)
-		{
-			case Oracle:
-				return new OracleDelimiterTester();
-			case Postgres:
-				return new PostgresDelimiterTester();
-			case Standard:
-				// Don't use @ for WbInclude for SQL Server or MySQL as that conflicts with parameter prefix
-			return new ShortIncludeDelimiterTester();
-		}
-		return null;
-	}
+public class DelimiterTesterFactory {
+  public static DelimiterTester getDelimiterTester(ParserType type) {
+    switch (type) {
+      case Oracle:
+        return new OracleDelimiterTester();
+      case Postgres:
+        return new PostgresDelimiterTester();
+      case Standard:
+        // Don't use @ for WbInclude for SQL Server or MySQL as that conflicts with parameter prefix
+        return new ShortIncludeDelimiterTester();
+    }
+    return null;
+  }
 }

@@ -23,14 +23,12 @@
 package workbench.db.compare;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public enum TableDiffStatus
-{
-	OK,
-	ColumnMismatch,
-	ReferenceNotFound,
-	TargetNotFound,
-	NoPK
+public enum TableDiffStatus {
+  OK,
+  ColumnMismatch,
+  ReferenceNotFound,
+  TargetNotFound,
+  NoPK
 }

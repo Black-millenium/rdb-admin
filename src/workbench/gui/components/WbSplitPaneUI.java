@@ -32,21 +32,17 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
  * @author Thomas Kellerer
  */
 public class WbSplitPaneUI
-	extends BasicSplitPaneUI
-{
+    extends BasicSplitPaneUI {
 
-	@Override
-	public BasicSplitPaneDivider createDefaultDivider()
-	{
-		return new WbSplitPaneDivider(this);
-	}
+  @Override
+  public BasicSplitPaneDivider createDefaultDivider() {
+    return new WbSplitPaneDivider(this);
+  }
 
-	public void setOneTouchTooltip(String tip)
-	{
-		if (divider instanceof WbSplitPaneDivider)
-		{
-			((WbSplitPaneDivider)divider).setOneTouchTooltip(tip);
-		}
-	}
+  public void setOneTouchTooltip(String tip) {
+    if (divider instanceof WbSplitPaneDivider) {
+      ((WbSplitPaneDivider) divider).setOneTouchTooltip(tip);
+    }
+  }
 }
 

@@ -19,31 +19,20 @@
  */
 package workbench.gui.dbobjects.objecttree;
 
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DragSourceDragEvent;
-import java.awt.dnd.DragSourceDropEvent;
-import java.awt.dnd.DragSourceEvent;
-import java.awt.dnd.DragSourceListener;
+import javax.swing.tree.TreePath;
+import java.awt.dnd.*;
 import java.io.Serializable;
 
-import javax.swing.tree.TreePath;
-
 /**
- *
  * @author Thomas Kellerer
  */
 public class ObjectTreeDragSource
-implements DragSourceListener, DragGestureListener, Serializable
-{
+    implements DragSourceListener, DragGestureListener, Serializable {
   private DragSource source;
   private ObjectTreeTransferable transferable;
   private DbObjectsTree sourceTree;
 
-  public ObjectTreeDragSource(DbObjectsTree tree)
-  {
+  public ObjectTreeDragSource(DbObjectsTree tree) {
     sourceTree = tree;
     source = new DragSource();
     source.createDefaultDragGestureRecognizer(sourceTree, DnDConstants.ACTION_COPY, this);
@@ -53,15 +42,13 @@ implements DragSourceListener, DragGestureListener, Serializable
    * Drag Gesture Handler
    */
   @Override
-  public void dragGestureRecognized(DragGestureEvent dge)
-  {
+  public void dragGestureRecognized(DragGestureEvent dge) {
     TreePath[] selected = sourceTree.getSelectionPaths();
     if (selected == null) return;
 
     ObjectTreeNode[] nodes = new ObjectTreeNode[selected.length];
-    for (int i=0; i < selected.length; i++)
-    {
-      nodes[i] = (ObjectTreeNode)selected[i].getLastPathComponent();
+    for (int i = 0; i < selected.length; i++) {
+      nodes[i] = (ObjectTreeNode) selected[i].getLastPathComponent();
     }
     transferable = new ObjectTreeTransferable(nodes, sourceTree.getConnection().getId());
     source.startDrag(dge, DragSource.DefaultCopyDrop, transferable, this);
@@ -71,27 +58,22 @@ implements DragSourceListener, DragGestureListener, Serializable
    * Drag Event Handlers
    */
   @Override
-  public void dragEnter(DragSourceDragEvent dsde)
-  {
+  public void dragEnter(DragSourceDragEvent dsde) {
   }
 
   @Override
-  public void dragExit(DragSourceEvent dse)
-  {
+  public void dragExit(DragSourceEvent dse) {
   }
 
   @Override
-  public void dragOver(DragSourceDragEvent dsde)
-  {
+  public void dragOver(DragSourceDragEvent dsde) {
   }
 
   @Override
-  public void dropActionChanged(DragSourceDragEvent dsde)
-  {
+  public void dropActionChanged(DragSourceDragEvent dsde) {
   }
 
   @Override
-  public void dragDropEnd(DragSourceDropEvent dsde)
-  {
+  public void dragDropEnd(DragSourceDropEvent dsde) {
   }
 }

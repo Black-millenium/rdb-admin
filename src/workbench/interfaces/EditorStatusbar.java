@@ -23,11 +23,10 @@
 package workbench.interfaces;
 
 /**
- *
  * @author Thomas Kellerer
  */
-public interface EditorStatusbar
-{
-	void setEditorLocation(int line, int column);
-	void setStatusMessage(String message, int duration);
+public interface EditorStatusbar {
+  void setEditorLocation(int line, int column);
+
+  void setStatusMessage(String message, int duration);
 }
