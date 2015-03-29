@@ -46,7 +46,7 @@ import java.util.List;
  * @author Thomas Kellerer.kellerer
  */
 public class ResourceMgr {
-  public static final String TXT_PRODUCT_NAME = "SQL Workbench/J";
+  public static final String TXT_PRODUCT_NAME = "RDB Admin";
 
   public static final String TXT_OK = "LblOK";
   public static final String TXT_CANCEL = "LblCancel";

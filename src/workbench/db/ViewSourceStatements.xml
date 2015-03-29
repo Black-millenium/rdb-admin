@@ -410,7 +410,7 @@
     </void>
 
     <void method="put">
-      <string>Red Database 2.5:WI</string>
+      <string>Red Database</string>
       <object class="workbench.db.GetMetaDataSql">
         <void property="baseSql">
           <string>SELECT rdb$view_source FROM rdb$relations</string>

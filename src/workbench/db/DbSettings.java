@@ -114,6 +114,7 @@ public class DbSettings {
     dbmsNames.put("db2i", "DB2 iSeries");
     dbmsNames.put("mysql", "MySQL");
     dbmsNames.put("firebird", "Firebird SQL");
+    dbmsNames.put("rdb", "Red Database");
     dbmsNames.put("informix_dynamic_server", "Informix");
     dbmsNames.put("sql_anywhere", "SQL Anywhere");
     dbmsNames.put("microsoft_sql_server", "Microsoft SQL Server");

@@ -165,7 +165,7 @@ public interface MergeGenerator {
       }
 
       if ("rdb".equals(type)) {
-        if (Settings.getInstance().getBoolProperty("workbench.db.rdb.mergegenerator.use.ansi", true)) {
+        if (Settings.getInstance().getBoolProperty("workbench.db.firebird.mergegenerator.use.ansi", true)) {
           return new Rdb21MergeGenerator();
         }
         return new Rdb20MergeGenerator();

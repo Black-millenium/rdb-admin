@@ -81,6 +81,9 @@ public class MetaDataSqlManager {
       // To ease the DBMS handling we'll simply use Firebird as the product name here
       productName = "Firebird";
     }
+    if (productName.toLowerCase().startsWith("red") && productName.toLowerCase().contains("database")) {
+      productName = "Red Database";
+    }
     if (version != null) {
       this.majorVersion = version.getMajorVersion();
       this.minorVersion = version.getMinorVersion();

@@ -19,12 +19,6 @@ public class RdbTableSourceBuilder
     super(con);
   }
 
-  /**
-   * Read additional options for the CREATE TABLE part.
-   *
-   * @param tbl     the table for which the options should be retrieved
-   * @param columns the table's columns
-   */
   @Override
   public void readTableOptions(TableIdentifier tbl, List<ColumnIdentifier> columns) {
     if (tbl.getSourceOptions().isInitialized()) return;

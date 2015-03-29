@@ -14,8 +14,6 @@ public class RdbProcedureReader
 
   @Override
   public boolean needsHeader(CharSequence procedureBody) {
-    // Our statement to retrieve the procedure source will return
-    // the full package definition for a packaged procedure
     String packageHeader = "CREATE PACKAGE";
     if (procedureBody.subSequence(0, packageHeader.length()).equals(packageHeader)) {
       return false;
@@ -25,8 +23,6 @@ public class RdbProcedureReader
 
   @Override
   public StringBuilder getProcedureHeader(String aCatalog, String aSchema, String aProcname, int procType) {
-    // TODO: handle packages properly (e.g. like in Oracle)
-
     StringBuilder source = new StringBuilder();
     try {
       DataStore ds = this.getProcedureColumns(aCatalog, aSchema, aProcname, null);

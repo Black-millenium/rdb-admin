@@ -113,15 +113,6 @@ public class RdbStatementHook
     }
   }
 
-  /**
-   * Instruct this instance to use the default (system) classloader
-   * instead of the the ConnectionMgr.loadClassFromDriverLib().
-   * <p/>
-   * During unit testing the classloader in the ConnectionMgr is not initialized
-   * because all drivers are alread on the classpath. Therefor this switch is needed
-   *
-   * @param flag if true, load the CopyManager from the system classpath, otherwise use the ConnectionMgr.
-   */
   public void setUseDefaultClassloader(boolean flag) {
     useDefaultClassloader = flag;
   }
