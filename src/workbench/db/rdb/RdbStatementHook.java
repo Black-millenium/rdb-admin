@@ -100,9 +100,9 @@ public class RdbStatementHook
       try {
         Class pstmtClass = null;
         if (useDefaultClassloader) {
-          pstmtClass = Class.forName("org.rdbsql.jdbc.RdbPreparedStatement");
+          pstmtClass = Class.forName("org.firebirdsql.jdbc.FirebirdPreparedStatement");
         } else {
-          pstmtClass = ConnectionMgr.getInstance().loadClassFromDriverLib(connection.getProfile(), "org.rdbsql.jdbc.RdbPreparedStatement");
+          pstmtClass = ConnectionMgr.getInstance().loadClassFromDriverLib(connection.getProfile(), "org.firebirdsql.jdbc.FirebirdPreparedStatement");
         }
 
         getPlan = pstmtClass.getMethod("getExecutionPlan", (Class[]) null);
