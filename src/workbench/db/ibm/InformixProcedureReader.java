@@ -98,7 +98,7 @@ public class InformixProcedureReader
         ProcedureDefinition def = new ProcedureDefinition(null, schema, name, type);
 
         List<ParamDef> argTypes = convertTypeList(args);
-        List<ColumnIdentifier> cols = new ArrayList<>();
+        List<ColumnIdentifier> cols = new ArrayList<ColumnIdentifier>();
 
         String typeList = "";
 
@@ -137,7 +137,7 @@ public class InformixProcedureReader
 
   private List<ParamDef> convertTypeList(String ifxTypeList) {
     List<String> plain = StringUtil.stringToList(ifxTypeList, ",", true, true);
-    List<ParamDef> result = new ArrayList<>(plain.size());
+    List<ParamDef> result = new ArrayList<ParamDef>(plain.size());
     for (String ifx : plain) {
       String[] elements = ifx.split(" ");
       ParamDef def = new ParamDef();
@@ -297,7 +297,7 @@ public class InformixProcedureReader
 
   private Map<String, Integer> getJavaTypeMapping() {
     if (typeMap == null) {
-      typeMap = new HashMap<>();
+      typeMap = new HashMap<String, Integer>();
       typeMap.put("smallint", Integer.valueOf(Types.SMALLINT));
       typeMap.put("byte", Integer.valueOf(Types.SMALLINT));
       typeMap.put("integer", Integer.valueOf(Types.INTEGER));

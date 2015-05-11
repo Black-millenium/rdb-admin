@@ -49,7 +49,7 @@ public class SqlServerRuleReader
     implements ObjectListExtender {
 
   public List<SqlServerRule> getRuleList(WbConnection connection, String schemaPattern, String namePattern, String ruleTable) {
-    List<SqlServerRule> result = new ArrayList<>();
+    List<SqlServerRule> result = new ArrayList<SqlServerRule>();
 
     Statement stmt = null;
     ResultSet rs = null;

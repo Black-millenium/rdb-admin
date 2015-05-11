@@ -43,8 +43,8 @@ import java.util.TreeMap;
 public class MacroManager {
   public static final int DEFAULT_STORAGE = Integer.MIN_VALUE;
 
-  private final Map<String, MacroStorage> allMacros = new HashMap<>();
-  private final Map<Integer, String> macroClients = new HashMap<>();
+  private final Map<String, MacroStorage> allMacros = new HashMap<String, MacroStorage>();
+  private final Map<Integer, String> macroClients = new HashMap<Integer, String>();
 
   private MacroManager() {
     String defaultPath = getDefaultMacroFile().getFullPath();
@@ -163,7 +163,7 @@ public class MacroManager {
 
   public Map<String, MacroDefinition> getExpandableMacros(int clientId) {
     MacroStorage storage = getStorage(clientId);
-    Map<String, MacroDefinition> result = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+    Map<String, MacroDefinition> result = new TreeMap<String, MacroDefinition>(CaseInsensitiveComparator.INSTANCE);
     List<MacroGroup> groups = storage.getGroups();
     for (MacroGroup group : groups) {
       for (MacroDefinition def : group.getMacros()) {

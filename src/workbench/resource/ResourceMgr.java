@@ -117,7 +117,7 @@ public class ResourceMgr {
   public static void setWindowIcons(Window window, List<File> iconFiles) {
     if (iconFiles == null) return;
     try {
-      List<Image> icons = new ArrayList<>(iconFiles.size());
+      List<Image> icons = new ArrayList<Image>(iconFiles.size());
       for (File f : iconFiles) {
         URL url = f.toURI().toURL();
         ImageIcon img = new ImageIcon(url);
@@ -131,7 +131,7 @@ public class ResourceMgr {
   }
 
   public static void setWindowIcons(Window window, String baseName) {
-    List<Image> icons = new ArrayList<>(2);
+    List<Image> icons = new ArrayList<Image>(2);
     ImageIcon image16 = IconMgr.getInstance().getPngIcon(baseName, 16);
     if (image16 != null) {
       icons.add(image16.getImage());

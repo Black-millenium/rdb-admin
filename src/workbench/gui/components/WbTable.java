@@ -113,7 +113,7 @@ public class WbTable
   private int headerPopupX = -1;
   private Map<String, Integer> savedColumnSizes;
   private RowHeightResizer rowResizer;
-  private List<TableModelListener> changeListener = new ArrayList<>();
+  private List<TableModelListener> changeListener = new ArrayList<TableModelListener>();
   private JScrollPane scrollPane;
   private DwStatusBar statusBar;
   private String defaultPrintHeader;
@@ -1395,7 +1395,7 @@ public class WbTable
   public void saveColumnSizes() {
     TableColumnModel colMod = this.getColumnModel();
     int count = colMod.getColumnCount();
-    this.savedColumnSizes = new HashMap<>();
+    this.savedColumnSizes = new HashMap<String, Integer>();
     int start = 0;
     if (this.dwModel.getShowStatusColumn()) start = 1;
 

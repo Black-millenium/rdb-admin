@@ -350,7 +350,7 @@ public class BookmarkSelector
   private Object[] getTabs() {
     List<String> tabIds = BookmarkManager.getInstance().getTabs(window);
 
-    List<TabEntry> entries = new ArrayList<>();
+    List<TabEntry> entries = new ArrayList<TabEntry>();
     entries.add(new TabEntry(null, ResourceMgr.getString("LblBookPanelAll"), -1));
     for (String tabId : tabIds) {
       int index = window.getIndexForPanel(tabId);

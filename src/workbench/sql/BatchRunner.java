@@ -64,7 +64,7 @@ import java.util.Properties;
 public class BatchRunner
     implements PropertyChangeListener {
   public static final String CMD_LINE_PROFILE_NAME = "$Wb$CommandLineProfile";
-  private final List<DataStore> queryResults = new ArrayList<>();
+  private final List<DataStore> queryResults = new ArrayList<DataStore>();
   private List<String> filenames;
   private StatementRunner stmtRunner;
   private WbConnection connection;
@@ -108,7 +108,7 @@ public class BatchRunner
     this();
     WbStringTokenizer tok = new WbStringTokenizer(aFilelist, ",", false, "\"'", false);
     List<String> names = tok.getAllTokens();
-    filenames = new ArrayList<>(names.size());
+    filenames = new ArrayList<String>(names.size());
     for (String name : names) {
       filenames.add(name.trim());
     }
@@ -116,7 +116,7 @@ public class BatchRunner
 
   public BatchRunner(List<File> files) {
     this();
-    filenames = new ArrayList<>(files.size());
+    filenames = new ArrayList<String>(files.size());
     for (File f : files) {
       filenames.add(f.getAbsolutePath());
     }

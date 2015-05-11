@@ -54,8 +54,8 @@ public class MacroStorage {
 
   public MacroStorage(String id) {
     storageId = id;
-    allMacros = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
-    groups = new ArrayList<>();
+    allMacros = new TreeMap<String, MacroDefinition>(CaseInsensitiveComparator.INSTANCE);
+    groups = new ArrayList<MacroGroup>();
   }
 
   public synchronized MacroDefinition getMacro(String key) {
@@ -94,7 +94,7 @@ public class MacroStorage {
 
   public void addChangeListener(MacroChangeListener aListener) {
     if (this.changeListeners == null) {
-      this.changeListeners = new ArrayList<>();
+      this.changeListeners = new ArrayList<MacroChangeListener>();
     }
     this.changeListeners.add(aListener);
   }
@@ -369,7 +369,7 @@ public class MacroStorage {
    * contain only macros hat have isVisibleInMenu() == true
    */
   public List<MacroGroup> getVisibleGroups() {
-    List<MacroGroup> result = new ArrayList<>(groups.size());
+    List<MacroGroup> result = new ArrayList<MacroGroup>(groups.size());
     synchronized (lock) {
       for (MacroGroup group : groups) {
         if (group.isVisibleInMenu() && group.getVisibleMacroSize() > 0) {

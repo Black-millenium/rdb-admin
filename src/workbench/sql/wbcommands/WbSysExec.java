@@ -115,7 +115,7 @@ public class WbSysExec
       }
 
       File cwd = new File(getBaseDir());
-      List<String> args = new ArrayList<>();
+      List<String> args = new ArrayList<String>();
 
       List<String> params = cmdLine.getList(ARG_PRG_ARG);
 
@@ -191,7 +191,7 @@ public class WbSysExec
     if (CollectionUtil.isEmpty(command)) return command;
 
     String os = getOSID();
-    List<String> args = new ArrayList<>(command.size() + 2);
+    List<String> args = new ArrayList<String>(command.size() + 2);
 
     String first = StringUtil.getFirstWord(command.get(0)).toLowerCase();
 

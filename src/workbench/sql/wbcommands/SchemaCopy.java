@@ -212,7 +212,7 @@ class SchemaCopy
   }
 
   private void mapTables() {
-    targetToSourceMap = new HashMap<>(sourceTables.size());
+    targetToSourceMap = new HashMap<TableIdentifier, TableIdentifier>(sourceTables.size());
 
     String currentTargetSchema = this.targetConnection.getMetadata().getCurrentSchema();
     String currentTargetCatalog = this.targetConnection.getMetadata().getCurrentCatalog();
@@ -322,7 +322,7 @@ class SchemaCopy
         this.rowMonitor.setCurrentObject(ResourceMgr.getString("MsgFkDeps"), -1, -1);
       }
 
-      List<TableIdentifier> tables = new ArrayList<>(targetToSourceMap.keySet());
+      List<TableIdentifier> tables = new ArrayList<TableIdentifier>(targetToSourceMap.keySet());
       TableDependencySorter sorter = new TableDependencySorter(targetConnection);
       List<TableIdentifier> sorted = null;
       if (forInsert) {
@@ -374,7 +374,7 @@ class SchemaCopy
     if (cancel) return false;
 
     if (checkDependencies && !doSyncDelete) {
-      List<TableIdentifier> targetTables = new ArrayList<>(targetToSourceMap.keySet());
+      List<TableIdentifier> targetTables = new ArrayList<TableIdentifier>(targetToSourceMap.keySet());
 
       // The table list is needed if the -deleteTarget=true was specified
       // and checkDependencies. In that case, all target tables must be deleted

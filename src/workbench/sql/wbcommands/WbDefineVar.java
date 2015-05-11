@@ -286,7 +286,7 @@ public class WbDefineVar
   private List<String> evaluateSql(WbConnection conn, String sql, StatementRunnerResult stmtResult)
       throws SQLException {
     ResultSet rs = null;
-    List<String> result = new ArrayList<>(1);
+    List<String> result = new ArrayList<String>(1);
     if (conn == null) {
       throw new SQLException("Cannot evaluate SQL based variable without a connection");
     }

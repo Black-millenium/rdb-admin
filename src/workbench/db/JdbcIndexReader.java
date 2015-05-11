@@ -149,7 +149,7 @@ public class JdbcIndexReader
     if (this.metaData.getDbSettings().supportsGetPrimaryKeys()) {
       String catalog = tbl.getCatalog();
       String schema = tbl.getSchema();
-      List<IndexColumn> cols = new ArrayList<>();
+      List<IndexColumn> cols = new ArrayList<IndexColumn>();
 
       ResultSet keysRs = null;
       String pkStatus = null;
@@ -654,7 +654,7 @@ public class JdbcIndexReader
    * @see IndexDefinition#isPrimaryKeyIndex()
    */
   public List<IndexDefinition> getTableIndexList(TableIdentifier table, boolean uniqueOnly, boolean checkPK) {
-    if (table == null) return new ArrayList<>();
+    if (table == null) return new ArrayList<IndexDefinition>();
 
     ResultSet idxRs = null;
     TableIdentifier tbl = table.createCopy();
@@ -672,7 +672,7 @@ public class JdbcIndexReader
       result = processIndexResult(idxRs, pk, tbl);
     } catch (Exception e) {
       LogMgr.logWarning("JdbcIndexReader.getTableIndexInformation()", "Could not retrieve indexes", e);
-      result = new ArrayList<>(0);
+      result = new ArrayList<IndexDefinition>(0);
     } finally {
       SqlUtil.closeResult(idxRs);
       indexInfoProcessed();
@@ -689,7 +689,7 @@ public class JdbcIndexReader
     // This will map an indexname to an IndexDefinition object
     // getIndexInfo() returns one row for each column
     // so the columns of the index are collected in the IndexDefinition
-    HashMap<String, IndexDefinition> defs = new HashMap<>();
+    HashMap<String, IndexDefinition> defs = new HashMap<String, IndexDefinition>();
 
     boolean supportsDirection = metaData.getDbSettings().supportsSortedIndex();
     boolean ignoreZeroOrdinalPos = metaData.getDbSettings().ignoreIndexColumnWithOrdinalZero();
@@ -797,7 +797,7 @@ public class JdbcIndexReader
     }
 
     processIndexList(indexes);
-    return new ArrayList<>(indexes);
+    return new ArrayList<IndexDefinition>(indexes);
   }
 
   /**
@@ -904,7 +904,7 @@ public class JdbcIndexReader
       LogMgr.logInfo("JdbcIndexReader.getIndexes()", "Retrieving index list using:\n" + sql);
     }
 
-    List<IndexDefinition> result = new ArrayList<>();
+    List<IndexDefinition> result = new ArrayList<IndexDefinition>();
     Statement stmt = null;
     ResultSet rs = null;
 

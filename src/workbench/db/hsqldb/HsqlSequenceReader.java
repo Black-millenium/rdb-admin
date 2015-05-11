@@ -126,7 +126,7 @@ public class HsqlSequenceReader
     DataStore ds = getRawSequenceDefinition(catalog, owner, namePattern);
     if (ds == null) return Collections.emptyList();
 
-    List<SequenceDefinition> result = new ArrayList<>();
+    List<SequenceDefinition> result = new ArrayList<SequenceDefinition>();
 
     for (int row = 0; row < ds.getRowCount(); row++) {
       result.add(createSequenceDefinition(ds, row));

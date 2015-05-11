@@ -109,7 +109,7 @@ public class TableDeleter {
 
     boolean hasError = false;
 
-    List<TableIdentifier> deletedTables = new ArrayList<>();
+    List<TableIdentifier> deletedTables = new ArrayList<TableIdentifier>();
 
     try {
       this.currentStatement = this.connection.createStatement();

@@ -38,7 +38,7 @@ public class MacroAnnotation
   public static final String MAP_KEYWORD = "map";
   public static final String NAME_KEYWORD = "name";
   public static final String ANNOTATION = "WbMacro";
-  private Map<String, String> columnMap = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+  private Map<String, String> columnMap = new TreeMap<String, String>(CaseInsensitiveComparator.INSTANCE);
 
   public MacroAnnotation() {
     super(ANNOTATION);

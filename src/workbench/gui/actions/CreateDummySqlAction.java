@@ -69,8 +69,8 @@ public class CreateDummySqlAction
   @Override
   public void executeAction(ActionEvent e) {
     List<? extends DbObject> objects = source.getSelectedObjects();
-    List<DbObject> scriptObjects = new ArrayList<>(objects.size());
-    List<ColumnIdentifier> cols = new ArrayList<>();
+    List<DbObject> scriptObjects = new ArrayList<DbObject>(objects.size());
+    List<ColumnIdentifier> cols = new ArrayList<ColumnIdentifier>();
     for (DbObject dbo : objects) {
       if (dbo instanceof TableIdentifier) {
         TableIdentifier tbl = (TableIdentifier) dbo;

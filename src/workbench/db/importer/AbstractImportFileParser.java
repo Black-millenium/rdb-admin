@@ -86,7 +86,7 @@ public abstract class AbstractImportFileParser
 
   protected JobErrorHandler errorHandler;
 
-  protected List<File> filesProcessed = new ArrayList<>(25);
+  protected List<File> filesProcessed = new ArrayList<File>(25);
   protected BlobDecoder blobDecoder = new BlobDecoder();
   protected RowActionMonitor rowMonitor;
   protected boolean ignoreMissingColumns;
@@ -432,7 +432,7 @@ public abstract class AbstractImportFileParser
   }
 
   protected List<ColumnIdentifier> getColumnsToImport() {
-    List<ColumnIdentifier> result = new ArrayList<>();
+    List<ColumnIdentifier> result = new ArrayList<ColumnIdentifier>();
     for (ImportFileColumn col : importColumns) {
       if (col.getTargetIndex() >= 0) {
         result.add(col.getColumn());

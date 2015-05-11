@@ -37,9 +37,9 @@ import java.util.*;
 class ProfileListModel
     extends DefaultTreeModel {
   private final DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("Profiles");
-  private final List<ConnectionProfile> profiles = new ArrayList<>();
+  private final List<ConnectionProfile> profiles = new ArrayList<ConnectionProfile>();
   ;
-  private final List<ConnectionProfile> filtered = new ArrayList<>();
+  private final List<ConnectionProfile> filtered = new ArrayList<ConnectionProfile>();
 
   ProfileListModel() {
     super(null, true);
@@ -156,7 +156,7 @@ class ProfileListModel
 
   public List<String> getGroups() {
     if (this.rootNode == null) return null;
-    List<String> result = new LinkedList<>();
+    List<String> result = new LinkedList<String>();
     int children = this.getChildCount(this.rootNode);
     for (int i = 0; i < children; i++) {
       DefaultMutableTreeNode n = (DefaultMutableTreeNode) getChild(rootNode, i);
@@ -283,7 +283,7 @@ class ProfileListModel
   }
 
   private List<ConnectionProfile> getAllProfiles() {
-    List<ConnectionProfile> current = new ArrayList<>(profiles.size() + filtered.size());
+    List<ConnectionProfile> current = new ArrayList<ConnectionProfile>(profiles.size() + filtered.size());
     for (ConnectionProfile prof : profiles) {
       current.add(prof);
     }
@@ -302,7 +302,7 @@ class ProfileListModel
     rootNode.removeAllChildren();
 
     // Make sure the default group is added as the first item!
-    List<String> groups = new ArrayList<>();
+    List<String> groups = new ArrayList<String>();
     groups.addAll(groupMap.keySet());
     Collections.sort(groups, CaseInsensitiveComparator.INSTANCE);
 

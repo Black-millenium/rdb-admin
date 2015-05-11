@@ -41,13 +41,13 @@ import java.util.*;
 class ObjectCache {
   private static final String NULL_SCHEMA = "-$$wb-null-schema$$-";
   private final Set<String> schemasInCache = CollectionUtil.caseInsensitiveSet();
-  private final Map<TableIdentifier, List<DependencyNode>> referencedTables = new HashMap<>();
-  private final Map<TableIdentifier, List<DependencyNode>> referencingTables = new HashMap<>();
-  private final Map<TableIdentifier, List<ColumnIdentifier>> objects = new HashMap<>();
-  private final Map<TableIdentifier, TableIdentifier> synonymMap = new HashMap<>();
-  private final Map<TableIdentifier, List<IndexDefinition>> indexMap = new HashMap<>();
-  private final Map<TableIdentifier, PkDefinition> pkMap = new HashMap<>();
-  private final Map<String, List<ProcedureDefinition>> procedureCache = new HashMap<>();
+  private final Map<TableIdentifier, List<DependencyNode>> referencedTables = new HashMap<TableIdentifier, List<DependencyNode>>();
+  private final Map<TableIdentifier, List<DependencyNode>> referencingTables = new HashMap<TableIdentifier, List<DependencyNode>>();
+  private final Map<TableIdentifier, List<ColumnIdentifier>> objects = new HashMap<TableIdentifier, List<ColumnIdentifier>>();
+  private final Map<TableIdentifier, TableIdentifier> synonymMap = new HashMap<TableIdentifier, TableIdentifier>();
+  private final Map<TableIdentifier, List<IndexDefinition>> indexMap = new HashMap<TableIdentifier, List<IndexDefinition>>();
+  private final Map<TableIdentifier, PkDefinition> pkMap = new HashMap<TableIdentifier, PkDefinition>();
+  private final Map<String, List<ProcedureDefinition>> procedureCache = new HashMap<String, List<ProcedureDefinition>>();
   private final TableIdentifier dummyTable = new TableIdentifier("-$WB DUMMY$-", "-$WB DUMMY$-");
   private boolean retrieveOraclePublicSynonyms;
   private ObjectNameFilter schemaFilter;
@@ -206,7 +206,7 @@ class ObjectCache {
   }
 
   Map<String, List<ProcedureDefinition>> getProcedures() {
-    if (procedureCache == null) return new HashMap<>(0);
+    if (procedureCache == null) return new HashMap<String, List<ProcedureDefinition>>(0);
     return procedureCache;
   }
 
@@ -238,7 +238,7 @@ class ObjectCache {
   }
 
   private Set<TableIdentifier> filterTablesByType(WbConnection conn, List<String> schemas, List<String> requestedTypes) {
-    SortedSet<TableIdentifier> result = new TreeSet<>(new TableNameSorter());
+    SortedSet<TableIdentifier> result = new TreeSet<TableIdentifier>(new TableNameSorter());
     String currentSchema = null;
     if (schemas.size() == 1) {
       currentSchema = schemas.get(0);
@@ -274,10 +274,10 @@ class ObjectCache {
   }
 
   private Set<TableIdentifier> filterTablesBySchema(WbConnection dbConnection, List<String> schemas) {
-    SortedSet<TableIdentifier> result = new TreeSet<>(new TableNameSorter(true));
+    SortedSet<TableIdentifier> result = new TreeSet<TableIdentifier>(new TableNameSorter(true));
     DbMetadata meta = dbConnection.getMetadata();
 
-    List<String> schemasToCheck = new ArrayList<>(schemas.size());
+    List<String> schemasToCheck = new ArrayList<String>(schemas.size());
     for (String s : schemas) {
       if (s != null) schemasToCheck.add(s);
     }
@@ -462,7 +462,7 @@ class ObjectCache {
   synchronized void addProcedureList(DataStore procs, String schema) {
     if (schema == null) return;
     int count = procs.getRowCount();
-    List<ProcedureDefinition> procList = new ArrayList<>();
+    List<ProcedureDefinition> procList = new ArrayList<ProcedureDefinition>();
     for (int row = 0; row < count; row++) {
       Object uo = procs.getRow(row).getUserObject();
       if (uo instanceof ProcedureDefinition) {
@@ -568,7 +568,7 @@ class ObjectCache {
     List<ColumnIdentifier> columns = this.objects.get(toSearch);
     if (CollectionUtil.isEmpty(columns)) return null;
 
-    List<String> pkCols = new ArrayList<>(1);
+    List<String> pkCols = new ArrayList<String>(1);
     for (ColumnIdentifier col : columns) {
       if (col.isPkColumn()) {
         pkCols.add(col.getColumnName());
@@ -588,7 +588,7 @@ class ObjectCache {
       if (indexes == null) {
         IndexReader reader = ReaderFactory.getIndexReader(con.getMetadata());
         indexes = reader.getUniqueIndexes(table);
-        if (indexes == null) indexes = new ArrayList<>(0);
+        if (indexes == null) indexes = new ArrayList<IndexDefinition>(0);
         indexMap.put(table, indexes);
       }
       return indexes;

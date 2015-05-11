@@ -46,7 +46,7 @@ public class WbWorkspace
   private boolean isReadOnly;
   private WbProperties tabInfo = new WbProperties(null, 0);
   private int tabCount = -1;
-  private Map<String, WbProperties> toolProperties = new HashMap<>();
+  private Map<String, WbProperties> toolProperties = new HashMap<String, WbProperties>();
 
   public WbWorkspace(String archiveName, boolean createNew)
       throws IOException {
@@ -135,7 +135,7 @@ public class WbWorkspace
   }
 
   public void setToolProperties(Map<String, WbProperties> toolProps) {
-    this.toolProperties = new HashMap<>(toolProps);
+    this.toolProperties = new HashMap<String, WbProperties>(toolProps);
   }
 
   public void addHistoryEntry(int index, SqlHistory history)

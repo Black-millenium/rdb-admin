@@ -41,7 +41,7 @@ public class CteParser {
 
   private String baseSql;
   private int baseSqlStart;
-  private List<CteDefinition> cteList = new ArrayList<>();
+  private List<CteDefinition> cteList = new ArrayList<CteDefinition>();
 
   CteParser(String sql) {
     parseCte(null, sql);
@@ -137,7 +137,7 @@ public class CteParser {
 
   private List<ColumnIdentifier> getColumnsFromDefinition(String columnList) {
     List<String> cl = StringUtil.stringToList(columnList, ",", true, true, false, true);
-    List<ColumnIdentifier> cols = new ArrayList<>(cl.size());
+    List<ColumnIdentifier> cols = new ArrayList<ColumnIdentifier>(cl.size());
     int colIndex = 1;
     for (String col : cl) {
       SelectColumn sc = new SelectColumn(col);
@@ -151,7 +151,7 @@ public class CteParser {
 
   private List<ColumnIdentifier> getColumnsFromSelect(String select, WbConnection conn) {
     List<String> cl = SqlUtil.getSelectColumns(select, true, conn);
-    List<ColumnIdentifier> cols = new ArrayList<>(cl.size());
+    List<ColumnIdentifier> cols = new ArrayList<ColumnIdentifier>(cl.size());
 
     int colIndex = 1;
     for (String col : cl) {

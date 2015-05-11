@@ -41,8 +41,8 @@ import java.util.List;
  * @author Thomas Kellerer
  */
 public class SourceTableArgument {
-  private List<String> missingTables = new ArrayList<>();
-  private List<TableIdentifier> tables = new ArrayList<>();
+  private List<String> missingTables = new ArrayList<String>();
+  private List<TableIdentifier> tables = new ArrayList<TableIdentifier>();
   private boolean wildcardsPresent;
   private boolean schemaAsCatalog;
 
@@ -201,7 +201,7 @@ public class SourceTableArgument {
     tok.setDelimiterNeedsWhitspace(false);
     tok.setCheckBrackets(false);
     tok.setKeepQuotes(true);
-    List<String> result = new LinkedList<>();
+    List<String> result = new LinkedList<String>();
     while (tok.hasMoreTokens()) {
       String element = tok.nextToken();
       if (element == null) continue;

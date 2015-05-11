@@ -68,7 +68,7 @@ public class DefaultTriggerReader
   public List<TriggerDefinition> getTriggerList(String catalog, String schema, String baseTable)
       throws SQLException {
     DataStore triggers = getTriggers(catalog, schema, baseTable);
-    List<TriggerDefinition> result = new ArrayList<>(triggers.getRowCount());
+    List<TriggerDefinition> result = new ArrayList<TriggerDefinition>(triggers.getRowCount());
     for (int row = 0; row < triggers.getRowCount(); row++) {
       String trgName = triggers.getValueAsString(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_NAME);
       String trgType = triggers.getValueAsString(row, COLUMN_IDX_TABLE_TRIGGERLIST_TRG_TYPE);

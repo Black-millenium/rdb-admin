@@ -103,7 +103,7 @@ public class SqlServerObjectListEnhancer
       schema = con.getMetadata().getCurrentSchema();
     }
 
-    Map<String, String> remarks = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+    Map<String, String> remarks = new TreeMap<String, String>(CaseInsensitiveComparator.INSTANCE);
     String type = null;
     try {
       for (String requestedType : requestedTypes) {

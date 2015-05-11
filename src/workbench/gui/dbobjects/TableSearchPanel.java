@@ -390,7 +390,7 @@ public class TableSearchPanel
 
     int[] selectedTables = this.tableNames.getSelectedRows();
 
-    List<TableIdentifier> searchTables = new ArrayList<>(this.tableNames.getSelectedRowCount());
+    List<TableIdentifier> searchTables = new ArrayList<TableIdentifier>(this.tableNames.getSelectedRowCount());
     DataStore tables = ((WbTable) (this.tableNames)).getDataStore();
     for (int i = 0; i < selectedTables.length; i++) {
       String catalog = tables.getValueAsString(selectedTables[i], DbMetadata.COLUMN_IDX_TABLE_LIST_CATALOG);

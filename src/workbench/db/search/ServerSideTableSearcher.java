@@ -303,9 +303,9 @@ public class ServerSideTableSearcher
   @Override
   public void setTableNames(List<TableIdentifier> tables) {
     if (tables == null) {
-      this.tablesToSearch = new ArrayList<>(0);
+      this.tablesToSearch = new ArrayList<TableIdentifier>(0);
     } else {
-      this.tablesToSearch = new ArrayList<>(tables);
+      this.tablesToSearch = new ArrayList<TableIdentifier>(tables);
     }
   }
 

@@ -80,7 +80,7 @@ public class PostgresProcedureReader
       // This map is a private attribute of the class org.postgresql.jdbc2.TypeInfoCache
       // so, even if I hardcoded references to the Postgres driver I wouldn't be able
       // to use the information.
-      pgType2Java = new HashMap<>();
+      pgType2Java = new HashMap<String, Integer>();
       pgType2Java.put("int2", Integer.valueOf(Types.SMALLINT));
       pgType2Java.put("int4", Integer.valueOf(Types.INTEGER));
       pgType2Java.put("integer", Integer.valueOf(Types.INTEGER));
@@ -115,7 +115,7 @@ public class PostgresProcedureReader
 
   protected PGTypeLookup getTypeLookup() {
     if (pgTypes == null) {
-      Map<Long, PGType> typeMap = new HashMap<>(300);
+      Map<Long, PGType> typeMap = new HashMap<Long, PGType>(300);
       Statement stmt = null;
       ResultSet rs = null;
       Savepoint sp = null;
@@ -750,7 +750,7 @@ public class PostgresProcedureReader
   }
 
   private List<ColumnIdentifier> convertToColumns(List<String> argNames, List<String> argTypes, List<String> argModes) {
-    List<ColumnIdentifier> result = new ArrayList<>(argTypes.size());
+    List<ColumnIdentifier> result = new ArrayList<ColumnIdentifier>(argTypes.size());
     for (int i = 0; i < argTypes.size(); i++) {
       int typeOid = StringUtil.getIntValue(argTypes.get(i), -1);
       String pgt = getTypeNameFromOid(typeOid);

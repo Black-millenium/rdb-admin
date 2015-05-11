@@ -37,7 +37,7 @@ import java.util.*;
  */
 class DependencyDuplicateFinder {
   private final DependencyNode root;
-  private final Map<TableIdentifier, Integer> tableLevels = new HashMap<>();
+  private final Map<TableIdentifier, Integer> tableLevels = new HashMap<TableIdentifier, Integer>();
 
   DependencyDuplicateFinder(DependencyNode rootNode) {
     this.root = rootNode;
@@ -56,7 +56,7 @@ class DependencyDuplicateFinder {
   }
 
   Set<String> getDuplicates() {
-    Set<String> result = new HashSet<>();
+    Set<String> result = new HashSet<String>();
     List<NodeInformation> tree = buildTree(root, 0);
     for (NodeInformation info : tree) {
       if (info.level > getHighestLevel(info.node.getTable())) {
@@ -97,7 +97,7 @@ class DependencyDuplicateFinder {
   }
 
   List<NodeInformation> buildTree(DependencyNode root, int level) {
-    List<NodeInformation> result = new ArrayList<>();
+    List<NodeInformation> result = new ArrayList<NodeInformation>();
     List<DependencyNode> children = root.getChildren();
     if (children.isEmpty()) return result;
 

@@ -47,7 +47,7 @@ import java.util.Map;
  */
 public class DB2TypeReader
     implements ObjectListExtender, ObjectListEnhancer {
-  private final Map<String, Integer> typeNameMap = new HashMap<>(10);
+  private final Map<String, Integer> typeNameMap = new HashMap<String, Integer>(10);
 
   public DB2TypeReader() {
     typeNameMap.put("VARCHAR", Types.VARCHAR);
@@ -100,7 +100,7 @@ public class DB2TypeReader
   }
 
   public List<DB2ObjectType> getTypes(WbConnection con, String schemaPattern, String namePattern) {
-    List<DB2ObjectType> result = new ArrayList<>();
+    List<DB2ObjectType> result = new ArrayList<DB2ObjectType>();
     String select =
         "select typeschema,  \n" +
             "       typename,   \n" +
@@ -306,7 +306,7 @@ public class DB2TypeReader
 
     Statement stmt = null;
     ResultSet rs = null;
-    List<ColumnIdentifier> result = new ArrayList<>(type.getNumberOfAttributes());
+    List<ColumnIdentifier> result = new ArrayList<ColumnIdentifier>(type.getNumberOfAttributes());
     try {
       stmt = con.createStatementForQuery();
       rs = stmt.executeQuery(sql);

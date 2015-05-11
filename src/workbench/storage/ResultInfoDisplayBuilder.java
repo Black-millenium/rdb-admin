@@ -33,7 +33,7 @@ import java.util.List;
 public class ResultInfoDisplayBuilder {
 
   public static DataStore getDataStore(ResultInfo info, boolean showComments, boolean showTableName) {
-    List<String> columns = new ArrayList<>(12);
+    List<String> columns = new ArrayList<String>(12);
     columns.add("INDEX");
     columns.add("COLUMN_NAME");
     columns.add("ALIAS");

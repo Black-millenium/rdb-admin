@@ -72,8 +72,8 @@ public class ConstantColumnValues {
   protected final void init(List<String> entries, List<ColumnIdentifier> tableColumns, ValueConverter converter)
       throws SQLException, ConverterException {
 
-    columnValues = new ArrayList<>(entries.size());
-    selectStatements = new HashMap<>();
+    columnValues = new ArrayList<ColumnData>(entries.size());
+    selectStatements = new HashMap<Integer, ValueStatement>();
 
     for (String entry : entries) {
       int pos = entry.indexOf('=');

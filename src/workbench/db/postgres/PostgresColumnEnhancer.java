@@ -136,7 +136,7 @@ public class PostgresColumnEnhancer
     PreparedStatement stmt = null;
     ResultSet rs = null;
 
-    HashMap<String, ArrayDef> dims = new HashMap<>(table.getColumnCount());
+    HashMap<String, ArrayDef> dims = new HashMap<String, ArrayDef>(table.getColumnCount());
 
     try {
       stmt = conn.getSqlConnection().prepareStatement(sql);

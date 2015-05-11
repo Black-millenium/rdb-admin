@@ -45,7 +45,7 @@ import java.util.List;
  */
 public class TextComponentMouseListener
     implements MouseListener, CaretListener {
-  private List<JMenuItem> additionalItems = new LinkedList<>();
+  private List<JMenuItem> additionalItems = new LinkedList<JMenuItem>();
   private TextPopup popup;
   private JTextComponent text;
   private int originalComponentCount = -1;

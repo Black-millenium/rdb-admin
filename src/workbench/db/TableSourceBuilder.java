@@ -176,7 +176,7 @@ public class TableSourceBuilder {
     if (CollectionUtil.isEmpty(indexList)) return indexList;
     if (CollectionUtil.isEmpty(foreignKeys)) return indexList;
 
-    List<IndexDefinition> result = new ArrayList<>(indexList.size());
+    List<IndexDefinition> result = new ArrayList<IndexDefinition>(indexList.size());
     for (IndexDefinition idx : indexList) {
       if (!isFKName(idx.getName(), foreignKeys)) {
         result.add(idx);
@@ -469,7 +469,7 @@ public class TableSourceBuilder {
   }
 
   private List<String> findPkColumns(List<ColumnIdentifier> columns) {
-    List<String> result = new ArrayList<>(2);
+    List<String> result = new ArrayList<String>(2);
     for (ColumnIdentifier column : columns) {
       if (column.isPkColumn()) {
         result.add(column.getColumnName());
@@ -487,7 +487,7 @@ public class TableSourceBuilder {
     int maxTypeLength = 0;
 
     // Make sure the columns are sorted correctly
-    List<ColumnIdentifier> cols = new ArrayList<>(columns);
+    List<ColumnIdentifier> cols = new ArrayList<ColumnIdentifier>(columns);
     ColumnIdentifier.sortByPosition(cols);
 
     // calculate the longest column name, so that the display can be formatted
@@ -524,7 +524,7 @@ public class TableSourceBuilder {
   }
 
   private List<String> getPKColsFromIndex(List<IndexDefinition> indexList) {
-    List<String> columns = new ArrayList<>();
+    List<String> columns = new ArrayList<String>();
     for (IndexDefinition index : indexList) {
       if (index != null && index.isPrimaryKeyIndex()) {
         for (IndexColumn col : index.getColumns()) {
@@ -710,7 +710,7 @@ public class TableSourceBuilder {
 
     FkTemplate tmpl = new FkTemplate(dbConnection.getDbId(), forInlineUse);
     String template = tmpl.getSQLTemplate();
-    List<String> fkStatements = new ArrayList<>(fkList.size());
+    List<String> fkStatements = new ArrayList<String>(fkList.size());
 
     for (DependencyNode node : fkList) {
       String fkname = node.getFkName();

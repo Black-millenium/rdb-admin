@@ -56,7 +56,7 @@ public class TableListParser {
 
     String fromPart = SqlParsingUtil.getFromPart(sql, lexer);
     if (StringUtil.isBlank(fromPart)) return Collections.emptyList();
-    List<Alias> result = new LinkedList<>();
+    List<Alias> result = new LinkedList<Alias>();
 
     try {
       lexer.setInput(fromPart);

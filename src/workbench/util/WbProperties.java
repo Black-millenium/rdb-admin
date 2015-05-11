@@ -40,8 +40,8 @@ public class WbProperties
     extends Properties
     implements PropertyStorage {
   private static final long serialVersionUID = 1L;
-  private final Map<String, List<PropertyChangeListener>> changeListeners = new HashMap<>();
-  private final Map<String, String> comments = new HashMap<>();
+  private final Map<String, List<PropertyChangeListener>> changeListeners = new HashMap<String, List<PropertyChangeListener>>();
+  private final Map<String, String> comments = new HashMap<String, String>();
   private int distinctSections;
   private Object changeNotificationSource = null;
   private boolean changed = false;
@@ -75,9 +75,8 @@ public class WbProperties
 
   public synchronized void saveToFile(File filename, WbProperties reference)
       throws IOException {
-    try (FileOutputStream out = new FileOutputStream(filename)) {
+      FileOutputStream out = new FileOutputStream(filename);
       this.save(out, reference);
-    }
   }
 
   public synchronized void save(OutputStream out)
@@ -209,7 +208,7 @@ public class WbProperties
       for (String prop : properties) {
         List<PropertyChangeListener> listeners = this.changeListeners.get(prop);
         if (listeners == null) {
-          listeners = new ArrayList<>();
+          listeners = new ArrayList<PropertyChangeListener>();
           this.changeListeners.put(prop, listeners);
         }
         listeners.add(aListener);
@@ -233,7 +232,7 @@ public class WbProperties
     if (listeners == null || listeners.isEmpty()) return;
 
     // Making a shallow copy of the list prevents a ConcurrentModificationException
-    List<PropertyChangeListener> l2 = new ArrayList<>(listeners);
+    List<PropertyChangeListener> l2 = new ArrayList<PropertyChangeListener>(listeners);
     PropertyChangeEvent evt = new PropertyChangeEvent(this.changeNotificationSource, name, oldValue, newValue);
 
     for (PropertyChangeListener l : l2) {
@@ -250,11 +249,11 @@ public class WbProperties
 
   public List<String> getKeysWithPrefix(String prefix) {
     if (prefix == null) {
-      return new ArrayList<>(getKeys());
+      return new ArrayList<String>(getKeys());
     }
 
     Set<String> keys = getKeys();
-    List<String> result = new ArrayList<>();
+    List<String> result = new ArrayList<String>();
 
     for (String key : keys) {
       if (key.contains(prefix)) {

@@ -85,7 +85,7 @@ public class TableExporter
       ExportType type = dialog.getExportType();
       this.extension = type.getDefaultFileExtension();
 
-      this.toExport = new ArrayList<>(tables.size());
+      this.toExport = new ArrayList<TableIdentifier>(tables.size());
 
       for (DbObject dbo : tables) {
         String ttype = dbo.getObjectType();

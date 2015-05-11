@@ -45,12 +45,12 @@ public class ColumnWidthDefinition {
     if (entries == null || entries.isEmpty()) {
       return;
     }
-    this.columnWidths = new HashMap<>();
+    this.columnWidths = new HashMap<ColumnIdentifier, Integer>();
 
     for (String def : entries) {
       String[] parms = def.split("=");
 
-      if (parms == null || parms.length != 2) {
+      if (parms.length != 2) {
         throw new MissingWidthDefinition(def);
       }
       ColumnIdentifier col = new ColumnIdentifier(parms[0]);

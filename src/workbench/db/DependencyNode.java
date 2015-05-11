@@ -48,8 +48,8 @@ public class DependencyNode
    * <p/>
    * The LinkedHashMap is used to preserve the order of the columns in the FK definition.
    */
-  private final Map<String, String> columns = new LinkedHashMap<>();
-  private final List<DependencyNode> childTables = new ArrayList<>();
+  private final Map<String, String> columns = new LinkedHashMap<String, String>();
+  private final List<DependencyNode> childTables = new ArrayList<DependencyNode>();
   private DependencyNode parentNode;
   private String updateAction = "";
   private String deleteAction = "";

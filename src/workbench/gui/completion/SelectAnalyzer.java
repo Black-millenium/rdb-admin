@@ -277,7 +277,7 @@ public class SelectAnalyzer
 
   private List getColumnsForHaving() {
     List<String> cols = SqlUtil.getSelectColumns(this.sql, false, dbConnection);
-    List<String> validCols = new LinkedList<>();
+    List<String> validCols = new LinkedList<String>();
     for (String col : cols) {
       if (col.indexOf('(') > -1 && col.indexOf(')') > -1) {
         validCols.add(col);
@@ -288,7 +288,7 @@ public class SelectAnalyzer
 
   private List getColumnsForGroupBy() {
     List<String> cols = SqlUtil.getSelectColumns(this.sql, false, dbConnection);
-    List<String> validCols = new LinkedList<>();
+    List<String> validCols = new LinkedList<String>();
     String[] funcs = new String[]{"sum", "count", "avg", "min", "max"};
     StringBuilder regex = new StringBuilder(50);
     for (int i = 0; i < funcs.length; i++) {
@@ -313,7 +313,7 @@ public class SelectAnalyzer
   @Override
   public List<TableAlias> getTables() {
     List<Alias> tables = SqlUtil.getTables(sql, true, dbConnection);
-    List<TableAlias> result = new ArrayList<>(tables.size());
+    List<TableAlias> result = new ArrayList<TableAlias>(tables.size());
     for (Alias s : tables) {
       TableAlias tbl = new TableAlias(s.getObjectName());
       tbl.setAlias(s.getAlias());

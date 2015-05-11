@@ -48,10 +48,10 @@ public class TableDependency {
   private final WbConnection connection;
   private final DbMetadata metaData;
   private final FKHandler fkHandler;
-  private final List<DependencyNode> leafs = new ArrayList<>();
-  private final Map<DependencyNode, DependencyNode> visitedRelations = new HashMap<>();
-  private final Set<DependencyNode> visitedParents = new HashSet<>();
-  private final List<TableIdentifier> excludeTables = new ArrayList<>();
+  private final List<DependencyNode> leafs = new ArrayList<DependencyNode>();
+  private final Map<DependencyNode, DependencyNode> visitedRelations = new HashMap<DependencyNode, DependencyNode>();
+  private final Set<DependencyNode> visitedParents = new HashSet<DependencyNode>();
+  private final List<TableIdentifier> excludeTables = new ArrayList<TableIdentifier>();
   private TableIdentifier theTable;
   private DependencyNode tableRoot;
   private boolean directChildrenOnly;
@@ -524,7 +524,7 @@ public class TableDependency {
   }
 
   private Set<TableIdentifier> getAllTables(DependencyNode root) {
-    Set<TableIdentifier> result = new HashSet<>();
+    Set<TableIdentifier> result = new HashSet<TableIdentifier>();
     if (root == null) return result;
 
     List<DependencyNode> children = root.getChildren();
@@ -542,7 +542,7 @@ public class TableDependency {
   }
 
   private List<DependencyNode> getAllNodes(DependencyNode root) {
-    List<DependencyNode> result = new ArrayList<>();
+    List<DependencyNode> result = new ArrayList<DependencyNode>();
     if (root == null) {
       return result;
     }

@@ -47,7 +47,7 @@ public class DataStoreValueProvider
   @Override
   public Collection<String> getColumnValues(String columnName) {
     int rowCount = data.getRowCount();
-    Set<String> result = new TreeSet<>();
+    Set<String> result = new TreeSet<String>();
     int col = data.getColumnIndex(columnName);
     if (col < 0) return result;
 

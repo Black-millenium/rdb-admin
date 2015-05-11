@@ -99,7 +99,7 @@ public class PostgresSequenceAdjuster
             ") t \n" +
             "where sequence_name is not null";
 
-    Map<String, String> result = new HashMap<>();
+    Map<String, String> result = new HashMap<String, String>();
     try {
       pstmt = dbConnection.getSqlConnection().prepareStatement(sql);
       pstmt.setString(1, table.getRawTableName());

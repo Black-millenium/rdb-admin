@@ -56,7 +56,7 @@ public class ResultColumnMetaData {
     List<Alias> list = SqlUtil.getTables(sql, true, conn);
     if (CollectionUtil.isEmpty(list)) return;
 
-    tables = new ArrayList<>(list.size());
+    tables = new ArrayList<String>(list.size());
     for (Alias a : list) {
       tables.add(a.getName());
     }
@@ -74,7 +74,7 @@ public class ResultColumnMetaData {
 
     DbMetadata meta = connection.getMetadata();
 
-    Map<String, TableDefinition> tableDefs = new HashMap<>(tables.size());
+    Map<String, TableDefinition> tableDefs = new HashMap<String, TableDefinition>(tables.size());
     for (String table : tables) {
       if (StringUtil.isBlank(table)) continue;
 

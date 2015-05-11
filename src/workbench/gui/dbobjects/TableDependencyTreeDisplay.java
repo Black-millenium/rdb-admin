@@ -170,7 +170,7 @@ public class TableDependencyTreeDisplay
   private void buildTree(DependencyNode parent, DefaultMutableTreeNode treeParent) {
     String parenttable = parent.getTable().getTableName();
 
-    this.nodesToExpand = new ArrayList<>();
+    this.nodesToExpand = new ArrayList<TreeNode[]>();
 
     DefaultMutableTreeNode treeNode = null;
     String table = null;

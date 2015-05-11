@@ -85,7 +85,7 @@ public class PostgresExplainAnalyzer
 
     if (use90Options) {
       if (usedOptions.isEmpty()) {
-        elements = new ArrayList<>(options90.keySet());
+        elements = new ArrayList<String>(options90.keySet());
         context = CONTEXT_SYNTAX_COMPLETION;
       } else {
         String word = currentWord;
@@ -119,7 +119,7 @@ public class PostgresExplainAnalyzer
   }
 
   private Map<String, List<String>> get90Options() {
-    Map<String, List<String>> options = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+    Map<String, List<String>> options = new TreeMap<String, List<String>>(CaseInsensitiveComparator.INSTANCE);
     List<String> booleanValues = CollectionUtil.arrayList("true", "false");
     options.put("analyze", booleanValues);
     options.put("verbose", booleanValues);

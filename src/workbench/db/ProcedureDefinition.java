@@ -205,7 +205,7 @@ public class ProcedureDefinition
       if (procParams == null) {
         this.parameters = null;
       } else {
-        this.parameters = new ArrayList<>(procParams);
+        this.parameters = new ArrayList<ColumnIdentifier>(procParams);
       }
     }
   }
@@ -239,7 +239,7 @@ public class ProcedureDefinition
   public List<String> getParameterNames() {
     synchronized (this) {
       if (parameters == null) return Collections.emptyList();
-      List<String> result = new ArrayList<>(parameters.size());
+      List<String> result = new ArrayList<String>(parameters.size());
       for (ColumnIdentifier col : parameters) {
         result.add(col.getColumnName());
       }
@@ -250,7 +250,7 @@ public class ProcedureDefinition
   public List<String> getParameterTypes() {
     synchronized (this) {
       if (parameters == null) return Collections.emptyList();
-      List<String> result = new ArrayList<>(parameters.size());
+      List<String> result = new ArrayList<String>(parameters.size());
       for (ColumnIdentifier col : parameters) {
         result.add(col.getDbmsType());
       }

@@ -694,10 +694,19 @@ public class WbImport
         result.setFailure();
       }
       result.setWarning(imp.hasWarnings());
-    } catch (CycleErrorException | ParsingInterruptedException e) {
+    } catch (CycleErrorException e) {
       // Logging already done.
       result.setFailure();
-    } catch (IOException | SQLException | ConverterException e) {
+    } catch (ParsingInterruptedException e) {
+      // Logging already done.
+      result.setFailure();
+    } catch (IOException e) {
+      LogMgr.logError("WbImport.execute()", "Error importing " + (inputFile == null ? dir : inputFile), e);
+      result.setFailure();
+    } catch (SQLException e) {
+      LogMgr.logError("WbImport.execute()", "Error importing " + (inputFile == null ? dir : inputFile), e);
+      result.setFailure();
+    } catch (ConverterException e) {
       LogMgr.logError("WbImport.execute()", "Error importing " + (inputFile == null ? dir : inputFile), e);
       result.setFailure();
     } catch (Exception e) {
@@ -779,7 +788,7 @@ public class WbImport
 
   private List<ColumnIdentifier> stringToCols(String columns) {
     List<String> names = StringUtil.stringToList(columns, ",", true, true);
-    List<ColumnIdentifier> cols = new ArrayList<>(names.size());
+    List<ColumnIdentifier> cols = new ArrayList<ColumnIdentifier>(names.size());
     for (String name : names) {
       cols.add(new ColumnIdentifier(name));
     }

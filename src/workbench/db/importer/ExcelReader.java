@@ -87,7 +87,7 @@ public class ExcelReader
 
   @Override
   public List<String> getSheets() {
-    List<String> names = new ArrayList<>();
+    List<String> names = new ArrayList<String>();
 
     if (dataFile == null) {
       try {
@@ -158,7 +158,7 @@ public class ExcelReader
     }
     headerColumns = null;
     int numMergedRegions = dataSheet.getNumMergedRegions();
-    mergedRegions = new ArrayList<>(numMergedRegions);
+    mergedRegions = new ArrayList<CellRangeAddress>(numMergedRegions);
     for (int i = 0; i < numMergedRegions; i++) {
       mergedRegions.add(dataSheet.getMergedRegion(i));
     }
@@ -167,7 +167,7 @@ public class ExcelReader
   @Override
   public List<String> getHeaderColumns() {
     if (headerColumns == null) {
-      headerColumns = new ArrayList<>();
+      headerColumns = new ArrayList<String>();
       Row row = dataSheet.getRow(0);
 
       int colCount = row != null ? row.getLastCellNum() : 0;
@@ -263,7 +263,7 @@ public class ExcelReader
   @Override
   public List<Object> getRowValues(int rowIndex) {
     Row row = dataSheet.getRow(rowIndex);
-    ArrayList<Object> values = new ArrayList<>();
+    ArrayList<Object> values = new ArrayList<Object>();
 
     if (row == null) return values;
 

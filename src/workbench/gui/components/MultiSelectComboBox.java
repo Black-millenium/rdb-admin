@@ -239,7 +239,7 @@ public class MultiSelectComboBox<T extends Object>
    * @see #getSelectedCount()
    */
   public List<T> getSelectedItems() {
-    List<T> ret = new ArrayList<>();
+    List<T> ret = new ArrayList<T>();
     if (values.isEmpty()) return ret;
 
     synchronized (values) {
@@ -302,7 +302,7 @@ public class MultiSelectComboBox<T extends Object>
 
   private boolean isChanged() {
     List<T> selected = getSelectedItems();
-    return !Objects.equals(selected, lastSelected);
+    return !selected.equals(lastSelected);
   }
 
   private void closeAndFire() {

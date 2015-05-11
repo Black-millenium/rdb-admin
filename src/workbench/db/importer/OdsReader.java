@@ -81,7 +81,7 @@ public class OdsReader
   @Override
   public synchronized List<String> getHeaderColumns() {
     if (headerColumns == null) {
-      headerColumns = new ArrayList<>();
+      headerColumns = new ArrayList<String>();
       if (Settings.getInstance().getBoolProperty("workbench.ods.use.get_cell_count", true)) {
         readHeaderColsDefault();
       } else {
@@ -195,7 +195,7 @@ public class OdsReader
       colCount = columnList.size();
     }
 
-    List<Object> result = new ArrayList<>(colCount);
+    List<Object> result = new ArrayList<Object>(colCount);
     int nullCount = 0;
 
     for (int col = 0; col < colCount; col++) {
@@ -296,7 +296,7 @@ public class OdsReader
 
   @Override
   public List<String> getSheets() {
-    List<String> result = new ArrayList<>();
+    List<String> result = new ArrayList<String>();
     if (dataFile == null) {
       try {
         load();

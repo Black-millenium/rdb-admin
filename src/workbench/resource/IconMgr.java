@@ -42,7 +42,7 @@ public class IconMgr {
 
   private final RenderingHints scaleHint = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
-  private final Map<String, ImageIcon> iconCache = new HashMap<>();
+  private final Map<String, ImageIcon> iconCache = new HashMap<String, ImageIcon>();
   private final String filepath;
 
   private final int menuFontHeight;

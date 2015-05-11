@@ -98,7 +98,7 @@ public class JdbcTableDefinitionReader
     }
 
     ResultSet rs = null;
-    List<ColumnIdentifier> columns = new ArrayList<>();
+    List<ColumnIdentifier> columns = new ArrayList<ColumnIdentifier>();
 
     PkDefinition primaryKey = table.getPrimaryKey();
     Set<String> primaryKeyColumns = CollectionUtil.caseInsensitiveSet();

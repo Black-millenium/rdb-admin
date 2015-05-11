@@ -263,7 +263,7 @@ public class CompletionHandler
    */
   @Override
   public void addListDataListener(ListDataListener listDataListener) {
-    if (this.listeners == null) this.listeners = new ArrayList<>();
+    if (this.listeners == null) this.listeners = new ArrayList<ListDataListener>();
     this.listeners.add(listDataListener);
   }
 

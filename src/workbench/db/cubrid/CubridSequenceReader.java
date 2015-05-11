@@ -113,7 +113,7 @@ public class CubridSequenceReader
    */
   @Override
   public List<SequenceDefinition> getSequences(String catalog, String owner, String namePattern) {
-    List<SequenceDefinition> result = new ArrayList<>();
+    List<SequenceDefinition> result = new ArrayList<SequenceDefinition>();
 
     StringBuilder sql = new StringBuilder(baseSql.length() + 20);
     sql.append(baseSql);

@@ -56,7 +56,7 @@ public class SettingsPanel
   private JButton okButton;
   private JDialog dialog;
   private EscAction escAction;
-  private List<OptionPanelPage> pages = new ArrayList<>();
+  private List<OptionPanelPage> pages = new ArrayList<OptionPanelPage>();
 
   public SettingsPanel() {
     super();

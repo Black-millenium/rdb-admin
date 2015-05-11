@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class CommandRegistry {
   private static final String PACKAGE_NAME = "workbench.extensions";
-  private final List<Class> commands = new ArrayList<>();
+  private final List<Class> commands = new ArrayList<Class>();
   private List<String> verbs;
 
   private CommandRegistry() {
@@ -51,7 +51,7 @@ public class CommandRegistry {
 
   private void initVerbs() {
     List<SqlCommand> cmdList = getCommands();
-    verbs = new ArrayList<>(cmdList.size());
+    verbs = new ArrayList<String>(cmdList.size());
     for (SqlCommand cmd : cmdList) {
       verbs.add(cmd.getVerb());
       if (cmd.getAlternateVerb() != null) {
@@ -61,7 +61,7 @@ public class CommandRegistry {
   }
 
   public List<SqlCommand> getCommands() {
-    List<SqlCommand> result = new ArrayList<>(commands.size());
+    List<SqlCommand> result = new ArrayList<SqlCommand>(commands.size());
     for (Class clz : commands) {
       try {
         SqlCommand cmd = (SqlCommand) clz.newInstance();

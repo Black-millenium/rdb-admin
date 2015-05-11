@@ -66,7 +66,7 @@ public class DeleteAnalyzer
   public List<TableAlias> getTables() {
     String table = SqlUtil.getDeleteTable(this.sql, this.catalogSeparator, dbConnection);
     TableAlias a = new TableAlias(table, SqlUtil.getCatalogSeparator(this.dbConnection), SqlUtil.getSchemaSeparator(dbConnection));
-    List<TableAlias> result = new ArrayList<>(1);
+    List<TableAlias> result = new ArrayList<TableAlias>(1);
     result.add(a);
     return result;
   }

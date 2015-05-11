@@ -114,7 +114,7 @@ public class TableDiff {
     TableIdentifier ref = this.referenceTable.getTable();
     TableIdentifier target = this.targetTable.getTable();
     StringBuilder colDiff = new StringBuilder(500);
-    ArrayList<ReportColumn> colsToBeAdded = new ArrayList<>();
+    ArrayList<ReportColumn> colsToBeAdded = new ArrayList<ReportColumn>();
     List<ReportColumn> refCols = this.referenceTable.getColumns();
     StringBuilder myindent = new StringBuilder(indent);
     myindent.append("  ");
@@ -135,7 +135,7 @@ public class TableDiff {
         }
       }
     }
-    ArrayList<ReportColumn> colsToBeRemoved = new ArrayList<>();
+    ArrayList<ReportColumn> colsToBeRemoved = new ArrayList<ReportColumn>();
     List<ReportColumn> tcols = this.targetTable.getColumns();
 
     for (ReportColumn tcol : tcols) {
@@ -352,7 +352,7 @@ public class TableDiff {
     Collection<ForeignKeyDefinition> sourceFK = referenceTable.getForeignKeys().values();
     Collection<ForeignKeyDefinition> targetFK = targetTable.getForeignKeys().values();
 
-    List<ForeignKeyDefinition> missing = new ArrayList<>();
+    List<ForeignKeyDefinition> missing = new ArrayList<ForeignKeyDefinition>();
     for (ForeignKeyDefinition fk : sourceFK) {
       ForeignKeyDefinition other = findFKByDefinition(targetFK, fk);
       if (other == null) {
@@ -367,7 +367,7 @@ public class TableDiff {
     Collection<ForeignKeyDefinition> sourceFK = referenceTable.getForeignKeys().values();
     Collection<ForeignKeyDefinition> targetFK = targetTable.getForeignKeys().values();
 
-    List<ForeignKeyDefinition> toDelete = new ArrayList<>();
+    List<ForeignKeyDefinition> toDelete = new ArrayList<ForeignKeyDefinition>();
     for (ForeignKeyDefinition fk : targetFK) {
       ForeignKeyDefinition other = findFKByDefinition(sourceFK, fk);
       if (other == null) {

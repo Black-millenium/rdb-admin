@@ -47,7 +47,7 @@ public class SequenceDefinition
   private String relatedColumn;
   private String typeName = SequenceReader.DEFAULT_TYPE_NAME;
 
-  private Map<String, Object> properties = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+  private Map<String, Object> properties = new TreeMap<String, Object>(CaseInsensitiveComparator.INSTANCE);
 
   public SequenceDefinition(String seqSchema, String seqName) {
     sequenceName = seqName;

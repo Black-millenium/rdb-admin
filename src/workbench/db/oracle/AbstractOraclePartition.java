@@ -233,9 +233,9 @@ public abstract class AbstractOraclePartition {
         intervalDefinition = supportsIntervals ? rs.getString("INTERVAL") : null;
         subKeyCount = rs.getInt("SUBPARTITIONING_KEY_COUNT");
         int colCount = rs.getInt("PARTITIONING_KEY_COUNT");
-        columns = new ArrayList<>(colCount);
+        columns = new ArrayList<String>(colCount);
         int partCount = rs.getInt("PARTITION_COUNT");
-        partitions = new ArrayList<>(partCount);
+        partitions = new ArrayList<OraclePartitionDefinition>(partCount);
         tableSpace = rs.getString("DEF_TABLESPACE_NAME");
         objectOwner = dbObject.getSchema();
       }
@@ -266,7 +266,7 @@ public abstract class AbstractOraclePartition {
       pstmt.setString(2, SqlUtil.removeObjectQuotes(table.getObjectName()));
       rs = pstmt.executeQuery();
 
-      columns = new ArrayList<>();
+      columns = new ArrayList<String>();
       while (rs.next()) {
         columns.add(rs.getString("COLUMN_NAME"));
       }
@@ -291,7 +291,7 @@ public abstract class AbstractOraclePartition {
       pstmt.setString(2, SqlUtil.removeObjectQuotes(dbObject.getObjectName()));
       rs = pstmt.executeQuery();
 
-      subColumns = new ArrayList<>();
+      subColumns = new ArrayList<String>();
       while (rs.next()) {
         subColumns.add(rs.getString("COLUMN_NAME"));
       }
@@ -375,7 +375,7 @@ public abstract class AbstractOraclePartition {
       pstmt.setString(2, SqlUtil.removeObjectQuotes(object.getObjectName()));
       rs = pstmt.executeQuery();
 
-      partitions = new ArrayList<>();
+      partitions = new ArrayList<OraclePartitionDefinition>();
 
       while (rs.next()) {
         String name = rs.getString("PARTITION_NAME");

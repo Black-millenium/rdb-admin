@@ -37,7 +37,7 @@ public class PkDefinition
     implements Serializable {
   private static final long serialVersionUID = DbObjectCacheFactory.CACHE_VERSION_UID;
 
-  private List<IndexColumn> columns = new ArrayList<>();
+  private List<IndexColumn> columns = new ArrayList<IndexColumn>();
   private String pkName;
   private String pkIndexName;
 
@@ -58,7 +58,7 @@ public class PkDefinition
   public PkDefinition(String name, List<IndexColumn> columns) {
     this.pkName = StringUtil.trim(name);
     if (columns != null) {
-      this.columns = new ArrayList<>(columns);
+      this.columns = new ArrayList<IndexColumn>(columns);
     }
   }
 
@@ -109,7 +109,7 @@ public class PkDefinition
     if (columns.size() > 1) {
       Collections.sort(this.columns, IndexColumn.getSequenceSorter());
     }
-    List<String> result = new ArrayList<>(columns.size());
+    List<String> result = new ArrayList<String>(columns.size());
     for (IndexColumn col : columns) {
       result.add(col.getColumn());
     }

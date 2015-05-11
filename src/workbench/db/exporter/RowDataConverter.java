@@ -261,7 +261,7 @@ public abstract class RowDataConverter
     }
 
     int colCount = metaData.getColumnCount();
-    this.multilineInfo = new HashMap<>(colCount);
+    this.multilineInfo = new HashMap<Integer, Boolean>(colCount);
     for (int c = 0; c < colCount; c++) {
       boolean multiline = SqlUtil.isMultiLineColumn(metaData.getColumn(c));
       multilineInfo.put(Integer.valueOf(c), Boolean.valueOf(multiline));

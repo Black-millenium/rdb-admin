@@ -301,10 +301,12 @@ public class XmlDataFileParser
   public List<ColumnIdentifier> getColumnsFromFile() {
     try {
       if (this.columns == null) this.readXmlTableDefinition();
-    } catch (IOException | SAXException e) {
+    } catch (IOException e) {
+      return Collections.emptyList();
+    } catch (SAXException e) {
       return Collections.emptyList();
     }
-    ArrayList<ColumnIdentifier> result = new ArrayList<>(this.columns.length);
+    ArrayList<ColumnIdentifier> result = new ArrayList<ColumnIdentifier>(this.columns.length);
     result.addAll(Arrays.asList(this.columns));
     return result;
   }
@@ -562,7 +564,7 @@ public class XmlDataFileParser
       if (this.importColumns == null) {
         this.receiver.setTargetTable(tbl, Arrays.asList(this.columns));
       } else {
-        List<ColumnIdentifier> cols = new ArrayList<>(this.realColCount);
+        List<ColumnIdentifier> cols = new ArrayList<ColumnIdentifier>(this.realColCount);
         for (int i = 0; i < this.colCount; i++) {
           if (getColumnIndex(this.columns[i].getColumnName()) > -1) {
             cols.add(this.columns[i]);

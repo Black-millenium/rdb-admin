@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class EventNotifier {
   private static EventNotifier instance = new EventNotifier();
-  private List<EventDisplay> displayClients = new LinkedList<>();
+  private List<EventDisplay> displayClients = new LinkedList<EventDisplay>();
   private NotifierEvent lastEvent = null;
 
   private EventNotifier() {

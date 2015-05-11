@@ -85,7 +85,7 @@ public class FileUtil {
    * @return a Collection with all the lines in the file
    */
   public static List<String> getLines(BufferedReader input, boolean trim, boolean checkComments) {
-    List<String> result = new ArrayList<>();
+    List<String> result = new ArrayList<String>();
 
     try {
       String line;
@@ -463,7 +463,7 @@ public class FileUtil {
     Comparator<File> comp = new Comparator<File>() {
       @Override
       public int compare(File o1, File o2) {
-        if (Objects.equals(o1, o2)) return 0;
+        if (o1.hashCode() == o2.hashCode()) return 0;
         if (o1 == null && o2 != null) return -1;
         if (o1 != null && o2 == null) return 1;
 

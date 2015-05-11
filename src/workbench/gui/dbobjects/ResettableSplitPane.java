@@ -34,7 +34,7 @@ import java.util.Set;
 public class ResettableSplitPane
     extends WbSplitPane
     implements Resettable {
-  private Set<Resettable> clients = new HashSet<>();
+  private Set<Resettable> clients = new HashSet<Resettable>();
 
   public ResettableSplitPane(int type) {
     super(type);

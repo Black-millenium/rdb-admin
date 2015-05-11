@@ -161,7 +161,7 @@ public class TextFileParser
       // When using the TextFileParser to import into a DataStore
       // no target table is defined, so this is an expected situation and we simply
       // pretend the file columns are the target columns
-      tableCols = new ArrayList<>(fileColumns);
+      tableCols = new ArrayList<ColumnIdentifier>(fileColumns);
     } else {
       tableCols = target.getColumns();
     }
@@ -173,7 +173,7 @@ public class TextFileParser
       columnsToImport = Collections.emptyList();
     }
 
-    List<String> warnings = new ArrayList<>();
+    List<String> warnings = new ArrayList<String>();
 
     try {
       for (ColumnIdentifier sourceCol : fileColumns) {
@@ -246,7 +246,7 @@ public class TextFileParser
     if (currentRowValues == null) return null;
     if (inputFileIndexes == null) return null;
 
-    Map<Integer, Object> result = new HashMap<>(inputFileIndexes.size());
+    Map<Integer, Object> result = new HashMap<Integer, Object>(inputFileIndexes.size());
     for (Integer index : inputFileIndexes) {
       if (index > 0 && index <= currentRowValues.size()) {
         result.put(index, currentRowValues.get(index - 1));
@@ -259,7 +259,7 @@ public class TextFileParser
     if (this.importColumns == null) return null;
 
     if (!fixedWidthImport) return null;
-    List<Integer> result = new ArrayList<>();
+    List<Integer> result = new ArrayList<Integer>();
     for (ImportFileColumn col : importColumns) {
       if (col.getDataWidth() > -1) {
         result.add(Integer.valueOf(col.getDataWidth()));
@@ -652,7 +652,7 @@ public class TextFileParser
   }
 
   protected List<String> getLineValues(LineParser parser, String line) {
-    List<String> result = new ArrayList<>(getColumnCount());
+    List<String> result = new ArrayList<String>(getColumnCount());
     parser.setLine(line);
     while (parser.hasNext()) {
       String value = parser.getNext();
@@ -669,7 +669,7 @@ public class TextFileParser
    */
   private void readColumns(String headerLine)
       throws Exception {
-    List<ColumnIdentifier> cols = new ArrayList<>();
+    List<ColumnIdentifier> cols = new ArrayList<ColumnIdentifier>();
     WbStringTokenizer tok = new WbStringTokenizer(delimiter, this.quoteChar, false);
     tok.setDelimiterNeedsWhitspace(false);
     tok.setSourceString(headerLine);
@@ -692,7 +692,7 @@ public class TextFileParser
   @Override
   public List<ColumnIdentifier> getColumnsFromFile() {
     BufferedReader in = null;
-    List<ColumnIdentifier> cols = new ArrayList<>();
+    List<ColumnIdentifier> cols = new ArrayList<ColumnIdentifier>();
     try {
       // Make sure the file handler is initialized as this can be called from
       // the outside as well.

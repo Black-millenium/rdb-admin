@@ -66,7 +66,7 @@ public class SqlServerSynonymReader
   @Override
   public List<TableIdentifier> getSynonymList(WbConnection con, String catalog, String schemaPattern, String namePattern)
       throws SQLException {
-    List<TableIdentifier> result = new ArrayList<>();
+    List<TableIdentifier> result = new ArrayList<TableIdentifier>();
     StringBuilder sql = new StringBuilder(baseSql.length() + 50);
     sql.append(baseSql);
     int schemaIndex = -1;

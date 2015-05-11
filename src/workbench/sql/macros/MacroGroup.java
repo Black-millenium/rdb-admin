@@ -42,7 +42,7 @@ import java.util.List;
 public class MacroGroup
     implements Sortable {
   private String name;
-  private List<MacroDefinition> macros = new ArrayList<>();
+  private List<MacroDefinition> macros = new ArrayList<MacroDefinition>();
   private int sortOrder;
   private boolean modified = false;
   private boolean showInMenu = true;
@@ -145,7 +145,7 @@ public class MacroGroup
    * @see MacroDefinition#isVisibleInMenu() ()
    */
   public synchronized List<MacroDefinition> getVisibleMacros() {
-    List<MacroDefinition> result = new ArrayList<>(macros.size());
+    List<MacroDefinition> result = new ArrayList<MacroDefinition>(macros.size());
     for (MacroDefinition macro : macros) {
       if (macro.isVisibleInMenu()) {
         result.add(macro);
@@ -164,7 +164,7 @@ public class MacroGroup
    * @see MacroDefinition#isVisibleInPopup()
    */
   public synchronized List<MacroDefinition> getMacrosForPopup() {
-    List<MacroDefinition> result = new ArrayList<>(macros.size());
+    List<MacroDefinition> result = new ArrayList<MacroDefinition>(macros.size());
     for (MacroDefinition macro : macros) {
       if (macro.isVisibleInPopup()) {
         result.add(macro);

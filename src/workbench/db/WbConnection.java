@@ -59,7 +59,7 @@ public class WbConnection
   public static final String PROP_READONLY = "readonly";
   private final String id;
   private final List<PropertyChangeListener> listeners = Collections.synchronizedList(new ArrayList<PropertyChangeListener>(1));
-  private final Map<String, String> sessionProps = new HashMap<>();
+  private final Map<String, String> sessionProps = new HashMap<String, String>();
   // version information is cached to avoid
   // blocks on the connection if getDatabaseVersion() is called in the background.
   private VersionNumber dbVersion;
@@ -1092,7 +1092,7 @@ public class WbConnection
     int count = this.listeners.size();
     if (count == 0) return;
 
-    List<PropertyChangeListener> listCopy = new ArrayList<>(listeners);
+    List<PropertyChangeListener> listCopy = new ArrayList<PropertyChangeListener>(listeners);
     PropertyChangeEvent evt = new PropertyChangeEvent(this, property, oldValue, newValue);
     for (PropertyChangeListener l : listCopy) {
       if (l != null) {
@@ -1216,7 +1216,15 @@ public class WbConnection
 
       LogMgr.logDebug("WbConnection.oracleCancel()", "Calling pingDatabase() to clear the communication");
       ping.invoke(sqlConnection, (Object[]) null);
-    } catch (NoSuchMethodException | SecurityException | IllegalAccessException ex) {
+    } catch (NoSuchMethodException ex) {
+      LogMgr.logDebug("WbConnection.oracleCancel()", "pingDatabase() not available", ex);
+      // only try once for the livetime of this connection
+      pingAvailable = false;
+    } catch (SecurityException ex) {
+      LogMgr.logDebug("WbConnection.oracleCancel()", "pingDatabase() not available", ex);
+      // only try once for the livetime of this connection
+      pingAvailable = false;
+    } catch (IllegalAccessException ex) {
       LogMgr.logDebug("WbConnection.oracleCancel()", "pingDatabase() not available", ex);
       // only try once for the livetime of this connection
       pingAvailable = false;

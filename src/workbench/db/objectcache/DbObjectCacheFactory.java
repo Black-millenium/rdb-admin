@@ -47,8 +47,8 @@ public class DbObjectCacheFactory
 
   private final Object lock = new Object();
 
-  private final Map<String, ObjectCache> caches = new HashMap<>();
-  private final Map<String, Set<String>> refCounter = new HashMap<>();
+  private final Map<String, ObjectCache> caches = new HashMap<String, ObjectCache>();
+  private final Map<String, Set<String>> refCounter = new HashMap<String, Set<String>>();
 
   private DbObjectCacheFactory() {
   }
@@ -126,7 +126,7 @@ public class DbObjectCacheFactory
   private boolean isConnectionUsed(String key, String connectionId) {
     Set<String> ids = refCounter.get(key);
     if (ids == null) {
-      ids = new HashSet<>();
+      ids = new HashSet<String>();
       refCounter.put(key, ids);
       ids.add(connectionId);
       return false;

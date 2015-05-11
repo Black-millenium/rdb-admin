@@ -416,7 +416,7 @@ public class DataStore
   public void applyFilter(FilterExpression filterExpression) {
     this.clearFilter();
     int cols = getColumnCount();
-    Map<String, Object> valueMap = new HashMap<>(cols);
+    Map<String, Object> valueMap = new HashMap<String, Object>(cols);
     this.filteredRows = createData();
     int count = this.getRowCount();
     for (int i = (count - 1); i >= 0; i--) {
@@ -702,7 +702,7 @@ public class DataStore
   }
 
   public void setUpdateTable(TableDefinition tableDef) {
-    this.missingPkcolumns = new ArrayList<>(0);
+    this.missingPkcolumns = new ArrayList<ColumnIdentifier>(0);
 
     if (tableDef == null) {
       this.updateTable = null;
@@ -1102,7 +1102,7 @@ public class DataStore
   }
 
   public Map<String, Object> getRowData(int row) {
-    Map<String, Object> result = new HashMap<>(this.getColumnCount());
+    Map<String, Object> result = new HashMap<String, Object>(this.getColumnCount());
     for (int i = 0; i < this.resultInfo.getColumnCount(); i++) {
       result.put(getColumnName(i), getValue(row, i));
     }
@@ -1433,7 +1433,7 @@ public class DataStore
     if (this.updateTable == null) throw new NullPointerException("No update table defined!");
     this.updatePkInformation();
 
-    List<DmlStatement> stmtList = new LinkedList<>();
+    List<DmlStatement> stmtList = new LinkedList<DmlStatement>();
     this.resetUpdateRowCounters();
 
     DmlStatement dml;
@@ -1831,7 +1831,7 @@ public class DataStore
     if (rowdata == null) return Collections.emptyList();
 
     int count = this.resultInfo.getColumnCount();
-    List<ColumnData> result = new LinkedList<>();
+    List<ColumnData> result = new LinkedList<ColumnData>();
     for (int j = 0; j < count; j++) {
       if (this.resultInfo.isPkColumn(j)) {
         ColumnIdentifier col = this.resultInfo.getColumn(j);

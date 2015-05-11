@@ -124,7 +124,7 @@ public class ConnectionEditorPanel
   private ConnectionProfile currentProfile;
   private ProfileListModel sourceModel;
   private boolean init;
-  private List<SimplePropertyEditor> editors = new LinkedList<>();
+  private List<SimplePropertyEditor> editors = new LinkedList<SimplePropertyEditor>();
   public ConnectionEditorPanel() {
     super();
     this.initComponents();

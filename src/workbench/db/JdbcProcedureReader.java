@@ -195,7 +195,7 @@ public class JdbcProcedureReader
   public void readProcedureParameters(ProcedureDefinition def)
       throws SQLException {
     DataStore ds = getProcedureColumns(def);
-    List<ColumnIdentifier> parameters = new ArrayList<>(ds.getRowCount());
+    List<ColumnIdentifier> parameters = new ArrayList<ColumnIdentifier>(ds.getRowCount());
 
     for (int i = 0; i < ds.getRowCount(); i++) {
       String type = ds.getValueAsString(i, ProcedureReader.COLUMN_IDX_PROC_COLUMNS_RESULT_TYPE);
@@ -480,7 +480,7 @@ public class JdbcProcedureReader
   @Override
   public List<ProcedureDefinition> getProcedureList(String catalogPattern, String schemaPattern, String namePattern)
       throws SQLException {
-    List<ProcedureDefinition> result = new LinkedList<>();
+    List<ProcedureDefinition> result = new LinkedList<ProcedureDefinition>();
 
     catalogPattern = DbMetadata.cleanupWildcards(catalogPattern);
     schemaPattern = DbMetadata.cleanupWildcards(schemaPattern);

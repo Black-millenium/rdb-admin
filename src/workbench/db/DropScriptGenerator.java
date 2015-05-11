@@ -45,9 +45,9 @@ public class DropScriptGenerator
   private List<TableIdentifier> tables;
   private ScriptGenerationMonitor scriptMonitor;
   private RowActionMonitor rowMonitor;
-  private Map<TableIdentifier, List<String>> dropConstraints = new HashMap<>();
-  private Map<TableIdentifier, List<String>> restoreConstraints = new HashMap<>();
-  private Map<TableIdentifier, String> dropTableStatements = new HashMap<>();
+  private Map<TableIdentifier, List<String>> dropConstraints = new HashMap<TableIdentifier, List<String>>();
+  private Map<TableIdentifier, List<String>> restoreConstraints = new HashMap<TableIdentifier, List<String>>();
+  private Map<TableIdentifier, String> dropTableStatements = new HashMap<TableIdentifier, String>();
   private String dropTemplate;
   private boolean includeCreate = true;
   private boolean includeDropTable = true;
@@ -104,14 +104,14 @@ public class DropScriptGenerator
   }
 
   private void createStatementsForTable(TableIdentifier table) {
-    List<DependencyNode> visitedTables = new ArrayList<>();
+    List<DependencyNode> visitedTables = new ArrayList<DependencyNode>();
     TableDependency dependency = new TableDependency(connection, table);
     dependency.readDependencyTree(true);
     dependency.setRetrieveDirectChildrenOnly(true);
     List<DependencyNode> leafs = dependency.getRootNode().getChildren();
 
-    List<String> drop = new ArrayList<>();
-    List<String> restore = new ArrayList<>();
+    List<String> drop = new ArrayList<String>();
+    List<String> restore = new ArrayList<String>();
 
     if (includeDropTable) {
       TableSourceBuilder builder = TableSourceBuilderFactory.getBuilder(connection);
@@ -309,7 +309,7 @@ public class DropScriptGenerator
   }
 
   public void setTables(List<TableIdentifier> tableList) {
-    this.tables = new ArrayList<>(tableList.size());
+    this.tables = new ArrayList<TableIdentifier>(tableList.size());
     for (TableIdentifier tbl : tableList) {
       TableIdentifier toUse = this.connection.getMetadata().findTable(tbl, false);
       if (toUse != null) {

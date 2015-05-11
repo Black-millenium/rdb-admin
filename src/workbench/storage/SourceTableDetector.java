@@ -42,7 +42,7 @@ public class SourceTableDetector {
     List<Alias> tables = SqlUtil.getTables(sql, true, connection);
 
     List<String> colNames = SqlUtil.getSelectColumns(sql, true, connection);
-    List<SelectColumn> columns = new ArrayList<>(colNames.size());
+    List<SelectColumn> columns = new ArrayList<SelectColumn>(colNames.size());
     for (String name : colNames) {
       columns.add(new SelectColumn(name));
     }

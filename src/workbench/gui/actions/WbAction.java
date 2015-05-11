@@ -55,7 +55,7 @@ public class WbAction
   private static final String ALTERNATE_ACCELERATOR = "AltAcc";
   private static final String DEFAULT_ACCELERATOR = "DefaultAcc";
   private static final String MNEMONIC_INDEX = "MnemonicIndex";
-  private final List<WeakReference<JMenuItem>> createdItems = new LinkedList<>();
+  private final List<WeakReference<JMenuItem>> createdItems = new LinkedList<WeakReference<JMenuItem>>();
   protected JButton toolbarButton;
   protected WbAction proxy;
   protected boolean isConfigurable = true;

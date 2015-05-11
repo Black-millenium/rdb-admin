@@ -76,7 +76,7 @@ public class DBUnitTableAdapter
 
         if (columns == null) return null;
 
-        List<Column> pkCols = new ArrayList<>(1);
+        List<Column> pkCols = new ArrayList<Column>(1);
         for (ColumnIdentifier col : columns) {
           if (col.isPkColumn()) {
             DataType type = DataType.forSqlType(col.getDataType());
@@ -93,7 +93,7 @@ public class DBUnitTableAdapter
       @Override
       public Column[] getColumns()
           throws DataSetException {
-        List<Column> columns = new ArrayList<>();
+        List<Column> columns = new ArrayList<Column>();
         for (int i = 0; i < dataStore.getColumns().length; i++) {
           String columnName = dataStore.getColumnName(i);
           DataType columnType = DataType.forSqlType(dataStore.getColumnType(i));

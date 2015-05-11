@@ -99,7 +99,7 @@ public class H2SequenceAdjuster
             " and table_schema = ? \n" +
             " and column_default like '(NEXT VALUE FOR%'";
 
-    Map<String, String> result = new HashMap<>();
+    Map<String, String> result = new HashMap<String, String>();
     try {
       pstmt = dbConnection.getSqlConnection().prepareStatement(sql);
       pstmt.setString(1, table.getRawTableName());

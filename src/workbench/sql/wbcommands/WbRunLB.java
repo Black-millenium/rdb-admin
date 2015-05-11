@@ -105,7 +105,7 @@ public class WbRunLB
     List<ChangeSetIdentifier> ids = null;
 
     if (CollectionUtil.isNonEmpty(idStrings)) {
-      ids = new ArrayList<>(idStrings.size());
+      ids = new ArrayList<ChangeSetIdentifier>(idStrings.size());
       for (String param : idStrings) {
         ChangeSetIdentifier id = new ChangeSetIdentifier(param);
         ids.add(id);

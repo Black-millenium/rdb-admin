@@ -55,7 +55,7 @@ public class IndexReporter {
   private Collection<IndexDefinition> indexList;
   private TagWriter tagWriter = new TagWriter();
   private String mainTagToUse;
-  private Map<IndexDefinition, List<ObjectOption>> indexOptions = new HashMap<>();
+  private Map<IndexDefinition, List<ObjectOption>> indexOptions = new HashMap<IndexDefinition, List<ObjectOption>>();
 
   public IndexReporter(TableIdentifier tbl, WbConnection conn, boolean includePartitions) {
     indexList = conn.getMetadata().getIndexReader().getTableIndexList(tbl);
@@ -67,7 +67,7 @@ public class IndexReporter {
   }
 
   public IndexReporter(IndexDefinition index) {
-    indexList = new LinkedList<>();
+    indexList = new LinkedList<IndexDefinition>();
     indexList.add(index);
   }
 
@@ -100,7 +100,7 @@ public class IndexReporter {
         result.append('\n');
         for (IndexColumn col : columns) {
 
-          List<TagAttribute> attrs = new ArrayList<>(2);
+          List<TagAttribute> attrs = new ArrayList<TagAttribute>(2);
           attrs.add(new TagAttribute("name", SqlUtil.removeObjectQuotes(col.getColumn())));
 
           if (col.getDirection() != null) {
@@ -168,7 +168,7 @@ public class IndexReporter {
   private void addOption(IndexDefinition index, ObjectOption option) {
     List<ObjectOption> options = indexOptions.get(index);
     if (options == null) {
-      options = new ArrayList<>();
+      options = new ArrayList<ObjectOption>();
       indexOptions.put(index, options);
     }
     options.add(option);

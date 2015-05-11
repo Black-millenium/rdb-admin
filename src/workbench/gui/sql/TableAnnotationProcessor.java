@@ -56,7 +56,7 @@ public class TableAnnotationProcessor {
         WbAnnotation.getTag(RefreshAnnotation.ANNOTATION));
 
     List<WbAnnotation> annotations = WbAnnotation.readAllAnnotations(sql, keys);
-    List<MacroAnnotation> macros = new ArrayList<>();
+    List<MacroAnnotation> macros = new ArrayList<MacroAnnotation>();
 
     boolean scrollToEnd = false;
     int line = -1;

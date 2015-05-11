@@ -37,8 +37,8 @@ import java.util.TreeMap;
  */
 public class DbObjectNodeRenderer
     extends DefaultTreeCellRenderer {
-  private Map<String, String> iconMap = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
-  private Map<String, String> iconMapOpen = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+  private Map<String, String> iconMap = new TreeMap<String, String>(CaseInsensitiveComparator.INSTANCE);
+  private Map<String, String> iconMapOpen = new TreeMap<String, String>(CaseInsensitiveComparator.INSTANCE);
 
   public DbObjectNodeRenderer() {
     super();

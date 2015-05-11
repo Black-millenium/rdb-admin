@@ -48,7 +48,7 @@ public class CommandMapper {
   private DbMetadata metaData;
 
   public CommandMapper() {
-    cmdDispatch = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+    cmdDispatch = new TreeMap<String, SqlCommand>(CaseInsensitiveComparator.INSTANCE);
     cmdDispatch.put("*", new SqlCommand());
 
     // Workbench specific commands
@@ -142,7 +142,7 @@ public class CommandMapper {
     }
     this.cmdDispatch.put("CREATE OR REPLACE", DdlCommand.getCreateCommand());
 
-    this.dbSpecificCommands = new LinkedList<>();
+    this.dbSpecificCommands = new LinkedList<String>();
     this.allowAbbreviated = Settings.getInstance().getBoolProperty("workbench.sql.allow.abbreviation", false);
     registerExtensions();
   }
@@ -156,7 +156,7 @@ public class CommandMapper {
 
   public Collection<String> getAllWbCommands() {
     Collection<SqlCommand> commands = cmdDispatch.values();
-    TreeSet<String> result = new TreeSet<>();
+    TreeSet<String> result = new TreeSet<String>();
     for (SqlCommand cmd : commands) {
       if (cmd.isWbCommand()) {
         result.add(cmd.getVerb());

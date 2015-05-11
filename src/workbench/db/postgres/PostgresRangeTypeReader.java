@@ -70,7 +70,7 @@ public class PostgresRangeTypeReader
   }
 
   public List<PgRangeType> getRangeTypes(WbConnection con, String schemaPattern, String objectPattern) {
-    List<PgRangeType> result = new ArrayList<>();
+    List<PgRangeType> result = new ArrayList<PgRangeType>();
 
     StringBuilder select = new StringBuilder(100);
 

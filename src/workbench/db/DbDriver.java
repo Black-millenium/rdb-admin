@@ -136,7 +136,7 @@ public class DbDriver
 
   private void addToLibraryPath() {
     if (this.libraryList == null) return;
-    Set<String> paths = new TreeSet<>();
+    Set<String> paths = new TreeSet<String>();
     for (String file : libraryList) {
       WbFile f = buildFile(file);
       paths.add(f.getParentFile().getAbsolutePath());
@@ -186,7 +186,7 @@ public class DbDriver
     if (CollectionUtil.isEmpty(files)) {
       this.libraryList = null;
     } else {
-      this.libraryList = new ArrayList<>(files);
+      this.libraryList = new ArrayList<String>(files);
     }
   }
 
@@ -308,7 +308,7 @@ public class DbDriver
   public DbDriver createCopy() {
     DbDriver copy = new DbDriver();
     copy.driverClass = this.driverClass;
-    copy.libraryList = new ArrayList<>(libraryList);
+    copy.libraryList = new ArrayList<String>(libraryList);
     copy.sampleUrl = this.sampleUrl;
     copy.name = this.name;
 
@@ -378,7 +378,9 @@ public class DbDriver
       if (doSetAppName() && url.startsWith("jdbc:postgresql") && !props.containsKey(PostgresUtil.APP_NAME_PROPERTY)) {
         PostgresUtil.setApplicationName(conn, getProgramName() + " (" + id + ")");
       }
-    } catch (ClassNotFoundException | UnsupportedClassVersionError e) {
+    } catch (ClassNotFoundException e) {
+      throw e;
+    } catch (UnsupportedClassVersionError e) {
       throw e;
     } catch (Throwable th) {
       LogMgr.logError("DbDriver.connect()", "Error connecting to the database using URL=" + url + ", username=" + user, th);

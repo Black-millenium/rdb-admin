@@ -101,7 +101,7 @@ public class WbListIndexes
       SourceTableArgument tableArg = new SourceTableArgument(cmdLine.getValue(ARG_TABLE_NAME), null, StringUtil.coalesce(schema, currentSchema), currentConnection);
 
       List<TableIdentifier> tables = tableArg.getTables();
-      indexes = new ArrayList<>();
+      indexes = new ArrayList<IndexDefinition>();
       for (TableIdentifier tbl : tables) {
         List<IndexDefinition> indexList = reader.getTableIndexList(tbl);
         indexes.addAll(indexList);

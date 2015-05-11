@@ -86,7 +86,7 @@ public class H2ConstantReader
     Statement stmt = null;
     ResultSet rs = null;
     Savepoint sp = null;
-    List<H2Constant> result = new ArrayList<>();
+    List<H2Constant> result = new ArrayList<H2Constant>();
     try {
       sp = connection.setSavepoint();
       stmt = connection.createStatementForQuery();

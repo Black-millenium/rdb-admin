@@ -118,7 +118,7 @@ public class WbStringTokenizer {
   }
 
   public List<String> getAllTokens() {
-    List<String> result = new LinkedList<>();
+    List<String> result = new LinkedList<String>();
     while (this.hasMoreTokens()) {
       result.add(this.nextToken());
     }

@@ -48,7 +48,7 @@ import java.util.*;
 public class OracleControlFileWriter
     implements FormatFileWriter {
 
-  private final Map<String, String> encodingMap = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+  private final Map<String, String> encodingMap = new TreeMap<String, String>(CaseInsensitiveComparator.INSTANCE);
 
   public OracleControlFileWriter() {
     encodingMap.put("UTF8", "AL32UTF8");
@@ -118,7 +118,7 @@ public class OracleControlFileWriter
         format = Settings.getInstance().getDefaultTimestampFormat();
       }
       String oraFormat = convertJavaDateFormatToOracle(format);
-      List<String> blobColumns = new LinkedList<>();
+      List<String> blobColumns = new LinkedList<String>();
       boolean clobAsFile = exporter.getWriteClobAsFile();
       for (int i = 0; i < count; i++) {
         String col = resultInfo.getColumnName(i);

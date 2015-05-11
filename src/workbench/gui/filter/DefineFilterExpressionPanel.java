@@ -55,7 +55,7 @@ public class DefineFilterExpressionPanel
     extends JPanel
     implements ActionListener, ValidatingComponent {
   private ValueProvider data;
-  private List<PanelEntry> panels = new ArrayList<>();
+  private List<PanelEntry> panels = new ArrayList<PanelEntry>();
   private JButton addLineButton;
   private JRadioButton andButton;
   private JRadioButton orButton;

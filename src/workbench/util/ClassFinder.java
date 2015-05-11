@@ -51,9 +51,10 @@ public class ClassFinder {
 
   private static List<Class> scanJarFile(String archive, ClassLoader loader, Set<String> excluded)
       throws IOException {
-    List<Class> result = new ArrayList<>();
+    List<Class> result = new ArrayList<Class>();
 
-    try (JarFile jarFile = new JarFile(archive)) {
+    try {
+      JarFile jarFile = new JarFile(archive);
       Enumeration<JarEntry> entries = jarFile.entries();
 
       while (entries.hasMoreElements()) {
@@ -80,6 +81,7 @@ public class ClassFinder {
           // ignore
         }
       }
+    } catch (Exception ignored) {
     }
 
     return result;
@@ -117,9 +119,9 @@ public class ClassFinder {
     assert classLoader != null;
     String path = packageName.replace('.', '/');
 
-    ArrayList<Class> result = new ArrayList<>();
+    ArrayList<Class> result = new ArrayList<Class>();
     Enumeration<URL> resources = classLoader.getResources(path);
-    List<File> dirs = new ArrayList<>();
+    List<File> dirs = new ArrayList<File>();
 
     while (resources.hasMoreElements()) {
       URL resource = resources.nextElement();
@@ -157,7 +159,7 @@ public class ClassFinder {
   @SuppressWarnings("unchecked")
   private static List<Class> findClasses(File directory, String packageName)
       throws ClassNotFoundException {
-    List<Class> classes = new ArrayList<>();
+    List<Class> classes = new ArrayList<Class>();
     if (!directory.exists()) {
       return classes;
     }
@@ -187,7 +189,7 @@ public class ClassFinder {
    */
   public void setExcludedClasses(Collection<String> classNames) {
     if (classNames != null) {
-      excludedClasses = new TreeSet<>(classNames);
+      excludedClasses = new TreeSet<String>(classNames);
     }
   }
 
@@ -202,7 +204,7 @@ public class ClassFinder {
    */
   public List<String> findImplementations(List<String> jarFiles)
       throws IOException {
-    List<String> result = new ArrayList<>();
+    List<String> result = new ArrayList<String>();
     ClassLoader loader = buildClassLoader(jarFiles);
 
     for (String file : jarFiles) {
@@ -217,7 +219,7 @@ public class ClassFinder {
 
   private List<String> processJarFile(String archive, ClassLoader loader)
       throws IOException {
-    List<String> result = new ArrayList<>();
+    List<String> result = new ArrayList<String>();
 
     List<Class> classes = scanJarFile(archive, loader, excludedClasses);
 

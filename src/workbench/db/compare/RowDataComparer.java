@@ -166,7 +166,7 @@ public class RowDataComparer {
 
   public void excludeColumns(Set<String> columns, ResultInfo info) {
     ColumnIdentifier[] resultColumns = info.getColumns();
-    List<ColumnIdentifier> toExport = new ArrayList<>();
+    List<ColumnIdentifier> toExport = new ArrayList<ColumnIdentifier>();
     for (ColumnIdentifier col : resultColumns) {
       if (!columns.contains(col.getColumnName())) {
         toExport.add(col);

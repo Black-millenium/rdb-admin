@@ -111,7 +111,7 @@ public class StatementFactory {
     DmlStatement dml = null;
 
     if (!ignoreStatus && !aRow.isModified()) return null;
-    ArrayList<ColumnData> values = new ArrayList<>(cols);
+    ArrayList<ColumnData> values = new ArrayList<ColumnData>(cols);
     StringBuilder sql = new StringBuilder(50);
     appendKeyword(sql, "UPDATE ");
     sql.append(getTableNameToUse());
@@ -233,7 +233,7 @@ public class StatementFactory {
     DmlStatement dml;
     int cols = this.resultInfo.getColumnCount();
 
-    ArrayList<ColumnData> values = new ArrayList<>(cols);
+    ArrayList<ColumnData> values = new ArrayList<ColumnData>(cols);
 
     StringBuilder sql = new StringBuilder(250);
     appendKeyword(sql, "INSERT INTO ");
@@ -318,7 +318,7 @@ public class StatementFactory {
     DmlStatement dml;
     int count = this.resultInfo.getColumnCount();
 
-    ArrayList<ColumnData> values = new ArrayList<>(count);
+    ArrayList<ColumnData> values = new ArrayList<ColumnData>(count);
     StringBuilder sql = new StringBuilder(250);
     appendKeyword(sql, "DELETE FROM ");
     sql.append(getTableNameToUse());

@@ -40,7 +40,7 @@ public class BookmarkAnnotation
     extends WbAnnotation {
   public static final String ANNOTATION = "WbTag";
 
-  private List<String> validTags = new ArrayList<>(3);
+  private List<String> validTags = new ArrayList<String>(3);
 
   public BookmarkAnnotation() {
     super(ANNOTATION);
@@ -69,7 +69,7 @@ public class BookmarkAnnotation
    * @see ProcedureBookmarks
    */
   public List<NamedScriptLocation> getBookmarks(String script, String tabId, ParserType type) {
-    List<NamedScriptLocation> bookmarks = new ArrayList<>();
+    List<NamedScriptLocation> bookmarks = new ArrayList<NamedScriptLocation>();
 
     ProcedureBookmarks parser = null;
     if (GuiSettings.getParseProceduresForBookmarks()) {

@@ -81,7 +81,7 @@ public class LiquibaseParser {
    */
   public List<String> getContentFromChangeSet(List<ChangeSetIdentifier> changeSetIds)
       throws IOException, SAXException {
-    List<String> result = new ArrayList<>();
+    List<String> result = new ArrayList<String>();
     try {
       DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -114,7 +114,7 @@ public class LiquibaseParser {
    * @return all changesets from the changelog file.
    */
   public List<ChangeSetIdentifier> getChangeSets() {
-    List<ChangeSetIdentifier> result = new ArrayList<>();
+    List<ChangeSetIdentifier> result = new ArrayList<ChangeSetIdentifier>();
     try {
       DocumentBuilderFactory factor = DocumentBuilderFactory.newInstance();
       DocumentBuilder builder = factor.newDocumentBuilder();
@@ -135,7 +135,7 @@ public class LiquibaseParser {
   }
 
   private List<String> getContent(Element item) {
-    List<String> result = new ArrayList<>();
+    List<String> result = new ArrayList<String>();
 
     NodeList nodes = item.getChildNodes();
     int size = nodes.getLength();
@@ -168,7 +168,7 @@ public class LiquibaseParser {
   }
 
   private List<String> splitStatements(String content, DelimiterDefinition delimiter) {
-    List<String> result = new ArrayList<>();
+    List<String> result = new ArrayList<String>();
     ScriptParser parser = new ScriptParser(content, sqlParserType);
     parser.setAlternateDelimiter(delimiter);
     int count = parser.getSize();
@@ -181,7 +181,7 @@ public class LiquibaseParser {
 
   private List<String> getContentFromSqlFile(Element element) {
     String path = element.getAttribute("path");
-    List<String> result = new ArrayList<>();
+    List<String> result = new ArrayList<String>();
 
     if (StringUtil.isEmptyString(path)) return result;
 
@@ -265,7 +265,7 @@ public class LiquibaseParser {
   }
 
   private List<String> readSqlFile(WbFile include, DelimiterDefinition delimiter, String encoding, boolean splitStatements) {
-    List<String> result = new ArrayList<>();
+    List<String> result = new ArrayList<String>();
     try {
       if (splitStatements) {
         ScriptParser parser = new ScriptParser(sqlParserType);

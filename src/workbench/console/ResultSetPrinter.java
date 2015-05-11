@@ -99,7 +99,7 @@ public class ResultSetPrinter
 
   @Override
   protected Map<Integer, Integer> getColumnSizes() {
-    Map<Integer, Integer> widths = new HashMap<>();
+    Map<Integer, Integer> widths = new HashMap<Integer, Integer>();
     for (int i = 0; i < info.getColumnCount(); i++) {
       int nameWidth = info.getColumnName(i).length();
       int colSize = info.getColumn(i).getDisplaySize();

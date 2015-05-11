@@ -84,7 +84,7 @@ public class DbTreePanel
 
   private void createToolbar() {
     toolPanel = new JPanel(new GridBagLayout());
-    typeFilter = new MultiSelectComboBox<>();
+    typeFilter = new MultiSelectComboBox<String>();
     GridBagConstraints gc = new GridBagConstraints();
     gc.gridx = 0;
     gc.gridy = 0;
@@ -170,7 +170,7 @@ public class DbTreePanel
   private void loadTypes() {
     try {
       typeFilter.removeActionListener(this);
-      List<String> types = new ArrayList<>(connection.getMetadata().getObjectTypes());
+      List<String> types = new ArrayList<String>(connection.getMetadata().getObjectTypes());
       List<String> toSelect = selectedTypes;
       if (CollectionUtil.isEmpty(toSelect)) {
         toSelect = types;

@@ -54,8 +54,8 @@ import java.util.Map;
 public class XlsRowDataConverter
     extends RowDataConverter {
   public static final String INFO_SHEETNAME = "SQL";
-  final private Map<Integer, CellStyle> styles = new HashMap<>(10);
-  final private Map<Integer, CellStyle> headerStyles = new HashMap<>(10);
+  final private Map<Integer, CellStyle> styles = new HashMap<Integer, CellStyle>(10);
+  final private Map<Integer, CellStyle> headerStyles = new HashMap<Integer, CellStyle>(10);
   private final StringBuilder dummyResult = new StringBuilder();
   private Workbook workbook = null;
   private Sheet sheet = null;

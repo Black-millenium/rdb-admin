@@ -43,7 +43,7 @@ import java.util.Map.Entry;
  */
 public class PkMapping {
   private static PkMapping instance;
-  private final Map<String, String> columnMapping = new HashMap<>();
+  private final Map<String, String> columnMapping = new HashMap<String, String>();
 
   /**
    * For testing purposes only

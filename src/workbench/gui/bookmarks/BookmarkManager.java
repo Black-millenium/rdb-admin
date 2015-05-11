@@ -37,7 +37,7 @@ import java.util.*;
 public class BookmarkManager {
   // Maps the ID of a MainWindow to bookmarks defined for each tab.
   // each BookmarkGroup represents the bookmarks from a single editor tab
-  private final Map<String, Map<String, BookmarkGroup>> bookmarks = new HashMap<>();
+  private final Map<String, Map<String, BookmarkGroup>> bookmarks = new HashMap<String, Map<String, BookmarkGroup>>();
 
   private BookmarkManager() {
   }
@@ -80,7 +80,7 @@ public class BookmarkManager {
     synchronized (this) {
       Map<String, BookmarkGroup> windowBookmarks = bookmarks.get(win.getWindowId());
       if (windowBookmarks == null) {
-        windowBookmarks = new HashMap<>();
+        windowBookmarks = new HashMap<String, BookmarkGroup>();
         bookmarks.put(win.getWindowId(), windowBookmarks);
       }
 
@@ -117,7 +117,7 @@ public class BookmarkManager {
     Map<String, BookmarkGroup> bm = bookmarks.get(windowId);
     if (bm == null) return Collections.emptyList();
 
-    result = new ArrayList<>();
+    result = new ArrayList<String>();
     for (Map.Entry<String, BookmarkGroup> entry : bm.entrySet()) {
       String id = entry.getKey();
       BookmarkGroup group = entry.getValue();

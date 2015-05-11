@@ -78,7 +78,7 @@ public class MySQLExplainAnalyzer
         t = lexer.getNextToken(false, false);
       }
       if (usedOptions.isEmpty()) {
-        this.elements = new ArrayList<>(allOptions);
+        this.elements = new ArrayList<String>(allOptions);
       } else {
         // only one option allowed
         this.elements = Collections.emptyList();
@@ -86,7 +86,7 @@ public class MySQLExplainAnalyzer
       this.context = CONTEXT_SYNTAX_COMPLETION;
     } catch (Exception e) {
       LogMgr.logError("MySQLExplainAnalyzer.checkContext()", "Error getting optiosn", e);
-      this.elements = new ArrayList<>();
+      this.elements = new ArrayList();
       this.context = NO_CONTEXT;
     }
   }

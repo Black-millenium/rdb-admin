@@ -45,7 +45,7 @@ public class Db2FormatFileWriter
   private Map<String, String> codePageMap;
 
   public Db2FormatFileWriter() {
-    codePageMap = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+    codePageMap = new TreeMap<String, String>(CaseInsensitiveComparator.INSTANCE);
     codePageMap.put("UTF-8", "1208");
     codePageMap.put("UTF-16", "1200");
     codePageMap.put("UTF-16BE", "1200");

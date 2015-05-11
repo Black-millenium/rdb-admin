@@ -44,7 +44,7 @@ public class ClasspathEditor
     implements ListSelectionListener, ActionListener {
   private String lastDirProperty;
   private String lastDir = null;
-  private List<ActionListener> listener = new ArrayList<>();
+  private List<ActionListener> listener = new ArrayList<ActionListener>();
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton btnAdd;
   private javax.swing.JButton btnDown;
@@ -97,7 +97,7 @@ public class ClasspathEditor
 
   public List<String> getRealJarPaths() {
     int size = libList.getModel().getSize();
-    List<String> result = new ArrayList<>(size);
+    List<String> result = new ArrayList<String>(size);
     for (int i = 0; i < size; i++) {
       LibraryElement lib = (LibraryElement) libList.getModel().getElementAt(i);
       result.add(lib.getRealPath());
@@ -107,7 +107,7 @@ public class ClasspathEditor
 
   public List<String> getLibraries() {
     int size = libList.getModel().getSize();
-    List<String> result = new ArrayList<>(size);
+    List<String> result = new ArrayList<String>(size);
     for (int i = 0; i < size; i++) {
       LibraryElement lib = (LibraryElement) libList.getModel().getElementAt(i);
       result.add(lib.getPath());

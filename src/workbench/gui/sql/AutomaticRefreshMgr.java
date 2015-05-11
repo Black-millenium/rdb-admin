@@ -39,7 +39,7 @@ import java.util.List;
  */
 public class AutomaticRefreshMgr
     implements ActionListener {
-  private List<PanelEntry> panels = new ArrayList<>();
+  private List<PanelEntry> panels = new ArrayList<PanelEntry>();
 
   public AutomaticRefreshMgr() {
   }

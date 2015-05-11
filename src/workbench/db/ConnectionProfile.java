@@ -33,7 +33,6 @@ import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.util.Comparator;
 import java.util.Enumeration;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -335,7 +334,7 @@ public class ConnectionProfile
     // Do not accept a semicolon as the alternate delimiter
     if (def != null && def.isStandard()) return;
 
-    if (!Objects.equals(def, this.alternateDelimiter) || (def != null && def.isChanged())) {
+    if (!(def != null && def.equals(this.alternateDelimiter)) || (def.isChanged())) {
       this.alternateDelimiter = def;
       this.changed = true;
     }

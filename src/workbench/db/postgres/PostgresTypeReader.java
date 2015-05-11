@@ -85,7 +85,7 @@ public class PostgresTypeReader
       retrieveTypes = false;
     }
 
-    List<BaseObjectType> types = new ArrayList<>();
+    List<BaseObjectType> types = new ArrayList<BaseObjectType>();
     if (retrieveTypes) {
       // this is only needed for pre 9.0 drivers as they did not return
       // any object types, if that was specifically requested
@@ -110,7 +110,7 @@ public class PostgresTypeReader
   }
 
   public List<BaseObjectType> getTypes(WbConnection con, String schemaPattern, String objectPattern) {
-    List<BaseObjectType> result = new ArrayList<>();
+    List<BaseObjectType> result = new ArrayList<BaseObjectType>();
 
     StringBuilder select = new StringBuilder(100);
 

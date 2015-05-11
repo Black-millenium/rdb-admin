@@ -94,7 +94,7 @@ public class IngresSequenceReader
 
     ResultSet rs = null;
     PreparedStatement stmt = null;
-    List<SequenceDefinition> result = new ArrayList<>();
+    List<SequenceDefinition> result = new ArrayList<SequenceDefinition>();
 
     if (Settings.getInstance().getDebugMetadataSql()) {
       LogMgr.logInfo("IngresSequenceReqder.getSquences()", "Query to retrieve sequence:" + sql);

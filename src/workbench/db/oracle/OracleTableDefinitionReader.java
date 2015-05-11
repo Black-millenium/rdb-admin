@@ -133,7 +133,7 @@ public class OracleTableDefinitionReader
     String schema = StringUtil.trimQuotes(table.getSchema());
     String tablename = StringUtil.trimQuotes(table.getTableName());
 
-    List<ColumnIdentifier> columns = new ArrayList<>();
+    List<ColumnIdentifier> columns = new ArrayList<ColumnIdentifier>();
 
     ResultSet rs = null;
     PreparedStatement pstmt = null;

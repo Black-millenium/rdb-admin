@@ -60,7 +60,7 @@ public class WbAnnotation {
     SQLLexer lexer = SQLLexerFactory.createLexer(sql);
     SQLToken token = lexer.getNextToken(true, false);
 
-    List<WbAnnotation> result = new ArrayList<>();
+    List<WbAnnotation> result = new ArrayList<WbAnnotation>();
 
     while (token != null && token.isComment()) {
       String comment = token.getText();

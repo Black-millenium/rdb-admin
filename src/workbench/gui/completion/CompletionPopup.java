@@ -290,7 +290,7 @@ public class CompletionPopup
 
   private List<ColumnIdentifier> getColumnsFromData() {
     int count = data.getSize();
-    List<ColumnIdentifier> result = new ArrayList<>(count);
+    List<ColumnIdentifier> result = new ArrayList<ColumnIdentifier>(count);
 
     // The first element is the SelectAllMarker, so we do not
     // need to include it
@@ -335,11 +335,11 @@ public class CompletionPopup
   }
 
   private boolean handleFKSelection() {
-    List selected = this.elementList.getSelectedValuesList();
+    Object[] selected = this.elementList.getSelectedValues();
     if (selected == null) return false;
-    if (selected.size() != 1) return false;
-    if (selected.get(0) instanceof SelectFKValueMarker) {
-      final SelectFKValueMarker marker = (SelectFKValueMarker) selected.get(0);
+    if (selected.length != 1) return false;
+    if (selected[0] instanceof SelectFKValueMarker) {
+      final SelectFKValueMarker marker = (SelectFKValueMarker) selected[0];
       final WbConnection connection = this.context.getAnalyzer().getConnection();
       if (!WbSwingUtilities.isConnectionIdle(editor, connection)) {
         return false;

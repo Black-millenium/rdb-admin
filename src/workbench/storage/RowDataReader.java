@@ -84,8 +84,8 @@ public class RowDataReader {
     useGetXML = info.useGetXML();
     adjustArrayDisplay = info.getConvertArrays();
     showArrayType = info.showArrayType();
-    streams = new ArrayList<>(countLobColumns());
-    fixStupidMySQLZeroDate = conn != null ? conn.getDbSettings().fixStupidMySQLZeroDate() : false;
+    streams = new ArrayList<Closeable>(countLobColumns());
+    fixStupidMySQLZeroDate = conn != null && conn.getDbSettings().fixStupidMySQLZeroDate();
   }
 
   /**

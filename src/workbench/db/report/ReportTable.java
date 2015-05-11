@@ -61,9 +61,9 @@ public class ReportTable {
   public static final String TAG_CONSTRAINT_COMMENT = "constraint-comment";
   public static final String TAG_TABLESPACE = "tablespace";
   public static final String TAG_TABLE_TYPE = "table-type";
-  private final List<ObjectOption> dbmsOptions = new ArrayList<>();
+  private final List<ObjectOption> dbmsOptions = new ArrayList<ObjectOption>();
   private TableIdentifier table;
-  private Map<String, ForeignKeyDefinition> foreignKeys = new HashMap<>();
+  private Map<String, ForeignKeyDefinition> foreignKeys = new HashMap<String, ForeignKeyDefinition>();
   private List<ReportColumn> columns;
   private IndexReporter reporter;
   private String tableComment;
@@ -220,7 +220,7 @@ public class ReportTable {
   }
 
   private List<ColumnIdentifier> getColumnList() {
-    List<ColumnIdentifier> cols = new ArrayList<>(columns.size());
+    List<ColumnIdentifier> cols = new ArrayList<ColumnIdentifier>(columns.size());
     for (ReportColumn col : columns) {
       cols.add(col.getColumn());
     }
@@ -343,14 +343,14 @@ public class ReportTable {
         return pos1 - pos2;
       }
     };
-    List<ReportColumn> result = new ArrayList<>(columns.size());
+    List<ReportColumn> result = new ArrayList<ReportColumn>(columns.size());
     result.addAll(columns);
     Collections.sort(result, comp);
     return result;
   }
 
   public List<ReportColumn> getColumns() {
-    return new ArrayList<>(this.columns);
+    return new ArrayList<ReportColumn>(this.columns);
   }
 
   /**
@@ -359,7 +359,7 @@ public class ReportTable {
   public final void setColumns(List<ColumnIdentifier> cols) {
     if (cols == null) return;
     int numCols = cols.size();
-    this.columns = new ArrayList<>(numCols);
+    this.columns = new ArrayList<ReportColumn>(numCols);
     for (ColumnIdentifier col : cols) {
       ReportColumn repCol = new ReportColumn(col);
       repCol.setFixDefaultValue(fixDefaultValues);

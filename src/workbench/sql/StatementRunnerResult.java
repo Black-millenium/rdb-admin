@@ -180,7 +180,7 @@ public class StatementRunnerResult {
   }
 
   public int addDataStore(DataStore ds) {
-    if (this.datastores == null) this.datastores = new ArrayList<>(5);
+    if (this.datastores == null) this.datastores = new ArrayList<DataStore>(5);
     if (ds != null) {
       ds.resetCancelStatus();
       this.datastores.add(ds);
@@ -189,7 +189,7 @@ public class StatementRunnerResult {
   }
 
   public int addResultSet(ResultSet rs) {
-    if (this.results == null) this.results = new LinkedList<>();
+    if (this.results == null) this.results = new LinkedList<ResultSet>();
     this.results.add(rs);
     return this.results.size();
   }

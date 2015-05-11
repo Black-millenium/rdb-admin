@@ -49,7 +49,7 @@ public class WbSetProp
   public static final String ARG_TYPE = "type";
   public static final String ARG_PROP = "property";
   public static final String ARG_VALUE = "value";
-  private final Map<String, String> configMap = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+  private final Map<String, String> configMap = new TreeMap<String, String>(CaseInsensitiveComparator.INSTANCE);
 
   public WbSetProp() {
     super();

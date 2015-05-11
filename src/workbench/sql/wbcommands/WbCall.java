@@ -65,7 +65,7 @@ public class WbCall
   private Map<Integer, ParameterDefinition> refCursor = null;
 
   // Stores all parameters that need an input
-  private List<ParameterDefinition> inputParameters = new ArrayList<>(5);
+  private List<ParameterDefinition> inputParameters = new ArrayList<ParameterDefinition>(5);
   private String sqlUsed = null;
 
   private StatementParameterPrompter parameterPrompter;
@@ -287,7 +287,7 @@ public class WbCall
 
     ParameterMetaData parmData = cstmt.getParameterMetaData();
     if (parmData != null) {
-      parameterNames = new ArrayList<>();
+      parameterNames = new ArrayList<ParameterDefinition>();
 
       for (int i = 0; i < parmData.getParameterCount(); i++) {
         int mode = parmData.getParameterMode(i + 1);
@@ -381,7 +381,7 @@ public class WbCall
     if (procs.size() == 1) {
       procDef = procs.get(0);
     } else if (procs.size() > 1) {
-      List<DataStore> procParams = new ArrayList<>(procs.size());
+      List<DataStore> procParams = new ArrayList<DataStore>(procs.size());
 
       // if more than one procedure was found this could be an overloaded one
       // so loop through all definitions and compare the number of parameters
@@ -465,7 +465,7 @@ public class WbCall
       int realParamIndex = 1 + parameterIndexOffset;
       int inputIndex = 0;
 
-      parameterNames = new ArrayList<>(definedParamCount);
+      parameterNames = new ArrayList<ParameterDefinition>(definedParamCount);
       for (int i = 0; i < definedParamCount; i++) {
         int dataType = params.getValueAsInt(i, ProcedureReader.COLUMN_IDX_PROC_COLUMNS_JDBC_DATA_TYPE, -1);
 
@@ -519,7 +519,7 @@ public class WbCall
             int dbmsTypeOverride = currentConnection.getDbSettings().getRefCursorDataType();
             if (dbmsTypeOverride != Integer.MIN_VALUE) dataType = dbmsTypeOverride;
             if (refCursor == null) {
-              refCursor = new HashMap<>();
+              refCursor = new HashMap<Integer, ParameterDefinition>();
             }
             refCursor.put(Integer.valueOf(realParamIndex), def);
           } else {

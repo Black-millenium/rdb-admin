@@ -244,7 +244,7 @@ public class MacroTree
    * Return the names of the expaned groups.
    */
   public List<String> getExpandedGroupNames() {
-    LinkedList<String> result = new LinkedList<>();
+    LinkedList<String> result = new LinkedList<String>();
     TreePath[] groupNodes = this.macroModel.getGroupNodes();
     for (TreePath groupNode : groupNodes) {
       if (isExpanded(groupNode)) {

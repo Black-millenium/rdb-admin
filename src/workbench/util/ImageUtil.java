@@ -128,7 +128,7 @@ public class ImageUtil {
    * @see #isGifIcon(java.io.File)
    */
   public static List<File> getIcons(String iconList) {
-    List<File> iconFiles = new ArrayList<>(2);
+    List<File> iconFiles = new ArrayList<File>(2);
     if (StringUtil.isBlank(iconList)) return iconFiles;
 
     try {

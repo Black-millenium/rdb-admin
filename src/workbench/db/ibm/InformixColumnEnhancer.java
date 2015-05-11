@@ -39,7 +39,7 @@ import java.util.TreeMap;
  */
 public class InformixColumnEnhancer
     implements ColumnDefinitionEnhancer {
-  private final Map<Integer, String> limits = new HashMap<>(11);
+  private final Map<Integer, String> limits = new HashMap<Integer, String>(11);
 
   public InformixColumnEnhancer() {
     limits.put(0, "YEAR");
@@ -124,7 +124,7 @@ public class InformixColumnEnhancer
     PreparedStatement stmt = null;
     ResultSet rs = null;
 
-    Map<String, ColumnIdentifier> cols = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+    Map<String, ColumnIdentifier> cols = new TreeMap<String, ColumnIdentifier>(CaseInsensitiveComparator.INSTANCE);
     for (ColumnIdentifier col : table.getColumns()) {
       cols.put(col.getColumnName(), col);
     }

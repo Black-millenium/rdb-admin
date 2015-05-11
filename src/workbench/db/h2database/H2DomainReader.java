@@ -88,7 +88,7 @@ public class H2DomainReader
     Statement stmt = null;
     ResultSet rs = null;
     Savepoint sp = null;
-    List<DomainIdentifier> result = new ArrayList<>();
+    List<DomainIdentifier> result = new ArrayList<DomainIdentifier>();
     try {
       sp = connection.setSavepoint();
       stmt = connection.createStatementForQuery();

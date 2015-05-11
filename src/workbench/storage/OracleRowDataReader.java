@@ -45,7 +45,7 @@ import java.util.Set;
  */
 public class OracleRowDataReader
     extends RowDataReader {
-  private final Set<String> tsClasses = new HashSet<>(3);
+  private final Set<String> tsClasses = new HashSet<String>(3);
   private Method stringValue;
   private Connection sqlConnection;
   private SimpleDateFormat tsParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");

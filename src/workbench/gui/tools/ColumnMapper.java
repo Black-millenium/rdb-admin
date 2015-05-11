@@ -219,7 +219,7 @@ public class ColumnMapper
    */
   public List<ColumnIdentifier> getMappingForImport() {
     int count = this.sourceColumns.size();
-    ArrayList<ColumnIdentifier> result = new ArrayList<>(count);
+    ArrayList<ColumnIdentifier> result = new ArrayList<ColumnIdentifier>(count);
     ColumnIdentifier skipId = new ColumnIdentifier(RowDataProducer.SKIP_INDICATOR);
     for (int i = 0; i < count; i++) {
       ColumnIdentifier col = this.sourceColumns.get(i);

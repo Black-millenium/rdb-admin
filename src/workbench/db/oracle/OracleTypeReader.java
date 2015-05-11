@@ -121,7 +121,7 @@ public class OracleTypeReader
 
     PreparedStatement stmt = null;
     ResultSet rs = null;
-    List<OracleObjectType> result = new ArrayList<>();
+    List<OracleObjectType> result = new ArrayList<OracleObjectType>();
     try {
       stmt = con.getSqlConnection().prepareStatement(select.toString());
       if (schemaIndex > -1) {
@@ -213,7 +213,7 @@ public class OracleTypeReader
     sql += " ORDER BY attr_no";
     Statement stmt = null;
     ResultSet rs = null;
-    List<ColumnIdentifier> result = new ArrayList<>(type.getNumberOfAttributes());
+    List<ColumnIdentifier> result = new ArrayList<ColumnIdentifier>(type.getNumberOfAttributes());
 
     if (Settings.getInstance().getDebugMetadataSql()) {
       LogMgr.logDebug("OracleTypeReader.getAttributes()", "Using SQL: " + sql);

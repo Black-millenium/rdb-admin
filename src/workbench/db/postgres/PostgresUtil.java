@@ -117,7 +117,7 @@ public class PostgresUtil {
    */
   public static List<String> getSearchPath(WbConnection con) {
     if (con == null) return Collections.emptyList();
-    List<String> result = new ArrayList<>();
+    List<String> result = new ArrayList<String>();
 
     ResultSet rs = null;
     Statement stmt = null;

@@ -38,7 +38,7 @@ public class TableHistoryModel
   private final FixedSizeList<TableIdentifier> history;
 
   public TableHistoryModel() {
-    history = new FixedSizeList<>(DbExplorerSettings.getDbExplorerTableHistorySize());
+    history = new FixedSizeList<TableIdentifier>(DbExplorerSettings.getDbExplorerTableHistorySize());
   }
 
   public TableIdentifier getSelectedTable() {

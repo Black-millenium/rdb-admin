@@ -90,7 +90,7 @@ public class WbGenerateScript
       types = cmdLine.getListValue(CommonArgs.ARG_TYPES);
     }
 
-    List<DbObject> objects = new ArrayList<>();
+    List<DbObject> objects = new ArrayList<DbObject>();
 
     if (CollectionUtil.isEmpty(schemas)) {
       schemas = CollectionUtil.arrayList(currentConnection.getCurrentSchema());

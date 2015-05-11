@@ -44,7 +44,7 @@ import java.util.TreeMap;
 public class WbIsolationLevel
     extends SqlCommand {
   public static final String VERB = "WbIsolationLevel";
-  private final Map<String, Integer> levelMap = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+  private final Map<String, Integer> levelMap = new TreeMap<String, Integer>(CaseInsensitiveComparator.INSTANCE);
 
   public WbIsolationLevel() {
     levelMap.put("read_committed", Integer.valueOf(Connection.TRANSACTION_READ_COMMITTED));

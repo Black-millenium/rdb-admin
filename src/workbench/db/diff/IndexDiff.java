@@ -64,8 +64,8 @@ public class IndexDiff {
 
   public StringBuilder getMigrateTargetXml() {
     StringBuilder result = new StringBuilder();
-    List<IndexDefinition> indexToAdd = new LinkedList<>();
-    List<IndexDefinition> indexToDrop = new LinkedList<>();
+    List<IndexDefinition> indexToAdd = new LinkedList<IndexDefinition>();
+    List<IndexDefinition> indexToDrop = new LinkedList<IndexDefinition>();
 
     StringBuilder myindent = new StringBuilder(indent);
     myindent.append("  ");

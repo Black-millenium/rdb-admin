@@ -54,7 +54,7 @@ import java.util.List;
  * @author Thomas Kellerer
  */
 public class BatchedStatement {
-  private final List<Closeable> streams = new ArrayList<>();
+  private final List<Closeable> streams = new ArrayList<Closeable>();
   private PreparedStatement statement;
   private int batchSize;
   private int currentSize;

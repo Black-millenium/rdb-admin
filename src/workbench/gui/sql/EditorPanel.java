@@ -83,7 +83,7 @@ public class EditorPanel
   private final CommentAction commentAction;
   private final UnCommentAction unCommentAction;
   private final JumpToLineAction jumpToLineAction;
-  private final List<FilenameChangeListener> filenameChangeListeners = new LinkedList<>();
+  private final List<FilenameChangeListener> filenameChangeListeners = new LinkedList<FilenameChangeListener>();
   protected UndoAction undo;
   protected RedoAction redo;
   protected OpenFileAction fileOpen;
@@ -650,7 +650,9 @@ public class EditorPanel
         fireFilenameChanged(toLoad.getAbsolutePath());
       }
       checkFileActions();
-    } catch (BadLocationException | IOException bl) {
+    } catch (BadLocationException bl) {
+      LogMgr.logError("EditorPanel.readFile()", "Error reading file " + toLoad.getAbsolutePath(), bl);
+    } catch (IOException bl) {
       LogMgr.logError("EditorPanel.readFile()", "Error reading file " + toLoad.getAbsolutePath(), bl);
     } catch (OutOfMemoryError mem) {
       if (doc != null) doc.reset();
@@ -881,7 +883,10 @@ public class EditorPanel
       } else {
         evt.rejectDrop();
       }
-    } catch (IOException | UnsupportedFlavorException ex) {
+    } catch (IOException ex) {
+      LogMgr.logDebug("EditorPanel.drop()", "Error when processing drop event", ex);
+      evt.rejectDrop();
+    } catch (UnsupportedFlavorException ex) {
       LogMgr.logDebug("EditorPanel.drop()", "Error when processing drop event", ex);
       evt.rejectDrop();
     }

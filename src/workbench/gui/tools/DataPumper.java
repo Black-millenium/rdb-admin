@@ -1430,7 +1430,7 @@ public class DataPumper
     ColumnMapper.MappingDefinition colMapping = this.columnMapper.getMapping();
     if (colMapping == null) return Collections.emptyList();
     int count = colMapping.targetColumns.length;
-    List<ColumnIdentifier> keys = new ArrayList<>();
+    List<ColumnIdentifier> keys = new ArrayList<ColumnIdentifier>();
 
     for (int i = 0; i < count; i++) {
       if (colMapping.targetColumns[i].isPkColumn()) {
@@ -1763,7 +1763,7 @@ public class DataPumper
         }
         if (!ignoreSelect) where = this.sqlEditor.getText();
 
-        Map<String, String> mapping = new HashMap<>();
+        Map<String, String> mapping = new HashMap<String, String>();
         int count = colMapping.sourceColumns.length;
         for (int i = 0; i < count; i++) {
           mapping.put(colMapping.sourceColumns[i].getColumnName(), colMapping.targetColumns[i].getColumnName());

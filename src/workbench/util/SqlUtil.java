@@ -500,7 +500,7 @@ public class SqlUtil {
     if (info == null) return null;
 
     int count = info.getColumnCount();
-    ArrayList<ColumnIdentifier> result = new ArrayList<>(count);
+    ArrayList<ColumnIdentifier> result = new ArrayList<ColumnIdentifier>(count);
     for (int i = 0; i < count; i++) {
       result.add(info.getColumn(i));
     }
@@ -593,7 +593,7 @@ public class SqlUtil {
    */
   public static List<String> getSelectColumns(String select, boolean includeAlias, WbConnection conn) {
     List<ElementInfo> entries = getColumnEntries(select, includeAlias, conn);
-    List<String> result = new ArrayList<>(entries.size());
+    List<String> result = new ArrayList<String>(entries.size());
     for (ElementInfo entry : entries) {
       result.add(entry.getElementValue());
     }
@@ -614,7 +614,7 @@ public class SqlUtil {
    * @see #getSelectColumns(java.lang.String, boolean)
    */
   public static List<ElementInfo> getColumnEntries(String select, boolean includeAlias, WbConnection conn) {
-    List<ElementInfo> result = new LinkedList<>();
+    List<ElementInfo> result = new LinkedList<ElementInfo>();
     try {
       SQLLexer lexer = SQLLexerFactory.createLexer(conn, select);
       SQLToken t = lexer.getNextToken(false, false);
@@ -1264,7 +1264,7 @@ public class SqlUtil {
       // For this we keep a list of warnings which have been added
       // from the statement. They will not be added when the Warnings from
       // the connection are retrieved
-      Set<String> added = new HashSet<>();
+      Set<String> added = new HashSet<String>();
       StringBuilder msg = null;
       String s = null;
 
@@ -1582,7 +1582,7 @@ public class SqlUtil {
   public static SQLToken getOperatorBeforeCursor(String sql, int cursor) {
     if (StringUtil.isBlank(sql)) return null;
     SQLLexer lexer = SQLLexerFactory.createLexer(sql);
-    List<SQLToken> tokens = new ArrayList<>();
+    List<SQLToken> tokens = new ArrayList<SQLToken>();
     SQLToken token = lexer.getNextToken(false, false);
     while (token != null) {
       tokens.add(token);

@@ -281,7 +281,7 @@ public class DataCopier
     try {
       List<ColumnIdentifier> pkCols = this.importer.getKeyColumns();
 
-      List<ColumnIdentifier> targetCols = new ArrayList<>(columns.size());
+      List<ColumnIdentifier> targetCols = new ArrayList<ColumnIdentifier>(columns.size());
       for (ColumnIdentifier col : columns) {
         // When copying a table from MySQL or SQL Server to a standard compliant DBMS we must ensure
         // that wrong quoting characters are removed
@@ -383,7 +383,7 @@ public class DataCopier
     this.sourceTable = null;
     this.targetTable = aTargetTable;
 
-    this.targetColumnsForQuery = new ArrayList<>(queryColumns);
+    this.targetColumnsForQuery = new ArrayList<ColumnIdentifier>(queryColumns);
     if (createTableType != null) {
       createTable(targetColumnsForQuery, dropTarget, ignoreDropError, createTableType, skipTargetCheck);
     }
@@ -546,8 +546,8 @@ public class DataCopier
     }
     int count = this.columnMap.size();
 
-    List<ColumnIdentifier> cols = new ArrayList<>(count);
-    List<ColumnIdentifier> sourceCols = new ArrayList<>(count);
+    List<ColumnIdentifier> cols = new ArrayList<ColumnIdentifier>(count);
+    List<ColumnIdentifier> sourceCols = new ArrayList<ColumnIdentifier>(count);
     TableSelectBuilder builder = new TableSelectBuilder(sourceConnection, "export", TableSelectBuilder.TABLEDATA_TEMPLATE_NAME);
 
     StringBuilder sql = new StringBuilder(count * 25 + 30);
@@ -591,7 +591,7 @@ public class DataCopier
       TableIdentifier tbl = sourceMeta.resolveSynonym(this.sourceTable);
       sourceCols = sourceMeta.getTableColumns(tbl, false);
     } else if (this.targetColumnsForQuery != null) {
-      sourceCols = new ArrayList<>(this.targetColumnsForQuery);
+      sourceCols = new ArrayList<ColumnIdentifier>(this.targetColumnsForQuery);
     }
     return sourceCols;
   }
@@ -638,7 +638,7 @@ public class DataCopier
       }
     }
 
-    this.columnMap = new HashMap<>(sourceCols.size());
+    this.columnMap = new HashMap<ColumnIdentifier, ColumnIdentifier>(sourceCols.size());
 
     if (columnMapping != null) {
       int colPos = 0;

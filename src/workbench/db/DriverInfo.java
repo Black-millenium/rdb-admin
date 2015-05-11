@@ -37,8 +37,8 @@ import java.util.*;
  * @author Thomas Kellerer
  */
 public class DriverInfo {
-  private final Set<String> methods = new TreeSet<>();
-  private Map<String, String> infoMap = new HashMap<>(30);
+  private final Set<String> methods = new TreeSet<String>();
+  private Map<String, String> infoMap = new HashMap<String, String>(30);
 
   public DriverInfo(Connection con) {
     methods.add("getSearchStringEscape");

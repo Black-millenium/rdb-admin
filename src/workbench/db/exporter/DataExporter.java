@@ -135,7 +135,7 @@ public class DataExporter
   private long totalRows;
   private Set<ControlFileFormat> controlFiles = EnumSet.noneOf(ControlFileFormat.class);
   private boolean compressOutput;
-  private List<DbExecutionListener> listener = new ArrayList<>();
+  private List<DbExecutionListener> listener = new ArrayList<DbExecutionListener>();
   private ExportDataModifier modifier;
   private boolean includeColumnComments;
   private String nullString;
@@ -184,7 +184,7 @@ public class DataExporter
    */
   public DataExporter(WbConnection con) {
     this.dbConn = con;
-    this.jobQueue = new LinkedList<>();
+    this.jobQueue = new LinkedList<ExportJobEntry>();
     this.useSchemaInSql = Settings.getInstance().getIncludeOwnerInSqlExport();
     this.numberFormatter = Settings.getInstance().createDefaultDecimalFormatter();
     this.setExportHeaders(Settings.getInstance().getBoolProperty("workbench.export.text.default.header", false));

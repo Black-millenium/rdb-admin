@@ -107,8 +107,8 @@ public class CompileDbObjectAction
       return null;
     }
 
-    List<String> catalogs = new ArrayList<>();
-    List<DbObject> objects = new ArrayList<>();
+    List<String> catalogs = new ArrayList<String>();
+    List<DbObject> objects = new ArrayList<DbObject>();
     for (DbObject dbo : selected) {
       if (!OracleObjectCompiler.canCompile(dbo)) {
         // next selected element

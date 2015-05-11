@@ -84,7 +84,7 @@ public class InsertColumnMatcher {
       }
 
       List<ElementInfo> columnEntries = null;
-      List<List<ElementInfo>> rowValues = new ArrayList<>(1);
+      List<List<ElementInfo>> rowValues = new ArrayList<List<ElementInfo>>(1);
 
       int bracketCount = 0;
       boolean isSubSelect = false;
@@ -130,7 +130,7 @@ public class InsertColumnMatcher {
       }
 
       int maxElements = columnEntries.size() > maxValues ? columnEntries.size() : maxValues;
-      columns = new ArrayList<>(maxElements);
+      columns = new ArrayList<InsertColumnInfo>(maxElements);
       for (int i = 0; i < maxElements; i++) {
         InsertColumnInfo info = new InsertColumnInfo();
         if (i < columnEntries.size()) {
@@ -181,7 +181,7 @@ public class InsertColumnMatcher {
   }
 
   private List<ElementInfo> getListValues(SQLLexer lexer, int lastStart, String sql) {
-    List<ElementInfo> result = new ArrayList<>();
+    List<ElementInfo> result = new ArrayList<ElementInfo>();
 
     int bracketCount = 1;
     int lastComma = lastStart;
@@ -231,7 +231,7 @@ public class InsertColumnMatcher {
   public List<String> getColumns() {
     if (columns == null) return Collections.emptyList();
 
-    List<String> result = new ArrayList<>(columns.size());
+    List<String> result = new ArrayList<String>(columns.size());
     for (InsertColumnInfo column : columns) {
       result.add(column.columnName);
     }
@@ -301,7 +301,7 @@ public class InsertColumnMatcher {
     int columnStart;
     int columnEnd;
     String columnName;
-    List<ColumnValueInfo> values = new ArrayList<>(1);
+    List<ColumnValueInfo> values = new ArrayList<ColumnValueInfo>(1);
 
     void addValue(String value, int valueStart, int valueEnd) {
       values.add(new ColumnValueInfo(value, valueStart, valueEnd));

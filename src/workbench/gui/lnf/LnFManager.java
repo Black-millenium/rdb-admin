@@ -37,7 +37,7 @@ import java.util.List;
  * @author Thomas Kellerer
  */
 public class LnFManager {
-  private List<LnFDefinition> lnfList = new ArrayList<>();
+  private List<LnFDefinition> lnfList = new ArrayList<LnFDefinition>();
 
   public LnFManager() {
     Settings set = Settings.getInstance();

@@ -93,12 +93,12 @@ public class MainWindow
   private final List<JMenuBar> panelMenus = Collections.synchronizedList(new ArrayList<JMenuBar>(15));
   private final NextTabAction nextTab;
   private final PrevTabAction prevTab;
-  private final List<ToolWindow> explorerWindows = new ArrayList<>();
+  private final List<ToolWindow> explorerWindows = new ArrayList<ToolWindow>();
   /**
    * Stores additional properties that should be saved into the Worskpace from objects that are not constantly visible.
    * e.g. the Macro Popup window
    */
-  private final Map<String, WbProperties> toolProperties = new HashMap<>();
+  private final Map<String, WbProperties> toolProperties = new HashMap<String, WbProperties>();
   protected ConnectionSelector connectionSelector;
   protected WbThread connectThread;
   private boolean exitOnCancel = false;
@@ -439,7 +439,7 @@ public class MainWindow
   }
 
   private JMenuBar createMenuForPanel(MainPanel panel) {
-    HashMap<String, JMenu> menus = new HashMap<>(10);
+    HashMap<String, JMenu> menus = new HashMap<String, JMenu>(10);
 
     JMenuBar menuBar = new JMenuBar();
     menuBar.setBorderPainted(false);
@@ -807,7 +807,7 @@ public class MainWindow
   public List<String> getPanelLabels() {
     int tabCount = this.sqlTab.getTabCount();
 
-    List<String> result = new ArrayList<>(tabCount);
+    List<String> result = new ArrayList<String>(tabCount);
     for (int i = 0; i < tabCount; i++) {
       MainPanel p = this.getSqlPanel(i);
       if (p instanceof SqlPanel) {
@@ -1606,7 +1606,7 @@ public class MainWindow
     setConnectIsInProgress();
     showDisconnectInfo();
     try {
-      final List<WbConnection> toAbort = new ArrayList<>();
+      final List<WbConnection> toAbort = new ArrayList<WbConnection>();
 
       for (int i = 0; i < this.sqlTab.getTabCount(); i++) {
         final MainPanel sql = (MainPanel) this.sqlTab.getComponentAt(i);
@@ -2060,7 +2060,7 @@ public class MainWindow
 
   public void closeExplorerWindows(boolean doDisconnect) {
     try {
-      List<ToolWindow> copy = new ArrayList<>(explorerWindows);
+      List<ToolWindow> copy = new ArrayList<ToolWindow>(explorerWindows);
       for (ToolWindow w : copy) {
         WbConnection conn = w.getConnection();
         if (conn != null && doDisconnect && conn != this.currentConnection) {

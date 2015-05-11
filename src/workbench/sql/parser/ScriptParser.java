@@ -444,7 +444,7 @@ public class ScriptParser {
       p.setStoreStatementText(true);
       storeStatement = true;
     }
-    commands = new ArrayList<>();
+    commands = new ArrayList<ScriptCommandDefinition>();
 
     ScriptCommandDefinition c = null;
     int index = 0;

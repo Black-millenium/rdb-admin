@@ -110,7 +110,7 @@ public class WbProcSource
 
   private List<String> getParameterNames(DataStore procColumns) {
     int rows = procColumns.getRowCount();
-    List<String> names = new ArrayList<>(rows);
+    List<String> names = new ArrayList<String>(rows);
     for (int row = 0; row < rows; row++) {
       String name = procColumns.getValueAsString(row, 0);
       if (name != null) {

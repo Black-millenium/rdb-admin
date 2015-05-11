@@ -288,7 +288,7 @@ public class OracleStatementHook
 
   private void storeSessionStats(StatementRunner runner) {
     WbConnection con = runner.getConnection();
-    values = new HashMap<>(10);
+    values = new HashMap<String, Long>(10);
 
     ResultSet rs = null;
     try {

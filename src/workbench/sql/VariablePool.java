@@ -60,8 +60,8 @@ import java.util.regex.Pattern;
 public class VariablePool
     implements PropertyChangeListener {
   public static final String PROP_PREFIX = "wbp.";
-  private final Map<String, String> data = new LinkedHashMap<>();
-  private final Map<String, List<String>> lookups = new HashMap<>();
+  private final Map<String, String> data = new LinkedHashMap<String, String>();
+  private final Map<String, List<String>> lookups = new HashMap<String, List<String>>();
 
   private final Object lock = new Object();
   private final Pattern validNamePattern = Pattern.compile("[\\w\\.]*");
@@ -207,7 +207,7 @@ public class VariablePool
     if (sql == null) return Collections.emptySet();
     Matcher m = this.promptPattern.matcher(sql);
     if (m == null) return Collections.emptySet();
-    Set<String> variables = new TreeSet<>();
+    Set<String> variables = new TreeSet<String>();
     synchronized (this.data) {
       while (m.find()) {
         int start = m.start() + this.getPrefix().length();

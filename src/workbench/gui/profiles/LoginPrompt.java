@@ -55,7 +55,7 @@ public class LoginPrompt
   }
 
   public String getPassword() {
-    return tfPwd.getText();
+    return new String(tfPwd.getPassword());
   }
 
   @Override

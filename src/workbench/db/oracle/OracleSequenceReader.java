@@ -55,7 +55,7 @@ public class OracleSequenceReader
   public List<SequenceDefinition> getSequences(String catalog, String owner, String namePattern) {
     DataStore ds = getRawSequenceDefinition(catalog, owner, namePattern);
     if (ds == null || ds.getRowCount() == 0) return Collections.emptyList();
-    ArrayList<SequenceDefinition> result = new ArrayList<>();
+    ArrayList<SequenceDefinition> result = new ArrayList<SequenceDefinition>();
     for (int row = 0; row < ds.getRowCount(); row++) {
       result.add(createDefinition(ds, row));
     }

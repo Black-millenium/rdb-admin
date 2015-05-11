@@ -62,7 +62,7 @@ public class ColumnDropper
   public static List<String> getSql(TableIdentifier table, List<ColumnIdentifier> columns, WbConnection conn) {
     String multiSql = conn.getDbSettings().getDropMultipleColumnSql();
     String singleSql = conn.getDbSettings().getDropSingleColumnSql();
-    List<String> result = new ArrayList<>(columns.size());
+    List<String> result = new ArrayList<String>(columns.size());
 
     if (columns.size() == 1 || StringUtil.isEmptyString(multiSql)) {
       singleSql = StringUtil.replace(singleSql, MetaDataSqlManager.TABLE_NAME_PLACEHOLDER, table.getTableExpression(conn));
@@ -135,7 +135,7 @@ public class ColumnDropper
 
   @Override
   public void setObjects(List<? extends DbObject> toDrop) {
-    this.columns = new ArrayList<>();
+    this.columns = new ArrayList<ColumnIdentifier>();
     if (toDrop == null) return;
     for (DbObject dbo : toDrop) {
       if (dbo instanceof ColumnIdentifier) {

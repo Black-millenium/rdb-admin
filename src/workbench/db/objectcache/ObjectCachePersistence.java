@@ -210,7 +210,9 @@ class ObjectCachePersistence {
       ObjectOutputStream oos = new ObjectOutputStream(zout);
       oos.writeObject(toWrite);
       zout.closeEntry();
-    } catch (InvalidClassException | NotSerializableException ice) {
+    } catch (InvalidClassException ice) {
+      LogMgr.logError("ObjectCachePersistence.writeObject()", "Could not write cache entry: " + filename, ice);
+    } catch (NotSerializableException ice) {
       LogMgr.logError("ObjectCachePersistence.writeObject()", "Could not write cache entry: " + filename, ice);
     }
   }

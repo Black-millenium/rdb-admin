@@ -520,7 +520,7 @@ public class TableDeleterUI
 
   public void addDeleteListener(TableDeleteListener listener) {
     if (this.deleteListener == null) {
-      this.deleteListener = new ArrayList<>();
+      this.deleteListener = new ArrayList<TableDeleteListener>();
     }
     this.deleteListener.add(listener);
   }

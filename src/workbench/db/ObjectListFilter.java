@@ -32,7 +32,7 @@ import java.util.Map;
  * @author Thomas Kellerer
  */
 public class ObjectListFilter {
-  private Map<String, ObjectNameFilter> filterMap = new HashMap<>();
+  private Map<String, ObjectNameFilter> filterMap = new HashMap<String, ObjectNameFilter>();
 
   public ObjectListFilter(String dbid) {
     String synRegex = Settings.getInstance().getProperty("workbench.db." + dbid + ".exclude.synonyms", null);

@@ -56,7 +56,7 @@ public class UpdateTableSelector {
     TableIdentifier table = null;
 
     if (tables.size() > 1) {
-      List<String> tableNames = new ArrayList<>(tables.size());
+      List<String> tableNames = new ArrayList<String>(tables.size());
       for (Alias a : tables) {
         tableNames.add(a.getObjectName());
       }

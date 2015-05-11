@@ -101,7 +101,7 @@ public class OpenEdgeObjectListEnhancer
       sql += " and tbl = ? ";
     }
 
-    Map<String, String> remarks = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+    Map<String, String> remarks = new TreeMap<String, String>(CaseInsensitiveComparator.INSTANCE);
 
     long start = System.currentTimeMillis();
     try {

@@ -173,7 +173,7 @@ public class ColumnIdentifier
    * @return a new list where the PK columns are at the beginning.
    */
   public static List<ColumnIdentifier> sortPksFirst(List<ColumnIdentifier> columns) {
-    List<ColumnIdentifier> result = new ArrayList<>(columns.size());
+    List<ColumnIdentifier> result = new ArrayList<ColumnIdentifier>(columns.size());
     for (ColumnIdentifier col : columns) {
       if (col.isPkColumn()) {
         result.add(col);

@@ -54,7 +54,7 @@ public class DerbySynonymReader
   @Override
   public List<TableIdentifier> getSynonymList(WbConnection con, String catalog, String owner, String namePattern)
       throws SQLException {
-    List<TableIdentifier> result = new ArrayList<>();
+    List<TableIdentifier> result = new ArrayList<TableIdentifier>();
     String sql = "SELECT s.schemaname, a.alias \n" +
         " FROM sys.sysaliases a, sys.sysschemas s \n" +
         " WHERE a.schemaid = s.schemaid \n" +

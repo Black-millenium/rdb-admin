@@ -130,7 +130,7 @@ public class ClipBoardCopier {
         printer.setFormatColumns(true);
         printer.setPrintRowCount(false);
         if (columnsToCopy != null) {
-          List<String> colNames = new ArrayList<>(columnsToCopy.size());
+          List<String> colNames = new ArrayList<String>(columnsToCopy.size());
           for (ColumnIdentifier id : columnsToCopy) {
             colNames.add(id.getColumnName());
           }
@@ -340,7 +340,7 @@ public class ClipBoardCopier {
     // Now check if the selected columns are different to the key columns.
     // If only key columns are selected then creating an UPDATE statement does not make sense.
     if (type == ExportType.SQL_UPDATE) {
-      List<ColumnIdentifier> keyColumns = new ArrayList<>();
+      List<ColumnIdentifier> keyColumns = new ArrayList<ColumnIdentifier>();
       for (ColumnIdentifier col : data.getResultInfo().getColumns()) {
         if (col.isPkColumn()) {
           keyColumns.add(col);
@@ -476,7 +476,7 @@ public class ClipBoardCopier {
     int[] cols = this.client.getSelectedColumns();
     DataStore ds = this.client.getDataStore();
     if (ds == null) return Collections.emptyList();
-    List<ColumnIdentifier> result = new ArrayList<>(cols.length);
+    List<ColumnIdentifier> result = new ArrayList<ColumnIdentifier>(cols.length);
     TableColumnModel model = client.getColumnModel();
     for (int i = 0; i < cols.length; i++) {
       int realIndex = model.getColumn(cols[i]).getModelIndex();

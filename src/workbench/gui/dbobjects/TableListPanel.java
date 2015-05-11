@@ -155,7 +155,7 @@ public class TableListPanel
       tableTypes = new MultiSelectComboBox();
       ((MultiSelectComboBox) tableTypes).setCloseOnSelect(DbExplorerSettings.getDbExplorerMultiSelectTypesAutoClose());
     } else {
-      tableTypes = new JComboBox<>();
+      tableTypes = new JComboBox();
     }
     this.tableDefinition = new TableDefinitionPanel();
     this.tableDefinition.setName("tabledefinition");
@@ -391,7 +391,7 @@ public class TableListPanel
         int[] rows = indexes.getSelectedRows();
         if (rows == null) return null;
 
-        ArrayList<DbObject> objects = new ArrayList<>(rows.length);
+        ArrayList<DbObject> objects = new ArrayList<DbObject>(rows.length);
 
         TableIdentifier tbl = getObjectTable();
 
@@ -731,8 +731,8 @@ public class TableListPanel
   private void setupMultiSelectTypes() {
     MultiSelectComboBox<String> typeCb = (MultiSelectComboBox) tableTypes;
 
-    List<String> types = new ArrayList<>(this.dbConnection.getMetadata().getObjectTypes());
-    List<String> toSelect = new ArrayList<>();
+    List<String> types = new ArrayList<String>(this.dbConnection.getMetadata().getObjectTypes());
+    List<String> toSelect = new ArrayList<String>();
 
     if (tableTypeToSelect != null) {
       if (tableTypeToSelect.equals("*")) {
@@ -1794,7 +1794,7 @@ public class TableListPanel
 
   @Override
   public void addTableListDisplayClient(JTable aClient) {
-    if (this.tableListClients == null) this.tableListClients = new ArrayList<>();
+    if (this.tableListClients == null) this.tableListClients = new ArrayList<JTable>();
     if (!this.tableListClients.contains(aClient)) this.tableListClients.add(aClient);
     if (tableList != null && tableList.getRowCount() > 0) {
       updateDisplayClients();
@@ -1875,7 +1875,7 @@ public class TableListPanel
     int count = rows.length;
     if (count == 0) return null;
 
-    List<DbObject> result = new ArrayList<>(count);
+    List<DbObject> result = new ArrayList<DbObject>(count);
     for (int i = 0; i < count; i++) {
       DbObject db = (DbObject) tableList.getDataStore().getRow(rows[i]).getUserObject();
       if (db == null) {

@@ -53,7 +53,7 @@ public class ValueStatement {
     SQLLexer lexer = SQLLexerFactory.createLexer(sql);
     SQLToken t = lexer.getNextToken(false, true);
     int currentIndex = 1;
-    columnIndexMap = new HashMap<>();
+    columnIndexMap = new HashMap<Integer, Integer>();
     while (t != null) {
       String text = t.getText();
       Matcher m = columnReference.matcher(text);

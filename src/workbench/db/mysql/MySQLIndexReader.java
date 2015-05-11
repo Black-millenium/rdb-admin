@@ -87,7 +87,7 @@ public class MySQLIndexReader
   }
 
   private Set<TableIdentifier> getIndexTables(Collection<IndexDefinition> indexList) {
-    Set<TableIdentifier> result = new HashSet<>();
+    Set<TableIdentifier> result = new HashSet<TableIdentifier>();
     for (IndexDefinition def : indexList) {
       if (def.getBaseTable() != null) {
         result.add(def.getBaseTable());

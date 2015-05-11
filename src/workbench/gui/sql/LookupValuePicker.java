@@ -61,7 +61,7 @@ public class LookupValuePicker
     extends JPanel
     implements KeyListener, ValidatingComponent, MouseListener, Restoreable, Reloadable, ActionListener {
   private final LookupDataLoader lookupLoader;
-  private final Map<String, Object> currentValues = new HashMap<>();
+  private final Map<String, Object> currentValues = new HashMap<String, Object>();
   private JTextField filterValue;
   private JRadioButton doFilter;
   private JRadioButton doSearch;
@@ -313,7 +313,7 @@ public class LookupValuePicker
       // <editor-fold defaultstate="collapsed" desc="Implementation">
       @Override
       public Map<String, Object> getFKValues(List<String> columns) {
-        Map<String, Object> result = new HashMap<>(columns.size());
+        Map<String, Object> result = new HashMap<String, Object>(columns.size());
         for (String name : columns) {
           int colIndex = table.getColumnIndex(name);
           if (colIndex > -1) {
@@ -616,13 +616,13 @@ public class LookupValuePicker
     int[] rows = lookupData.getSelectedRows();
     if (rows == null || rows.length == 0) return Collections.emptyList();
     PkDefinition pk = lookupLoader.getPK();
-    List<Map<String, Object>> result = new ArrayList<>(1);
+    List<Map<String, Object>> result = new ArrayList<Map<String, Object>>(1);
     List<String> columns = pk.getColumns();
     DataStore ds = lookupData.getDataStore();
 
     for (int i = 0; i < rows.length; i++) {
       int row = rows[i];
-      Map<String, Object> values = new HashMap<>();
+      Map<String, Object> values = new HashMap<String, Object>();
       for (String column : columns) {
         Object value = ds.getValue(row, column);
         values.put(column, value);

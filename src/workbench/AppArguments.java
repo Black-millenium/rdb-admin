@@ -183,7 +183,7 @@ public class AppArguments
         File f = new File(lb);
         BufferedReader in = EncodingUtil.createBufferedReader(f, null);
         List<String> lines = FileUtil.getLines(in, true);
-        List<String> translated = new ArrayList<>(lines.size());
+        List<String> translated = new ArrayList<String>(lines.size());
         for (String line : lines) {
           if (StringUtil.isBlank(line)) continue;
 

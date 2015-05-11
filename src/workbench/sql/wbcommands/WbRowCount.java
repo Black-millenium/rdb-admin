@@ -72,7 +72,7 @@ public class WbRowCount
   }
 
   public static DataStore buildResultDataStore(WbConnection connection, boolean includeCatalog, boolean includeSchema, boolean includeType) {
-    List<String> colNames = new ArrayList<>(5);
+    List<String> colNames = new ArrayList<String>(5);
 
     colNames.add(ResourceMgr.getString("TxtRowCnt").toUpperCase());
     colNames.add("NAME");
@@ -192,7 +192,7 @@ public class WbRowCount
     int schemaIndex = rowCounts.getColumnIndex(currentConnection.getMetadata().getSchemaTerm());
 
     int tableCount = resultList.getRowCount();
-    Set<TableIdentifier> processed = new HashSet<>(tableCount);
+    Set<TableIdentifier> processed = new HashSet<TableIdentifier>(tableCount);
 
     for (int row = 0; row < tableCount; row++) {
       ResultSet rs = null;

@@ -112,7 +112,7 @@ public class UpdateTableDetector {
       // Note that this does not work, if the columns were renamed via an alias in the select statement
 
       if (columns != null) {
-        this.missingPkcolumns = new ArrayList<>(columns.size());
+        this.missingPkcolumns = new ArrayList<ColumnIdentifier>(columns.size());
 
         for (ColumnIdentifier column : columns) {
           int index = resultInfo.findColumn(column.getColumnName(), conn.getMetadata());
@@ -191,7 +191,7 @@ public class UpdateTableDetector {
       LogMgr.logDebug("UpdateTableDetector.checkPkOnlyForUpdateTable()", "Retrieving primary key for table " + tbl.getTableExpression() + " took: " + duration + "ms");
     }
 
-    this.missingPkcolumns = new ArrayList<>(1);
+    this.missingPkcolumns = new ArrayList<ColumnIdentifier>(1);
 
     if (pk == null || CollectionUtil.isEmpty(pk.getColumns())) {
       checkUniqueIndexesFor(tbl, resultInfo);

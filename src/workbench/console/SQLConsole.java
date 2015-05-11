@@ -66,7 +66,7 @@ public class SQLConsole
   private static final String PROMPT_END = "> ";
   private final ConsolePrompter prompter;
   private final WbThread shutdownHook = new WbThread(this, "ShutdownHook");
-  private final Map<String, String> abbreviations = new HashMap<>();
+  private final Map<String, String> abbreviations = new HashMap<String, String>();
   private final StatementHistory history;
   private final boolean changeTerminalTitle;
   private final String titlePrefix = "\033]0;";

@@ -86,10 +86,10 @@ public class SqlPanel
     JobErrorHandler, ExecutionController, ResultLogger, ParameterPrompter, DbExecutionNotifier,
     FilenameChangeListener, ResultReceiver, MacroClient, Moveable, TabCloser, StatusBar, ToolWindowManager, OutputPrinter, PanelReloader {
   private static int instanceCount = 0;
-  protected final List<ToolWindow> resultWindows = new ArrayList<>(1);
+  protected final List<ToolWindow> resultWindows = new ArrayList<ToolWindow>(1);
   private final List actions = new LinkedList();
-  private final List<WbAction> toolbarActions = new LinkedList<>();
-  private final List<FilenameChangeListener> filenameChangeListeners = new LinkedList<>();
+  private final List<WbAction> toolbarActions = new LinkedList<WbAction>();
+  private final List<FilenameChangeListener> filenameChangeListeners = new LinkedList<FilenameChangeListener>();
   private final int internalId;
   private final Object connectionLock = new Object();
   private final int macroClientId;
@@ -3157,7 +3157,7 @@ public class SqlPanel
     if (result.hasDataStores()) {
       final List<DataStore> results = result.getDataStores();
       count += results.size();
-      final List<DwPanel> panels = new ArrayList<>(results.size());
+      final List<DwPanel> panels = new ArrayList<DwPanel>(results.size());
       WbSwingUtilities.invoke(new Runnable() {
         @Override
         public void run() {

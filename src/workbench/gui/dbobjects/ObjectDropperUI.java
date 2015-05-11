@@ -469,7 +469,7 @@ public class ObjectDropperUI
           // not DbObjects, so I need to create a new list.
           // The list should not contain only TableIdentifiers anyway, otherwise
           // the ObjectDropper wouldn't (or shouldn't) support FK checking
-          List<TableIdentifier> tables = new ArrayList<>();
+          List<TableIdentifier> tables = new ArrayList<TableIdentifier>();
           for (DbObject dbo : dropper.getObjects()) {
             if (dbo instanceof TableIdentifier) {
               tables.add((TableIdentifier) dbo);

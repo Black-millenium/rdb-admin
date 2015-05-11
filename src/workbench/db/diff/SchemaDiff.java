@@ -262,8 +262,8 @@ public class SchemaDiff {
    */
   public void setTableNames(List<String> referenceList, List<String> targetList)
       throws SQLException {
-    ArrayList<TableIdentifier> reference = new ArrayList<>(referenceList.size());
-    ArrayList<TableIdentifier> target = new ArrayList<>(targetList.size());
+    ArrayList<TableIdentifier> reference = new ArrayList<TableIdentifier>(referenceList.size());
+    ArrayList<TableIdentifier> target = new ArrayList<TableIdentifier>(targetList.size());
 
     if (referenceList.size() != targetList.size()) throw new IllegalArgumentException("Size of lists does not match");
 
@@ -302,7 +302,7 @@ public class SchemaDiff {
     if (referenceList.size() != targetList.size())
       throw new IllegalArgumentException("Number of source and target tables have to match");
     int count = referenceList.size();
-    this.objectsToCompare = new ArrayList<>(count);
+    this.objectsToCompare = new ArrayList<Object>(count);
 
     if (this.monitor != null) {
       this.monitor.setMonitorType(RowActionMonitor.MONITOR_PROCESS_TABLE);
@@ -542,9 +542,9 @@ public class SchemaDiff {
   private void processTableList(List<TableIdentifier> refTables, List<TableIdentifier> targetTables)
       throws SQLException {
     int count = refTables.size();
-    HashSet<String> refTableNames = new HashSet<>();
+    HashSet<String> refTableNames = new HashSet<String>();
 
-    this.objectsToCompare = new ArrayList<>(count);
+    this.objectsToCompare = new ArrayList<Object>(count);
 
     if (this.monitor != null) {
       this.monitor.setMonitorType(RowActionMonitor.MONITOR_PLAIN);
@@ -589,8 +589,8 @@ public class SchemaDiff {
 
     if (cancel) return;
 
-    this.tablesToDelete = new ArrayList<>();
-    this.viewsToDelete = new ArrayList<>();
+    this.tablesToDelete = new ArrayList<TableIdentifier>();
+    this.viewsToDelete = new ArrayList<TableIdentifier>();
 
     if (targetTables != null) {
       DbMetadata meta = targetDb.getMetadata();
@@ -615,8 +615,8 @@ public class SchemaDiff {
   }
 
   private void processSequenceList(List<SequenceDefinition> refSeqs, List<SequenceDefinition> targetSeqs) {
-    HashSet<String> refSeqNames = new HashSet<>();
-    this.sequencesToDelete = new ArrayList<>();
+    HashSet<String> refSeqNames = new HashSet<String>();
+    this.sequencesToDelete = new ArrayList<SequenceDefinition>();
 
     if (this.monitor != null) {
       this.monitor.setMonitorType(RowActionMonitor.MONITOR_PLAIN);
@@ -662,11 +662,11 @@ public class SchemaDiff {
   }
 
   private void processProcedureList(List<ProcedureDefinition> refProcs, List<ProcedureDefinition> targetProcs) {
-    HashSet<String> refProcNames = new HashSet<>();
-    this.procsToDelete = new ArrayList<>();
-    this.packagesToDelete = new ArrayList<>();
+    HashSet<String> refProcNames = new HashSet<String>();
+    this.procsToDelete = new ArrayList<ProcedureDefinition>();
+    this.packagesToDelete = new ArrayList<ReportPackage>();
 
-    Set<ReportPackage> refPackages = new HashSet<>();
+    Set<ReportPackage> refPackages = new HashSet<ReportPackage>();
 
     DbMetadata targetMeta = this.targetDb.getMetadata();
 
@@ -743,7 +743,7 @@ public class SchemaDiff {
     }
 
     if (targetMeta.isOracle()) {
-      Set<ReportPackage> deleted = new HashSet<>();
+      Set<ReportPackage> deleted = new HashSet<ReportPackage>();
       for (ProcedureDefinition tProc : targetProcs) {
         if (!tProc.isOraclePackage()) continue;
 
@@ -850,7 +850,7 @@ public class SchemaDiff {
     writeTag(out, null, "schema-diff", true);
     writeDiffInfo(out);
     int count = this.objectsToCompare.size();
-    List<ViewDiff> viewDiffs = new ArrayList<>();
+    List<ViewDiff> viewDiffs = new ArrayList<ViewDiff>();
 
     // First we have to process the tables
     for (int i = 0; i < count; i++) {

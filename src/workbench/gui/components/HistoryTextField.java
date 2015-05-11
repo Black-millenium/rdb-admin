@@ -81,7 +81,7 @@ public class HistoryTextField
   public void setSettingsProperty(String prop) {
     propName = prop;
     int maxHistorySize = Settings.getInstance().getIntProperty("workbench.history." + propName + ".size", 25);
-    historyValues = new FixedSizeList<>(maxHistorySize);
+    historyValues = new FixedSizeList<String>(maxHistorySize);
   }
 
   public void selectAll() {

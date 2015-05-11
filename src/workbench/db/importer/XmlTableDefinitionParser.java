@@ -85,7 +85,9 @@ public class XmlTableDefinitionParser
       in = this.fileHandler.getMainFileReader();
       InputSource source = new InputSource(in);
       saxParser.parse(source, this);
-    } catch (ParserConfigurationException | ParsingEndedException ce) {
+    } catch (ParserConfigurationException ce) {
+      // should not happen
+    } catch (ParsingEndedException ce) {
       // should not happen
     } catch (IOException e) {
       throw e;

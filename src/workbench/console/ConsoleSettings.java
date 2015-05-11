@@ -48,7 +48,7 @@ public class ConsoleSettings {
 
   private RowDisplay rowDisplay = RowDisplay.SingleLine;
   private RowDisplay nextRowDisplay;
-  private List<PropertyChangeListener> listener = new ArrayList<>();
+  private List<PropertyChangeListener> listener = new ArrayList<PropertyChangeListener>();
 
   private ConsoleSettings() {
   }

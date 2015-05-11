@@ -84,7 +84,7 @@ public class ValueConverter {
   private final WbDateFormatter dateFormatter = new WbDateFormatter();
   private final WbDateFormatter timestampFormatter = new WbDateFormatter();
   private final WbDateFormatter formatter = new WbDateFormatter();
-  private final Map<String, Boolean> booleanValues = new HashMap<>();
+  private final Map<String, Boolean> booleanValues = new HashMap<String, Boolean>();
   private String defaultDateFormat;
   private String defaultTimestampFormat;
   private char decimalCharacter = '.';

@@ -88,7 +88,7 @@ public class OracleObjectListEnhancer
     if (StringUtil.isBlank(defaultPrefix)) {
       defaultPrefix = null;
     }
-    Map<String, String> result = new HashMap<>();
+    Map<String, String> result = new HashMap<String, String>();
 
     String sql =
         "SELECT /* SQLWorkbench */ mv.owner, mv.mview_name, \n " +

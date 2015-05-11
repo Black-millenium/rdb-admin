@@ -242,7 +242,7 @@ public class ReferenceTableNavigator
   }
 
   private void buildMenu(WbMenu menu, ReferenceTableNavigation navi, String cmd) {
-    List<JMenuItem> itemsToAdd = new LinkedList<>();
+    List<JMenuItem> itemsToAdd = new LinkedList<JMenuItem>();
 
     TableIdentifier tbl = getUpdateTable();
     if (tbl != null) {
@@ -339,14 +339,14 @@ public class ReferenceTableNavigator
   }
 
   private List<List<ColumnData>> getColumnData(DependencyNode node) {
-    List<List<ColumnData>> rows = new LinkedList<>();
+    List<List<ColumnData>> rows = new LinkedList<List<ColumnData>>();
     int[] selectedRows = this.source.getSelectedRows();
     int rowCount = selectedRows.length;
 
     Map<String, String> columns = node.getColumns();
     DataStore ds = this.source.getDataStore();
     for (int i = 0; i < rowCount; i++) {
-      List<ColumnData> rowData = new LinkedList<>();
+      List<ColumnData> rowData = new LinkedList<ColumnData>();
       for (String col : columns.values()) {
         int colIndex = ds.getColumnIndex(col);
         if (colIndex > -1) {

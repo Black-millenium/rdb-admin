@@ -45,8 +45,8 @@ public class RdbColumnEnhancer
     if (Settings.getInstance().getDebugMetadataSql()) {
       LogMgr.logInfo("RdbColumnEnhancer.updateColumnDefinition()", "Query to retrieve column information:\n " + sql);
     }
-    Map<String, String> expressions = new HashMap<>();
-    Map<String, String> identityCols = new HashMap<>();
+    Map<String, String> expressions = new HashMap<String, String>();
+    Map<String, String> identityCols = new HashMap<String, String>();
     try {
       stmt = conn.getSqlConnection().prepareStatement(sql);
       stmt.setString(1, table.getTable().getTableName());

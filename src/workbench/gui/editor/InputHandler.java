@@ -151,7 +151,7 @@ public class InputHandler
    * Adds the default key bindings to this input handler.
    */
   public final void initKeyBindings() {
-    bindings = new HashMap<>();
+    bindings = new HashMap<KeyStroke, ActionListener>();
     addKeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), BACKSPACE);
 
     addKeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), DELETE);
@@ -361,7 +361,7 @@ public class InputHandler
 
   public List<KeyStroke> getKeys(JMenu menu) {
     if (menu == null) return Collections.emptyList();
-    List<KeyStroke> allKeys = new ArrayList<>();
+    List<KeyStroke> allKeys = new ArrayList<KeyStroke>();
 
     for (int i = 0; i < menu.getItemCount(); i++) {
       JMenuItem item = menu.getItem(i);
@@ -381,7 +381,7 @@ public class InputHandler
         JComponent.WHEN_IN_FOCUSED_WINDOW
     };
 
-    List<KeyStroke> allKeys = new ArrayList<>();
+    List<KeyStroke> allKeys = new ArrayList<KeyStroke>();
     for (int when : types) {
       InputMap map = c.getInputMap(when);
       KeyStroke[] keys = (map != null ? map.allKeys() : null);
@@ -410,7 +410,7 @@ public class InputHandler
 
     JEditTextArea area = getTextArea(evt);
 
-    List<KeyStroke> allKeys = new ArrayList<>();
+    List<KeyStroke> allKeys = new ArrayList<KeyStroke>();
     allKeys.addAll(getKeys(area));
 
     Window w = SwingUtilities.getWindowAncestor(area);

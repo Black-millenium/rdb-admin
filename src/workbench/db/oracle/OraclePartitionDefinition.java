@@ -89,7 +89,7 @@ public class OraclePartitionDefinition {
 
   public void addSubPartition(OraclePartitionDefinition subPartition) {
     if (this.subPartitions == null) {
-      this.subPartitions = new ArrayList<>();
+      this.subPartitions = new ArrayList<OraclePartitionDefinition>();
     }
     subPartitions.add(subPartition);
   }

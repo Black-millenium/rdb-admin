@@ -58,7 +58,7 @@ public class DeleteScriptGenerator
     implements Scripter {
   private final WbConnection connection;
   private final DbMetadata meta;
-  private final List<String> statements = new LinkedList<>();
+  private final List<String> statements = new LinkedList<String>();
   private final SqlLiteralFormatter formatter;
   private final Comparator<Integer> descComparator = new Comparator<Integer>() {
     @Override
@@ -76,7 +76,7 @@ public class DeleteScriptGenerator
   private ScriptGenerationMonitor monitor;
   private boolean formatSql = true;
   private boolean showFkNames;
-  private List<TableIdentifier> excludeTables = new ArrayList<>();
+  private List<TableIdentifier> excludeTables = new ArrayList<TableIdentifier>();
 
   public DeleteScriptGenerator(WbConnection aConnection)
       throws SQLException {
@@ -94,7 +94,7 @@ public class DeleteScriptGenerator
     if (CollectionUtil.isEmpty(toExclude)) {
       this.excludeTables.clear();
     } else {
-      this.excludeTables = new ArrayList<>(toExclude);
+      this.excludeTables = new ArrayList<TableIdentifier>(toExclude);
     }
   }
 
@@ -209,7 +209,7 @@ public class DeleteScriptGenerator
 
         // collect all nodes for one table (on the current level) so that we can generate a single delete statement
         // that covers all foreign keys at once
-        AggregatingMap<TableIdentifier, DependencyNode> tableNodes = new AggregatingMap<>(false);
+        AggregatingMap<TableIdentifier, DependencyNode> tableNodes = new AggregatingMap<TableIdentifier, DependencyNode>(false);
 
         for (DependencyNode node : entry.getValue()) {
           tableNodes.addValue(node.getTable(), node);
@@ -239,7 +239,7 @@ public class DeleteScriptGenerator
   }
 
   private List<TableIdentifier> sortTables(final Map<TableIdentifier, Set<DependencyNode>> tables) {
-    final Set<DependencyNode> allNodes = new HashSet<>();
+    final Set<DependencyNode> allNodes = new HashSet<DependencyNode>();
     for (Set<DependencyNode> values : tables.values()) {
       allNodes.addAll(values);
     }
@@ -265,7 +265,7 @@ public class DeleteScriptGenerator
     if (table == null) return StringUtil.EMPTY_STRING;
     if (CollectionUtil.isEmpty(nodes)) return StringUtil.EMPTY_STRING;
 
-    Set<DependencyNode> processed = new HashSet<>(nodes.size());
+    Set<DependencyNode> processed = new HashSet<DependencyNode>(nodes.size());
     StringBuilder sql = new StringBuilder(nodes.size() * 200);
 
     if (showFkNames) {
@@ -482,7 +482,7 @@ public class DeleteScriptGenerator
   }
 
   private int adjustLevels(Map<Integer, Set<DependencyNode>> levels) {
-    Map<DependencyNode, Integer> newLevels = new HashMap<>();
+    Map<DependencyNode, Integer> newLevels = new HashMap<DependencyNode, Integer>();
 
     for (Map.Entry<Integer, Set<DependencyNode>> entry : levels.entrySet()) {
       Iterator<DependencyNode> itr = entry.getValue().iterator();
@@ -530,7 +530,7 @@ public class DeleteScriptGenerator
   }
 
   private Map<Integer, Set<DependencyNode>> buildLevelsTopDown(DependencyNode root, int level) {
-    AggregatingMap<Integer, DependencyNode> map = new AggregatingMap<>(new TreeMap<Integer, Set<DependencyNode>>(descComparator));
+    AggregatingMap<Integer, DependencyNode> map = new AggregatingMap<Integer, DependencyNode>(new TreeMap<Integer, Set<DependencyNode>>(descComparator));
 
     List<DependencyNode> children = root.getChildren();
 

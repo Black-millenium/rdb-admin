@@ -144,7 +144,7 @@ public class SpreadsheetFileParser
     if (target == null) {
       // this is acceptable if no real target table has been defined
       // in this case assume the file columns and table columns are identical
-      tableCols = new ArrayList<>(fileColumns);
+      tableCols = new ArrayList<ColumnIdentifier>(fileColumns);
     } else {
       tableCols = target.getColumns();
     }
@@ -228,7 +228,7 @@ public class SpreadsheetFileParser
     if (dataRowValues == null) return null;
     if (inputFileIndexes == null) return null;
 
-    Map<Integer, Object> result = new HashMap<>(inputFileIndexes.size());
+    Map<Integer, Object> result = new HashMap<Integer, Object>(inputFileIndexes.size());
     for (Integer index : inputFileIndexes) {
       if (index > 0 && index <= dataRowValues.size()) {
         result.put(index, dataRowValues.get(index - 1));
@@ -309,7 +309,7 @@ public class SpreadsheetFileParser
 
   private List<Integer> getSheets() {
     List<String> allSheets = reader.getSheets();
-    List<Integer> result = new ArrayList<>(allSheets.size());
+    List<Integer> result = new ArrayList<Integer>(allSheets.size());
 
     if (this.checkDependencies) {
       if (this.rowMonitor != null) {
@@ -321,7 +321,7 @@ public class SpreadsheetFileParser
       tableSorter = new TableDependencySorter(this.connection);
       tableSorter.setProgressMonitor(this);
 
-      List<TableIdentifier> tables = new ArrayList<>(allSheets.size());
+      List<TableIdentifier> tables = new ArrayList<TableIdentifier>(allSheets.size());
       for (String sheet : allSheets) {
         TableIdentifier ts = new TableIdentifier(sheet);
         if (this.cancelImport) break;
@@ -599,7 +599,7 @@ public class SpreadsheetFileParser
    */
   @Override
   public List<ColumnIdentifier> getColumnsFromFile() {
-    List<ColumnIdentifier> cols = new ArrayList<>();
+    List<ColumnIdentifier> cols = new ArrayList<ColumnIdentifier>();
     try {
       createReader();
       List<String> columns = reader.getHeaderColumns();

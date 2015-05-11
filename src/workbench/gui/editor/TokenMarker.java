@@ -29,7 +29,7 @@ public abstract class TokenMarker {
    * Stores the first {@link Token} for each line that
    * has been tokenized
    */
-  protected ArrayList<Token> lineStartTokens = new ArrayList<>(250);
+  protected ArrayList<Token> lineStartTokens = new ArrayList<Token>(250);
 
   /**
    * The number of lines in the model being tokenized. This can be
@@ -172,7 +172,7 @@ public abstract class TokenMarker {
     for (int i = 0; i < lineStartTokens.size(); i++) {
       clearLine(i);
     }
-    lineStartTokens = new ArrayList<>(250);
+    lineStartTokens = new ArrayList<Token>(250);
     length = 0;
   }
 

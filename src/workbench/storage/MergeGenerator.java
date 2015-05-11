@@ -98,7 +98,7 @@ public interface MergeGenerator {
    * The factory go create MergeGenerator instances depending on the DBMS.
    */
   class Factory {
-    private static final Map<String, String> DBID_TO_TYPE_MAP = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+    private static final Map<String, String> DBID_TO_TYPE_MAP = new TreeMap<String, String>(CaseInsensitiveComparator.INSTANCE);
 
     static {
       DBID_TO_TYPE_MAP.put("postgresql", "postgres");

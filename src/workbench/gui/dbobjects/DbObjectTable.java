@@ -101,7 +101,7 @@ public class DbObjectTable
 
   public void setOriginalOrder(DataStore objectList) {
     ColumnIdentifier[] columns = objectList.getColumns();
-    originalColumnOrder = new ArrayList<>(columns.length);
+    originalColumnOrder = new ArrayList<String>(columns.length);
     for (ColumnIdentifier col : columns) {
       originalColumnOrder.add(col.getColumnName());
     }
@@ -111,14 +111,14 @@ public class DbObjectTable
     if (CollectionUtil.isEmpty(newOrder)) {
       this.pendingOrder = null;
     } else {
-      this.pendingOrder = new ArrayList<>(newOrder);
+      this.pendingOrder = new ArrayList<String>(newOrder);
     }
   }
 
   public List<String> saveColumnOrder() {
     if (rememberColumnOrder) {
       columnOrder = ColumnOrderMgr.getInstance().getColumnOrder(this);
-      return new ArrayList<>(columnOrder);
+      return new ArrayList<String>(columnOrder);
     }
     return null;
   }

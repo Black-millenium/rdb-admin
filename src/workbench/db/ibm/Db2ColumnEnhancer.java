@@ -85,7 +85,7 @@ public class Db2ColumnEnhancer
       LogMgr.logInfo("Db2ColumnEnhancer.updateComputedColumns()", "Query to retrieve column details:\n" + SqlUtil.replaceParameters(sql, schema, tablename));
     }
 
-    Map<String, String> expressions = new HashMap<>();
+    Map<String, String> expressions = new HashMap<String, String>();
     try {
       stmt = conn.getSqlConnection().prepareStatement(sql);
       stmt.setString(1, tablename);

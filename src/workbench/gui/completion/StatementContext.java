@@ -148,7 +148,7 @@ public class StatementContext {
       String verb = t.getContents();
 
       // Will contain each "union" token to find the start and end of each sub-statement
-      List<SQLToken> unionStarts = new ArrayList<>();
+      List<SQLToken> unionStarts = new ArrayList<SQLToken>();
 
       int bracketCount = 0;
       boolean inSubselect = false;

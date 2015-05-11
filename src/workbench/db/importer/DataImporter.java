@@ -564,7 +564,7 @@ public class DataImporter
   public void setKeyColumns(String aColumnList) {
     List cols = StringUtil.stringToList(aColumnList, ",");
     int count = cols.size();
-    this.keyColumns = new LinkedList<>();
+    this.keyColumns = new LinkedList<ColumnIdentifier>();
     for (int i = 0; i < count; i++) {
       ColumnIdentifier col = new ColumnIdentifier((String) cols.get(i));
       keyColumns.add(col);
@@ -1277,7 +1277,7 @@ public class DataImporter
    */
   @Override
   public void setTargetTable(TableIdentifier table, List<ColumnIdentifier> columns)
-      throws SQLException {
+      throws Exception {
     // be prepared to import more then one table...
     if (this.isRunning && this.targetTable != null) {
       try {
@@ -1300,7 +1300,7 @@ public class DataImporter
 
     try {
       this.targetTable = table.createCopy();
-      this.targetColumns = new ArrayList<>(columns);
+      this.targetColumns = new ArrayList<ColumnIdentifier>(columns);
 
       // Key columns might have been externally defined if
       // a single table import is run which is not possible
@@ -1719,7 +1719,7 @@ public class DataImporter
   private void retrieveKeyColumns() {
     try {
       List<ColumnIdentifier> cols = this.dbConn.getMetadata().getTableColumns(this.targetTable);
-      this.keyColumns = new LinkedList<>();
+      this.keyColumns = new LinkedList<ColumnIdentifier>();
       for (ColumnIdentifier col : cols) {
         if (col.isPkColumn()) {
           this.keyColumns.add(col);

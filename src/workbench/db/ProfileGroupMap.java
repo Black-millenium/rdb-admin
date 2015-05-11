@@ -43,7 +43,7 @@ public class ProfileGroupMap
       String group = profile.getGroup();
       List<ConnectionProfile> l = get(group);
       if (l == null) {
-        l = new ArrayList<>();
+        l = new ArrayList<ConnectionProfile>();
         put(group, l);
       }
       l.add(profile);

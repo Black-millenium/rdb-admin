@@ -114,7 +114,7 @@ public class SqlServerTypeReader
   public List<DomainIdentifier> getTypeList(WbConnection connection, String owner, String typeName) {
     Statement stmt = null;
     ResultSet rs = null;
-    List<DomainIdentifier> result = new ArrayList<>();
+    List<DomainIdentifier> result = new ArrayList<DomainIdentifier>();
     try {
       stmt = connection.createStatementForQuery();
       String sql = getSql(connection, owner, typeName);
@@ -246,7 +246,7 @@ public class SqlServerTypeReader
       sql += " AND s.name = '" + type.getSchema() + "' \n";
     }
     sql += "order by col.column_id";
-    List<ColumnIdentifier> columns = new ArrayList<>();
+    List<ColumnIdentifier> columns = new ArrayList<ColumnIdentifier>();
 
     try {
       stmt = con.createStatementForQuery();

@@ -55,7 +55,7 @@ public class DataStoreTableModel
   private DataStore dataCache;
   private boolean showStatusColumn;
   private int columnStartIndex;
-  private List<Integer> noneditableColumns = new ArrayList<>();
+  private List<Integer> noneditableColumns = new ArrayList<Integer>();
   private SortDefinition sortDefinition = new SortDefinition();
   private boolean allowEditing = true;
   private boolean showConverterError = true;

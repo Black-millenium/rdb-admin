@@ -82,7 +82,7 @@ public interface DataReceiver {
    * @throws SQLException
    */
   void setTargetTable(TableIdentifier table, List<ColumnIdentifier> columns)
-      throws SQLException;
+      throws Exception;
 
   void importFinished();
 

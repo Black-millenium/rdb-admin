@@ -156,7 +156,7 @@ public class WbFileChooser
         fileEncodings.add(fileEncoding);
       }
     }
-    return new ArrayList<>(fileEncodings);
+    return new ArrayList<String>(fileEncodings);
   }
 
   private boolean encodingMatches() {

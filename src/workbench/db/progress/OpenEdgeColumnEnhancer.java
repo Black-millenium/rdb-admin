@@ -68,7 +68,7 @@ public class OpenEdgeColumnEnhancer
           "Retrieving column remarks using query:\n" + SqlUtil.replaceParameters(sql, schema, tablename));
     }
 
-    Map<String, String> remarks = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+    Map<String, String> remarks = new TreeMap<String, String>(CaseInsensitiveComparator.INSTANCE);
     try {
       stmt = conn.getSqlConnection().prepareStatement(sql);
       stmt.setString(1, schema);

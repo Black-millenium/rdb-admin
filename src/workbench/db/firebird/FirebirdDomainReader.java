@@ -105,7 +105,7 @@ public class FirebirdDomainReader
     Statement stmt = null;
     ResultSet rs = null;
     Savepoint sp = null;
-    List<DomainIdentifier> result = new ArrayList<>();
+    List<DomainIdentifier> result = new ArrayList<DomainIdentifier>();
     String sql = null;
     try {
       sp = connection.setSavepoint();

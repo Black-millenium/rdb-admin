@@ -42,7 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SqlServerFKHandler
     extends DefaultFKHandler {
-  private Map<TableIdentifier, Map<String, FkStatusInfo>> fkStatusInfo = new ConcurrentHashMap<>();
+  private Map<TableIdentifier, Map<String, FkStatusInfo>> fkStatusInfo = new ConcurrentHashMap<TableIdentifier, Map<String, FkStatusInfo>>();
 
   public SqlServerFKHandler(WbConnection conn) {
     super(conn);
@@ -80,7 +80,7 @@ public class SqlServerFKHandler
             "from sys.foreign_keys with (nolock) \n" +
             "where parent_object_id = object_id(?)";
 
-    Map<String, FkStatusInfo> info = new HashMap<>();
+    Map<String, FkStatusInfo> info = new HashMap<String, FkStatusInfo>();
 
     try {
       stmt = getConnection().getSqlConnection().prepareStatement(sql);

@@ -42,7 +42,7 @@ public class ArgumentParser {
   protected Map<String, Object> arguments;
   // Maps a registered argument to the argument type
   private Map<String, ArgumentType> argTypes;
-  private List<String> unknownParameters = new ArrayList<>();
+  private List<String> unknownParameters = new ArrayList<String>();
   // Stores the allowed values for a parameter
   private Map<String, Collection<ArgumentValue>> allowedValues;
   private int argCount = 0;
@@ -50,9 +50,9 @@ public class ArgumentParser {
   private String nonArguments;
 
   public ArgumentParser() {
-    arguments = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
-    argTypes = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
-    allowedValues = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+    arguments = new TreeMap<String, Object>(CaseInsensitiveComparator.INSTANCE);
+    argTypes = new TreeMap<String, ArgumentType>(CaseInsensitiveComparator.INSTANCE);
+    allowedValues = new TreeMap<String, Collection<ArgumentValue>>(CaseInsensitiveComparator.INSTANCE);
   }
 
   public ArgumentParser(boolean parameterSwitchNeeded) {
@@ -94,7 +94,7 @@ public class ArgumentParser {
    */
   public <T extends Enum<T>> void addArgument(String key, Class<T> enumClass) {
     T[] values = enumClass.getEnumConstants();
-    List<String> names = new ArrayList<>(values.length);
+    List<String> names = new ArrayList<String>(values.length);
     for (T value : values) {
       names.add(value.toString());
     }
@@ -114,7 +114,7 @@ public class ArgumentParser {
   public void addArgument(String key, List<String> values) {
     addArgument(key, ArgumentType.ListArgument);
     if (values == null) return;
-    Collection<ArgumentValue> v = new TreeSet<>(ArgumentValue.COMPARATOR);
+    Collection<ArgumentValue> v = new TreeSet<ArgumentValue>(ArgumentValue.COMPARATOR);
     for (String value : values) {
       v.add(new StringArgumentValue(value));
     }
@@ -124,7 +124,7 @@ public class ArgumentParser {
   public void addArgumentWithValues(String key, List<? extends ArgumentValue> values) {
     addArgument(key, ArgumentType.ListArgument);
     if (values == null) return;
-    Collection<ArgumentValue> v = new TreeSet<>();
+    Collection<ArgumentValue> v = new TreeSet<ArgumentValue>();
     v.addAll(values);
     allowedValues.put(key, v);
   }
@@ -238,7 +238,7 @@ public class ArgumentParser {
           if (repeatableTypes.contains(type)) {
             List<String> list = (List<String>) arguments.get(key);
             if (list == null) {
-              list = new ArrayList<>();
+              list = new ArrayList<String>();
               arguments.put(key, list);
             }
             if (wasQuoted) {
@@ -264,7 +264,7 @@ public class ArgumentParser {
   }
 
   public List<String> getArgumentsOnCommandLine() {
-    ArrayList<String> result = new ArrayList<>(this.arguments.size());
+    ArrayList<String> result = new ArrayList<String>(this.arguments.size());
     for (Map.Entry<String, Object> entry : arguments.entrySet()) {
       if (entry.getValue() != null && getArgumentType(entry.getKey()) != ArgumentType.Repeatable) {
         result.add(entry.getKey());
@@ -281,7 +281,7 @@ public class ArgumentParser {
   public List<String> getRegisteredArguments() {
     Iterator<Map.Entry<String, ArgumentType>> itr = this.argTypes.entrySet().iterator();
 
-    List<String> result = new ArrayList<>(this.argTypes.size());
+    List<String> result = new ArrayList<String>(this.argTypes.size());
     while (itr.hasNext()) {
       Map.Entry<String, ArgumentType> entry = itr.next();
       if (entry.getValue() != ArgumentType.Deprecated) {
@@ -500,7 +500,7 @@ public class ArgumentParser {
     List<String> entries = getListValue(key);
     if (CollectionUtil.isEmpty(entries)) return Collections.emptyMap();
 
-    Map<String, String> result = new HashMap<>(entries.size());
+    Map<String, String> result = new HashMap<String, String>(entries.size());
     for (String entry : entries) {
       String[] param = entry.split("=");
       if (param == null || param.length != 2) {

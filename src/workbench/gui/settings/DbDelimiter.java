@@ -40,7 +40,7 @@ public class DbDelimiter {
   }
 
   public static DbDelimiter[] getMapping() {
-    List<DbDelimiter> result = new ArrayList<>();
+    List<DbDelimiter> result = new ArrayList<DbDelimiter>();
     Map<String, String> map = Settings.getInstance().getDbIdMapping();
     for (Map.Entry<String, String> entry : map.entrySet()) {
       DbDelimiter def = new DbDelimiter(entry.getKey(), entry.getValue());
@@ -88,7 +88,7 @@ public class DbDelimiter {
   @Override
   public int hashCode() {
     int hash = 7;
-    hash = 53 * hash + Objects.hashCode(this.dbid);
+    hash = 53 * hash + this.dbid.hashCode();
     return hash;
   }
 
@@ -98,7 +98,7 @@ public class DbDelimiter {
       return false;
     }
     if (other instanceof DbDelimiter) {
-      return Objects.equals(this.dbid, ((DbDelimiter) other).dbid);
+      return this.dbid.equals(((DbDelimiter) other).dbid);
     }
     return false;
   }

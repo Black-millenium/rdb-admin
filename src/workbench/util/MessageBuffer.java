@@ -46,7 +46,7 @@ import java.util.List;
 public class MessageBuffer {
   private final String newLine = "\n";
   private final int maxSize;
-  private LinkedList<CharSequence> messages = new LinkedList<>();
+  private LinkedList<CharSequence> messages = new LinkedList<CharSequence>();
   private int length = 0;
   private boolean trimmed = false;
 

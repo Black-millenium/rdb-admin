@@ -82,7 +82,7 @@ public class ZipUtil {
   public static List<String> getFiles(File archive)
       throws IOException {
     ZipFile zip = new ZipFile(archive);
-    List<String> result = new ArrayList<>(zip.size());
+    List<String> result = new ArrayList<String>(zip.size());
 
     try {
       Enumeration<? extends ZipEntry> entries = zip.entries();

@@ -95,7 +95,7 @@ public abstract class AbstractWbCallHandler
    * @see ParameterDefinition#isOutParameter()
    */
   protected List<ParameterDefinition> getOutParameters(List<ParameterDefinition> parameters) {
-    List<ParameterDefinition> result = new ArrayList<>();
+    List<ParameterDefinition> result = new ArrayList<ParameterDefinition>();
     for (ParameterDefinition def : parameters) {
       if (def.isOutParameter()) {
         result.add(def);

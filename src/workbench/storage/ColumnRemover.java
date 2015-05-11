@@ -47,7 +47,7 @@ public class ColumnRemover {
    * @see #removeColumnsByIndex(java.util.List)
    */
   public DataStore removeColumnsByName(String... colNames) {
-    List<Integer> cols = new ArrayList<>(colNames.length);
+    List<Integer> cols = new ArrayList<Integer>(colNames.length);
     for (String name : colNames) {
       int index = original.getColumnIndex(name);
       if (index > -1) {
@@ -71,7 +71,7 @@ public class ColumnRemover {
    */
   public DataStore removeColumnsByIndex(List<Integer> toRemove) {
     ResultInfo info = original.getResultInfo();
-    List<ColumnIdentifier> cols = new ArrayList<>(info.getColumnCount());
+    List<ColumnIdentifier> cols = new ArrayList<ColumnIdentifier>(info.getColumnCount());
 
     for (int i = 0; i < info.getColumnCount(); i++) {
       Integer index = Integer.valueOf(i);

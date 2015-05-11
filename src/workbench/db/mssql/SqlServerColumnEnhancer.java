@@ -100,7 +100,7 @@ public class SqlServerColumnEnhancer
           "Retrieving column remarks using query:\n" + SqlUtil.replaceParameters(sql, schema, tablename));
     }
 
-    Map<String, String> remarks = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+    Map<String, String> remarks = new TreeMap<String, String>(CaseInsensitiveComparator.INSTANCE);
     try {
       stmt = conn.getSqlConnection().prepareStatement(sql);
       stmt.setString(1, schema);
@@ -157,8 +157,8 @@ public class SqlServerColumnEnhancer
     PreparedStatement stmt = null;
     ResultSet rs = null;
 
-    Map<String, String> expressions = new HashMap<>();
-    Map<String, Boolean> persisted = new HashMap<>();
+    Map<String, String> expressions = new HashMap<String, String>();
+    Map<String, Boolean> persisted = new HashMap<String, Boolean>();
 
     try {
       stmt = conn.getSqlConnection().prepareStatement(sql);
@@ -225,8 +225,8 @@ public class SqlServerColumnEnhancer
 
     PreparedStatement stmt = null;
 
-    HashMap<String, String> expressions = new HashMap<>(table.getColumnCount());
-    HashMap<String, String> collations = new HashMap<>(table.getColumnCount());
+    HashMap<String, String> expressions = new HashMap<String, String>(table.getColumnCount());
+    HashMap<String, String> collations = new HashMap<String, String>(table.getColumnCount());
 
     String sql =
         "SELECT COLUMN_NAME, \n" +

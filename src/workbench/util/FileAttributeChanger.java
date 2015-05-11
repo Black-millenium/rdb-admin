@@ -25,10 +25,10 @@ package workbench.util;
 import workbench.log.LogMgr;
 
 import java.io.File;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
-
 
 /**
  * @author Thomas Kellerer
@@ -43,7 +43,7 @@ public class FileAttributeChanger {
 
   private void removeAttribute(File dir) {
     try {
-      Path file = dir.toPath();
+      Path file = FileSystems.getDefault().getPath(dir.getPath());
       Files.setAttribute(file, "dos:hidden", false, LinkOption.NOFOLLOW_LINKS);
     } catch (Throwable th) {
       LogMgr.logWarning("FileAttributeChanger.removeAttribute()", "Could not remove hidden attribute of config dir: " + dir.getAbsolutePath(), th);

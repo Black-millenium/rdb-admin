@@ -47,7 +47,7 @@ import java.util.*;
 public class WbCommandAnalyzer
     extends BaseAnalyzer {
   // Maps a Wb command to a map of recently used directories for each parameter
-  private static final Map<String, Map<String, String>> LRU_DIR_MAP = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+  private static final Map<String, Map<String, String>> LRU_DIR_MAP = new TreeMap<String, Map<String, String>>(CaseInsensitiveComparator.INSTANCE);
   private final String wordDelimiters = " \t";
   // True if the the parameters are put into the
   // elements list. This is used by the CompletionPopup
@@ -145,16 +145,16 @@ public class WbCommandAnalyzer
       } else if (type == ArgumentType.ListArgument) {
         this.elements = new ArrayList(args.getAllowedValues(parameter));
       } else if (type == ArgumentType.ObjectTypeArgument) {
-        this.elements = new ArrayList<>(dbConnection.getMetadata().getObjectTypes());
+        this.elements = new ArrayList<String>(dbConnection.getMetadata().getObjectTypes());
         if (verb.equalsIgnoreCase(WbGrepSource.VERB)) {
           elements.add("FUNCTION");
           elements.add("PROCEDURE");
           elements.add("TRIGGER");
         }
       } else if (type == ArgumentType.SchemaArgument) {
-        this.elements = new ArrayList<>(dbConnection.getMetadata().getSchemas(dbConnection.getSchemaFilter()));
+        this.elements = new ArrayList<String>(dbConnection.getMetadata().getSchemas(dbConnection.getSchemaFilter()));
       } else if (type == ArgumentType.CatalogArgument) {
-        this.elements = new ArrayList<>(dbConnection.getMetadata().getCatalogInformation(dbConnection.getCatalogFilter()));
+        this.elements = new ArrayList<String>(dbConnection.getMetadata().getCatalogInformation(dbConnection.getCatalogFilter()));
       } else if (type == ArgumentType.ProfileArgument) {
         this.elements = ConnectionMgr.getInstance().getProfileKeys();
         changeCase = false;
@@ -245,7 +245,7 @@ public class WbCommandAnalyzer
 
     Map<String, String> parameterMap = LRU_DIR_MAP.get(getSqlVerb());
     if (parameterMap == null) {
-      parameterMap = new TreeMap<>(CaseInsensitiveComparator.INSTANCE);
+      parameterMap = new TreeMap<String, String>(CaseInsensitiveComparator.INSTANCE);
       LRU_DIR_MAP.put(getSqlVerb(), parameterMap);
     }
     String parameter = getCurrentParameter();
@@ -278,7 +278,7 @@ public class WbCommandAnalyzer
       return null;
     }
 
-    List<WbFile> result = new ArrayList<>(files.length);
+    List<WbFile> result = new ArrayList<WbFile>(files.length);
     for (File f : files) {
       if (!dirsOnly || f.isDirectory()) {
         WbFile wb = new TooltipFile(f);

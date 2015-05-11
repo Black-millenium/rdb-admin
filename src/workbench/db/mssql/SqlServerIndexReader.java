@@ -90,7 +90,7 @@ public class SqlServerIndexReader
           SqlUtil.replaceParameters(sql, index.getName(), table.getRawTableName(), table.getRawSchema()));
     }
 
-    List<String> cols = new ArrayList<>();
+    List<String> cols = new ArrayList<String>();
     boolean ignoreDups = false;
     boolean isPadded = false;
     int fillFactor = -1;

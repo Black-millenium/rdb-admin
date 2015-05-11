@@ -52,8 +52,8 @@ import java.util.*;
 public class StatementRunner
     implements PropertyChangeListener {
   public static final String SERVER_MSG_PROP = "server_messages";
-  private final List<PropertyChangeListener> changeListeners = new ArrayList<>();
-  private final Map<String, String> sessionAttributes = new TreeMap<>();
+  private final List<PropertyChangeListener> changeListeners = new ArrayList<PropertyChangeListener>();
+  private final Map<String, String> sessionAttributes = new TreeMap<String, String>();
   private final RemoveEmptyResultsAnnotation removeAnnotation = new RemoveEmptyResultsAnnotation();
   protected CommandMapper cmdMapper;
   // used to restore the "real" connection if WbConnect changes the "current"

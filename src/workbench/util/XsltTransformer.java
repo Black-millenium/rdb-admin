@@ -47,7 +47,7 @@ public class XsltTransformer
   private boolean saveSystemOut;
   private File xsltUsed;
 
-  private List<String> ignoredMessages = new ArrayList<>();
+  private List<String> ignoredMessages = new ArrayList<String>();
 
   /**
    * The directory where the initially defined XSLT is stored.

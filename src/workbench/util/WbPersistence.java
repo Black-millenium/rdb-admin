@@ -70,8 +70,10 @@ public class WbPersistence
 
   public Object readObject(InputStream in)
       throws Exception {
-    try (XMLDecoder e = new XMLDecoder(in, null, this)) {
+    try {
+      XMLDecoder e = new XMLDecoder(in, null, this);
       Object result = e.readObject();
+      e.close();
       return result;
     } finally {
       FileUtil.closeQuietely(in);
@@ -82,10 +84,13 @@ public class WbPersistence
       throws IOException {
     if (aValue == null) return;
 
-    try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(filename), 32 * 1024);
-         XMLEncoder e = new XMLEncoder(out)) {
+    try {
+      BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(filename), 32 * 1024);
+      XMLEncoder e = new XMLEncoder(out);
       e.writeObject(aValue);
-    }
+      e.close();
+      out.close();
+    } catch (Exception ex) {}
   }
 
   @Override

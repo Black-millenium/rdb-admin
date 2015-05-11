@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class WbCompoundEdit
     implements UndoableEdit {
-  private final List<UndoableEdit> edits = new ArrayList<>();
+  private final List<UndoableEdit> edits = new ArrayList<UndoableEdit>();
   private boolean acceptNew = true;
   private long lastEditTime;
 

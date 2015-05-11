@@ -90,7 +90,7 @@ public abstract class ViewGrantReader {
    * @return a List with TableGrant objects.
    */
   public Collection<TableGrant> getViewGrants(WbConnection dbConnection, TableIdentifier viewName) {
-    Collection<TableGrant> result = new HashSet<>();
+    Collection<TableGrant> result = new HashSet<TableGrant>();
 
     String sql = this.getViewGrantSql();
     if (sql == null) return Collections.emptyList();
@@ -144,7 +144,7 @@ public abstract class ViewGrantReader {
 
     // as several grants to several users can be made, we need to collect them
     // first, in order to be able to build the complete statements
-    Map<String, List<String>> grants = new HashMap<>(count);
+    Map<String, List<String>> grants = new HashMap<String, List<String>>(count);
 
     for (TableGrant grant : grantList) {
       String grantee = grant.getGrantee();
@@ -152,7 +152,7 @@ public abstract class ViewGrantReader {
       if (priv == null) continue;
       List<String> privs = grants.get(grantee);
       if (privs == null) {
-        privs = new LinkedList<>();
+        privs = new LinkedList<String>();
         grants.put(grantee, privs);
       }
       privs.add(priv.trim());

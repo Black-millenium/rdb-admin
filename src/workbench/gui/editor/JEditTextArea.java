@@ -2429,7 +2429,7 @@ public class JEditTextArea
   }
 
   class ScrollLayout implements LayoutManager {
-    private final List<Component> leftOfScrollBar = new ArrayList<>();
+    private final List<Component> leftOfScrollBar = new ArrayList<Component>();
     // private members
     private Component center;
     private Component right;

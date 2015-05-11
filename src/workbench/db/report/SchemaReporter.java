@@ -50,9 +50,9 @@ public class SchemaReporter
   public static final String TAG_OBJECT_TYPES = "included-types";
   protected volatile boolean cancel;
   private WbConnection dbConn;
-  private List<DbObject> objects = new ArrayList<>();
-  private List<ReportProcedure> procedures = new ArrayList<>();
-  private List<ReportSequence> sequences = new ArrayList<>();
+  private List<DbObject> objects = new ArrayList<DbObject>();
+  private List<ReportProcedure> procedures = new ArrayList<ReportProcedure>();
+  private List<ReportSequence> sequences = new ArrayList<ReportSequence>();
   private Set<String> types;
   private List<String> schemas;
   private TagWriter tagWriter = new TagWriter();
@@ -384,7 +384,7 @@ public class SchemaReporter
         }
       }
 
-      Set<String> oraPackages = new HashSet<>();
+      Set<String> oraPackages = new HashSet<String>();
 
       for (ProcedureDefinition def : procs) {
         // Object types are reported with the "normal" objects

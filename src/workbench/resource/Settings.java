@@ -143,8 +143,8 @@ public class Settings
   private static final String TOOLS_NAME = ".name";
   private static final String TOOLS_PARAM = ".parameter";
   private static final String TOOLS_PREFIX = "workbench.tools.";
-  private final List<FontChangedListener> fontChangeListeners = new ArrayList<>(5);
-  private final List<SettingsListener> saveListener = new ArrayList<>(5);
+  private final List<FontChangedListener> fontChangeListeners = new ArrayList<FontChangedListener>(5);
+  private final List<SettingsListener> saveListener = new ArrayList<SettingsListener>(5);
   private WbProperties props;
   private WbFile configfile;
   private long fileTime;
@@ -419,7 +419,7 @@ public class Settings
 
   public List<WbLocale> getLanguages() {
     List<String> codes = getListProperty("workbench.gui.languages.available", false, "en,de");
-    List<WbLocale> result = new ArrayList<>(codes.size());
+    List<WbLocale> result = new ArrayList<WbLocale>(codes.size());
     for (String c : codes) {
       try {
         result.add(new WbLocale(new Locale(c)));
@@ -560,7 +560,7 @@ public class Settings
 
   public List<ToolDefinition> getExternalTools(boolean checkExists, boolean addPdfReader) {
     int numTools = getIntProperty("workbench.tools.count", 0);
-    List<ToolDefinition> result = new ArrayList<>(numTools);
+    List<ToolDefinition> result = new ArrayList<ToolDefinition>(numTools);
 
     for (int i = 0; i < numTools; i++) {
       String path = getProperty(TOOLS_PREFIX + i + TOOLS_EXE, "");
@@ -2594,7 +2594,7 @@ public class Settings
     List<String> currentList = StringUtil.stringToList(currentValue, ",", true, true, false);
 
     // Use a HashSet to ensure that no duplicates are contained in the list
-    Set<String> currentProps = new HashSet<>();
+    Set<String> currentProps = new HashSet<String>();
     currentProps.addAll(currentList);
 
     String defValue = defProps.getProperty(key, "");
@@ -2604,7 +2604,7 @@ public class Settings
   }
 
   public void replacePartialKey(String oldKey, String newKey) {
-    Map<String, String> toChange = new HashMap<>();
+    Map<String, String> toChange = new HashMap<String, String>();
     for (Object keyObj : props.keySet()) {
       String key = keyObj.toString();
       if (key.contains(oldKey)) {
@@ -2901,7 +2901,7 @@ public class Settings
   }
 
   public Map<String, String> getDbIdMapping() {
-    Map<String, String> mapping = new LinkedHashMap<>();
+    Map<String, String> mapping = new LinkedHashMap<String, String>();
 
     List<String> propKeys = this.props.getKeysWithPrefix("workbench.db.name");
     for (String key : propKeys) {

@@ -403,16 +403,15 @@ public class OracleTableSourceBuilder
           }
         }
 
-        switch (cache) {
-          case "NO":
-            colOptions.append(" NOCACHE");
-            break;
-          case "YES":
-            colOptions.append(" CACHE");
-            break;
-          case "CACHEREADS":
-            colOptions.append(" CACHE READS");
-            break;
+        if (cache.equals("NO")) {
+          colOptions.append(" NOCACHE");
+
+        } else if (cache.equals("YES")) {
+          colOptions.append(" CACHE");
+
+        } else if (cache.equals("CACHEREADS")) {
+          colOptions.append(" CACHE READS");
+
         }
         colOptions.append(')');
         if (!first) result.append(",\n");

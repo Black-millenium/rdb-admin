@@ -27,6 +27,7 @@ import workbench.log.LogMgr;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -94,8 +95,8 @@ public class WbFile
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
     String newname = this.getName() + "." + sdf.format(new java.util.Date());
     WbFile newfile = new WbFile(this.getParent(), newname);
-    Path newPath = newfile.toPath();
-    Path myPath = this.toPath();
+    Path newPath = FileSystems.getDefault().getPath(newfile.getPath());
+    Path myPath = FileSystems.getDefault().getPath(this.getPath());
     try {
       Files.move(myPath, newPath, StandardCopyOption.REPLACE_EXISTING);
     } catch (IOException io) {

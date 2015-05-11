@@ -74,7 +74,7 @@ public class TableDeleteSync
   private int batchSize = 50;
 
   private Statement checkStatement;
-  private Map<ColumnIdentifier, Integer> columnMap = new HashMap<>();
+  private Map<ColumnIdentifier, Integer> columnMap = new HashMap<ColumnIdentifier, Integer>();
   private RowActionMonitor monitor;
   private Writer outputWriter;
   private String lineEnding = "\n";
@@ -266,7 +266,7 @@ public class TableDeleteSync
           this.monitor.setCurrentObject(msg, -1, -1);
         }
       }
-      List<RowData> packetRows = new ArrayList<>(chunkSize);
+      List<RowData> packetRows = new ArrayList<RowData>(chunkSize);
 
       RowDataReader reader = RowDataReaderFactory.createReader(info, toDelete);
       while (rs.next()) {
@@ -320,7 +320,7 @@ public class TableDeleteSync
     ResultSet rs = null;
     try {
       rs = checkStatement.executeQuery(sql);
-      List<RowData> checkRows = new ArrayList<>(referenceRows.size());
+      List<RowData> checkRows = new ArrayList<RowData>(referenceRows.size());
       ResultInfo ri = new ResultInfo(rs.getMetaData(), reference);
       RowDataReader reader = RowDataReaderFactory.createReader(ri, reference);
       while (rs.next()) {

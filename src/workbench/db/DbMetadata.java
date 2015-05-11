@@ -129,7 +129,7 @@ public class DbMetadata
   private ProcedureReader procedureReader;
   private SchemaInformationReader schemaInfoReader;
   private IndexReader indexReader;
-  private List<ObjectListExtender> extenders = new ArrayList<>();
+  private List<ObjectListExtender> extenders = new ArrayList<ObjectListExtender>();
   private DbmsOutput oraOutput;
   private boolean isOracle;
   private boolean isPostgres;
@@ -519,7 +519,7 @@ public class DbMetadata
   }
 
   public String[] getTablesAndViewTypes() {
-    List<String> types = new ArrayList<>(tableTypesList);
+    List<String> types = new ArrayList<String>(tableTypesList);
     types.add(getViewTypeName());
     return types.toArray(EMPTY_STRING_ARRAY);
   }
@@ -529,7 +529,7 @@ public class DbMetadata
   }
 
   public List<String> getTableTypes() {
-    return new ArrayList<>(tableTypesList);
+    return new ArrayList<String>(tableTypesList);
   }
 
   public String getMViewTypeName() {
@@ -767,7 +767,7 @@ public class DbMetadata
     Set<String> result;
     String ids = Settings.getInstance().getProperty("workbench.sql.ignore" + type + "." + this.getDbId(), defaultList);
     if (ids != null) {
-      result = new TreeSet<>(StringUtil.stringToList(ids, ","));
+      result = new TreeSet<String>(StringUtil.stringToList(ids, ","));
     } else {
       result = Collections.emptySet();
     }
@@ -1201,7 +1201,7 @@ public class DbMetadata
   private String[] cleanupTypes(String[] types) {
     if (types == null || types.length == 0) return types;
 
-    List<String> typesToUse = new ArrayList<>(types.length);
+    List<String> typesToUse = new ArrayList<String>(types.length);
 
     Collection<String> nativeTypes = retrieveTableTypes();
     for (String type : types) {
@@ -1983,7 +1983,7 @@ public class DbMetadata
       throws SQLException {
     DataStore ds = getObjects(catalogPattern, schemaPattern, namePattern, types);
     int count = ds.getRowCount();
-    List<TableIdentifier> tables = new ArrayList<>(count);
+    List<TableIdentifier> tables = new ArrayList<TableIdentifier>(count);
     for (int i = 0; i < count; i++) {
       TableIdentifier tbl = buildTableIdentifierFromDs(ds, i);
       tables.add(tbl);
@@ -2138,7 +2138,7 @@ public class DbMetadata
    * @see ObjectNameFilter#isExcluded(java.lang.String)
    */
   public List<String> getSchemas(ObjectNameFilter filter) {
-    ArrayList<String> result = new ArrayList<>();
+    ArrayList<String> result = new ArrayList<String>();
     ResultSet rs = null;
 
     boolean useColumnNames = dbSettings.useColumnNameForMetadata();

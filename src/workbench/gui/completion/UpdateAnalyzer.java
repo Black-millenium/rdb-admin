@@ -120,7 +120,7 @@ public class UpdateAnalyzer
    * Package visible for testing purposes.
    */
   List<ColumnInfo> getColumns() {
-    List<ColumnInfo> result = new ArrayList<>();
+    List<ColumnInfo> result = new ArrayList<ColumnInfo>();
 
     SQLLexer lexer = SQLLexerFactory.createLexer(dbConnection, sql);
     SQLToken t = lexer.getNextToken(false, false);
@@ -188,7 +188,7 @@ public class UpdateAnalyzer
     char schemaSep = SqlUtil.getSchemaSeparator(dbConnection);
     String table = SqlUtil.getUpdateTable(this.sql, catalogSeparator, dbConnection);
     TableAlias a = new TableAlias(table, catalogSeparator, schemaSep);
-    List<TableAlias> result = new ArrayList<>(1);
+    List<TableAlias> result = new ArrayList<TableAlias>(1);
     result.add(a);
     return result;
   }
